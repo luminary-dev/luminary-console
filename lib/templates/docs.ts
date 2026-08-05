@@ -2,7 +2,7 @@
 // All money values are pre-formatted strings ("LKR 35,000" / "35,000") so the
 // model owns rounding/formatting and the templates stay dumb.
 import type { ClientRecord, DocType } from "../types";
-import { esc, paras, clientBlock, metaRow, shell, type Mode } from "./shell";
+import { esc, paras, clientBlock, metaRow, policyBox, shell, type Mode } from "./shell";
 
 export type EstimateData = {
   confidence: string;
@@ -121,6 +121,7 @@ export function renderEstimate(d: EstimateData, ctx: Ctx): string {
       <div class="t-note">${esc(d.totalNote)}</div>
     </div></div>
     ${scaling}
+    ${policyBox()}
     <div class="cols2">
       <div><div class="sec-k">What could change it</div><div class="small">${esc(d.changeFactors)}</div></div>
       <div><div class="sec-k">Next step</div><div class="small">${esc(d.nextStep)}</div></div>
@@ -165,7 +166,8 @@ export function renderQuotation(d: QuotationData, ctx: Ctx): string {
       <div class="sec-k">Payment terms</div>
       <ul class="ticks">${d.paymentTerms.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
     </div>
-    <div class="section"><div class="sec-k">Notes</div><div class="small">${esc(d.notes)}</div></div>`;
+    <div class="section"><div class="sec-k">Notes</div><div class="small">${esc(d.notes)}</div></div>
+    <div class="section"><div class="sec-k">Accepting this quotation</div><div class="small">Reply by email confirming acceptance, or sign the accompanying Services Agreement — we'll then send the advance invoice and book your slot. The payment terms above form part of this quotation.</div></div>`;
   return shell({
     mode: ctx.mode,
     title: `Quotation ${ctx.docNo} — ${ctx.client.company}`,
@@ -198,7 +200,10 @@ export function renderInvoice(d: InvoiceData, ctx: Ctx): string {
       <div class="t-main"><b>Amount due</b><span class="val">${esc(d.total)}</span></div>
       <div class="t-note">Due ${esc(d.dueDate)}</div>
     </div></div>
-    <div class="box"><div class="sec-k">Payment</div><div class="small">${paras(d.paymentNote)}</div></div>`;
+    <div class="box"><div class="sec-k">Payment</div><div class="small">${paras(d.paymentNote)}${
+      process.env.BANK_DETAILS ? `<div style="margin-top:8px;">${paras(process.env.BANK_DETAILS)}</div>` : ""
+    }</div></div>
+    <div class="section"><div class="small">Please reference <b>${esc(ctx.docNo)}</b> with your transfer. Any remaining balance falls due on delivery, payable before final handover. Work beyond the agreed scope is quoted separately as a written change order.</div></div>`;
   return shell({
     mode: ctx.mode,
     title: `Invoice ${ctx.docNo} — ${ctx.client.company}`,
@@ -231,7 +236,7 @@ export function renderReceipt(d: ReceiptData, ctx: Ctx): string {
       <div class="t-main"><b>Total received</b><span class="val">${esc(d.totalReceived)}</span></div>
       <div class="t-note">${esc(d.balanceNote)}</div>
     </div></div>
-    <div class="box"><div class="small">Thank you — this receipt confirms payment received by Luminary Studio. Keep it for your records.</div></div>`;
+    <div class="box"><div class="small">Thank you — this receipt confirms payment received by Luminary Studio. Keep it for your records. Any remaining balance falls due on delivery, payable before final handover; the 30-day post-launch defect warranty runs from the launch date.</div></div>`;
   return shell({
     mode: ctx.mode,
     title: `Receipt ${ctx.docNo} — ${ctx.client.company}`,
@@ -324,6 +329,7 @@ export function renderProposal(d: ProposalData, ctx: Ctx): string {
       <div class="t-main"><b>Investment</b><span class="val" style="font-size:15px;">${esc(d.investment)}</span></div>
       <div class="t-note">Valid until ${esc(d.validUntil)}</div>
     </div></div>
+    ${policyBox()}
     <div class="cols2">
       <div><div class="sec-k">Why Luminary</div><div class="small">${esc(d.whyUs)}</div></div>
       <div><div class="sec-k">Next steps</div><div class="small">${esc(d.nextSteps)}</div></div>

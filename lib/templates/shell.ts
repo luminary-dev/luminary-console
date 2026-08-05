@@ -122,6 +122,23 @@ html[data-reveal] *{transition:none!important;}
 }
 `;
 
+// Studio-standard commercial terms — rendered by the TEMPLATES (not the AI),
+// so no generated document can ever omit them.
+export const POLICY_ITEMS = [
+  "50% advance to begin; the balance falls due on delivery and is payable before final handover (DNS cutover / file transfer).",
+  "Every fixed price includes two revision rounds at design stage and one at build stage.",
+  "Changes beyond the agreed scope — at any stage, including after the advance is paid — are quoted first as a written change order and built only once approved; change orders may adjust the timeline.",
+  "A 30-day post-launch warranty covers defects at no charge (new features excluded); ongoing hosting & care is available as a monthly plan.",
+  "Intellectual property transfers to you on receipt of full payment.",
+];
+
+export function policyBox(title = "How payment & changes work"): string {
+  return `<div class="box">
+    <div class="sec-k">${esc(title)}</div>
+    <ul class="ticks">${POLICY_ITEMS.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
+  </div>`;
+}
+
 export function metaRow(k: string, v: string, mono = false): string {
   return `<div class="meta-row"><span>${esc(k)}</span><span${mono ? ' class="mono"' : ""}>${esc(v)}</span></div>`;
 }
