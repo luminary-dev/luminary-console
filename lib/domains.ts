@@ -44,9 +44,9 @@ async function cloudflareCname(slug: string): Promise<string> {
   );
   const data = await res.json();
   if (!data.success) {
-    // 81057/81058 = record already exists — that's fine.
+    // 81053/81057/81058 = a record with that host already exists — that's fine.
     const codes = (data.errors ?? []).map((e: { code: number }) => e.code);
-    if (codes.includes(81057) || codes.includes(81058)) return "cname exists";
+    if (codes.some((c: number) => [81053, 81057, 81058].includes(c))) return "cname exists";
     throw new Error(`Cloudflare: ${JSON.stringify(data.errors)}`);
   }
   return "cname created";
