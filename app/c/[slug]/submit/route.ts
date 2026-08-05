@@ -57,6 +57,10 @@ export async function POST(
   }
 
   try {
+    const prevAnswers =
+      !client.submissions && client.answersAt && client.answersUrl && client.answersPdfUrl
+        ? { at: client.answersAt, by: client.answersBy ?? "—", answersUrl: client.answersUrl, pdfUrl: client.answersPdfUrl }
+        : null;
     const submittedAt = nowLabel();
     const pdf = await renderPdf(renderAnswers(client, answers, submittedAt));
     const answersUrl = await putAsset(`clients/${slug}/answers.json`, JSON.stringify(answers), "application/json");
@@ -66,8 +70,15 @@ export async function POST(
     client.answersPdfUrl = answersPdfUrl;
     client.answersAt = submittedAt;
     client.answersBy = contactName;
+    // Seed the history with the pre-history submission if this record predates
+    // the submissions field.
+    const history =
+      client.submissions ??
+      (prevAnswers
+        ? [prevAnswers]
+        : []);
     client.submissions = [
-      ...(client.submissions ?? []),
+      ...history,
       { at: submittedAt, by: contactName, answersUrl, pdfUrl: answersPdfUrl },
     ];
     if (client.status === "created") client.status = "answers_in";
