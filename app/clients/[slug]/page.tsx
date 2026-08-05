@@ -47,9 +47,10 @@ export default async function ClientPage({
             <CopyLink url={`${base}/questionnaire`} />
           </div>
           {ORDER.filter((t) => client.docs[t]?.status === "published").map((t) => (
-            <div key={t}>
-              <span className="k" style={{ marginRight: 10 }}>{DOC_LABELS[t]}</span>
+            <div key={t} style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
+              <span className="k" style={{ marginRight: -4 }}>{DOC_LABELS[t]}</span>
               <CopyLink url={`${base}/${t}`} />
+              <CopyLink url={`${base}/${t}/pdf`} />
             </div>
           ))}
         </div>
@@ -88,6 +89,26 @@ export default async function ClientPage({
             </tr>
           </thead>
           <tbody>
+            <tr>
+              <td style={{ fontWeight: 600 }}>Questionnaire</td>
+              <td className="mono">LUM-QST-{client.docNoBase}</td>
+              <td>
+                <span className={`pill${client.answersAt ? "" : " grey"}`}>
+                  <i />
+                  {client.answersAt ? "answers in" : "live"}
+                </span>
+              </td>
+              <td>
+                <a href={`${base}/questionnaire`} target="_blank" rel="noopener noreferrer">Form</a>
+                {client.answersPdfUrl && (
+                  <>
+                    {" · "}
+                    <a href={client.answersPdfUrl} target="_blank" rel="noopener noreferrer">Answers PDF</a>
+                  </>
+                )}
+              </td>
+              <td style={{ color: "var(--subtle)" }}>—</td>
+            </tr>
             {ORDER.map((t) => {
               const meta = client.docs[t];
               const billing = t === "invoice" || t === "receipt";

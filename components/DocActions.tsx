@@ -58,12 +58,12 @@ export default function DocActions({
         )}
         {exists && (
           <button className="btn ghost small" disabled={!!busy} onClick={() => setShowRevise((s) => !s)}>
-            Revise…
+            Revise
           </button>
         )}
         {!exists && billing && (
           <button className="btn small" disabled={!!busy} onClick={() => setShowRevise((s) => !s)}>
-            Generate…
+            Generate
           </button>
         )}
       </div>
