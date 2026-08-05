@@ -19,6 +19,10 @@ export async function proxy(request: NextRequest) {
     host.endsWith(`.${ROOT}`) && host !== CONSOLE_HOST && host !== ROOT;
 
   if (isClientHost) {
+    // Shared assets (favicon etc.) resolve as-is on client hosts.
+    if (pathname === "/icon.svg" || pathname === "/favicon.ico") {
+      return NextResponse.next();
+    }
     const slug = host.slice(0, -(ROOT.length + 1));
     // Client hosts may only reach client-site routes.
     const url = request.nextUrl.clone();
