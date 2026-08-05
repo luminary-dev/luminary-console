@@ -22,6 +22,9 @@ export type Mode = "web" | "pdf";
 
 const CSS = `
 :root{--bg:#ffffff;--off:#f7f7f5;--text:#0d0d0f;--muted:#6b7280;--subtle:#c4c4c8;--border:rgba(0,0,0,.09);--border-hi:rgba(0,0,0,.14);--accent:#84cc16;--a-text:#5a9e08;--a-dim:rgba(132,204,22,.09);--a-border:rgba(132,204,22,.28);--desk:#f0f0ee;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:'Outfit',system-ui,sans-serif;}
+html[data-theme="dark"]{--bg:#0b0b0d;--off:#141416;--text:#f4f4f5;--muted:#8a8a92;--subtle:#3f3f46;--border:rgba(255,255,255,.09);--border-hi:rgba(255,255,255,.16);--accent:#a3e635;--a-text:#a3e635;--a-dim:rgba(163,230,53,.09);--a-border:rgba(163,230,53,.22);--desk:#050506;}
+html{color-scheme:light;}
+html[data-theme="dark"]{color-scheme:dark;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--desk);font-family:var(--sans);color:var(--text);font-size:13.5px;line-height:1.6;}
 a{color:var(--a-text);text-decoration:none;}
@@ -86,8 +89,23 @@ a{color:var(--a-text);text-decoration:none;}
 .a p+p{margin-top:5px;}
 .a .empty{color:var(--subtle);}
 @page{size:A4;margin:14mm 0 16mm;}
-@media print{.toolbar{display:none!important;}body{background:#fff;}.sheet{border:none;border-radius:0;margin:0;width:100%;}}
-@media (max-width:640px){.sheet{padding:28px 20px;}.meta,.cols2,.sig{grid-template-columns:1fr;}}
+@media print{
+ /* Documents always print light, whatever the on-screen theme. */
+ :root,html[data-theme="dark"]{--bg:#ffffff;--off:#f7f7f5;--text:#0d0d0f;--muted:#6b7280;--subtle:#c4c4c8;--border:rgba(0,0,0,.09);--border-hi:rgba(0,0,0,.14);--accent:#84cc16;--a-text:#5a9e08;--a-dim:rgba(132,204,22,.09);--a-border:rgba(132,204,22,.28);--desk:#ffffff;}
+ .toolbar{display:none!important;}body{background:#fff;}.sheet{border:none;border-radius:0;margin:0;width:100%;}
+}
+@media (max-width:640px){
+ .sheet{padding:28px 18px;}
+ .meta,.cols2,.sig{grid-template-columns:1fr;gap:18px;}
+ .doc-title,.head>div:last-child{text-align:left;}
+ .tbl-head{display:none;}
+ .tbl-row{display:flex!important;flex-wrap:wrap;gap:4px 12px;align-items:baseline;border-top:1px solid var(--border);border-bottom:none;padding:12px 0;}
+ .tbl-row>div{min-width:0;}
+ .tbl-row>.mono:first-child{display:none;}
+ .tbl-row .amt{margin-left:auto;}
+ .totals-box{width:100%;}
+ .toolbar{top:auto;bottom:14px;right:14px;}
+}
 `;
 
 export function metaRow(k: string, v: string, mono = false): string {
@@ -123,7 +141,12 @@ export function shell(opts: {
 }): string {
   const toolbar =
     opts.mode === "web"
-      ? `<div class="toolbar">${opts.pdfHref ? `<a href="${opts.pdfHref}">DOWNLOAD PDF</a>` : ""}<button onclick="window.print()">PRINT</button></div>`
+      ? `<div class="toolbar"><button onclick="var d=document.documentElement;var n=d.dataset.theme==='dark'?'light':'dark';d.dataset.theme=n;try{localStorage.setItem('luminary-theme',n);document.cookie='luminary-theme='+n+';path=/;max-age=31536000;samesite=lax'}catch(e){}">THEME</button>${opts.pdfHref ? `<a href="${opts.pdfHref}">PDF</a>` : ""}<button onclick="window.print()">PRINT</button></div>`
+      : "";
+  // Pre-paint theme pick (web only): saved choice, else system preference.
+  const themeScript =
+    opts.mode === "web"
+      ? `<script>(function(){var d=document.documentElement;var t=null;try{t=localStorage.getItem('luminary-theme')}catch(e){}if(t!=='light'&&t!=='dark'){try{t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}catch(e){t='light'}}d.dataset.theme=t;})();</script>`
       : "";
   return `<!DOCTYPE html>
 <html lang="en">
@@ -132,6 +155,7 @@ export function shell(opts: {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>${esc(opts.title)}</title>
+${themeScript}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>${CSS}</style>

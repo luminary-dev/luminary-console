@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClient } from "@/lib/store";
 import { DOC_LABELS, type DocType } from "@/lib/types";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,9 @@ export default async function ClientHome({
 
   return (
     <main className="sheet" style={{ maxWidth: 640 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+        <ThemeToggle />
+      </div>
       <div className="brand" style={{ fontSize: 26 }}>
         Luminary<span>.</span>
       </div>

@@ -5,6 +5,7 @@ import { DOC_LABELS, type DocType } from "@/lib/types";
 import DocActions from "@/components/DocActions";
 import CopyLink from "@/components/CopyLink";
 import RetryStage2 from "@/components/RetryStage2";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -27,9 +28,12 @@ export default async function ClientPage({
           Luminary<span>.</span>
           <small>{client.company}</small>
         </div>
-        <Link className="btn ghost small" href="/">
-          ← Dashboard
-        </Link>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <ThemeToggle />
+          <Link className="btn ghost small" href="/">
+            ← Dashboard
+          </Link>
+        </div>
       </div>
 
       <div className="card">
@@ -73,7 +77,7 @@ export default async function ClientPage({
 
       <div className="card">
         <h3>Documents</h3>
-        <table className="list">
+        <div className="table-scroll"><table className="list">
           <thead>
             <tr>
               <th>Document</th>
@@ -125,7 +129,7 @@ export default async function ClientPage({
               );
             })}
           </tbody>
-        </table>
+        </table></div>
         {client.status === "answers_in" && !client.docs.quotation && (
           <div className="notice" style={{ marginTop: 14 }}>
             Answers are in — drafting runs automatically in the background. If the drafts don&apos;t

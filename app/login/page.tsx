@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function LoginPage() {
   const [password, setPassword] = useState("");
@@ -29,7 +30,10 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="sheet" style={{ maxWidth: 420, marginTop: "18vh" }}>
+    <main className="sheet" style={{ maxWidth: 420, marginTop: "14vh" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+        <ThemeToggle />
+      </div>
       <div className="brand" style={{ fontSize: 26 }}>
         Luminary<span>.</span>
       </div>

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getClient } from "@/lib/store";
 import { buildSections } from "@/lib/questions";
 import QuestionnaireForm from "@/components/QuestionnaireForm";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,9 @@ export default async function QuestionnairePage({
 
   return (
     <main className="sheet">
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 14 }}>
+        <ThemeToggle />
+      </div>
       <div className="doc-head">
         <div>
           <div className="brand" style={{ fontSize: 26 }}>

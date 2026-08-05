@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function NewClientPage() {
   const router = useRouter();
@@ -47,9 +48,12 @@ export default function NewClientPage() {
           Luminary<span>.</span>
           <small>New client</small>
         </div>
-        <Link className="btn ghost small" href="/">
-          ← Dashboard
-        </Link>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <ThemeToggle />
+          <Link className="btn ghost small" href="/">
+            ← Dashboard
+          </Link>
+        </div>
       </div>
 
       <form className="card" onSubmit={submit}>

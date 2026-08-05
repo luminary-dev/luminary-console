@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getIndex } from "@/lib/store";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +20,12 @@ export default async function Dashboard() {
           Luminary<span>.</span>
           <small>Console</small>
         </div>
-        <Link className="btn" href="/clients/new">
-          + New client
-        </Link>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <ThemeToggle />
+          <Link className="btn" href="/clients/new">
+            + New client
+          </Link>
+        </div>
       </div>
 
       <div className="card">
@@ -32,7 +36,7 @@ export default async function Dashboard() {
             generated automatically.
           </p>
         ) : (
-          <table className="list">
+          <div className="table-scroll"><table className="list">
             <thead>
               <tr>
                 <th>Client</th>
@@ -60,7 +64,7 @@ export default async function Dashboard() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
     </main>
