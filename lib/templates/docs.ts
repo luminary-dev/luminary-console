@@ -265,8 +265,9 @@ export function renderContract(d: ContractData, ctx: Ctx): string {
     </div>
     ${d.clauses
       .map(
+        // The template owns clause numbering — strip any the model added.
         (c, i) => `<div class="clause">
-          <div class="clause-t">${i + 1}. ${esc(c.title)}</div>
+          <div class="clause-t">${i + 1}. ${esc(c.title.replace(/^\d+[.)]\s*/, ""))}</div>
           ${paras(c.body)}
         </div>`,
       )
