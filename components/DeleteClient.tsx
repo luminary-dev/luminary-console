@@ -11,7 +11,7 @@ export default function DeleteClient({ slug, company }: { slug: string; company:
   const run = async () => {
     // Irreversible → re-authenticate: the console password is required again.
     const password = window.prompt(
-      `Delete ${company} completely?\n\nThis removes every document, the questionnaire answers, the ${slug}.luminary-dev.xyz subdomain and its DNS record. This cannot be undone.\n\nEnter the console password to confirm:`,
+      `Delete ${company} completely?\n\nEvery document (PDFs of all docs, invoices, receipts and questionnaire answers) is first emailed to the studio as an archive, then the documents, subdomain and DNS record are removed. This cannot be undone.\n\nEnter the console password to confirm:`,
     );
     if (!password) return;
     setBusy(true);

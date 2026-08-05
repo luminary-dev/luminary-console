@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { getClient, deleteClient } from "@/lib/store";
 import { removeClientDomain } from "@/lib/domains";
+import { emailStudio } from "@/lib/email";
+import { DOC_LABELS } from "@/lib/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 export async function GET(
   _req: Request,
@@ -31,7 +33,41 @@ export async function DELETE(
   }
   const client = await getClient(slug);
   if (!client) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  // Archive first: every PDF the project produced is emailed to the studio
+  // before anything is destroyed, so deletion never loses a document.
+  const files: { filename: string; pdfUrl: string }[] = [];
+  for (const meta of Object.values(client.docs)) {
+    if (meta) files.push({ filename: `${DOC_LABELS[meta.type]} - ${meta.no}.pdf`, pdfUrl: meta.pdfUrl });
+  }
+  for (const b of client.billing ?? []) {
+    files.push({ filename: `${b.stage} ${DOC_LABELS[b.kind]} - ${b.no}.pdf`, pdfUrl: b.pdfUrl });
+  }
+  for (const [i, sub] of (client.submissions ?? []).entries()) {
+    files.push({ filename: `Questionnaire answers ${i + 1} (${sub.by}).pdf`, pdfUrl: sub.pdfUrl });
+  }
+  if (!client.submissions?.length && client.answersPdfUrl) {
+    files.push({ filename: `Questionnaire answers (${client.answersBy ?? "client"}).pdf`, pdfUrl: client.answersPdfUrl });
+  }
+  const attachments = (
+    await Promise.all(
+      files.map(async (f) => {
+        const res = await fetch(f.pdfUrl, { cache: "no-store" }).catch(() => null);
+        if (!res || !res.ok) return null;
+        return { filename: `${client.company} - ${f.filename}`, content: Buffer.from(await res.arrayBuffer()) };
+      }),
+    )
+  ).filter(Boolean) as { filename: string; content: Buffer }[];
+
+  await emailStudio(
+    `Archive before deletion — ${client.company}`,
+    `<p><strong>${client.company}</strong> (${client.slug}) is being deleted from the console. Every document the project produced is attached for your records:</p>
+<ul>${attachments.map((a) => `<li>${a.filename}</li>`).join("")}</ul>
+<p>Brief, for the record:</p><p style="color:#6b7280;">${client.brief}</p>`,
+    attachments,
+  );
+
   const domainNotes = await removeClientDomain(slug);
   const blobsDeleted = await deleteClient(slug);
-  return NextResponse.json({ ok: true, blobsDeleted, domainNotes });
+  return NextResponse.json({ ok: true, blobsDeleted, domainNotes, archived: attachments.length });
 }
