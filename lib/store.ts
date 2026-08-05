@@ -1,0 +1,94 @@
+// Vercel Blob-backed storage. Every write creates a new random-suffixed blob
+// (immutable URLs — no CDN staleness); reads resolve "latest version" via
+// list(prefix) ordered by upload time. Old versions are pruned best-effort.
+import { put, list, del } from "@vercel/blob";
+import type { ClientRecord, IndexEntry } from "./types";
+
+const PREFIX = "console/";
+
+async function latestUrl(pathname: string): Promise<string | null> {
+  const { blobs } = await list({ prefix: pathname, limit: 20 });
+  const exact = blobs
+    .filter((b) => b.pathname.startsWith(pathname))
+    .sort((a, b) => +new Date(b.uploadedAt) - +new Date(a.uploadedAt));
+  return exact[0]?.url ?? null;
+}
+
+async function readJson<T>(pathname: string): Promise<T | null> {
+  const url = await latestUrl(pathname);
+  if (!url) return null;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return null;
+  return (await res.json()) as T;
+}
+
+async function writeJson(pathname: string, data: unknown): Promise<string> {
+  const blob = await put(pathname, JSON.stringify(data), {
+    access: "public",
+    addRandomSuffix: true,
+    contentType: "application/json",
+  });
+  pruneOld(pathname, blob.url); // fire and forget
+  return blob.url;
+}
+
+async function pruneOld(pathname: string, keepUrl: string) {
+  try {
+    const { blobs } = await list({ prefix: pathname, limit: 50 });
+    const stale = blobs.filter((b) => b.url !== keepUrl).map((b) => b.url);
+    if (stale.length) await del(stale);
+  } catch {
+    /* best effort */
+  }
+}
+
+/** Store an asset (doc HTML / PDF); returns its immutable URL. */
+export async function putAsset(
+  pathname: string,
+  body: string | Buffer,
+  contentType: string,
+): Promise<string> {
+  const blob = await put(`${PREFIX}${pathname}`, body, {
+    access: "public",
+    addRandomSuffix: true,
+    contentType,
+  });
+  return blob.url;
+}
+
+export async function fetchAsset(url: string): Promise<Response> {
+  return fetch(url, { cache: "no-store" });
+}
+
+// ——— clients ———
+
+export async function getIndex(): Promise<IndexEntry[]> {
+  return (await readJson<IndexEntry[]>(`${PREFIX}index.json`)) ?? [];
+}
+
+export async function getClient(slug: string): Promise<ClientRecord | null> {
+  return readJson<ClientRecord>(`${PREFIX}clients/${slug}/record.json`);
+}
+
+export async function saveClient(record: ClientRecord): Promise<void> {
+  await writeJson(`${PREFIX}clients/${record.slug}/record.json`, record);
+  const index = await getIndex();
+  const entry: IndexEntry = {
+    slug: record.slug,
+    company: record.company,
+    status: record.status,
+    createdAt: record.createdAt,
+    docNoBase: record.docNoBase,
+  };
+  const i = index.findIndex((e) => e.slug === record.slug);
+  if (i >= 0) index[i] = entry;
+  else index.push(entry);
+  await writeJson(`${PREFIX}index.json`, index);
+}
+
+/** Next shared doc number, zero-padded. Starts after the manual 0043 docs. */
+export async function nextDocNoBase(): Promise<string> {
+  const index = await getIndex();
+  const max = index.reduce((m, e) => Math.max(m, parseInt(e.docNoBase, 10) || 0), 43);
+  return String(max + 1).padStart(4, "0");
+}
