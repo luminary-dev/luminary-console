@@ -206,7 +206,7 @@ export async function stage1(client: ClientRecord, today: string): Promise<Stage
 ${clientContext(client)}
 
 Draft, for this new client:
-1. estimate — a budgetary estimate from the operator brief. Follow any figures in the brief exactly; include a cost-scaling table when the deliverable naturally scales (pages, items, locations), otherwise null.
+1. estimate — a budgetary estimate from the operator brief. Follow any figures in the brief exactly: when the brief prices the workstreams, use ONLY those workstreams as line items (fold sub-tasks like forms, SEO and deployment into their descriptions) so the totals equal the brief's figures. Include a cost-scaling table when the deliverable naturally scales (pages, items, locations), otherwise null.
 2. projectLabel — a short project label.
 3. extraQuestions — up to 4 discovery questions specific to this client's industry/situation that our standard questionnaire (business, goals, customers, brand assets, design, content, practical, timeline) wouldn't already cover. Only genuinely useful ones; empty array is fine.`;
   return generate<Stage1Result>(prompt, STAGE1_SCHEMA);
