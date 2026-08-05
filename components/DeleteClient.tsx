@@ -9,15 +9,18 @@ export default function DeleteClient({ slug, company }: { slug: string; company:
   const [error, setError] = useState<string | null>(null);
 
   const run = async () => {
-    if (
-      !window.confirm(
-        `Delete ${company} completely?\n\nThis removes every document, the questionnaire answers, the ${slug}.luminary-dev.xyz subdomain and its DNS record. This cannot be undone.`,
-      )
-    )
-      return;
+    // Irreversible → re-authenticate: the console password is required again.
+    const password = window.prompt(
+      `Delete ${company} completely?\n\nThis removes every document, the questionnaire answers, the ${slug}.luminary-dev.xyz subdomain and its DNS record. This cannot be undone.\n\nEnter the console password to confirm:`,
+    );
+    if (!password) return;
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}`, { method: "DELETE" });
+    const res = await fetch(`/api/clients/${slug}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
     if (res.ok) {
       router.push("/");
       router.refresh();

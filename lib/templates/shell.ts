@@ -83,8 +83,19 @@ a{color:var(--a-text);text-decoration:none;}
 .foot{margin-top:26px;padding-top:12px;border-top:1px solid var(--border);text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);}
 .toolbar{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:10;}
 .toolbar a,.toolbar button{border:none;cursor:pointer;background:var(--text);color:var(--bg);border-radius:100px;padding:8px 18px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;}
+.theme-toggle{position:relative;width:52px;height:28px;flex-shrink:0;border:1px solid var(--border)!important;border-radius:100px;background:var(--off)!important;cursor:pointer;padding:0!important;box-shadow:inset 2px 2px 5px rgba(0,0,0,.12),inset -2px -2px 5px rgba(255,255,255,.6);align-self:center;}
+html[data-theme="dark"] .theme-toggle{box-shadow:inset 2px 2px 6px rgba(0,0,0,.55),inset -2px -2px 6px rgba(255,255,255,.04);}
+.theme-toggle:active{transform:scale(.96);}
+.theme-toggle__knob{position:absolute;top:50%;left:3px;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:var(--accent);color:#0d0d0f;display:flex;align-items:center;justify-content:center;transition:transform .3s cubic-bezier(.5,1.4,.6,1);}
+html[data-theme="dark"] .theme-toggle__knob{transform:translate(22px,-50%);}
+.theme-toggle__ico{position:absolute;display:flex;align-items:center;justify-content:center;}
+.theme-toggle__ico svg{width:12px;height:12px;}
+.theme-toggle__moon{display:none;}
+html[data-theme="dark"] .theme-toggle__sun{display:none;}
+html[data-theme="dark"] .theme-toggle__moon{display:flex;}
+html[data-reveal] *{transition:none!important;}
 .sow{width:100%;border-collapse:collapse;margin-top:6px;break-inside:avoid;}
-.sow th{text-align:left;vertical-align:top;width:132px;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--subtle);padding:9px 12px;border:1px solid var(--border-hi);background:var(--off);}
+.sow th{text-align:left;vertical-align:top;width:132px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:9px 12px;border:1px solid var(--border-hi);background:var(--off);}
 .sow td{padding:9px 12px;font-size:12.5px;border:1px solid var(--border-hi);line-height:1.6;}
 .qa{margin-top:13px;break-inside:avoid;}
 .q{font-size:12.5px;font-weight:600;}
@@ -144,12 +155,13 @@ export function shell(opts: {
 }): string {
   const toolbar =
     opts.mode === "web"
-      ? `<div class="toolbar"><button onclick="var d=document.documentElement;var n=d.dataset.theme==='dark'?'light':'dark';d.dataset.theme=n;try{localStorage.setItem('luminary-theme',n);document.cookie='luminary-theme='+n+';path=/;max-age=31536000;samesite=lax'}catch(e){}">THEME</button>${opts.pdfHref ? `<a href="${opts.pdfHref}">PDF</a>` : ""}<button onclick="window.print()">PRINT</button></div>`
+      ? `<div class="toolbar"><button class="theme-toggle" aria-label="Toggle light and dark theme" onclick="__flipTheme(this)"><span class="theme-toggle__knob"><span class="theme-toggle__ico theme-toggle__sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span><span class="theme-toggle__ico theme-toggle__moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span></span></button>${opts.pdfHref ? `<a href="${opts.pdfHref}">PDF</a>` : ""}<button onclick="window.print()">PRINT</button></div>`
       : "";
   // Pre-paint theme pick (web only): saved choice, else system preference.
   const themeScript =
     opts.mode === "web"
-      ? `<script>(function(){var d=document.documentElement;var t=null;try{t=localStorage.getItem('luminary-theme')}catch(e){}if(t!=='light'&&t!=='dark'){try{t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}catch(e){t='light'}}d.dataset.theme=t;})();</script>`
+      ? `<script>(function(){var d=document.documentElement;var t=null;try{t=localStorage.getItem('luminary-theme')}catch(e){}if(t!=='light'&&t!=='dark'){try{t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}catch(e){t='light'}}d.dataset.theme=t;})();
+function __flipTheme(btn){var d=document.documentElement;var next=d.dataset.theme==='dark'?'light':'dark';var apply=function(){d.dataset.theme=next;try{localStorage.setItem('luminary-theme',next);document.cookie='luminary-theme='+next+';path=/;max-age=31536000;samesite=lax'}catch(e){}};var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(!document.startViewTransition||reduce){apply();return}var r=btn.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;var rad=Math.hypot(Math.max(x,window.innerWidth-x),Math.max(y,window.innerHeight-y));var t=document.startViewTransition(function(){d.setAttribute('data-reveal','');apply()});t.ready.then(function(){d.animate({clipPath:['circle(0px at '+x+'px '+y+'px)','circle('+rad.toFixed(1)+'px at '+x+'px '+y+'px)']},{duration:600,easing:'linear',pseudoElement:'::view-transition-new(root)'})}).catch(function(){});t.finished.finally(function(){d.removeAttribute('data-reveal')})}</script>`
       : "";
   return `<!DOCTYPE html>
 <html lang="en">

@@ -21,6 +21,8 @@ Services: web design & development (Next.js/React), brand & graphic design, vide
 
 Currency & market: quote in Sri Lankan Rupees (LKR) unless the brief says otherwise. Calibration anchors for the local market: landing-page UX/design ≈ LKR 5,000–10,000; landing-page development ≈ LKR 30,000–40,000; multi-page sites 2–4 weeks; logos/flyers/short videos turn around in days. When the operator's brief states figures, treat those as authoritative and build ranges around them. Format money as "LKR 35,000" for totals and "35,000" or "5,000–10,000" for line amounts. Never invent certifications, client names, or capabilities Luminary doesn't have.
 
+Commercial policy (apply consistently in every document): 50% advance to begin work, balance due on delivery/launch and payable before final handover (DNS cutover / file transfer). Included in every fixed price: two revision rounds at design stage and one at build stage. Any change beyond the agreed scope — including changes requested during development or after the advance is paid — is quoted first as a written change order and only implemented once approved; change orders may adjust the timeline. After launch: a 30-day warranty window covering defects at no charge (new features excluded); ongoing hosting/care available as a separate monthly plan. Intellectual property transfers to the client on receipt of full payment.
+
 Tone: confident, warm, plain-spoken, precise — a senior studio writing to a client, never salesy or padded. Keep line-item descriptions to one line. British-adjacent Sri Lankan business English ("colour", "itemised").`;
 
 function extractJson<T>(msg: Anthropic.Message): T {
@@ -96,7 +98,7 @@ const QUOTATION_SCHEMA = S.obj(
     scopeSummary: { type: "string", description: "2-3 sentences of confirmed scope, grounded in the questionnaire answers." },
     items: S.arr(S.obj(["title", "desc", "amount"], { title: S.str, desc: S.str, amount: { type: "string", description: "e.g. '35,000'" } })),
     total: { type: "string", description: "e.g. 'LKR 45,000'" },
-    paymentTerms: { type: "array", items: S.str, description: "3-4 short terms, e.g. 50% advance to begin; balance on launch; includes N revision rounds." },
+    paymentTerms: { type: "array", items: S.str, description: "4-6 short terms covering the FULL money lifecycle: 50% advance to begin; balance due on delivery/launch before handover; included revision rounds; changes beyond scope quoted as written change orders before implementation; 30-day post-launch defect warranty; ongoing care available as a monthly plan." },
     notes: { type: "string", description: "One short paragraph: exclusions/assumptions." },
   },
 );
@@ -128,7 +130,7 @@ const CONTRACT_SCHEMA = S.obj(["agreementDate", "sow", "clauses"], {
   }),
   clauses: {
     type: "array",
-    description: "7-9 clauses: Scope of Services; Fees & Payment; Timeline & Client Responsibilities; Revisions; Intellectual Property; Confidentiality; Warranties & Liability; Termination; Governing Law (Sri Lanka). Plain-language but real.",
+    description: "9-11 clauses, plain-language but real: Scope of Services; Fees & Payment (advance, balance due on delivery before handover, late-payment handling); Revisions & Change Requests (included rounds; any change beyond scope — including during development or after the advance — is quoted as a written change order and approved before work, and may move the timeline); Timeline & Client Responsibilities; Intellectual Property (transfers on full payment); Confidentiality; Support & Warranty (30-day post-launch defect window; ongoing care as separate plan); Warranties & Liability; Termination; Governing Law (Sri Lanka).",
     items: S.obj(["title", "body"], { title: S.str, body: { type: "string", description: "2-5 sentences; newlines allowed" } }),
   },
 });

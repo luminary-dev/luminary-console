@@ -6,7 +6,7 @@ export default function CopyLink({ url }: { url: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <span style={{ display: "inline-flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-      <a href={url} target="_blank" rel="noopener noreferrer" className="mono" style={{ fontSize: 12.5 }}>
+      <a href={url} target="_blank" rel="noopener noreferrer" className="mono copy-url">
         {url.replace("https://", "")}
       </a>
       <button

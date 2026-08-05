@@ -15,12 +15,20 @@ export async function GET(
   return NextResponse.json(client);
 }
 
-/** Full teardown: documents, answers, record, DNS record, project domain. */
+/** Full teardown: documents, answers, record, DNS record, project domain.
+ *  Irreversible, so it re-verifies the console password on top of the
+ *  session cookie. */
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
+  const body = await req.json().catch(() => ({}));
+  const expected = process.env.ADMIN_PASSWORD;
+  if (!expected || body?.password !== expected) {
+    await new Promise((r) => setTimeout(r, 800));
+    return NextResponse.json({ error: "Wrong password — deletion cancelled." }, { status: 403 });
+  }
   const client = await getClient(slug);
   if (!client) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const domainNotes = await removeClientDomain(slug);

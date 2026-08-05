@@ -54,9 +54,33 @@ a:hover { color: var(--accent); }
 .btn.ghost { background: transparent; border: 1px solid var(--border-hi); color: var(--text); font-weight: 600; }
 .btn.small { padding: 6px 14px; font-size: 12px; }
 
-.btn-theme { border: 1px solid var(--border-hi); cursor: pointer; background: var(--bg); color: var(--text); border-radius: 100px; padding: 7px 14px; font-family: var(--font-mono), monospace; font-size: 11px; font-weight: 600; letter-spacing: .04em; display: inline-flex; align-items: center; gap: 7px; transition: border-color .15s ease; }
-.btn-theme:hover { border-color: var(--accent); }
-.btn-theme i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+/* Landing-page theme switch: sliding accent knob, sun/moon, circular wipe. */
+.theme-toggle {
+  position: relative; width: 52px; height: 28px; flex-shrink: 0;
+  border: 1px solid var(--border); border-radius: 100px;
+  background: var(--off); cursor: pointer; padding: 0;
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,.12), inset -2px -2px 5px rgba(255,255,255,.6);
+}
+html[data-theme="dark"] .theme-toggle {
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,.55), inset -2px -2px 6px rgba(255,255,255,.04);
+}
+.theme-toggle:active { transform: scale(.96); }
+.theme-toggle__knob {
+  position: absolute; top: 50%; left: 3px; transform: translateY(-50%);
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent); color: #0d0d0f;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .3s cubic-bezier(.5, 1.4, .6, 1);
+}
+html[data-theme="dark"] .theme-toggle__knob { transform: translate(22px, -50%); }
+.theme-toggle__ico { position: absolute; display: flex; align-items: center; justify-content: center; }
+.theme-toggle__ico svg { width: 12px; height: 12px; }
+.theme-toggle__moon { display: none; }
+html[data-theme="dark"] .theme-toggle__sun { display: none; }
+html[data-theme="dark"] .theme-toggle__moon { display: flex; }
+/* During the circular wipe, suppress colour transitions so the circle reveals
+   the fully recoloured page rather than a mid-lerp one. */
+html[data-reveal] *, html[data-reveal] body { transition: none !important; }
 
 .form-error { margin-top: 14px; padding: 12px 16px; border-radius: 10px; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.35); font-size: 13.5px; }
 .notice { margin-top: 14px; padding: 12px 16px; border-radius: 10px; background: var(--a-dim); border: 1px solid var(--a-border); font-size: 13.5px; }
@@ -72,7 +96,14 @@ table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font
   .card { padding: 16px 16px; }
   .table-scroll { margin: 8px -16px 0; padding: 0 16px; }
   .sheet { margin: 20px auto 48px; }
+  .brand small { display: block; margin: 6px 0 0; }
+  .meta-row { flex-wrap: wrap; }
+  .meta-row span:last-child { text-align: left; }
+  .doc-head { padding-bottom: 16px; }
+  .done { padding: 40px 4px 24px; }
 }
+/* Long client URLs must wrap inside cards on small screens. */
+.copy-url { font-size: 12.5px; word-break: break-all; }
 
 /* — forms (console + questionnaire) — */
 .q-line, .q-box, select.q-line {
