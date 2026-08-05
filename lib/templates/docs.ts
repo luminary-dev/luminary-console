@@ -254,12 +254,14 @@ export function renderContract(d: ContractData, ctx: Ctx): string {
     <div class="section">
       <div class="lead">This Agreement is made on <b>${esc(d.agreementDate)}</b> between <b>Luminary Studio</b> ("the Studio"), of Colombo, Sri Lanka, and <b>${esc(ctx.client.company)}</b> ("the Client")${ctx.client.address ? `, of ${esc(ctx.client.address)}` : ""}.</div>
     </div>
-    <div class="box">
+    <div class="section">
       <div class="sec-k">Statement of Work</div>
-      ${metaRow("Engagement", d.sow.engagement)}
-      ${metaRow("Term", d.sow.term)}
-      ${metaRow("Deliverables", d.sow.deliverables)}
-      ${metaRow("Fees", d.sow.fees, true)}
+      <table class="sow">
+        <tr><th>Engagement</th><td>${esc(d.sow.engagement)}</td></tr>
+        <tr><th>Term</th><td>${esc(d.sow.term)}</td></tr>
+        <tr><th>Deliverables</th><td>${esc(d.sow.deliverables)}</td></tr>
+        <tr><th>Fees</th><td class="mono" style="font-weight:600;">${esc(d.sow.fees)}</td></tr>
+      </table>
     </div>
     ${d.clauses
       .map(

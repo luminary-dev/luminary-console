@@ -83,6 +83,9 @@ a{color:var(--a-text);text-decoration:none;}
 .foot{margin-top:26px;padding-top:12px;border-top:1px solid var(--border);text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);}
 .toolbar{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:10;}
 .toolbar a,.toolbar button{border:none;cursor:pointer;background:var(--text);color:var(--bg);border-radius:100px;padding:8px 18px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;}
+.sow{width:100%;border-collapse:collapse;margin-top:6px;break-inside:avoid;}
+.sow th{text-align:left;vertical-align:top;width:132px;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--subtle);padding:9px 12px;border:1px solid var(--border-hi);background:var(--off);}
+.sow td{padding:9px 12px;font-size:12.5px;border:1px solid var(--border-hi);line-height:1.6;}
 .qa{margin-top:13px;break-inside:avoid;}
 .q{font-size:12.5px;font-weight:600;}
 .a{margin-top:5px;padding:9px 12px;background:var(--off);border:1px solid var(--border);border-radius:9px;font-size:12.5px;}
