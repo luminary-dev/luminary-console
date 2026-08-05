@@ -12,7 +12,6 @@ export default function NewClientPage() {
   const [f, setF] = useState({
     company: "",
     slug: "",
-    reg: "",
     address: "",
     email: "",
     phone: "",
@@ -68,10 +67,6 @@ export default function NewClientPage() {
             <input className="q-line" value={f.slug} onChange={set("slug")} placeholder="auto from name, e.g. eco-mech" />
           </div>
           <div className="q-field half">
-            <span className="q-label">Reg. no</span>
-            <input className="q-line" value={f.reg} onChange={set("reg")} />
-          </div>
-          <div className="q-field half">
             <span className="q-label">Contact person</span>
             <input className="q-line" value={f.contactName} onChange={set("contactName")} />
           </div>
@@ -91,9 +86,10 @@ export default function NewClientPage() {
             <div>
               <span className="q-label">Project brief <span className="req">*</span></span>
               <div className="q-hint">
-                What are we building and for how much? Figures you give are treated as authoritative —
-                e.g. &quot;Landing page. UX 5–10k, development 30–40k LKR. Client is an MEP engineering
-                firm bidding for hotel tenders in October.&quot;
+                What are we building and for how much? Figures you give are treated as authoritative.
+                Mention the reg. no here if you have it — it&apos;s picked up automatically. e.g.
+                &quot;Landing page. UX 5–10k, development 30–40k LKR. Reg no PV110496. Client is an MEP
+                engineering firm bidding for hotel tenders in October.&quot;
               </div>
             </div>
             <textarea className="q-box" rows={5} value={f.brief} onChange={set("brief")} required />

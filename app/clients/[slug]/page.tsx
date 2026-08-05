@@ -7,6 +7,7 @@ import CopyLink from "@/components/CopyLink";
 import RetryStage2 from "@/components/RetryStage2";
 import ThemeToggle from "@/components/ThemeToggle";
 import DeleteClient from "@/components/DeleteClient";
+import SendToClient from "@/components/SendToClient";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +61,11 @@ export default async function ClientPage({
             </div>
           ))}
         </div>
+        <SendToClient
+          slug={slug}
+          email={client.email}
+          publishedCount={ORDER.filter((t) => client.docs[t]?.status === "published").length}
+        />
         {client.dnsStatus !== "automated" && (
           <div className="form-error" style={{ marginTop: 14 }}>
             DNS is <b>{client.dnsStatus}</b> — the links above won&apos;t resolve until the CNAME
