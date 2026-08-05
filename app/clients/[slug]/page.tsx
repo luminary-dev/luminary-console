@@ -9,6 +9,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import DeleteClient from "@/components/DeleteClient";
 import SendToClient from "@/components/SendToClient";
 import BillingCard from "@/components/BillingCard";
+import EmailDocButton from "@/components/EmailDocButton";
 import ChangeOrders from "@/components/ChangeOrders";
 
 export const dynamic = "force-dynamic";
@@ -167,8 +168,10 @@ export default async function ClientPage({
                     )}
                   </td>
                   <td style={{ minWidth: 220 }}>
-                    <DocActions slug={slug} type={t} exists={!!meta} status={meta?.status} billing={false} />
-                    {billing && !meta ? null : null}
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
+                      <DocActions slug={slug} type={t} exists={!!meta} status={meta?.status} billing={false} />
+                      {meta && <EmailDocButton slug={slug} docKey={t} label={DOC_LABELS[t]} email={client.email} />}
+                    </div>
                   </td>
                 </tr>
               );
@@ -187,6 +190,7 @@ export default async function ClientPage({
         slug={slug}
         billing={client.billing ?? []}
         hasQuotation={!!client.docs.quotation}
+        email={client.email}
       />
 
       <ChangeOrders slug={slug} changeOrders={client.changeOrders ?? []} />

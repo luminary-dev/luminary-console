@@ -27,7 +27,7 @@ export default async function ClientHome({
   );
 
   return (
-    <main className="sheet" style={{ maxWidth: 640 }}>
+    <main className="sheet sheet--narrow">
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
         <ThemeToggle />
       </div>
@@ -39,18 +39,23 @@ export default async function ClientHome({
       </div>
       <div className="card" style={{ marginTop: 24 }}>
         <h3>Your documents</h3>
-        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
-          <Link href="/questionnaire">→ Project questionnaire</Link>
+        <div className="portal-links">
+          <Link className="portal-link" href="/questionnaire">
+            <span>Project questionnaire</span>
+            <span className="no">→</span>
+          </Link>
           {published.map((t) => (
-            <Link key={t} href={`/${t}`}>
-              → {DOC_LABELS[t]} ({client.docs[t]!.no})
+            <Link className="portal-link" key={t} href={`/${t}`}>
+              <span>{DOC_LABELS[t]}</span>
+              <span className="no">{client.docs[t]!.no} →</span>
             </Link>
           ))}
           {(client.billing ?? [])
             .filter((b) => b.status === "published")
             .map((b) => (
-              <Link key={b.slug} href={`/${b.slug}`}>
-                → {b.stage === "advance" ? "Advance" : b.stage === "final" ? "Final" : ""} {DOC_LABELS[b.kind]} ({b.no})
+              <Link className="portal-link" key={b.slug} href={`/${b.slug}`}>
+                <span>{b.stage === "advance" ? "Advance " : b.stage === "final" ? "Final " : ""}{DOC_LABELS[b.kind]}</span>
+                <span className="no">{b.no} →</span>
               </Link>
             ))}
         </div>

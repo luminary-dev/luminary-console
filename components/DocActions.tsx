@@ -74,7 +74,7 @@ export default function DocActions({
             rows={2}
             placeholder={
               exists
-                ? "Revision instructions for Claude — e.g. 'drop the total to 40,000 and add a maintenance line'"
+                ? "Revision instructions — e.g. 'drop the total to 40,000 and add a maintenance line'"
                 : "What to bill — e.g. '50% advance against the quotation' or 'receipt for 22,500 received today by bank transfer'"
             }
             value={instructions}
@@ -86,7 +86,7 @@ export default function DocActions({
             disabled={!!busy || (exists && !instructions.trim())}
             onClick={() => act(exists ? "regenerate" : "generate", { instructions })}
           >
-            {busy ? "Working… (takes ~30s)" : exists ? "Regenerate with Claude" : "Generate with Claude"}
+            {busy ? "Working… (takes ~30s)" : exists ? "Regenerate" : "Generate"}
           </button>
         </div>
       )}

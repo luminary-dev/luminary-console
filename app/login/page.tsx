@@ -30,7 +30,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="sheet" style={{ maxWidth: 420, marginTop: "14vh" }}>
+    <main className="sheet sheet--auth">
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
         <ThemeToggle />
       </div>

@@ -18,7 +18,7 @@ export default function SendToClient({
   const run = async () => {
     if (
       !window.confirm(
-        `Email ${email} the questionnaire link and ${publishedCount} published document${publishedCount === 1 ? "" : "s"} (links + PDFs)?`,
+        `Send ${email} ONE email containing:\n\n· the questionnaire link\n· all ${publishedCount} published document${publishedCount === 1 ? "" : "s"} — links + PDF attachments\n\nDrafts are never included. Send?`,
       )
     )
       return;

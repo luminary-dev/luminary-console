@@ -180,7 +180,7 @@ export async function runStage2(slug: string, answers: Answers, submittedAt: str
 
     await emailStudio(
       `Drafts ready — ${client.company} (quotation · proposal · contract)`,
-      `<p><strong>${client.company}</strong> submitted the questionnaire at ${submittedAt}, and Claude has drafted the follow-up documents from their answers.</p>
+      `<p><strong>${client.company}</strong> submitted the questionnaire at ${submittedAt}, and the follow-up documents have been drafted from their answers.</p>
 <p>All three are attached as PDFs and sitting in the console as <b>drafts</b> — nothing is client-visible until you publish:</p>
 <p><a href="https://${CONSOLE_HOST}/clients/${client.slug}">Review & publish in the console →</a></p>`,
       attachments,

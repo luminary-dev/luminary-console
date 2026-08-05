@@ -99,9 +99,9 @@ export default function NewClientPage() {
         {error && <div className="form-error">{error}</div>}
         {busy && (
           <div className="notice">
-            Working — Claude is drafting the estimate and tailoring the questionnaire, the documents
-            are being rendered to PDF, and the subdomain is being provisioned. This takes about a
-            minute; don&apos;t close the tab.
+            Working — the estimate is being drafted, the questionnaire tailored, the documents
+            rendered to PDF, and the subdomain provisioned. This takes about a minute; don&apos;t
+            close the tab.
           </div>
         )}
         <button className="btn" style={{ marginTop: 22 }} disabled={busy}>

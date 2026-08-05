@@ -96,7 +96,7 @@ export async function POST(
       `<p><strong>${contactName}</strong> submitted the ${client.company} discovery questionnaire at ${submittedAt} (Colombo)${submissionNo > 1 ? ` — this is submission #${submissionNo} for this client` : ""}.</p>
 <p>Full answers attached. ${
         willDraft
-          ? "Claude is drafting the quotation, proposal and contract now — a second email lands when they're ready."
+          ? "The quotation, proposal and contract are being drafted now — a second email lands when they're ready."
           : "Your existing quotation/proposal/contract were left untouched. To incorporate these new answers, use Revise on a document, or delete the drafts and press Draft now in the console."
       }</p>`,
       [{ filename, content: pdf }],

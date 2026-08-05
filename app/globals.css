@@ -31,6 +31,16 @@ a:hover { color: var(--accent); }
   background: var(--bg); border: 1px solid var(--border);
   border-radius: var(--r); padding: clamp(28px, 5vw, 52px);
 }
+.sheet--narrow { width: 640px; }
+.sheet--auth { width: 420px; margin-top: 14vh; }
+.portal-links { margin-top: 10px; }
+.portal-link {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 13px 2px; border-top: 1px solid var(--border);
+  font-size: 15px; font-weight: 600; min-height: 48px;
+}
+.portal-link:first-child { border-top: none; }
+.portal-link .no { font-family: var(--font-mono), monospace; font-size: 11px; color: var(--muted); font-weight: 500; flex-shrink: 0; }
 
 .topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0 4px; }
 .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; }

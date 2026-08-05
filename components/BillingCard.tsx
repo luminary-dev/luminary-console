@@ -9,14 +9,18 @@ import type { BillingDoc } from "@/lib/types";
 
 const STAGE_LABEL: Record<string, string> = { advance: "Advance", final: "Final", other: "" };
 
+import EmailDocButton from "./EmailDocButton";
+
 export default function BillingCard({
   slug,
   billing,
   hasQuotation,
+  email,
 }: {
   slug: string;
   billing: BillingDoc[];
   hasQuotation: boolean;
+  email?: string;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
@@ -113,13 +117,14 @@ export default function BillingCard({
                       <button className="btn ghost small" disabled={!!busy} onClick={() => setReviseFor(reviseFor === b.slug ? null : b.slug)}>
                         Revise
                       </button>
+                      <EmailDocButton slug={slug} docKey={b.slug} label={`${STAGE_LABEL[b.stage].toLowerCase()} ${b.kind}`} email={email} />
                     </div>
                     {reviseFor === b.slug && (
                       <div style={{ marginTop: 10 }}>
                         <textarea
                           className="q-box"
                           rows={2}
-                          placeholder="Revision instructions for Claude"
+                          placeholder="Revision instructions"
                           value={instructions}
                           onChange={(e) => setInstructions(e.target.value)}
                         />
@@ -129,7 +134,7 @@ export default function BillingCard({
                           disabled={!!busy || !instructions.trim()}
                           onClick={() => call({ action: "regenerate", doc: b.slug, instructions }, `rev-${b.slug}`)}
                         >
-                          {busy === `rev-${b.slug}` ? "Working… ~20s" : "Regenerate with Claude"}
+                          {busy === `rev-${b.slug}` ? "Working… ~20s" : "Regenerate"}
                         </button>
                       </div>
                     )}
