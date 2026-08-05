@@ -3,7 +3,7 @@
 // + PDF → publish → domain automation → studio email.
 // Stage 2 (answers in): answers PDF + emails, then Claude drafts quotation /
 // proposal / contract for review.
-import type { Answers, ClientRecord, DocMeta, DocType } from "./types";
+import type { Answers, BillingDoc, ClientRecord, DocMeta, DocType } from "./types";
 import { DOC_NO_PREFIX } from "./types";
 import { getClient, nextDocNoBase, putAsset, saveClient } from "./store";
 import { renderDoc, type EstimateData, type QuotationData } from "./templates/docs";
@@ -55,6 +55,45 @@ export async function saveDoc(
   const meta: DocMeta = { type, no, status, updatedAt: new Date().toISOString(), htmlUrl, pdfUrl, data };
   client.docs[type] = meta;
   return meta;
+}
+
+/** Render + persist an invoice/receipt. New docs get the next sequence
+ *  number (LUM-INV-0044-01, -02…); pass `existingSlug` to re-render one. */
+export async function saveBillingDoc(
+  client: ClientRecord,
+  kind: BillingDoc["kind"],
+  stage: BillingDoc["stage"],
+  data: unknown,
+  status: DocMeta["status"],
+  existingSlug?: string,
+): Promise<BillingDoc> {
+  client.billing = client.billing ?? [];
+  let doc = existingSlug ? client.billing.find((b) => b.slug === existingSlug) : undefined;
+  if (!doc) {
+    const seq = client.billing.filter((b) => b.kind === kind).length + 1;
+    doc = {
+      kind,
+      stage,
+      slug: `${kind}-${seq}`,
+      no: `${DOC_NO_PREFIX[kind]}${client.docNoBase}-${String(seq).padStart(2, "0")}`,
+      status,
+      updatedAt: "",
+      htmlUrl: "",
+      pdfUrl: "",
+      data,
+    };
+    client.billing.push(doc);
+  }
+  const ctx = { client, docNo: doc.no, issued: todayLabel() };
+  const webHtml = renderDoc(kind, data, { ...ctx, mode: "web", pdfHref: `${doc.slug}/pdf` });
+  const pdfHtml = renderDoc(kind, data, { ...ctx, mode: "pdf" });
+  const pdf = await renderPdf(pdfHtml);
+  doc.htmlUrl = await putAsset(`clients/${client.slug}/billing/${doc.slug}.html`, webHtml, "text/html; charset=utf-8");
+  doc.pdfUrl = await putAsset(`clients/${client.slug}/billing/${doc.slug}.pdf`, pdf, "application/pdf");
+  doc.data = data;
+  doc.status = status;
+  doc.updatedAt = new Date().toISOString();
+  return doc;
 }
 
 export async function runStage1(input: {

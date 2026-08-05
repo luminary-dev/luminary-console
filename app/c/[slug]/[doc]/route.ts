@@ -11,7 +11,9 @@ export async function GET(
 ) {
   const { slug, doc } = await params;
   const client = await getClient(slug);
-  const meta = client?.docs[doc as DocType];
+  const meta =
+    client?.docs[doc as DocType] ??
+    client?.billing?.find((b) => b.slug === doc);
   if (!client || !meta || meta.status !== "published") {
     return new Response("Not found", { status: 404 });
   }

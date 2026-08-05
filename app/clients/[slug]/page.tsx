@@ -8,6 +8,8 @@ import RetryStage2 from "@/components/RetryStage2";
 import ThemeToggle from "@/components/ThemeToggle";
 import DeleteClient from "@/components/DeleteClient";
 import SendToClient from "@/components/SendToClient";
+import BillingCard from "@/components/BillingCard";
+import ChangeOrders from "@/components/ChangeOrders";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +19,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: client ? `${client.company} · Console` : "Client" };
 }
 
-const ORDER: DocType[] = ["estimate", "quotation", "proposal", "contract", "invoice", "receipt"];
+const CORE: DocType[] = ["estimate", "quotation", "proposal", "contract"];
+const ORDER: DocType[] = [...CORE, "invoice", "receipt"]; // legacy single-slot billing docs still display
 
 export default async function ClientPage({
   params,
@@ -135,7 +138,7 @@ export default async function ClientPage({
               </td>
               <td style={{ color: "var(--subtle)" }}>—</td>
             </tr>
-            {ORDER.map((t) => {
+            {ORDER.filter((t) => CORE.includes(t) || client.docs[t]).map((t) => {
               const meta = client.docs[t];
               const billing = t === "invoice" || t === "receipt";
               return (
@@ -164,7 +167,8 @@ export default async function ClientPage({
                     )}
                   </td>
                   <td style={{ minWidth: 220 }}>
-                    <DocActions slug={slug} type={t} exists={!!meta} status={meta?.status} billing={billing} />
+                    <DocActions slug={slug} type={t} exists={!!meta} status={meta?.status} billing={false} />
+                    {billing && !meta ? null : null}
                   </td>
                 </tr>
               );
@@ -178,6 +182,14 @@ export default async function ClientPage({
           </div>
         )}
       </div>
+
+      <BillingCard
+        slug={slug}
+        billing={client.billing ?? []}
+        hasQuotation={!!client.docs.quotation}
+      />
+
+      <ChangeOrders slug={slug} changeOrders={client.changeOrders ?? []} />
 
       <div className="card">
         <h3>Brief</h3>

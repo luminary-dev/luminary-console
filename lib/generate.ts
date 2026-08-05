@@ -267,21 +267,40 @@ Return the full revised ${type} data (same structure), applying the instructions
 
 export async function generateBilling(
   client: ClientRecord,
-  type: "invoice" | "receipt",
-  quotation: QuotationData | null,
+  kind: "invoice" | "receipt",
+  stage: "advance" | "final" | "other",
+  context: {
+    quotation: QuotationData | null;
+    priorBilling: { kind: string; stage: string; no: string; data: unknown }[];
+    changeOrders: { at: string; desc: string; amount: string }[];
+  },
   instructions: string,
   today: string,
 ): Promise<unknown> {
+  const defaults: Record<string, string> = {
+    "invoice-advance": "Invoice the standard 50% advance against the quotation total.",
+    "invoice-final":
+      "Final invoice at delivery: the remaining balance of the quotation total (quotation total minus everything already invoiced/receipted as advance) PLUS one line item per approved change order listed below. Make each change order its own line ('Change order — <desc>').",
+    "receipt-advance": "Receipt for the advance payment received by bank transfer today, referencing the advance invoice.",
+    "receipt-final":
+      "Receipt for the final payment received by bank transfer today, referencing the final invoice. The balance note should confirm the account is fully settled and that IP has transferred.",
+  };
   const prompt = `Today is ${today}.
 
 ${clientContext(client)}
 
 QUOTATION (basis for billing):
-${JSON.stringify(quotation)}
+${JSON.stringify(context.quotation)}
 
-OPERATOR INSTRUCTIONS (what to bill / what was paid):
-${instructions || (type === "invoice" ? "Invoice the standard 50% advance against the quotation total." : "Receipt for the advance payment received by bank transfer today.")}
+BILLING HISTORY SO FAR (stay arithmetically consistent with these):
+${JSON.stringify(context.priorBilling)}
 
-Draft the ${type}.`;
-  return generate(prompt, DOC_SCHEMAS[type]);
+APPROVED CHANGE ORDERS (work added after the cost was finalised — billed on the FINAL invoice only):
+${JSON.stringify(context.changeOrders)}
+
+OPERATOR INSTRUCTIONS:
+${instructions || defaults[`${kind}-${stage}`] || `Draft the ${stage} ${kind}.`}
+
+Draft the ${stage} ${kind}. All arithmetic must be exact and consistent with the history above.`;
+  return generate(prompt, DOC_SCHEMAS[kind]);
 }

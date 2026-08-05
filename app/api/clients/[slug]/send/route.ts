@@ -25,21 +25,28 @@ export async function POST(
   const base = `https://${client.domain}`;
   const published = ORDER.filter((t) => client.docs[t]?.status === "published");
 
+  const publishedBilling = (client.billing ?? []).filter((b) => b.status === "published");
+  const stageLabel = (s: string) => (s === "advance" ? "Advance " : s === "final" ? "Final " : "");
   const rows = [
     `<li><a href="${base}/questionnaire">Project questionnaire</a> — tell us about your business, goals and design taste (~25 min)</li>`,
     ...published.map(
       (t) => `<li><a href="${base}/${t}">${DOC_LABELS[t]} (${client.docs[t]!.no})</a> — with a PDF download on the page</li>`,
     ),
+    ...publishedBilling.map(
+      (b) => `<li><a href="${base}/${b.slug}">${stageLabel(b.stage)}${DOC_LABELS[b.kind]} (${b.no})</a> — with a PDF download on the page</li>`,
+    ),
   ].join("");
 
   const attachments = (
     await Promise.all(
-      published.map(async (t) => {
-        const meta = client.docs[t]!;
-        const res = await fetch(meta.pdfUrl, { cache: "no-store" });
+      [
+        ...published.map((t) => ({ label: DOC_LABELS[t], no: client.docs[t]!.no, pdfUrl: client.docs[t]!.pdfUrl })),
+        ...publishedBilling.map((b) => ({ label: `${stageLabel(b.stage)}${DOC_LABELS[b.kind]}`, no: b.no, pdfUrl: b.pdfUrl })),
+      ].map(async (d) => {
+        const res = await fetch(d.pdfUrl, { cache: "no-store" });
         if (!res.ok) return null;
         return {
-          filename: `${DOC_LABELS[t]} - ${client.company} - ${meta.no}.pdf`,
+          filename: `${d.label} - ${client.company} - ${d.no}.pdf`,
           content: Buffer.from(await res.arrayBuffer()),
         };
       }),
@@ -60,5 +67,5 @@ export async function POST(
   );
 
   if (!ok) return NextResponse.json({ error: "Email failed to send." }, { status: 502 });
-  return NextResponse.json({ ok: true, sentTo: client.email, docs: ["questionnaire", ...published] });
+  return NextResponse.json({ ok: true, sentTo: client.email, docs: ["questionnaire", ...published, ...publishedBilling.map((b) => b.slug)] });
 }

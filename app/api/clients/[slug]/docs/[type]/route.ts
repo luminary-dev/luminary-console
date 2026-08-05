@@ -3,9 +3,8 @@
 import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { saveDoc, runStage2, todayLabel } from "@/lib/pipeline";
-import { generateBilling, reviseDoc } from "@/lib/generate";
+import { reviseDoc } from "@/lib/generate";
 import type { DocType } from "@/lib/types";
-import type { QuotationData } from "@/lib/templates/docs";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -48,13 +47,8 @@ export async function POST(
       return NextResponse.json({ ok: true, status: updated.status });
     }
 
-    if (action === "generate" && (docType === "invoice" || docType === "receipt")) {
-      const quotation = (client.docs.quotation?.data as QuotationData) ?? null;
-      const data = await generateBilling(client, docType, quotation, instructions, todayLabel());
-      await saveDoc(client, docType, data, "draft");
-      await saveClient(client);
-      return NextResponse.json({ ok: true, status: "draft" });
-    }
+    // (Invoice/receipt generation moved to /api/clients/[slug]/billing —
+    // the payment arc supports multiple invoices and receipts per client.)
 
     if (action === "retry-stage2") {
       if (!client.answersUrl) return NextResponse.json({ error: "No answers submitted yet" }, { status: 400 });

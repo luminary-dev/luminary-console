@@ -75,6 +75,30 @@ export type ClientRecord = {
   answersBy?: string;
   /** Full history — the questionnaire may be submitted more than once. */
   submissions?: Submission[];
+  /** Invoices & receipts across the payment arc (advance → final). */
+  billing?: BillingDoc[];
+  /** Changes requested after the cost was finalised — billed on the final invoice. */
+  changeOrders?: ChangeOrder[];
+};
+
+export type BillingDoc = {
+  kind: "invoice" | "receipt";
+  stage: "advance" | "final" | "other";
+  /** URL segment on the client site, e.g. "invoice-1". */
+  slug: string;
+  no: string;
+  status: DocStatus;
+  updatedAt: string;
+  htmlUrl: string;
+  pdfUrl: string;
+  data: unknown;
+};
+
+export type ChangeOrder = {
+  at: string;
+  desc: string;
+  /** Formatted LKR amount, e.g. "4,500". */
+  amount: string;
 };
 
 export type Submission = {

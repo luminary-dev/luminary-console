@@ -46,6 +46,13 @@ export default async function ClientHome({
               → {DOC_LABELS[t]} ({client.docs[t]!.no})
             </Link>
           ))}
+          {(client.billing ?? [])
+            .filter((b) => b.status === "published")
+            .map((b) => (
+              <Link key={b.slug} href={`/${b.slug}`}>
+                → {b.stage === "advance" ? "Advance" : b.stage === "final" ? "Final" : ""} {DOC_LABELS[b.kind]} ({b.no})
+              </Link>
+            ))}
         </div>
       </div>
       <div className="foot">
