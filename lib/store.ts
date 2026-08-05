@@ -7,11 +7,14 @@ import type { ClientRecord, IndexEntry } from "./types";
 const PREFIX = "console/";
 
 async function latestUrl(pathname: string): Promise<string | null> {
-  const { blobs } = await list({ prefix: pathname, limit: 20 });
-  const exact = blobs
-    .filter((b) => b.pathname.startsWith(pathname))
+  // addRandomSuffix inserts before the extension ("record.json" is stored as
+  // "record-<rand>.json"), so list by the extensionless prefix.
+  const prefix = pathname.replace(/\.json$/, "");
+  const { blobs } = await list({ prefix, limit: 100 });
+  const latest = blobs
+    .filter((b) => b.pathname.startsWith(prefix))
     .sort((a, b) => +new Date(b.uploadedAt) - +new Date(a.uploadedAt));
-  return exact[0]?.url ?? null;
+  return latest[0]?.url ?? null;
 }
 
 async function readJson<T>(pathname: string): Promise<T | null> {
@@ -34,7 +37,8 @@ async function writeJson(pathname: string, data: unknown): Promise<string> {
 
 async function pruneOld(pathname: string, keepUrl: string) {
   try {
-    const { blobs } = await list({ prefix: pathname, limit: 50 });
+    const prefix = pathname.replace(/\.json$/, "");
+    const { blobs } = await list({ prefix, limit: 100 });
     const stale = blobs.filter((b) => b.url !== keepUrl).map((b) => b.url);
     if (stale.length) await del(stale);
   } catch {
