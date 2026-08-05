@@ -90,6 +90,15 @@ export async function saveClient(record: ClientRecord): Promise<void> {
   await writeJson(`${PREFIX}index.json`, index);
 }
 
+/** Delete a client's blobs and index entry. */
+export async function deleteClient(slug: string): Promise<number> {
+  const { blobs } = await list({ prefix: `${PREFIX}clients/${slug}/`, limit: 1000 });
+  if (blobs.length) await del(blobs.map((b) => b.url));
+  const index = (await getIndex()).filter((e) => e.slug !== slug);
+  await writeJson(`${PREFIX}index.json`, index);
+  return blobs.length;
+}
+
 /** Next shared doc number, zero-padded. Starts after the manual 0043 docs. */
 export async function nextDocNoBase(): Promise<string> {
   const index = await getIndex();

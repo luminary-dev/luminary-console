@@ -79,6 +79,57 @@ async function vercelAddDomain(host: string): Promise<string> {
   throw new Error(`Vercel domains: ${res.status} ${JSON.stringify(data?.error)}`);
 }
 
+/** Tear down a client's subdomain: Cloudflare CNAME + Vercel project domain. */
+export async function removeClientDomain(slug: string): Promise<string[]> {
+  const host = `${slug}.${ROOT}`;
+  const notes: string[] = [];
+
+  const cfToken = process.env.CLOUDFLARE_API_TOKEN;
+  const zoneId = process.env.CLOUDFLARE_ZONE_ID;
+  if (cfToken && zoneId) {
+    try {
+      const headers = { Authorization: `Bearer ${cfToken}` };
+      const res = await fetch(
+        `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?name=${host}`,
+        { headers },
+      );
+      const data = await res.json();
+      for (const rec of data?.result ?? []) {
+        await fetch(
+          `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${rec.id}`,
+          { method: "DELETE", headers },
+        );
+        notes.push("cloudflare record deleted");
+      }
+      if (!(data?.result ?? []).length) notes.push("no cloudflare record");
+    } catch (e) {
+      notes.push(`cloudflare: ${String(e)}`);
+    }
+  } else {
+    notes.push("cloudflare token missing — remove CNAME manually");
+  }
+
+  const vToken = process.env.VERCEL_TOKEN;
+  const projectId = process.env.VERCEL_PROJECT_ID;
+  if (vToken && projectId) {
+    try {
+      const teamId = process.env.VERCEL_TEAM_ID;
+      const qs = teamId ? `?teamId=${teamId}` : "";
+      const res = await fetch(
+        `https://api.vercel.com/v9/projects/${projectId}/domains/${host}${qs}`,
+        { method: "DELETE", headers: { Authorization: `Bearer ${vToken}` } },
+      );
+      notes.push(res.ok ? "vercel domain detached" : `vercel: ${res.status}`);
+    } catch (e) {
+      notes.push(`vercel: ${String(e)}`);
+    }
+  } else {
+    notes.push("vercel token missing — detach domain manually");
+  }
+
+  return notes;
+}
+
 export async function ensureClientDomain(slug: string): Promise<DnsResult> {
   const host = `${slug}.${ROOT}`;
   try {

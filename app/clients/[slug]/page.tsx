@@ -6,6 +6,7 @@ import DocActions from "@/components/DocActions";
 import CopyLink from "@/components/CopyLink";
 import RetryStage2 from "@/components/RetryStage2";
 import ThemeToggle from "@/components/ThemeToggle";
+import DeleteClient from "@/components/DeleteClient";
 
 export const dynamic = "force-dynamic";
 
@@ -164,6 +165,8 @@ export default async function ClientPage({
           {client.brief}
         </p>
       </div>
+
+      <DeleteClient slug={slug} company={client.company} />
     </main>
   );
 }

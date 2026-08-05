@@ -37,12 +37,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Client "${slug}" already exists.` }, { status: 409 });
   }
 
+  // Reg no left blank? Pull it out of the brief automatically if it's there
+  // (operators often paste the client's letterhead details into the brief).
+  let reg = str(body.reg);
+  if (!reg) {
+    const m =
+      brief.match(/reg(?:istration)?\.?\s*no\.?\s*:?\s*([A-Z]{1,3}\s?\d{4,8})/i) ||
+      brief.match(/\b(P[VBQ]\s?\d{5,8})\b/i);
+    if (m) reg = m[1].replace(/\s+/g, "");
+  }
+
   try {
     const client = await runStage1({
       slug,
       company,
       brief,
-      reg: str(body.reg),
+      reg,
       address: str(body.address),
       email: str(body.email),
       phone: str(body.phone),
