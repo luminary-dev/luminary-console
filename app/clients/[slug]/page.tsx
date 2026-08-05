@@ -9,6 +9,12 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const client = await getClient(slug);
+  return { title: client ? `${client.company} · Console` : "Client" };
+}
+
 const ORDER: DocType[] = ["estimate", "quotation", "proposal", "contract", "invoice", "receipt"];
 
 export default async function ClientPage({
@@ -50,7 +56,6 @@ export default async function ClientPage({
             <div key={t} style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
               <span className="k" style={{ marginRight: -4 }}>{DOC_LABELS[t]}</span>
               <CopyLink url={`${base}/${t}`} />
-              <CopyLink url={`${base}/${t}/pdf`} />
             </div>
           ))}
         </div>
@@ -130,15 +135,9 @@ export default async function ClientPage({
                   </td>
                   <td>
                     {meta ? (
-                      <>
-                        <a href={`/preview/${slug}/${t}`} target="_blank" rel="noopener noreferrer">
-                          HTML
-                        </a>
-                        {" · "}
-                        <a href={meta.pdfUrl} target="_blank" rel="noopener noreferrer">
-                          PDF
-                        </a>
-                      </>
+                      <a href={`/preview/${slug}/${t}`} target="_blank" rel="noopener noreferrer">
+                        Preview
+                      </a>
                     ) : (
                       "—"
                     )}

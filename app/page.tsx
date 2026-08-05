@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getIndex } from "@/lib/store";
 import ThemeToggle from "@/components/ThemeToggle";
 
+export const metadata = { title: "Clients" };
 export const dynamic = "force-dynamic";
 
 const STATUS_LABEL: Record<string, string> = {

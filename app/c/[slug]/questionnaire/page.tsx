@@ -6,6 +6,12 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const client = await getClient(slug);
+  return { title: client ? `Project questionnaire · ${client.company}` : "Questionnaire" };
+}
+
 export default async function QuestionnairePage({
   params,
 }: {
