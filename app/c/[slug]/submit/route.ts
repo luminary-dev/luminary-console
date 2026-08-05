@@ -66,16 +66,28 @@ export async function POST(
     client.answersPdfUrl = answersPdfUrl;
     client.answersAt = submittedAt;
     client.answersBy = contactName;
-    client.status = "answers_in";
+    client.submissions = [
+      ...(client.submissions ?? []),
+      { at: submittedAt, by: contactName, answersUrl, pdfUrl: answersPdfUrl },
+    ];
+    if (client.status === "created") client.status = "answers_in";
     await saveClient(client);
+    const submissionNo = client.submissions.length;
+    // Auto-draft only while no drafts exist — later submissions must never
+    // clobber documents the studio may have revised or published.
+    const willDraft = !client.docs.quotation && !client.docs.proposal && !client.docs.contract;
 
     const filename = `Questionnaire - ${client.company} - LUM-QST-${client.docNoBase}.pdf`;
     const contactEmail = typeof answers.contactEmail === "string" ? answers.contactEmail.trim() : "";
 
     await emailStudio(
-      `Questionnaire submitted — ${client.company}`,
-      `<p><strong>${contactName}</strong> submitted the ${client.company} discovery questionnaire at ${submittedAt} (Colombo).</p>
-<p>Full answers attached. Claude is drafting the quotation, proposal and contract now — a second email lands when they're ready.</p>`,
+      `Questionnaire submitted — ${client.company}${submissionNo > 1 ? ` (submission #${submissionNo})` : ""}`,
+      `<p><strong>${contactName}</strong> submitted the ${client.company} discovery questionnaire at ${submittedAt} (Colombo)${submissionNo > 1 ? ` — this is submission #${submissionNo} for this client` : ""}.</p>
+<p>Full answers attached. ${
+        willDraft
+          ? "Claude is drafting the quotation, proposal and contract now — a second email lands when they're ready."
+          : "Your existing quotation/proposal/contract were left untouched. To incorporate these new answers, use Revise on a document, or delete the drafts and press Draft now in the console."
+      }</p>`,
       [{ filename, content: pdf }],
       contactEmail || undefined,
     );
@@ -94,10 +106,13 @@ export async function POST(
     }
 
     // Stage 2 runs after the response is sent — the client sees the thank-you
-    // immediately while Claude drafts in the background.
-    after(async () => {
-      await runStage2(slug, answers, submittedAt);
-    });
+    // immediately while Claude drafts in the background. Only for the first
+    // submission; later ones must not overwrite reviewed documents.
+    if (willDraft) {
+      after(async () => {
+        await runStage2(slug, answers, submittedAt);
+      });
+    }
 
     return NextResponse.json({ ok: true, copySent });
   } catch (e) {

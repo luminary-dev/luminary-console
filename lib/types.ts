@@ -68,10 +68,20 @@ export type ClientRecord = {
   dnsStatus: "automated" | "manual_required" | "error";
   extraQuestions: ExtraQuestion[];
   docs: Partial<Record<DocType, DocMeta>>;
+  /** Latest submission (kept for compatibility / quick access). */
   answersUrl?: string;
   answersPdfUrl?: string;
   answersAt?: string;
   answersBy?: string;
+  /** Full history — the questionnaire may be submitted more than once. */
+  submissions?: Submission[];
+};
+
+export type Submission = {
+  at: string;
+  by: string;
+  answersUrl: string;
+  pdfUrl: string;
 };
 
 export type IndexEntry = {

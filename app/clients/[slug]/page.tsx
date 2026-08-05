@@ -67,17 +67,31 @@ export default async function ClientPage({
             attached to the Vercel project. Set CLOUDFLARE_API_TOKEN / VERCEL_TOKEN to automate this.
           </div>
         )}
-        {client.answersAt && (
+        {(client.submissions?.length ?? (client.answersAt ? 1 : 0)) > 0 && (
           <div className="notice">
-            Questionnaire submitted {client.answersAt} by <b>{client.answersBy}</b>
-            {client.answersPdfUrl && (
-              <>
+            <b>Questionnaire submissions</b>
+            {(
+              client.submissions ?? [
+                {
+                  at: client.answersAt!,
+                  by: client.answersBy ?? "—",
+                  answersUrl: client.answersUrl!,
+                  pdfUrl: client.answersPdfUrl!,
+                },
+              ]
+            ).map((sub, i) => (
+              <div key={i} style={{ marginTop: 6 }}>
+                #{i + 1} · {sub.at} by <b>{sub.by}</b>
                 {" · "}
-                <a href={client.answersPdfUrl} target="_blank" rel="noopener noreferrer">
+                <a href={sub.pdfUrl} target="_blank" rel="noopener noreferrer">
                   answers PDF →
                 </a>
-              </>
-            )}
+              </div>
+            ))}
+            <div style={{ marginTop: 8, fontSize: 12, color: "var(--muted)" }}>
+              Documents are drafted from the first submission automatically; later submissions
+              never overwrite your documents — use Revise to fold them in.
+            </div>
           </div>
         )}
       </div>
