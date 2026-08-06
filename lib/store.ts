@@ -6,14 +6,25 @@ import type { ClientRecord, IndexEntry } from "./types";
 
 const PREFIX = "console/";
 
+// New versions are written under "<base>/<ms-timestamp>.json" so "latest" is
+// deterministic. Blob's uploadedAt has ONE-SECOND granularity: sorting on it
+// made rapid successive writes (publish → unpublish → delete) tie, so reads
+// could return a stale version and read-modify-write then resurrected it —
+// billing documents were silently lost this way. Legacy "<base>-<rand>.json"
+// blobs (no timestamp in the path) still order by uploadedAt.
+type Versioned = { pathname: string; uploadedAt: string | Date; url: string };
+
+function versionScore(b: Versioned): number {
+  const m = b.pathname.match(/\/(\d{13})[^/]*\.json$/);
+  return m ? Number(m[1]) : +new Date(b.uploadedAt);
+}
+
 async function latestUrl(pathname: string): Promise<string | null> {
-  // addRandomSuffix inserts before the extension ("record.json" is stored as
-  // "record-<rand>.json"), so list by the extensionless prefix.
   const prefix = pathname.replace(/\.json$/, "");
   const { blobs } = await list({ prefix, limit: 100 });
   const latest = blobs
     .filter((b) => b.pathname.startsWith(prefix))
-    .sort((a, b) => +new Date(b.uploadedAt) - +new Date(a.uploadedAt));
+    .sort((a, b) => versionScore(b) - versionScore(a));
   return latest[0]?.url ?? null;
 }
 
@@ -26,20 +37,25 @@ async function readJson<T>(pathname: string): Promise<T | null> {
 }
 
 async function writeJson(pathname: string, data: unknown): Promise<string> {
-  const blob = await put(pathname, JSON.stringify(data), {
+  const base = pathname.replace(/\.json$/, "");
+  const blob = await put(`${base}/${Date.now()}.json`, JSON.stringify(data), {
     access: "public",
-    addRandomSuffix: true,
+    addRandomSuffix: true, // keeps URLs unguessable
     contentType: "application/json",
   });
-  pruneOld(pathname, blob.url); // fire and forget
+  await pruneOld(base);
   return blob.url;
 }
 
-async function pruneOld(pathname: string, keepUrl: string) {
+// Keeps whatever is newest BY SCORE (not "the version I just wrote"), so a
+// prune racing a concurrent writer can never delete the newer version.
+async function pruneOld(base: string) {
   try {
-    const prefix = pathname.replace(/\.json$/, "");
-    const { blobs } = await list({ prefix, limit: 100 });
-    const stale = blobs.filter((b) => b.url !== keepUrl).map((b) => b.url);
+    const { blobs } = await list({ prefix: base, limit: 100 });
+    const sorted = blobs
+      .filter((b) => b.pathname.startsWith(base))
+      .sort((a, b) => versionScore(b) - versionScore(a));
+    const stale = sorted.slice(1).map((b) => b.url);
     if (stale.length) await del(stale);
   } catch {
     /* best effort */
