@@ -112,6 +112,9 @@ export type ClientRecord = {
   changeOrders?: ChangeOrder[];
   /** Lifecycle stage (see ClientStage) — absent on records that predate it. */
   stage?: ClientStage;
+  /** When delivery happened (final receipt published, or manual override) —
+   *  starts the 30-day warranty clock (delivered → warranty → closed). */
+  deliveredAt?: string;
   /** Payments received (advance/final/other) — drives outstanding-balance math. */
   payments?: Payment[];
   /** Set once when the client accepts the quotation from the portal. */

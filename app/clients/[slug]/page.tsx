@@ -12,6 +12,8 @@ import SendToClient from "@/components/SendToClient";
 import BillingCard from "@/components/BillingCard";
 import EmailDocButton from "@/components/EmailDocButton";
 import ChangeOrders from "@/components/ChangeOrders";
+import StageSelect from "@/components/StageSelect";
+import { currentStage } from "@/lib/stage";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +57,15 @@ export default async function ClientPage({
         <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 4 }}>
           {client.projectLabel} · doc no. {client.docNoBase} · created {client.createdAt.slice(0, 10)}
         </p>
+        <div style={{ marginTop: 12, display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+          <StageSelect slug={slug} stage={currentStage(client)} />
+          {client.acceptance && (
+            <span style={{ fontSize: 12.5, color: "var(--muted)" }}>
+              Quotation accepted by <b style={{ color: "var(--text)" }}>{client.acceptance.name}</b>{" "}
+              on {client.acceptance.at.slice(0, 10)}
+            </span>
+          )}
+        </div>
         <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 6 }}>
           <div>
             <span className="k" style={{ marginRight: 10 }}>Questionnaire</span>
@@ -204,6 +215,7 @@ export default async function ClientPage({
       <BillingCard
         slug={slug}
         billing={client.billing ?? []}
+        payments={client.payments ?? []}
         hasQuotation={!!client.docs.quotation}
         email={client.email}
       />

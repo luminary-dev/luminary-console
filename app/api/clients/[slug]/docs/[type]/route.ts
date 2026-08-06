@@ -5,6 +5,7 @@ import { getClient, saveClient } from "@/lib/store";
 import { saveDoc, runStage2, todayLabel } from "@/lib/pipeline";
 import { reviseDoc } from "@/lib/generate";
 import { logActivity } from "@/lib/activity";
+import { advanceStage } from "@/lib/stage";
 import type { DocType } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -34,6 +35,8 @@ export async function POST(
       if (!meta) return NextResponse.json({ error: "Document not generated yet" }, { status: 404 });
       meta.status = action === "publish" ? "published" : "draft";
       meta.updatedAt = new Date().toISOString();
+      // Lifecycle: a published quotation means the client is "quoted".
+      if (action === "publish" && docType === "quotation") advanceStage(client, "quoted");
       await saveClient(client);
       await logActivity("operator", `${action}ed ${docType}`, slug, meta.no);
       return NextResponse.json({ ok: true, status: meta.status });

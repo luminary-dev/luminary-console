@@ -38,15 +38,18 @@ export function docNo(client: ClientRecord, type: DocType): string {
   return `${DOC_NO_PREFIX[type]}${client.docNoBase}`;
 }
 
-/** Render + persist a document (HTML page, PDF) and update the record. */
+/** Render + persist a document (HTML page, PDF) and update the record.
+ *  `issued` overrides the printed issue date (used when re-rendering an
+ *  already-issued document, e.g. stamping an acceptance onto a quotation). */
 export async function saveDoc(
   client: ClientRecord,
   type: DocType,
   data: unknown,
   status: DocMeta["status"],
+  issued?: string,
 ): Promise<DocMeta> {
   const no = docNo(client, type);
-  const ctx = { client, docNo: no, issued: todayLabel() };
+  const ctx = { client, docNo: no, issued: issued ?? todayLabel() };
   const webHtml = renderDoc(type, data, { ...ctx, mode: "web", pdfHref: `${type}/pdf` });
   const pdfHtml = renderDoc(type, data, { ...ctx, mode: "pdf" });
   const pdf = await renderPdf(pdfHtml);

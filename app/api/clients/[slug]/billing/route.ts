@@ -6,6 +6,7 @@ import { deleteAssets, getClient, saveClient } from "@/lib/store";
 import { saveBillingDoc, todayLabel } from "@/lib/pipeline";
 import { generateBilling, reviseDoc } from "@/lib/generate";
 import { logActivity } from "@/lib/activity";
+import { advanceStage } from "@/lib/stage";
 import type { QuotationData } from "@/lib/templates/docs";
 
 export const runtime = "nodejs";
@@ -56,6 +57,11 @@ export async function POST(
     if (action === "publish" || action === "unpublish") {
       doc.status = action === "publish" ? "published" : "draft";
       doc.updatedAt = new Date().toISOString();
+      // Lifecycle: the published final receipt marks delivery (starts the
+      // 30-day warranty clock — delivered → warranty → closed).
+      if (action === "publish" && doc.kind === "receipt" && doc.stage === "final") {
+        advanceStage(client, "delivered");
+      }
       await saveClient(client);
       await logActivity("operator", `${action}ed ${doc.stage} ${doc.kind}`, slug, doc.no);
       return NextResponse.json({ ok: true, status: doc.status });

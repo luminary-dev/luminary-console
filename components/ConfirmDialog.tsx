@@ -3,7 +3,8 @@
 // Themed replacement for window.confirm / window.prompt: useConfirm() gives a
 // promise-based confirm() plus a `dialog` node to render once in the
 // component. Resolves null on cancel; "yes" on confirm; the typed value when
-// `password` is set (used by client deletion, which re-authenticates).
+// `password` (client deletion re-auth) or `prompt` (free-text, e.g. a payment
+// amount) is set.
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
@@ -13,6 +14,8 @@ export type ConfirmOptions = {
   confirmLabel?: string;
   danger?: boolean;
   password?: boolean;
+  /** Free-text input; resolves with the typed value. `initial` prefills it. */
+  prompt?: { placeholder?: string; initial?: string };
 };
 
 export function useConfirm() {
@@ -21,7 +24,7 @@ export function useConfirm() {
   const resolver = useRef<((v: string | null) => void) | null>(null);
 
   const confirm = useCallback((o: ConfirmOptions) => {
-    setPw("");
+    setPw(o.prompt?.initial ?? "");
     setOpts(o);
     return new Promise<string | null>((resolve) => {
       resolver.current = resolve;
@@ -56,16 +59,16 @@ export function useConfirm() {
           >
             <h4 className={`modal-title${opts.danger ? " danger" : ""}`}>{opts.title}</h4>
             <div className="modal-body">{opts.message}</div>
-            {opts.password && (
+            {(opts.password || opts.prompt) && (
               <input
                 className="q-line"
-                type="password"
-                placeholder="Console password"
+                type={opts.password ? "password" : "text"}
+                placeholder={opts.password ? "Console password" : opts.prompt?.placeholder}
                 autoFocus
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && pw) close(pw);
+                  if (e.key === "Enter" && pw.trim()) close(pw);
                 }}
                 style={{ width: "100%", marginTop: 4 }}
               />
@@ -77,9 +80,9 @@ export function useConfirm() {
               <button
                 type="button"
                 className={`btn small${opts.danger ? " btn-danger" : ""}`}
-                autoFocus={!opts.password}
-                disabled={opts.password ? pw.length === 0 : false}
-                onClick={() => close(opts.password ? pw : "yes")}
+                autoFocus={!opts.password && !opts.prompt}
+                disabled={opts.password || opts.prompt ? pw.trim().length === 0 : false}
+                onClick={() => close(opts.password || opts.prompt ? pw : "yes")}
               >
                 {opts.confirmLabel ?? "Confirm"}
               </button>

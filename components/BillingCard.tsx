@@ -5,7 +5,8 @@
 // orders) → final receipt. Each doc can be previewed, revised, published.
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { BillingDoc } from "@/lib/types";
+import type { BillingDoc, Payment } from "@/lib/types";
+import { fmtLKR, invoiceTotal, paidAgainst, parseAmount, summarizeMoney } from "@/lib/money";
 
 const STAGE_LABEL: Record<string, string> = { advance: "Advance", final: "Final", other: "Additional" };
 
@@ -15,11 +16,13 @@ import { useConfirm } from "./ConfirmDialog";
 export default function BillingCard({
   slug,
   billing,
+  payments,
   hasQuotation,
   email,
 }: {
   slug: string;
   billing: BillingDoc[];
+  payments: Payment[];
   hasQuotation: boolean;
   email?: string;
 }) {
@@ -95,6 +98,92 @@ export default function BillingCard({
     }
     await call({ action: "delete", doc: b.slug }, `del-${b.slug}`);
   };
+
+  // Payments API (add/remove) — same refresh flow as the billing actions.
+  const callPayments = async (payload: Record<string, unknown>, key: string): Promise<boolean> => {
+    setBusy(key);
+    setError(null);
+    const res = await fetch(`/api/clients/${slug}/payments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => null);
+    setBusy(null);
+    if (!res.ok) {
+      setError(data?.error || `Failed (${res.status})`);
+      return false;
+    }
+    router.refresh();
+    return true;
+  };
+
+  // "Mark paid": confirm with the amount prefilled (the invoice's remaining
+  // balance where the total parses; blank otherwise) — the operator can
+  // adjust it for partial payments.
+  const markPaid = async (b: BillingDoc) => {
+    const total = invoiceTotal(b);
+    const paid = paidAgainst(payments, b.slug);
+    const remaining = total !== null ? Math.max(0, total - paid) : null;
+    const typed = await confirm({
+      title: "Record payment",
+      confirmLabel: "Record payment",
+      message: (
+        <>
+          Record a payment received against <b>{b.no}</b>
+          {total !== null ? (
+            <>
+              {" "}
+              (invoice total <b>{fmtLKR(total)}</b>
+              {paid > 0 ? <>, {fmtLKR(paid)} already recorded</> : null})
+            </>
+          ) : (
+            <> — the invoice total couldn&apos;t be read automatically, so enter the amount received</>
+          )}
+          . Amount in LKR:
+        </>
+      ),
+      prompt: {
+        placeholder: "e.g. 22,500",
+        initial: remaining && remaining > 0 ? remaining.toLocaleString("en-US") : "",
+      },
+    });
+    if (typed === null) return;
+    const amount = parseAmount(typed);
+    if (amount === null || amount <= 0) {
+      setError("That amount didn't parse — digits only, e.g. 22,500.");
+      return;
+    }
+    await callPayments(
+      { action: "add", amount, method: "bank transfer", invoiceSlug: b.slug },
+      `pay-${b.slug}`,
+    );
+  };
+
+  const removePayment = async (p: Payment, index: number) => {
+    const sure = await confirm({
+      title: "Remove payment",
+      danger: true,
+      confirmLabel: "Remove",
+      message: (
+        <>
+          Remove the <b>{fmtLKR(p.amount)}</b> payment recorded on {p.at.slice(0, 10)}
+          {p.invoiceSlug ? (
+            <>
+              {" "}
+              against <b className="mono">{p.invoiceSlug}</b>
+            </>
+          ) : null}
+          ? The outstanding balance goes back up.
+        </>
+      ),
+    });
+    if (!sure) return;
+    await callPayments({ action: "remove", index }, `unpay-${index}`);
+  };
+
+  const money = summarizeMoney(billing, payments);
+  const hasPublishedInvoice = billing.some((b) => b.kind === "invoice" && b.status === "published");
 
   const gen = (kind: string, stage: string, label: string) => (
     <button
@@ -191,7 +280,13 @@ export default function BillingCard({
               </tr>
             </thead>
             <tbody>
-              {billing.map((b) => (
+              {billing.map((b) => {
+                const isInvoice = b.kind === "invoice";
+                const total = isInvoice ? invoiceTotal(b) : null;
+                const paid = isInvoice ? paidAgainst(payments, b.slug) : 0;
+                const fullyPaid = isInvoice && total !== null && total > 0 && paid >= total;
+                const dueDate = isInvoice ? (b.data as { dueDate?: string })?.dueDate : undefined;
+                return (
                 <tr key={b.slug}>
                   <td style={{ fontWeight: 600 }}>
                     {STAGE_LABEL[b.stage]} {b.kind}
@@ -202,6 +297,25 @@ export default function BillingCard({
                       <i />
                       {b.status}
                     </span>
+                    {isInvoice && (dueDate || paid > 0) && (
+                      <div style={{ marginTop: 6, fontSize: 11.5, color: "var(--muted)", whiteSpace: "nowrap" }}>
+                        {fullyPaid ? (
+                          <span className="pill">
+                            <i />
+                            paid
+                          </span>
+                        ) : (
+                          <>
+                            {dueDate && <div>Due {dueDate}</div>}
+                            {paid > 0 && (
+                              <div className="mono">
+                                {fmtLKR(paid)}{total !== null ? ` of ${fmtLKR(total)}` : ""} paid
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
                   </td>
                   <td style={{ whiteSpace: "nowrap" }}>
                     <a href={`/preview/${slug}/${b.slug}`} target="_blank" rel="noopener noreferrer">
@@ -221,6 +335,11 @@ export default function BillingCard({
                       ) : (
                         <button className="btn ghost small" disabled={!!busy} onClick={() => call({ action: "unpublish", doc: b.slug }, `unpub-${b.slug}`)}>
                           {busy === `unpub-${b.slug}` ? "…" : "Unpublish"}
+                        </button>
+                      )}
+                      {isInvoice && b.status === "published" && !fullyPaid && (
+                        <button className="btn small" disabled={!!busy} onClick={() => markPaid(b)}>
+                          {busy === `pay-${b.slug}` ? "…" : "Mark paid"}
                         </button>
                       )}
                       <button className="btn ghost small" disabled={!!busy} onClick={() => setReviseFor(reviseFor === b.slug ? null : b.slug)}>
@@ -257,11 +376,65 @@ export default function BillingCard({
                     )}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
       )}
+
+      {(payments.length > 0 || hasPublishedInvoice) && (
+        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
+          <div className="k">Payments</div>
+          {payments.length === 0 ? (
+            <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 8 }}>
+              No payments recorded yet — use <b>Mark paid</b> on a published invoice when the money
+              arrives.
+            </p>
+          ) : (
+            <div style={{ marginTop: 4 }}>
+              {payments.map((p, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex", gap: 12, alignItems: "baseline", flexWrap: "wrap",
+                    padding: "9px 0", borderBottom: "1px solid var(--border)",
+                  }}
+                >
+                  <span className="mono" style={{ fontWeight: 600, fontSize: 12.5 }}>{fmtLKR(p.amount)}</span>
+                  <span style={{ fontSize: 12.5, color: "var(--muted)" }}>
+                    {p.at.slice(0, 10)} · {p.method}
+                    {p.invoiceSlug ? ` · ${p.invoiceSlug}` : ""}
+                    {p.note ? ` · ${p.note}` : ""}
+                  </span>
+                  <button
+                    className="btn ghost small"
+                    style={{ padding: "2px 10px", fontSize: 11, marginLeft: "auto" }}
+                    disabled={!!busy}
+                    onClick={() => removePayment(p, i)}
+                  >
+                    {busy === `unpay-${i}` ? "…" : "Remove"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ marginTop: 10, fontSize: 13 }}>
+            Outstanding: <b className="mono">{fmtLKR(money.outstanding)}</b>
+            <span style={{ color: "var(--muted)" }}>
+              {" "}
+              ({fmtLKR(money.invoiced)} invoiced &amp; published − {fmtLKR(money.paid)} paid)
+            </span>
+            {money.unparsable.length > 0 && (
+              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+                Not counted (total unreadable): {money.unparsable.join(", ")} — record their
+                payments with Mark paid and the balance stays honest.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {error && <div className="form-error">{error}</div>}
       {dialog}
     </div>

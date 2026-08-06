@@ -104,7 +104,7 @@ const QUOTATION_SCHEMA = S.obj(
 );
 
 const INVOICE_SCHEMA = S.obj(["dueDate", "ref", "items", "total", "paymentNote"], {
-  dueDate: { type: "string", description: "~14 days from issue" },
+  dueDate: { type: "string", description: "Payment due date, e.g. '14 Aug 2026'. Use the exact default date given in the prompt unless the operator's instructions set a different one." },
   ref: { type: "string", description: "The quotation number this bills against" },
   items: S.arr(S.obj(["title", "desc", "amount"], { title: S.str, desc: S.str, amount: S.str })),
   total: S.str,
@@ -285,6 +285,19 @@ export async function generateBilling(
     "receipt-final":
       "Receipt for the final payment received by bank transfer today, referencing the final invoice. The balance note should confirm the account is fully settled and that IP has transferred.",
   };
+  // Standard due dates: advance invoices +7 days, final (and additional)
+  // invoices +14 — operator instructions override.
+  const dueDays = stage === "advance" ? 7 : 14;
+  const dueDefault = new Date(Date.now() + dueDays * 86_400_000).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Colombo",
+  });
+  const duePolicy =
+    kind === "invoice"
+      ? `\n\nDUE DATE: unless the operator instructions specify a different due date, set dueDate to exactly "${dueDefault}" (${dueDays} days from today — the standard term for ${stage === "advance" ? "advance" : "final/additional"} invoices).`
+      : "";
   const prompt = `Today is ${today}.
 
 ${clientContext(client)}
@@ -299,7 +312,7 @@ APPROVED CHANGE ORDERS (work added after the cost was finalised — billed on th
 ${JSON.stringify(context.changeOrders)}
 
 OPERATOR INSTRUCTIONS:
-${instructions || defaults[`${kind}-${stage}`] || `Draft the ${stage} ${kind}.`}
+${instructions || defaults[`${kind}-${stage}`] || `Draft the ${stage} ${kind}.`}${duePolicy}
 
 Draft the ${stage} ${kind}. All arithmetic must be exact and consistent with the history above.`;
   return generate(prompt, DOC_SCHEMAS[kind]);

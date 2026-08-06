@@ -143,6 +143,65 @@ export function renderEstimate(d: EstimateData, ctx: Ctx): string {
   });
 }
 
+/** "2026-08-07T…Z" → "07 Aug 2026" (Colombo). Falls back to the raw string. */
+const acceptedDate = (iso: string): string => {
+  const t = Date.parse(iso);
+  return Number.isFinite(t)
+    ? new Date(t).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Colombo" })
+    : iso;
+};
+
+/** The closing block of the quotation: the acceptance stamp once the client
+ *  has accepted, otherwise the how-to-accept note — plus, on the web page
+ *  only, the typed-name accept form (posts to the public /accept route on the
+ *  client's subdomain; hidden when printing). */
+function quotationAcceptBlock(ctx: Ctx): string {
+  const acc = ctx.client.acceptance;
+  if (acc) {
+    return `<div class="box" style="background:var(--a-dim);border-color:var(--a-border);break-inside:avoid;">
+      <div class="sec-k">Acceptance</div>
+      <div style="font-size:13.5px;"><b>Accepted by ${esc(acc.name)} on ${esc(acceptedDate(acc.at))}</b></div>
+      <div class="small" style="margin-top:4px;">Recorded via the client portal — the scope, price and payment terms above are confirmed. Next step: the advance invoice.</div>
+    </div>`;
+  }
+  const note = `<div class="section"><div class="sec-k">Accepting this quotation</div><div class="small">Reply by email confirming acceptance${ctx.mode === "web" ? ", or accept right here with your full name below" : ""}, or sign the accompanying Services Agreement — we'll then send the advance invoice and book your slot. The payment terms above form part of this quotation.</div></div>`;
+  if (ctx.mode !== "web") return note;
+  const inputStyle =
+    "flex:1 1 220px;min-width:0;border:1px solid var(--border-hi);background:var(--bg);color:var(--text);border-radius:10px;padding:10px 14px;font-family:var(--sans);font-size:14px;";
+  const btnStyle =
+    "border:none;cursor:pointer;background:var(--text);color:var(--bg);border-radius:100px;padding:11px 22px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;";
+  return `${note}
+  <div class="box" id="acceptBox" style="break-inside:avoid;">
+    <div class="sec-k">Accept online</div>
+    <div class="small">Type your full name and press accept — this records your acceptance of this quotation, including the payment terms above.</div>
+    <form id="acceptForm" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;">
+      <input type="text" name="company" value="" style="position:absolute;left:-9999px;top:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <input id="acceptName" type="text" placeholder="Your full name" maxlength="120" autocomplete="name" style="${inputStyle}">
+      <button type="submit" id="acceptBtn" style="${btnStyle}">ACCEPT QUOTATION</button>
+    </form>
+    <div id="acceptMsg" class="small" style="display:none;margin-top:10px;"></div>
+  </div>
+  <style>@media print{#acceptBox{display:none!important;}}</style>
+  <script>(function(){
+var f=document.getElementById('acceptForm');if(!f)return;
+var btn=document.getElementById('acceptBtn'),msg=document.getElementById('acceptMsg'),inp=document.getElementById('acceptName');
+function say(t){msg.style.display='block';msg.textContent=t;}
+function idle(){btn.disabled=false;btn.style.opacity='';btn.textContent='ACCEPT QUOTATION';}
+f.addEventListener('submit',function(e){
+e.preventDefault();
+var n=inp.value.trim();
+if(!n){say('Please type your full name first.');return;}
+btn.disabled=true;btn.style.opacity='.6';btn.textContent='SENDING\\u2026';
+fetch('/accept',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,company:f.elements.company.value})})
+.then(function(r){return r.json().then(function(d){return{ok:r.ok,d:d}}).catch(function(){return{ok:r.ok,d:{}}})})
+.then(function(x){
+if(x.ok){f.style.display='none';msg.style.display='block';msg.innerHTML='<b>Thank you \\u2014 quotation accepted.</b> '+((x.d&&x.d.already)?'(It was already accepted earlier, so nothing changed.) ':'')+'We\\u2019ll be in touch with the advance invoice shortly.';}
+else{say((x.d&&x.d.error)||'Something went wrong \\u2014 please try again, or reply by email.');idle();}
+})
+.catch(function(){say('Network problem \\u2014 please try again.');idle();});
+});})();</script>`;
+}
+
 export function renderQuotation(d: QuotationData, ctx: Ctx): string {
   const rows = d.items.map(
     (it) => `<div class="tbl-row" style="grid-template-columns:1fr 150px;">
@@ -167,18 +226,20 @@ export function renderQuotation(d: QuotationData, ctx: Ctx): string {
       <ul class="ticks">${d.paymentTerms.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>
     </div>
     <div class="section"><div class="sec-k">Notes</div><div class="small">${esc(d.notes)}</div></div>
-    <div class="section"><div class="sec-k">Accepting this quotation</div><div class="small">Reply by email confirming acceptance, or sign the accompanying Services Agreement — we'll then send the advance invoice and book your slot. The payment terms above form part of this quotation.</div></div>`;
+    ${quotationAcceptBlock(ctx)}`;
   return shell({
     mode: ctx.mode,
     title: `Quotation ${ctx.docNo} — ${ctx.client.company}`,
     docTitle: "Quotation",
-    pill: "Fixed price",
+    pill: ctx.client.acceptance ? "Accepted" : "Fixed price",
     metaLeft: clientBlock(ctx.client),
     metaRightRows: [
       metaRow("Quote no.", ctx.docNo, true),
       metaRow("Issued", ctx.issued, true),
       metaRow("Valid until", d.validUntil, true),
-      metaRow("Prepared by", "Luminary Studio"),
+      ...(ctx.client.acceptance
+        ? [metaRow("Accepted", acceptedDate(ctx.client.acceptance.at), true)]
+        : [metaRow("Prepared by", "Luminary Studio")]),
     ],
     body,
     pdfHref: ctx.pdfHref,
