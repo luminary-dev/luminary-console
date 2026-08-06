@@ -65,11 +65,16 @@ export function currentStage(c: ClientRecord): ClientStage {
   return s;
 }
 
-/** Auto-advance from a pipeline event. Only moves forward (never demotes a
- *  manual override); returns whether the stage actually changed. */
+/** Auto-advance from a pipeline event. Never demotes (skips when the current
+ *  stage is already beyond the target) but DOES persist on equal rank: the
+ *  triggering fact (published quotation, acceptance, payment) is usually
+ *  written to the record before this runs, so inference already matches the
+ *  target — writing it anyway pins the stage field (and deliveredAt) instead
+ *  of leaving them forever implicit. Returns whether the field changed. */
 export function advanceStage(c: ClientRecord, to: ClientStage): boolean {
-  if (stageRank(to) <= stageRank(currentStage(c))) return false;
+  if (stageRank(to) < stageRank(currentStage(c))) return false;
+  const changed = c.stage !== to;
   c.stage = to;
   if (to === "delivered" && !c.deliveredAt) c.deliveredAt = new Date().toISOString();
-  return true;
+  return changed;
 }
