@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useConfirm } from "./ConfirmDialog";
 
 export default function SendToClient({
   slug,
@@ -11,17 +12,30 @@ export default function SendToClient({
   email?: string;
   publishedCount: number;
 }) {
+  const { confirm, dialog } = useConfirm();
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const run = async () => {
-    if (
-      !window.confirm(
-        `Send ${email} ONE email containing:\n\n· the questionnaire link\n· all ${publishedCount} published document${publishedCount === 1 ? "" : "s"} — links + PDF attachments\n\nDrafts are never included. Send?`,
-      )
-    )
-      return;
+    const ok = await confirm({
+      title: "Email to client",
+      confirmLabel: "Send email",
+      message: (
+        <>
+          Send <b>{email}</b> ONE email containing:
+          <ul style={{ margin: "10px 0 10px 18px", padding: 0, display: "grid", gap: 4 }}>
+            <li>the questionnaire link</li>
+            <li>
+              all {publishedCount} published document{publishedCount === 1 ? "" : "s"} — links + PDF
+              attachments
+            </li>
+          </ul>
+          Drafts are never included.
+        </>
+      ),
+    });
+    if (!ok) return;
     setBusy(true);
     setError(null);
     setDone(null);
@@ -40,6 +54,7 @@ export default function SendToClient({
       {!email && <span style={{ fontSize: 12, color: "var(--muted)" }}>No client email on record.</span>}
       {done && <span style={{ fontSize: 12.5, color: "var(--a-text)" }}>{done} ✓</span>}
       {error && <span style={{ fontSize: 12.5, color: "var(--danger)" }}>{error}</span>}
+      {dialog}
     </div>
   );
 }

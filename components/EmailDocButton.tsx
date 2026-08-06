@@ -3,6 +3,7 @@
 // Per-document "Email" action: confirms, then sends that single document
 // (PDF attached; page link included when published) to the client.
 import { useState } from "react";
+import { useConfirm } from "./ConfirmDialog";
 
 export default function EmailDocButton({
   slug,
@@ -15,13 +16,23 @@ export default function EmailDocButton({
   label: string;
   email?: string;
 }) {
+  const { confirm, dialog } = useConfirm();
   const [busy, setBusy] = useState(false);
   const [state, setState] = useState<"idle" | "sent" | "error">("idle");
 
   if (!email) return null;
 
   const run = async () => {
-    if (!window.confirm(`Email the ${label} (PDF attached) to ${email}?`)) return;
+    const ok = await confirm({
+      title: "Email to client",
+      confirmLabel: "Send email",
+      message: (
+        <>
+          Email the <b>{label}</b> (PDF attached) to <b>{email}</b>?
+        </>
+      ),
+    });
+    if (!ok) return;
     setBusy(true);
     setState("idle");
     const res = await fetch(`/api/clients/${slug}/send`, {
@@ -35,8 +46,11 @@ export default function EmailDocButton({
   };
 
   return (
-    <button className="btn ghost small" disabled={busy} onClick={run}>
-      {busy ? "…" : state === "sent" ? "Sent ✓" : state === "error" ? "Failed — retry" : "Email"}
-    </button>
+    <>
+      <button className="btn ghost small" disabled={busy} onClick={run}>
+        {busy ? "…" : state === "sent" ? "Sent ✓" : state === "error" ? "Failed — retry" : "Email"}
+      </button>
+      {dialog}
+    </>
   );
 }

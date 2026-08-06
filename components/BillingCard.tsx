@@ -10,6 +10,7 @@ import type { BillingDoc } from "@/lib/types";
 const STAGE_LABEL: Record<string, string> = { advance: "Advance", final: "Final", other: "" };
 
 import EmailDocButton from "./EmailDocButton";
+import { useConfirm } from "./ConfirmDialog";
 
 export default function BillingCard({
   slug,
@@ -23,6 +24,7 @@ export default function BillingCard({
   email?: string;
 }) {
   const router = useRouter();
+  const { confirm, dialog } = useConfirm();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reviseFor, setReviseFor] = useState<string | null>(null);
@@ -54,11 +56,38 @@ export default function BillingCard({
   const remove = async (b: BillingDoc) => {
     const label = `the ${STAGE_LABEL[b.stage].toLowerCase()} ${b.kind} ${b.no}`;
     if (b.status === "published") {
-      if (!window.confirm(`${b.no} is PUBLISHED — it must be unpublished before it can be deleted. Unpublish it now?`)) return;
+      const step1 = await confirm({
+        title: "Unpublish first",
+        danger: true,
+        confirmLabel: "Unpublish",
+        message: (
+          <>
+            <b>{b.no}</b> is <b>published</b> — it must be unpublished before it can be deleted.
+            Unpublish it now?
+          </>
+        ),
+      });
+      if (!step1) return;
       if (!(await call({ action: "unpublish", doc: b.slug }, `unpub-${b.slug}`))) return;
-      if (!window.confirm(`${b.no} is now unpublished. Permanently delete ${label}? This cannot be undone.`)) return;
-    } else if (!window.confirm(`Permanently delete ${label}? This cannot be undone.`)) {
-      return;
+      const step2 = await confirm({
+        title: "Delete document",
+        danger: true,
+        confirmLabel: "Delete permanently",
+        message: (
+          <>
+            <b>{b.no}</b> is now unpublished. Permanently delete {label}? This cannot be undone.
+          </>
+        ),
+      });
+      if (!step2) return;
+    } else {
+      const sure = await confirm({
+        title: "Delete document",
+        danger: true,
+        confirmLabel: "Delete permanently",
+        message: <>Permanently delete {label}? This cannot be undone.</>,
+      });
+      if (!sure) return;
     }
     await call({ action: "delete", doc: b.slug }, `del-${b.slug}`);
   };
@@ -174,6 +203,7 @@ export default function BillingCard({
         </div>
       )}
       {error && <div className="form-error">{error}</div>}
+      {dialog}
     </div>
   );
 }

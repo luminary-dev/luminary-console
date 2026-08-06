@@ -2,17 +2,29 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useConfirm } from "./ConfirmDialog";
 
 export default function DeleteClient({ slug, company }: { slug: string; company: string }) {
   const router = useRouter();
+  const { confirm, dialog } = useConfirm();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const run = async () => {
     // Irreversible → re-authenticate: the console password is required again.
-    const password = window.prompt(
-      `Delete ${company} completely?\n\nEvery document (PDFs of all docs, invoices, receipts and questionnaire answers) is first emailed to the studio as an archive, then the documents, subdomain and DNS record are removed. This cannot be undone.\n\nEnter the console password to confirm:`,
-    );
+    const password = await confirm({
+      title: `Delete ${company}?`,
+      danger: true,
+      confirmLabel: "Delete forever",
+      password: true,
+      message: (
+        <>
+          Every document (PDFs of all docs, invoices, receipts and questionnaire answers) is first
+          emailed to the studio as an archive, then the documents, subdomain and DNS record are
+          removed. <b>This cannot be undone.</b> Enter the console password to confirm:
+        </>
+      ),
+    });
     if (!password) return;
     setBusy(true);
     setError(null);
@@ -47,6 +59,7 @@ export default function DeleteClient({ slug, company }: { slug: string; company:
       >
         {busy ? "Deleting…" : "Delete client & subdomain"}
       </button>
+      {dialog}
     </div>
   );
 }
