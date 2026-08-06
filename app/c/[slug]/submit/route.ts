@@ -9,6 +9,7 @@ import { renderAnswers } from "@/lib/templates/answers";
 import { renderPdf } from "@/lib/pdf";
 import { emailStudio, emailAddresses } from "@/lib/email";
 import { nowLabel, runStage2 } from "@/lib/pipeline";
+import { logActivity } from "@/lib/activity";
 import { esc } from "@/lib/templates/shell";
 import {
   MAX_FILES_PER_FIELD,
@@ -112,6 +113,7 @@ export async function POST(
     if (client.status === "created") client.status = "answers_in";
     await saveClient(client);
     const submissionNo = client.submissions.length;
+    await logActivity(contactName, "submitted questionnaire", slug, `submission #${submissionNo}`);
     // Auto-draft only while no drafts exist — later submissions must never
     // clobber documents the studio may have revised or published.
     const willDraft = !client.docs.quotation && !client.docs.proposal && !client.docs.contract;

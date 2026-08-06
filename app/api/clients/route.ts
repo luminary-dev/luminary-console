@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getIndex, getClient } from "@/lib/store";
 import { runStage1 } from "@/lib/pipeline";
+import { logActivity } from "@/lib/activity";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -71,6 +72,7 @@ export async function POST(req: Request) {
       phone: str(body.phone),
       contactName: str(body.contactName),
     });
+    await logActivity("operator", "created client", client.slug, company);
     return NextResponse.json({ ok: true, slug: client.slug });
   } catch (e) {
     console.error("Client creation failed:", e);

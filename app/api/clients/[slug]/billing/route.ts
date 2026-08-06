@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { deleteAssets, getClient, saveClient } from "@/lib/store";
 import { saveBillingDoc, todayLabel } from "@/lib/pipeline";
 import { generateBilling, reviseDoc } from "@/lib/generate";
+import { logActivity } from "@/lib/activity";
 import type { QuotationData } from "@/lib/templates/docs";
 
 export const runtime = "nodejs";
@@ -45,6 +46,7 @@ export async function POST(
       const data = await generateBilling(client, kind, stage, context, instructions, todayLabel());
       const doc = await saveBillingDoc(client, kind, stage, data, "draft");
       await saveClient(client);
+      await logActivity("operator", `generated ${stage} ${kind}`, slug, doc.no);
       return NextResponse.json({ ok: true, slug: doc.slug, no: doc.no });
     }
 
@@ -55,6 +57,7 @@ export async function POST(
       doc.status = action === "publish" ? "published" : "draft";
       doc.updatedAt = new Date().toISOString();
       await saveClient(client);
+      await logActivity("operator", `${action}ed ${doc.stage} ${doc.kind}`, slug, doc.no);
       return NextResponse.json({ ok: true, status: doc.status });
     }
 
@@ -70,6 +73,7 @@ export async function POST(
       await deleteAssets([doc.htmlUrl, doc.pdfUrl]);
       client.billing = (client.billing ?? []).filter((b) => b.slug !== doc.slug);
       await saveClient(client);
+      await logActivity("operator", `deleted ${doc.stage} ${doc.kind}`, slug, doc.no);
       return NextResponse.json({ ok: true });
     }
 
@@ -78,6 +82,7 @@ export async function POST(
       const data = await reviseDoc(client, doc.kind, doc.data, instructions, todayLabel());
       await saveBillingDoc(client, doc.kind, doc.stage, data, doc.status, doc.slug);
       await saveClient(client);
+      await logActivity("operator", `regenerated ${doc.stage} ${doc.kind}`, slug, doc.no);
       return NextResponse.json({ ok: true });
     }
 

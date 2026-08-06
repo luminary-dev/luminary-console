@@ -3,6 +3,7 @@ import { parseUsers, hashPassword } from "@/lib/users";
 import { getClient, deleteClient } from "@/lib/store";
 import { removeClientDomain } from "@/lib/domains";
 import { emailStudio } from "@/lib/email";
+import { logActivity } from "@/lib/activity";
 import { DOC_LABELS } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -71,6 +72,7 @@ export async function DELETE(
 
   const domainNotes = await removeClientDomain(slug);
   const blobsDeleted = await deleteClient(slug);
+  await logActivity("operator", "deleted client", slug, client.company);
   return NextResponse.json({ ok: true, blobsDeleted, domainNotes, archived: attachments.length });
 }
 

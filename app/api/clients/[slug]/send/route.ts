@@ -6,8 +6,9 @@
 // published. PDFs are attached for every generated doc; page links are
 // included only for published ones (drafts have no public URL).
 import { NextResponse } from "next/server";
-import { getClient } from "@/lib/store";
+import { getClient, saveClient } from "@/lib/store";
 import { emailAddresses } from "@/lib/email";
+import { logActivity } from "@/lib/activity";
 import { DOC_LABELS, type DocType } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -113,5 +114,13 @@ ${intro}
   );
 
   if (!ok) return NextResponse.json({ error: "Email failed to send." }, { status: 502 });
-  return NextResponse.json({ ok: true, sentTo: client.email, docs: docs.map((d) => d.key) });
+
+  const sentDocs = docs.map((d) => d.key);
+  client.emailLog = [
+    ...(client.emailLog ?? []),
+    { at: new Date().toISOString(), to: client.email, subject, docs: sentDocs },
+  ];
+  await saveClient(client);
+  await logActivity("operator", "emailed documents", slug, sentDocs.join(", "));
+  return NextResponse.json({ ok: true, sentTo: client.email, docs: sentDocs });
 }

@@ -50,6 +50,37 @@ export type ExtraQuestion = {
   kind: "text" | "textarea";
 };
 
+/** Lifecycle stage. Optional — older records derive a default from status/docs
+ *  (drafts_ready + published quotation → "quoted", else "lead"). */
+export type ClientStage =
+  | "lead"
+  | "quoted"
+  | "accepted"
+  | "development"
+  | "delivered"
+  | "warranty"
+  | "closed";
+
+/** A payment recorded against the project (usually against an invoice). */
+export type Payment = {
+  at: string;
+  /** LKR amount as a number — arithmetic (outstanding balance) needs it. */
+  amount: number;
+  /** e.g. "bank transfer", "cash", "card". */
+  method: string;
+  note?: string;
+  /** Billing slug the payment settles, e.g. "invoice-1". */
+  invoiceSlug?: string;
+};
+
+/** Client's typed acceptance of the published quotation (portal action). */
+export type Acceptance = { name: string; at: string; ip?: string };
+
+export type Task = { text: string; done: boolean; at: string };
+
+/** One client-facing email sent from the console (send route). */
+export type EmailLogEntry = { at: string; to: string; subject: string; docs?: string[] };
+
 export type ClientRecord = {
   slug: string;
   company: string;
@@ -79,6 +110,18 @@ export type ClientRecord = {
   billing?: BillingDoc[];
   /** Changes requested after the cost was finalised — billed on the final invoice. */
   changeOrders?: ChangeOrder[];
+  /** Lifecycle stage (see ClientStage) — absent on records that predate it. */
+  stage?: ClientStage;
+  /** Payments received (advance/final/other) — drives outstanding-balance math. */
+  payments?: Payment[];
+  /** Set once when the client accepts the quotation from the portal. */
+  acceptance?: Acceptance;
+  /** Free-form operator notes (console only, never client-facing). */
+  notes?: string;
+  /** Operator task checklist (console only). */
+  tasks?: Task[];
+  /** Every client-facing email sent via the send route, newest last. */
+  emailLog?: EmailLogEntry[];
 };
 
 export type BillingDoc = {

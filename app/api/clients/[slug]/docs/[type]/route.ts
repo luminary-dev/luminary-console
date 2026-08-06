@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { saveDoc, runStage2, todayLabel } from "@/lib/pipeline";
 import { reviseDoc } from "@/lib/generate";
+import { logActivity } from "@/lib/activity";
 import type { DocType } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -34,6 +35,7 @@ export async function POST(
       meta.status = action === "publish" ? "published" : "draft";
       meta.updatedAt = new Date().toISOString();
       await saveClient(client);
+      await logActivity("operator", `${action}ed ${docType}`, slug, meta.no);
       return NextResponse.json({ ok: true, status: meta.status });
     }
 
@@ -44,6 +46,7 @@ export async function POST(
       const data = await reviseDoc(client, docType, meta.data, instructions, todayLabel());
       const updated = await saveDoc(client, docType, data, meta.status);
       await saveClient(client);
+      await logActivity("operator", `regenerated ${docType}`, slug, updated.no);
       return NextResponse.json({ ok: true, status: updated.status });
     }
 

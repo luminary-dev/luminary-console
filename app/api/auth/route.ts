@@ -6,6 +6,7 @@ import { makeSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/auth";
 import { verifyUser } from "@/lib/users";
 import { issueOtp, verifyOtp } from "@/lib/otp";
 import { emailAddresses, NO_REPLY } from "@/lib/email";
+import { logActivity } from "@/lib/activity";
 
 export const runtime = "nodejs";
 
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
           : "Wrong code — check the email and try again.";
       return NextResponse.json({ error: msg }, { status: 401 });
     }
+    await logActivity(email, "signed in", "console");
     const res = NextResponse.json({ ok: true });
     res.cookies.set(SESSION_COOKIE, await makeSessionToken(secret), {
       httpOnly: true, secure: true, sameSite: "lax", maxAge: SESSION_MAX_AGE, path: "/",
