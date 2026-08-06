@@ -77,7 +77,7 @@ export default async function QuestionnairePage({
         <p style={{ color: "var(--muted)" }}>Takes 25–30 minutes — worth every one of them.</p>
       </div>
 
-      <QuestionnaireForm sections={sections} />
+      <QuestionnaireForm slug={client.slug} sections={sections} />
 
       <div className="foot">
         <div className="foot-links">

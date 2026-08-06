@@ -1,15 +1,15 @@
-// Public questionnaire-attachment upload. Files go straight to Blob under
-// the client's attachments folder; the returned ref is embedded in the
-// answers payload and re-validated (URL must point back here) at submit
-// time. Any file type is accepted — the studio opens these, clients never
-// serve them to each other — but HTML-ish types are stored as octet-stream
-// so the blob host never renders markup.
+// Questionnaire-attachment uploads go browser → Blob directly (client
+// upload), because routed-through-the-function bodies hit Vercel's 4.5 MB
+// limit — a phone photo wouldn't fit. This route only signs the upload
+// token, pinned to THIS client's attachments folder with a 15 MB cap;
+// submit re-validates every ref's URL against the same folder. HTML-ish
+// content types are refused so the blob host never renders markup.
 import { NextResponse } from "next/server";
-import { getClient, putAsset } from "@/lib/store";
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import { getClient } from "@/lib/store";
 import { MAX_FILE_BYTES } from "@/lib/attachments";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
 
 export async function POST(
   req: Request,
@@ -19,27 +19,46 @@ export async function POST(
   const client = await getClient(slug);
   if (!client) return NextResponse.json({ error: "Unknown client." }, { status: 404 });
 
-  const form = await req.formData().catch(() => null);
-  const file = form?.get("file");
-  if (!(file instanceof File)) {
-    return NextResponse.json({ error: "No file received." }, { status: 400 });
-  }
-  if (file.size === 0) {
-    return NextResponse.json({ error: "That file looks empty — please try another." }, { status: 400 });
-  }
-  if (file.size > MAX_FILE_BYTES) {
+  const body = (await req.json().catch(() => null)) as HandleUploadBody | null;
+  if (!body) return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+
+  try {
+    const json = await handleUpload({
+      body,
+      request: req,
+      onBeforeGenerateToken: async (pathname) => {
+        if (
+          !pathname.startsWith(`console/clients/${slug}/attachments/`) ||
+          !/^console\/clients\/[a-z0-9-]+\/attachments\/[\w.\- ()[\]]{1,120}$/.test(pathname)
+        ) {
+          throw new Error("Invalid upload path.");
+        }
+        return {
+          addRandomSuffix: true,
+          maximumSizeInBytes: MAX_FILE_BYTES,
+          // Everything real-world (Office, PDF, images, zips) fits these; the
+          // form maps anything odd to octet-stream. text/html stays excluded.
+          allowedContentTypes: [
+            "image/*",
+            "video/*",
+            "audio/*",
+            "font/*",
+            "application/*",
+            "text/plain",
+            "text/csv",
+            "text/markdown",
+            "text/rtf",
+          ],
+        };
+      },
+      // Refs reach us inside the submitted answers; nothing to do per-file.
+      onUploadCompleted: async () => {},
+    });
+    return NextResponse.json(json);
+  } catch (e) {
     return NextResponse.json(
-      { error: "Files can be up to 15 MB each — please compress it, or email it to support@luminary-dev.xyz instead." },
+      { error: e instanceof Error ? e.message : "Upload failed." },
       { status: 400 },
     );
   }
-
-  const name = (file.name || "attachment").replace(/[^\w.\- ()[\]]+/g, "_").slice(0, 120) || "attachment";
-  const type = file.type && !/html|javascript|xml/i.test(file.type) ? file.type : "application/octet-stream";
-  const url = await putAsset(
-    `clients/${slug}/attachments/${name}`,
-    Buffer.from(await file.arrayBuffer()),
-    type,
-  );
-  return NextResponse.json({ name, url, size: file.size });
 }

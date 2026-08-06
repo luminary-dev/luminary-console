@@ -5,6 +5,7 @@
 // in), and submission posts to the relative "submit" endpoint so the same
 // component works on the client subdomain and in console preview.
 import { useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 import type { Field, Section } from "@/lib/questions";
 import type { Answers } from "@/lib/types";
 import {
@@ -17,14 +18,26 @@ import {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Uploads go to the sibling "upload" endpoint immediately on pick, so submit
-// stays a small JSON POST; each uploaded file becomes a JSON-encoded ref in
-// answers[field.id] (see lib/attachments.ts).
+// Content types the upload token whitelists; anything else (and anything
+// markup-ish) uploads as a plain binary so the blob host never renders it.
+function safeContentType(type: string): string {
+  if (!type || /html|xml|javascript/i.test(type)) return "application/octet-stream";
+  if (/^(image|video|audio|font|application)\//.test(type)) return type;
+  if (["text/plain", "text/csv", "text/markdown", "text/rtf"].includes(type)) return type;
+  return "application/octet-stream";
+}
+
+// Files upload straight from the browser to Blob (the sibling "upload"
+// endpoint only signs a token scoped to this client's attachments folder —
+// routing bytes through a function would cap files at 4.5 MB); each uploaded
+// file becomes a JSON-encoded ref in answers[field.id] (see lib/attachments).
 function UploadControl({
+  slug,
   field,
   answers,
   setAnswer,
 }: {
+  slug: string;
   field: Field;
   answers: Answers;
   setAnswer: (id: string, value: string | string[]) => void;
@@ -58,12 +71,13 @@ function UploadControl({
         continue;
       }
       try {
-        const fd = new FormData();
-        fd.append("file", f);
-        const res = await fetch("upload", { method: "POST", body: fd });
-        const data = await res.json().catch(() => null);
-        if (!res.ok || !data?.url) throw new Error(data?.error || `Upload failed (${res.status}).`);
-        added.push(JSON.stringify({ n: data.name, u: data.url, s: data.size }));
+        const name = (f.name || "attachment").replace(/[^\w.\- ()[\]]+/g, "_").slice(0, 120) || "attachment";
+        const blob = await upload(`console/clients/${slug}/attachments/${name}`, f, {
+          access: "public",
+          handleUploadUrl: "upload",
+          contentType: safeContentType(f.type),
+        });
+        added.push(JSON.stringify({ n: name, u: blob.url, s: f.size }));
       } catch (e) {
         setErr(
           (e instanceof Error ? e.message : "Upload failed.") +
@@ -115,16 +129,18 @@ function UploadControl({
 }
 
 function FieldControl({
+  slug,
   field,
   answers,
   setAnswer,
 }: {
+  slug: string;
   field: Field;
   answers: Answers;
   setAnswer: (id: string, value: string | string[]) => void;
 }) {
   if (field.type === "upload") {
-    return <UploadControl field={field} answers={answers} setAnswer={setAnswer} />;
+    return <UploadControl slug={slug} field={field} answers={answers} setAnswer={setAnswer} />;
   }
 
   if (field.type === "checks") {
@@ -189,7 +205,7 @@ function FieldControl({
   );
 }
 
-export default function QuestionnaireForm({ sections }: { sections: Section[] }) {
+export default function QuestionnaireForm({ slug, sections }: { slug: string; sections: Section[] }) {
   const [answers, setAnswers] = useState<Answers>({});
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -286,7 +302,7 @@ export default function QuestionnaireForm({ sections }: { sections: Section[] })
                   </span>
                   {field.hint && <div className="q-hint">{field.hint}</div>}
                 </div>
-                <FieldControl field={field} answers={answers} setAnswer={setAnswer} />
+                <FieldControl slug={slug} field={field} answers={answers} setAnswer={setAnswer} />
               </div>
             ))}
           </div>
