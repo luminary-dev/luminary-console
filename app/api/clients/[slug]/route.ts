@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { parseUsers, hashPassword } from "@/lib/users";
 import { getClient, deleteClient } from "@/lib/store";
 import { removeClientDomain } from "@/lib/domains";
 import { emailStudio } from "@/lib/email";
@@ -26,8 +27,9 @@ export async function DELETE(
 ) {
   const { slug } = await params;
   const body = await req.json().catch(() => ({}));
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected || body?.password !== expected) {
+  // Any operator's password confirms (see lib/users).
+  const confirmed = typeof body?.password === "string" && (await anyUserPassword(body.password));
+  if (!confirmed) {
     await new Promise((r) => setTimeout(r, 800));
     return NextResponse.json({ error: "Wrong password — deletion cancelled." }, { status: 403 });
   }
@@ -70,4 +72,11 @@ export async function DELETE(
   const domainNotes = await removeClientDomain(slug);
   const blobsDeleted = await deleteClient(slug);
   return NextResponse.json({ ok: true, blobsDeleted, domainNotes, archived: attachments.length });
+}
+
+async function anyUserPassword(password: string): Promise<boolean> {
+  for (const u of parseUsers()) {
+    if ((await hashPassword(u.salt, password)) === u.hash) return true;
+  }
+  return false;
 }

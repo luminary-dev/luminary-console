@@ -80,6 +80,19 @@ export async function fetchAsset(url: string): Promise<Response> {
   return fetch(url, { cache: "no-store" });
 }
 
+// Small JSON state records outside the client tree (e.g. OTP codes).
+export const readState = <T>(path: string) => readJson<T>(`${PREFIX}${path}`);
+export const writeState = (path: string, data: unknown) => writeJson(`${PREFIX}${path}`, data);
+export async function clearState(path: string): Promise<void> {
+  try {
+    const prefix = `${PREFIX}${path}`.replace(/\.json$/, "");
+    const { blobs } = await list({ prefix, limit: 100 });
+    if (blobs.length) await del(blobs.map((b) => b.url));
+  } catch {
+    /* best effort */
+  }
+}
+
 /** Best-effort blob deletion (e.g. removing a mistakenly generated doc). */
 export async function deleteAssets(urls: string[]): Promise<void> {
   try {

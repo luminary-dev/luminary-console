@@ -1,4 +1,4 @@
-// Single-operator auth: ADMIN_PASSWORD checked once at /login, then a signed
+// Session tokens: issued after email+password+OTP at /login, then a signed
 // HMAC session cookie (SESSION_SECRET) verified by proxy.ts on every console
 // request. Web Crypto only, so the same code runs in the proxy and in routes.
 
