@@ -9,7 +9,7 @@ Working doc for the multi-agent build. Each wave: implement → `npm run build` 
 - Light+dark theme via existing tokens; mobile-first (no horizontal overflow at 390px; never inline maxWidth overriding responsive caps — use classes).
 - Secrets: `.env.local` (strip quotes when parsing). PATH can corrupt: use `/usr/bin/curl`, `/usr/bin/python3` or export PATH first.
 - Deploy check: poll `https://api.vercel.com/v6/deployments?projectId=prj_pK8jvT3YlYlOpMa3CezuzpDIOTIG&teamId=team_koRXXg51bnoBmXpHCrRzkK7S&limit=1` with `Authorization: Bearer $VERCEL_TOKEN`.
-- **Authed testing without OTP**: craft a session cookie locally — token = `{abs}.{idle}.{sig}`, sig = base64url(HMAC-SHA256(SESSION_SECRET, "lum-admin.{abs}.{idle}")), abs=now+24h ms, idle=now+30min ms. Send as `Cookie: lum_session=<token>`. (Python hmac works; urllib is blocked by api.resend.com's Cloudflare — use curl there.)
+- **Authed testing without OTP**: craft a session cookie locally — token = `{abs}.{idle}.{sid}.{sig}`, sig = base64url(HMAC-SHA256(SESSION_SECRET, "lum-admin.{abs}.{idle}.{sid}")), abs=now+24h ms, idle=now+30min ms, sid=16 lowercase hex chars (8 random bytes; Wave 3 session registry — a crafted sid won't appear in the dashboard Sessions card unless registered, and must not be on the revoked list). Send as `Cookie: lum_session=<token>`. (Python hmac works; urllib is blocked by api.resend.com's Cloudflare — use curl there.)
 - Store: use `lib/store.ts` helpers (`readState/writeState/clearState`, ms-versioned paths — NEVER raw `put` for state). Sequential writes only; the store has no concurrency control.
 - Doc/billing numbers must never be reused (monotonic counter exists). Billing slugs = max+1.
 - After your wave: run a quick regression (login gate 401, eco-mech GET intact via crafted cookie, portal of your test client renders, build clean).
@@ -37,6 +37,7 @@ Working doc for the multi-agent build. Each wave: implement → `npm run build` 
 - [ ] DNS health: same cron (or second) verifies each client's CNAME + Vercel domain still attached; mismatch → studio email.
 - [ ] Session registry: on login create `sid` in token + blob registry (`state console/sessions.json`, cap 50) with email/ua/time; proxy checks sid not revoked (cache 60s in module scope to avoid per-request blob reads — acceptable staleness); `/api/sessions` list + revoke (sign out everywhere) UI in a small Settings card on dashboard.
 - [ ] Tick. (TOTP explicitly deferred — email OTP already covers 2FA; note this.)
+- **TOTP is deferred**: the email OTP at login already provides a second factor bound to the operator's mailbox; adding TOTP would duplicate that with real enrolment/recovery complexity. Revisit only if the email channel itself becomes a concern.
 
 ### Wave 4 — Portal & console UX
 - [ ] Portal: progress indicator (stage-driven: questionnaire → quotation → advance → development → delivery → warranty), "new" badge for docs published since client's last portal visit (cookie), per-document comment box (public POST `/c/[slug]/comment`, honeypot, rate-limited, stores `comments?: {doc, by, text, at}[]`, emails studio, shows in console client page).

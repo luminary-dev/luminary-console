@@ -2,11 +2,13 @@
 // emailed to that address → session cookie. The step between them is a short
 // HMAC "pending" cookie so the code can only be redeemed by the same browser.
 import { NextResponse } from "next/server";
-import { makeSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/auth";
+import { makeSessionToken, newSid, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/auth";
 import { verifyUser } from "@/lib/users";
 import { issueOtp, verifyOtp } from "@/lib/otp";
 import { emailAddresses, NO_REPLY } from "@/lib/email";
 import { logActivity } from "@/lib/activity";
+import { registerSession } from "@/lib/sessions";
+import { rateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -36,6 +38,8 @@ async function readPending(secret: string, token: string | undefined): Promise<s
 }
 
 export async function POST(req: Request) {
+  const limited = rateLimit(req, "auth");
+  if (limited) return limited;
   const secret = process.env.SESSION_SECRET;
   if (!secret) return NextResponse.json({ error: "Auth not configured." }, { status: 503 });
   const body = await req.json().catch(() => ({}));
@@ -59,8 +63,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: msg }, { status: 401 });
     }
     await logActivity(email, "signed in", "console");
+    // Register the login in the session registry so it shows on the
+    // dashboard and can be revoked ("sign out everywhere").
+    const sid = newSid();
+    await registerSession(sid, email, req.headers.get("user-agent") || "unknown device");
     const res = NextResponse.json({ ok: true });
-    res.cookies.set(SESSION_COOKIE, await makeSessionToken(secret), {
+    res.cookies.set(SESSION_COOKIE, await makeSessionToken(secret, sid), {
       httpOnly: true, secure: true, sameSite: "lax", maxAge: SESSION_MAX_AGE, path: "/",
     });
     res.cookies.set(PENDING_COOKIE, "", { httpOnly: true, secure: true, sameSite: "lax", maxAge: 0, path: "/" });

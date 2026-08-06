@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { getClient } from "@/lib/store";
 import { MAX_FILE_BYTES } from "@/lib/attachments";
+import { rateLimit } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -15,6 +16,9 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  const limited = rateLimit(req, "upload");
+  if (limited) return limited;
+
   const { slug } = await params;
   const client = await getClient(slug);
   if (!client) return NextResponse.json({ error: "Unknown client." }, { status: 404 });

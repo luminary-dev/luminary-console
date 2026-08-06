@@ -3,6 +3,7 @@ import { getClient, getIndex } from "@/lib/store";
 import { STAGES, STAGE_LABELS, currentStage } from "@/lib/stage";
 import { clientMoney, fmtLKR } from "@/lib/money";
 import type { ClientStage } from "@/lib/types";
+import SessionsCard from "@/components/SessionsCard";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -132,6 +133,8 @@ export default async function Dashboard() {
           </table></div>
         )}
       </div>
+
+      <SessionsCard />
     </main>
   );
 }

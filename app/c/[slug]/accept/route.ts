@@ -9,6 +9,7 @@ import { getClient, saveClient } from "@/lib/store";
 import { saveDoc } from "@/lib/pipeline";
 import { emailStudio } from "@/lib/email";
 import { logActivity } from "@/lib/activity";
+import { rateLimit } from "@/lib/ratelimit";
 import { advanceStage } from "@/lib/stage";
 import { esc } from "@/lib/templates/shell";
 
@@ -22,6 +23,9 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  const limited = rateLimit(req, "accept");
+  if (limited) return limited;
+
   const { slug } = await params;
   const client = await getClient(slug);
   if (!client) return NextResponse.json({ error: "Unknown client." }, { status: 404 });

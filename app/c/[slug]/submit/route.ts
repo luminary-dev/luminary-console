@@ -10,6 +10,7 @@ import { renderPdf } from "@/lib/pdf";
 import { emailStudio, emailAddresses } from "@/lib/email";
 import { nowLabel, runStage2 } from "@/lib/pipeline";
 import { logActivity } from "@/lib/activity";
+import { rateLimit } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
 import {
   MAX_FILES_PER_FIELD,
@@ -29,6 +30,10 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  // Rate limit before any storage work, so unknown-slug floods are cheap too.
+  const limited = rateLimit(req, "submit");
+  if (limited) return limited;
+
   const { slug } = await params;
   const client = await getClient(slug);
   if (!client) return NextResponse.json({ error: "Unknown client." }, { status: 404 });

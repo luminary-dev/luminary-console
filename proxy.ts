@@ -7,6 +7,23 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { SESSION_COOKIE, SESSION_MAX_AGE, makeSessionToken, verifySessionToken } from "@/lib/auth";
+import { revokedSids } from "@/lib/sessions";
+
+// Revoked-sid cache: one blob read per instance per minute instead of per
+// request. Revocation therefore takes up to ~60s to propagate — acceptable
+// staleness for "sign that device out". Fails open (treats the list as
+// empty) so a blob hiccup can't lock the operator out of the console.
+let revokedCache: { at: number; sids: Set<string> } | null = null;
+async function sidRevoked(sid: string): Promise<boolean> {
+  if (!revokedCache || Date.now() - revokedCache.at > 60_000) {
+    try {
+      revokedCache = { at: Date.now(), sids: new Set(await revokedSids()) };
+    } catch {
+      revokedCache = { at: Date.now(), sids: new Set() };
+    }
+  }
+  return revokedCache.sids.has(sid);
+}
 
 // Standard hardening for a private operations console.
 function harden(res: NextResponse, console_: boolean) {
@@ -46,6 +63,9 @@ export async function proxy(request: NextRequest) {
     pathname === "/login" ||
     pathname === "/api/auth" ||
     pathname === "/api/logout" ||
+    // Cron endpoints skip the session gate — each route guards itself with
+    // the CRON_SECRET bearer check (Vercel Cron can't hold a session cookie).
+    pathname.startsWith("/api/cron/") ||
     pathname.startsWith("/_next") ||
     pathname === "/icon.svg" ||
     pathname === "/favicon.ico"
@@ -56,8 +76,8 @@ export async function proxy(request: NextRequest) {
   // Direct /c/* access on the console host is allowed for previewing —
   // but still behind auth like everything else.
   const secret = process.env.SESSION_SECRET || "";
-  const absExp = await verifySessionToken(secret, request.cookies.get(SESSION_COOKIE)?.value);
-  if (!absExp) {
+  const session = await verifySessionToken(secret, request.cookies.get(SESSION_COOKIE)?.value);
+  if (!session || (await sidRevoked(session.sid))) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -68,8 +88,9 @@ export async function proxy(request: NextRequest) {
   }
 
   // Slide the idle window (capped at the absolute expiry).
+  const { absExp, sid } = session;
   const res = harden(NextResponse.next(), true);
-  res.cookies.set(SESSION_COOKIE, await makeSessionToken(secret, absExp), {
+  res.cookies.set(SESSION_COOKIE, await makeSessionToken(secret, sid, absExp), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
