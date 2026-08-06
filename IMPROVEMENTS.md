@@ -17,11 +17,11 @@ Working doc for the multi-agent build. Each wave: implement → `npm run build` 
 ## Waves
 
 ### Wave 1 — Foundations (types + activity/email logs) ✅ prerequisites for all
-- [ ] `lib/types.ts`: extend ClientRecord with `stage?: "lead"|"quoted"|"accepted"|"development"|"delivered"|"warranty"|"closed"` (derive default from existing status/docs), `payments?: Payment[]` (`{at, amount, method, note?, invoiceSlug?}`), `acceptance?: {name, at, ip?}`, `notes?: string`, `tasks?: {text, done, at}[]`, `emailLog?: {at, to, subject, docs?: string[]}[]`.
-- [ ] `lib/activity.ts`: append-only audit log at `state console/activity.json` (cap last 500): `log(actor, action, target, detail?)`. Actor = email from session where available else "operator".
-- [ ] Hook activity log into: login success (auth route), publish/unpublish/regenerate/delete (docs + billing routes), send route (also append to client.emailLog), client create/delete, questionnaire submission (actor = client contact).
-- [ ] `GET /api/activity` (authed) returns last 100.
-- [ ] Build, deploy, tick.
+- [x] `lib/types.ts`: extend ClientRecord with `stage?: "lead"|"quoted"|"accepted"|"development"|"delivered"|"warranty"|"closed"` (derive default from existing status/docs), `payments?: Payment[]` (`{at, amount, method, note?, invoiceSlug?}` — `amount` is a **number**, LKR, for balance math), `acceptance?: {name, at, ip?}`, `notes?: string`, `tasks?: {text, done, at}[]`, `emailLog?: {at, to, subject, docs?: string[]}[]`. (Types: `ClientStage`, `Payment`, `Acceptance`, `Task`, `EmailLogEntry`.)
+- [x] `lib/activity.ts`: append-only audit log at `state console/activity.json` (cap last 500): exported as `logActivity(actor, action, target, detail?)` + `recentActivity(limit=100)` (newest first). Actor = email from session where available else "operator". Best-effort: both swallow errors.
+- [x] Hook activity log into: login success (auth route, actor = verified email), publish/unpublish/regenerate (docs route), generate/publish/unpublish/regenerate/delete (billing route), send route (also append to client.emailLog + saveClient), client create/delete, questionnaire submission (actor = client contact).
+- [x] `GET /api/activity` (authed) returns last 100.
+- [x] Build, deploy, tick. (Verified on prod: authed GET /api/activity 200 JSON, unauthed 401, eco-mech record intact.)
 
 ### Wave 2 — Money: payments, acceptance, lifecycle, dashboard
 - [ ] Invoice due dates: generation includes `dueDate` (default: advance = +7 days, final = +14; overridable via instructions). Show on invoice doc + console.
@@ -58,3 +58,4 @@ Working doc for the multi-agent build. Each wave: implement → `npm run build` 
 
 ## Progress log
 (append: date — wave — agent summary — deploy sha)
+- 2026-08-07 — Wave 1 — extended ClientRecord types (stage/payments/acceptance/notes/tasks/emailLog), added lib/activity.ts audit log (activity.json, cap 500, best-effort) hooked into auth/docs/billing/send/clients-CRUD/submit, new authed GET /api/activity (last 100, newest first); prod verified (activity 200 + JSON, unauthed 401, eco-mech intact) — 46994c3
