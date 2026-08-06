@@ -5,6 +5,16 @@ import { runStage1 } from "@/lib/pipeline";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
+// Subdomains that already mean something (or ever could): a client slug
+// becomes <slug>.luminary-dev.xyz, and client DELETION removes that CNAME —
+// a client named "console" or "dev" would tear down real infrastructure.
+const RESERVED_SLUGS = new Set([
+  "console", "dev", "www", "api", "app", "admin", "mail", "smtp", "imap",
+  "pop", "mx", "webmail", "autodiscover", "autoconfig", "dmarc", "ns1", "ns2",
+  "ftp", "cdn", "assets", "static", "status", "blog", "docs", "support",
+  "help", "staging", "test", "preview", "vercel", "luminary",
+]);
+
 export async function GET() {
   return NextResponse.json(await getIndex());
 }
@@ -32,6 +42,9 @@ export async function POST(req: Request) {
   }
   if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(slug)) {
     return NextResponse.json({ error: "Slug must be lowercase letters, digits and dashes." }, { status: 400 });
+  }
+  if (RESERVED_SLUGS.has(slug) || slug.startsWith("_")) {
+    return NextResponse.json({ error: `"${slug}" is a reserved subdomain — pick another slug.` }, { status: 400 });
   }
   if (await getClient(slug)) {
     return NextResponse.json({ error: `Client "${slug}" already exists.` }, { status: 409 });
