@@ -42,7 +42,7 @@ export default async function ClientHome({
         <div className="portal-links">
           <Link className="portal-link" href="/questionnaire">
             <span>Project questionnaire</span>
-            <span className="no">→</span>
+            <span className="no">LUM-QST-{client.docNoBase} →</span>
           </Link>
           {published.map((t) => (
             <Link className="portal-link" key={t} href={`/${t}`}>
