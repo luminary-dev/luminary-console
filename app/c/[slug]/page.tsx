@@ -54,7 +54,7 @@ export default async function ClientHome({
             .filter((b) => b.status === "published")
             .map((b) => (
               <Link className="portal-link" key={b.slug} href={`/${b.slug}`}>
-                <span>{b.stage === "advance" ? "Advance " : b.stage === "final" ? "Final " : ""}{DOC_LABELS[b.kind]}</span>
+                <span>{b.stage === "advance" ? "Advance " : b.stage === "final" ? "Final " : "Additional "}{DOC_LABELS[b.kind]}</span>
                 <span className="no">{b.no} →</span>
               </Link>
             ))}

@@ -26,6 +26,12 @@ export async function POST(
     if (action === "generate") {
       const kind = body.kind === "receipt" ? "receipt" : "invoice";
       const stage = ["advance", "final", "other"].includes(body.stage) ? body.stage : "other";
+      if (stage === "other" && !instructions) {
+        return NextResponse.json(
+          { error: "Describe the additional work and amount (invoice) or the payment received (receipt) first." },
+          { status: 400 },
+        );
+      }
       const context = {
         quotation: (client.docs.quotation?.data as QuotationData) ?? null,
         priorBilling: (client.billing ?? []).map((b) => ({

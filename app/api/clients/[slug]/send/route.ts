@@ -14,7 +14,7 @@ export const runtime = "nodejs";
 export const maxDuration = 120;
 
 const CORE: DocType[] = ["estimate", "quotation", "proposal", "contract", "invoice", "receipt"];
-const stageLabel = (s: string) => (s === "advance" ? "Advance " : s === "final" ? "Final " : "");
+const stageLabel = (s: string) => (s === "advance" ? "Advance " : s === "final" ? "Final " : "Additional ");
 
 type Resolved = {
   key: string;

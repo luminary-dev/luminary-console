@@ -295,7 +295,7 @@ ${JSON.stringify(context.quotation)}
 BILLING HISTORY SO FAR (stay arithmetically consistent with these):
 ${JSON.stringify(context.priorBilling)}
 
-APPROVED CHANGE ORDERS (work added after the cost was finalised — billed on the FINAL invoice only):
+APPROVED CHANGE ORDERS (work added after the cost was finalised — billed on the FINAL invoice; a change order already itemised on an invoice in the billing history has been billed, NEVER bill the same change order twice):
 ${JSON.stringify(context.changeOrders)}
 
 OPERATOR INSTRUCTIONS:
