@@ -70,7 +70,12 @@ export async function saveBillingDoc(
   client.billing = client.billing ?? [];
   let doc = existingSlug ? client.billing.find((b) => b.slug === existingSlug) : undefined;
   if (!doc) {
-    const seq = client.billing.filter((b) => b.kind === kind).length + 1;
+    // Max existing sequence + 1, not count + 1: deleting a middle document
+    // must never make the next one collide with a surviving slug/number.
+    const seq =
+      client.billing
+        .filter((b) => b.kind === kind)
+        .reduce((m, b) => Math.max(m, parseInt(b.slug.split("-").pop() ?? "", 10) || 0), 0) + 1;
     doc = {
       kind,
       stage,

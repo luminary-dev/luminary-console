@@ -64,6 +64,16 @@ export async function fetchAsset(url: string): Promise<Response> {
   return fetch(url, { cache: "no-store" });
 }
 
+/** Best-effort blob deletion (e.g. removing a mistakenly generated doc). */
+export async function deleteAssets(urls: string[]): Promise<void> {
+  try {
+    const real = urls.filter(Boolean);
+    if (real.length) await del(real);
+  } catch {
+    /* best effort */
+  }
+}
+
 // ——— clients ———
 
 export async function getIndex(): Promise<IndexEntry[]> {

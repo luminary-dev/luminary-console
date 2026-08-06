@@ -2,7 +2,7 @@
 // arithmetic grounded in the quotation + billing history + change orders),
 // publish/unpublish, revise.
 import { NextResponse } from "next/server";
-import { getClient, saveClient } from "@/lib/store";
+import { deleteAssets, getClient, saveClient } from "@/lib/store";
 import { saveBillingDoc, todayLabel } from "@/lib/pipeline";
 import { generateBilling, reviseDoc } from "@/lib/generate";
 import type { QuotationData } from "@/lib/templates/docs";
@@ -50,6 +50,21 @@ export async function POST(
       doc.updatedAt = new Date().toISOString();
       await saveClient(client);
       return NextResponse.json({ ok: true, status: doc.status });
+    }
+
+    if (action === "delete") {
+      // Deleting a published document would break links a client may already
+      // hold — the console unpublishes first, but enforce it here too.
+      if (doc.status === "published") {
+        return NextResponse.json(
+          { error: "This document is published — unpublish it before deleting." },
+          { status: 400 },
+        );
+      }
+      await deleteAssets([doc.htmlUrl, doc.pdfUrl]);
+      client.billing = (client.billing ?? []).filter((b) => b.slug !== doc.slug);
+      await saveClient(client);
+      return NextResponse.json({ ok: true });
     }
 
     if (action === "regenerate") {

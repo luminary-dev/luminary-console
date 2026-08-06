@@ -28,7 +28,7 @@ export default function BillingCard({
   const [reviseFor, setReviseFor] = useState<string | null>(null);
   const [instructions, setInstructions] = useState("");
 
-  const call = async (payload: Record<string, unknown>, key: string) => {
+  const call = async (payload: Record<string, unknown>, key: string): Promise<boolean> => {
     setBusy(key);
     setError(null);
     const res = await fetch(`/api/clients/${slug}/billing`, {
@@ -40,11 +40,27 @@ export default function BillingCard({
     setBusy(null);
     if (!res.ok) {
       setError(data?.error || `Failed (${res.status})`);
-      return;
+      return false;
     }
     setReviseFor(null);
     setInstructions("");
     router.refresh();
+    return true;
+  };
+
+  // Deleting is for mistakes only, so it's deliberately slow: a published
+  // document must be unpublished first (confirmed), then deletion itself is
+  // confirmed again; a draft just confirms once.
+  const remove = async (b: BillingDoc) => {
+    const label = `the ${STAGE_LABEL[b.stage].toLowerCase()} ${b.kind} ${b.no}`;
+    if (b.status === "published") {
+      if (!window.confirm(`${b.no} is PUBLISHED — it must be unpublished before it can be deleted. Unpublish it now?`)) return;
+      if (!(await call({ action: "unpublish", doc: b.slug }, `unpub-${b.slug}`))) return;
+      if (!window.confirm(`${b.no} is now unpublished. Permanently delete ${label}? This cannot be undone.`)) return;
+    } else if (!window.confirm(`Permanently delete ${label}? This cannot be undone.`)) {
+      return;
+    }
+    await call({ action: "delete", doc: b.slug }, `del-${b.slug}`);
   };
 
   const gen = (kind: string, stage: string, label: string) => (
@@ -98,9 +114,13 @@ export default function BillingCard({
                       {b.status}
                     </span>
                   </td>
-                  <td>
-                    <a href={b.htmlUrl} target="_blank" rel="noopener noreferrer">
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    <a href={`/preview/${slug}/${b.slug}`} target="_blank" rel="noopener noreferrer">
                       Preview
+                    </a>
+                    {" · "}
+                    <a href={b.htmlUrl} title="Download the HTML file">
+                      HTML ↓
                     </a>
                   </td>
                   <td style={{ minWidth: 220 }}>
@@ -118,6 +138,14 @@ export default function BillingCard({
                         Revise
                       </button>
                       <EmailDocButton slug={slug} docKey={b.slug} label={`${STAGE_LABEL[b.stage].toLowerCase()} ${b.kind}`} email={email} />
+                      <button
+                        className="btn ghost small"
+                        style={{ color: "#ef4444", borderColor: "rgba(239,68,68,.35)" }}
+                        disabled={!!busy}
+                        onClick={() => remove(b)}
+                      >
+                        {busy === `del-${b.slug}` ? "…" : "Delete"}
+                      </button>
                     </div>
                     {reviseFor === b.slug && (
                       <div style={{ marginTop: 10 }}>

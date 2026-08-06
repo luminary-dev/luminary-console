@@ -11,7 +11,8 @@ export async function GET(
 ) {
   const { slug, type } = await params;
   const client = await getClient(slug);
-  const meta = client?.docs[type as DocType];
+  // Core doc type ("invoice") or billing slug ("invoice-2").
+  const meta = client?.docs[type as DocType] ?? client?.billing?.find((b) => b.slug === type);
   if (!client || !meta) return new Response("Not found", { status: 404 });
   const res = await fetch(meta.pdfUrl && type === "pdf" ? meta.pdfUrl : meta.htmlUrl, { cache: "no-store" });
   return new Response(await res.arrayBuffer(), {
