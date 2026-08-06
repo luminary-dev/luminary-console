@@ -1,3 +1,4 @@
+import SessionGuard from "@/components/SessionGuard";
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { Outfit, JetBrains_Mono } from "next/font/google";
@@ -30,7 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <style>{`html{background:#f0f0ee;color-scheme:light}html[data-theme="dark"]{background:#050506;color-scheme:dark}`}</style>
       </head>
-      <body>{children}</body>
+      <body>{children}<SessionGuard /></body>
     </html>
   );
 }

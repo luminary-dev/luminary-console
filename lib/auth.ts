@@ -3,7 +3,8 @@
 // request. Web Crypto only, so the same code runs in the proxy and in routes.
 
 export const SESSION_COOKIE = "lum_session";
-export const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+export const SESSION_MAX_AGE = 30 * 60; // idle window: 30 min, slid on activity
+export const SESSION_ABS_MAX_AGE = 60 * 60 * 24; // hard cap: re-auth daily
 
 function toB64url(bytes: ArrayBuffer): string {
   let bin = "";
@@ -23,20 +24,25 @@ async function sign(secret: string, value: string): Promise<string> {
   return toB64url(sig);
 }
 
-export async function makeSessionToken(secret: string): Promise<string> {
-  const exp = Date.now() + SESSION_MAX_AGE * 1000;
-  return `${exp}.${await sign(secret, `lum-admin.${exp}`)}`;
+// Token: "<absExp>.<idleExp>.<sig>" — idleExp slides forward on every
+// request (30-min inactivity logout); absExp never moves (daily re-auth).
+export async function makeSessionToken(secret: string, absExp?: number): Promise<string> {
+  const abs = absExp ?? Date.now() + SESSION_ABS_MAX_AGE * 1000;
+  const idle = Math.min(Date.now() + SESSION_MAX_AGE * 1000, abs);
+  return `${abs}.${idle}.${await sign(secret, `lum-admin.${abs}.${idle}`)}`;
 }
 
+/** Returns the absolute expiry (for re-issuing a slid token) or null. */
 export async function verifySessionToken(
   secret: string,
   token: string | undefined,
-): Promise<boolean> {
-  if (!token) return false;
-  const dot = token.indexOf(".");
-  if (dot < 1) return false;
-  const exp = Number(token.slice(0, dot));
-  if (!Number.isFinite(exp) || exp < Date.now()) return false;
-  const expected = await sign(secret, `lum-admin.${exp}`);
-  return token.slice(dot + 1) === expected;
+): Promise<number | null> {
+  if (!token) return null;
+  const [abs, idle, sig] = token.split(".");
+  if (!abs || !idle || !sig) return null;
+  const absN = Number(abs), idleN = Number(idle);
+  if (!Number.isFinite(absN) || !Number.isFinite(idleN)) return null;
+  if (absN < Date.now() || idleN < Date.now()) return null;
+  if ((await sign(secret, `lum-admin.${abs}.${idle}`)) !== sig) return null;
+  return absN;
 }

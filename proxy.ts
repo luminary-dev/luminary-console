@@ -6,7 +6,18 @@
 //   path except /login and /api/auth requires the signed session cookie.
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import { SESSION_COOKIE, SESSION_MAX_AGE, makeSessionToken, verifySessionToken } from "@/lib/auth";
+
+// Standard hardening for a private operations console.
+function harden(res: NextResponse, console_: boolean) {
+  res.headers.set("X-Content-Type-Options", "nosniff");
+  res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains");
+  res.headers.set("X-Frame-Options", console_ ? "DENY" : "SAMEORIGIN");
+  res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  if (console_) res.headers.set("Cache-Control", "no-store"); // back/hard-reload never shows stale authed pages
+  return res;
+}
 
 const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
 const CONSOLE_HOST = process.env.CONSOLE_HOST || `console.${ROOT}`;
@@ -27,25 +38,26 @@ export async function proxy(request: NextRequest) {
     // Client hosts may only reach client-site routes.
     const url = request.nextUrl.clone();
     url.pathname = `/c/${slug}${pathname === "/" ? "" : pathname}`;
-    return NextResponse.rewrite(url);
+    return harden(NextResponse.rewrite(url), false);
   }
 
   // Console host: public paths first.
   if (
     pathname === "/login" ||
     pathname === "/api/auth" ||
+    pathname === "/api/logout" ||
     pathname.startsWith("/_next") ||
     pathname === "/icon.svg" ||
     pathname === "/favicon.ico"
   ) {
-    return NextResponse.next();
+    return harden(NextResponse.next(), pathname === "/login");
   }
 
   // Direct /c/* access on the console host is allowed for previewing —
   // but still behind auth like everything else.
   const secret = process.env.SESSION_SECRET || "";
-  const ok = await verifySessionToken(secret, request.cookies.get(SESSION_COOKIE)?.value);
-  if (!ok) {
+  const absExp = await verifySessionToken(secret, request.cookies.get(SESSION_COOKIE)?.value);
+  if (!absExp) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -55,7 +67,16 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
+  // Slide the idle window (capped at the absolute expiry).
+  const res = harden(NextResponse.next(), true);
+  res.cookies.set(SESSION_COOKIE, await makeSessionToken(secret, absExp), {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    maxAge: Math.min(SESSION_MAX_AGE, Math.max(1, Math.floor((absExp - Date.now()) / 1000))),
+    path: "/",
+  });
+  return res;
 }
 
 export const config = {

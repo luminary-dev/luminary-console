@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export default function NewClientPage() {
@@ -49,6 +50,7 @@ export default function NewClientPage() {
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <ThemeToggle />
+          <SignOut />
           <Link className="btn ghost small" href="/">
             ← Dashboard
           </Link>

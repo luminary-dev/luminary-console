@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const timedOut = typeof window !== "undefined" && window.location.search.includes("timedout");
   const router = useRouter();
 
   const post = async (body: Record<string, string>) => {
@@ -62,6 +63,9 @@ export default function LoginPage() {
       </div>
       <div className="k" style={{ marginTop: 8, letterSpacing: ".16em" }}>Studio console</div>
 
+      {timedOut && step === "creds" && (
+        <div className="notice" style={{ marginTop: 18 }}>You were signed out after 30 minutes of inactivity.</div>
+      )}
       {step === "creds" ? (
         <form onSubmit={submitCreds} style={{ marginTop: 28 }}>
           <div className="q-field">

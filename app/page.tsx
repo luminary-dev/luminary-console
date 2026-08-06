@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getIndex } from "@/lib/store";
+import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata = { title: "Clients" };
@@ -23,6 +24,7 @@ export default async function Dashboard() {
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <ThemeToggle />
+          <SignOut />
           <Link className="btn" href="/clients/new">
             + New client
           </Link>

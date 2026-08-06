@@ -5,6 +5,7 @@ import { DOC_LABELS, type DocType } from "@/lib/types";
 import DocActions from "@/components/DocActions";
 import CopyLink from "@/components/CopyLink";
 import RetryStage2 from "@/components/RetryStage2";
+import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
 import DeleteClient from "@/components/DeleteClient";
 import SendToClient from "@/components/SendToClient";
@@ -42,6 +43,7 @@ export default async function ClientPage({
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <ThemeToggle />
+          <SignOut />
           <Link className="btn ghost small" href="/">
             ← Dashboard
           </Link>
