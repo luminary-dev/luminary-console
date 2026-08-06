@@ -1,0 +1,60 @@
+# Console improvement program — agent coordination file
+
+Working doc for the multi-agent build. Each wave: implement → `npm run build` passes → commit → push to `main` (auto-deploys) → verify deploy READY → tick your boxes here (commit the tick too) → report.
+
+## Hard rules (every agent)
+- **NEVER touch the `eco-mech` client record** (real client). Test with new clients (never reserved slugs: console/dev/www/api/…); DELETE test clients when done (the delete endpoint archives + removes domain).
+- Read `CLAUDE.md`-style conventions from the code itself; match existing patterns (globals.css tokens, `.card`, `.btn`, q-* form classes, ConfirmDialog for confirmations, no browser alert/confirm/prompt).
+- **No "Claude"/AI mentions in any UI or client-facing email.** Client emails only on explicit operator action.
+- Light+dark theme via existing tokens; mobile-first (no horizontal overflow at 390px; never inline maxWidth overriding responsive caps — use classes).
+- Secrets: `.env.local` (strip quotes when parsing). PATH can corrupt: use `/usr/bin/curl`, `/usr/bin/python3` or export PATH first.
+- Deploy check: poll `https://api.vercel.com/v6/deployments?projectId=prj_pK8jvT3YlYlOpMa3CezuzpDIOTIG&teamId=team_koRXXg51bnoBmXpHCrRzkK7S&limit=1` with `Authorization: Bearer $VERCEL_TOKEN`.
+- **Authed testing without OTP**: craft a session cookie locally — token = `{abs}.{idle}.{sig}`, sig = base64url(HMAC-SHA256(SESSION_SECRET, "lum-admin.{abs}.{idle}")), abs=now+24h ms, idle=now+30min ms. Send as `Cookie: lum_session=<token>`. (Python hmac works; urllib is blocked by api.resend.com's Cloudflare — use curl there.)
+- Store: use `lib/store.ts` helpers (`readState/writeState/clearState`, ms-versioned paths — NEVER raw `put` for state). Sequential writes only; the store has no concurrency control.
+- Doc/billing numbers must never be reused (monotonic counter exists). Billing slugs = max+1.
+- After your wave: run a quick regression (login gate 401, eco-mech GET intact via crafted cookie, portal of your test client renders, build clean).
+
+## Waves
+
+### Wave 1 — Foundations (types + activity/email logs) ✅ prerequisites for all
+- [ ] `lib/types.ts`: extend ClientRecord with `stage?: "lead"|"quoted"|"accepted"|"development"|"delivered"|"warranty"|"closed"` (derive default from existing status/docs), `payments?: Payment[]` (`{at, amount, method, note?, invoiceSlug?}`), `acceptance?: {name, at, ip?}`, `notes?: string`, `tasks?: {text, done, at}[]`, `emailLog?: {at, to, subject, docs?: string[]}[]`.
+- [ ] `lib/activity.ts`: append-only audit log at `state console/activity.json` (cap last 500): `log(actor, action, target, detail?)`. Actor = email from session where available else "operator".
+- [ ] Hook activity log into: login success (auth route), publish/unpublish/regenerate/delete (docs + billing routes), send route (also append to client.emailLog), client create/delete, questionnaire submission (actor = client contact).
+- [ ] `GET /api/activity` (authed) returns last 100.
+- [ ] Build, deploy, tick.
+
+### Wave 2 — Money: payments, acceptance, lifecycle, dashboard
+- [ ] Invoice due dates: generation includes `dueDate` (default: advance = +7 days, final = +14; overridable via instructions). Show on invoice doc + console.
+- [ ] Payments: `POST /api/clients/[slug]/payments` add/remove `{amount, method, at?, invoiceSlug?, note?}`; BillingCard shows per-invoice paid state (Mark paid → ConfirmDialog) and outstanding balance = invoiced(published) − paid.
+- [ ] Quotation acceptance: portal quotation page gets an "Accept this quotation" block (typed full name → POST `/c/[slug]/accept`, public, honeypot + name required, only when quotation published & not yet accepted). Stores `acceptance`, stamps a visible acceptance line into the quotation render (name/date), emails studio, activity-logs. Idempotent: second accept → friendly "already accepted".
+- [ ] Lifecycle `stage`: auto-advance (quotation published→quoted; acceptance→accepted; advance payment recorded→development; final receipt published→delivered→warranty(30d auto)→closed) + manual override dropdown on client page. Show stage pill on dashboard rows.
+- [ ] Dashboard: pipeline summary (count per stage) + "LKR X outstanding across N clients" from payments math.
+- [ ] Test with a scratch client end-to-end incl. arithmetic; delete it. Tick.
+
+### Wave 3 — Security/ops: rate limiting, backups, DNS health, sessions
+- [ ] Rate limiting (in-function, fixed-window via Map — per instance is fine): submit 5/10min/IP, upload 30/10min/IP, auth 10/10min/IP (429 + friendly error; form shows it). IP from x-forwarded-for first hop.
+- [ ] Weekly backup cron (`vercel.json`/`vercel.ts` crons or GitHub Action schedule): route `GET /api/cron/backup` (protected by CRON_SECRET env — generate + set on Vercel) that zips all client records+index (JSON only, not PDFs) and emails to studio.
+- [ ] DNS health: same cron (or second) verifies each client's CNAME + Vercel domain still attached; mismatch → studio email.
+- [ ] Session registry: on login create `sid` in token + blob registry (`state console/sessions.json`, cap 50) with email/ua/time; proxy checks sid not revoked (cache 60s in module scope to avoid per-request blob reads — acceptable staleness); `/api/sessions` list + revoke (sign out everywhere) UI in a small Settings card on dashboard.
+- [ ] Tick. (TOTP explicitly deferred — email OTP already covers 2FA; note this.)
+
+### Wave 4 — Portal & console UX
+- [ ] Portal: progress indicator (stage-driven: questionnaire → quotation → advance → development → delivery → warranty), "new" badge for docs published since client's last portal visit (cookie), per-document comment box (public POST `/c/[slug]/comment`, honeypot, rate-limited, stores `comments?: {doc, by, text, at}[]`, emails studio, shows in console client page).
+- [ ] Questionnaire Sinhala toggle: EN/සිං switch; static translations for section titles/hints/buttons (hand-write good Sinhala for chrome; question labels stay EN with Sinhala sub-hint where feasible — translate the fixed base schema at build time into `lib/questions.si.ts`; answers accepted in any language).
+- [ ] Console: per-client Notes card (autosave textarea → `notes`) + Tasks checklist (add/toggle/remove → `tasks`); revision history — before regenerate/revise, push current `{htmlUrl, pdfUrl, no, at}` onto `meta.history[]` (cap 10) and list versions in console with preview links; email history card from `emailLog`; activity feed page `/activity` (authed) rendering `/api/activity`.
+- [ ] Tick.
+
+### Wave 5 — AI assistant + handover pack
+- [ ] Client-page assistant card (operator-only): textarea → `POST /api/clients/[slug]/assist` (authed) with the full client record as context (Claude Opus 5, stream not required; reuse lib/generate `client` setup, `claude-opus-5`, cache system prompt). Prompt use-cases: summarize submissions, draft follow-up email, explain outstanding money. Output rendered as text with a Copy button. NO client-facing sending from here.
+- [ ] Handover pack: button on client page (enabled when stage ≥ delivered or final receipt exists) → `POST /api/clients/[slug]/handover` generates a branded HTML+PDF doc (existing shell/templates): credentials placeholder table, warranty terms (30d from delivery), care-plan pitch, doc index with numbers. Stored as billing-style asset, previewable, publishable to portal, emailable per-doc like others. Doc no: `LUM-HOP-{base}`.
+- [ ] Tick.
+
+### Wave 6 — Full E2E QA (fresh agent)
+- [ ] Re-run whole-platform test matrix (auth+OTP mechanics, guards, questionnaire+uploads, docs lifecycle, billing arc incl. payments/due/acceptance, new features, crons, rate limits — expect 429s, portal UX incl. comments/badges/Sinhala, mobile+desktop light+dark screenshots, JS console errors, no horizontal overflow).
+- [ ] Fix everything found (commit fixes), re-test, document results at the bottom of this file. eco-mech must be byte-identical (record + doc URLs) before/after.
+
+## Env additions
+- `CRON_SECRET` (Wave 3 — generate, set on Vercel all targets + .env.local).
+
+## Progress log
+(append: date — wave — agent summary — deploy sha)
