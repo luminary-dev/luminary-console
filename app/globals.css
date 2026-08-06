@@ -26,6 +26,9 @@ a:hover { color: var(--accent); }
 .mono { font-family: var(--font-mono), ui-monospace, monospace; }
 
 .wrap { width: 960px; max-width: calc(100% - 32px); margin: 0 auto; }
+/* Inline maxWidth on .wrap overrides the responsive cap above — use this
+   class instead (the /clients/new mobile-overflow bug). */
+.wrap--narrow { max-width: min(720px, calc(100% - 32px)); }
 .sheet {
   width: 880px; max-width: calc(100% - 32px); margin: 40px auto 80px;
   background: var(--bg); border: 1px solid var(--border);

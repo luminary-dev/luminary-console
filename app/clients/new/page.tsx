@@ -41,7 +41,7 @@ export default function NewClientPage() {
   };
 
   return (
-    <main className="wrap" style={{ paddingBottom: 80, maxWidth: 720 }}>
+    <main className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
       <div className="topbar">
         <div className="brand">
           Luminary<span>.</span>
