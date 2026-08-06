@@ -99,9 +99,14 @@ export async function deleteClient(slug: string): Promise<number> {
   return blobs.length;
 }
 
-/** Next shared doc number, zero-padded. Starts after the manual 0043 docs. */
+/** Next shared doc number, zero-padded. Monotonic: a separate counter records
+ *  the highest number ever issued, so deleting a client can never cause its
+ *  document numbers to be reused (an accounting hazard). Gaps are fine. */
 export async function nextDocNoBase(): Promise<string> {
   const index = await getIndex();
-  const max = index.reduce((m, e) => Math.max(m, parseInt(e.docNoBase, 10) || 0), 43);
-  return String(max + 1).padStart(4, "0");
+  const indexMax = index.reduce((m, e) => Math.max(m, parseInt(e.docNoBase, 10) || 0), 43);
+  const counter = (await readJson<{ last: number }>(`${PREFIX}counter.json`))?.last ?? 0;
+  const next = Math.max(indexMax, counter) + 1;
+  await writeJson(`${PREFIX}counter.json`, { last: next });
+  return String(next).padStart(4, "0");
 }
