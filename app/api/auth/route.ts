@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { makeSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/auth";
 import { verifyUser } from "@/lib/users";
 import { issueOtp, verifyOtp } from "@/lib/otp";
-import { emailAddresses } from "@/lib/email";
+import { emailAddresses, NO_REPLY } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -85,7 +85,10 @@ export async function POST(req: Request) {
     `${issued.code} is your Luminary Console code`,
     `<p>Your one-time sign-in code:</p>
 <p style="font-size:28px;font-weight:700;letter-spacing:.2em">${issued.code}</p>
-<p>It expires in 10 minutes and works once. If you didn't try to sign in to the Luminary Console, change your password.</p>`,
+<p>It expires in 10 minutes and works once. If you didn't try to sign in to the Luminary Console, change your password.</p>
+<p style="color:#888;font-size:12px">This is an automated message — replies aren't monitored.</p>`,
+    [],
+    { from: NO_REPLY, noReply: true },
   );
   if (!sent) return NextResponse.json({ error: "Couldn't send the code — try again." }, { status: 502 });
   const res = NextResponse.json({ ok: true, step: "otp" });
