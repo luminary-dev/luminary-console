@@ -69,7 +69,8 @@ export default async function QuestionnairePage({
         <strong>How this works:</strong>
         <p>
           answer below and press <strong>Submit</strong> — your answers come straight to our studio,
-          no printing or emailing needed. Logos, photos and screenshots can be emailed afterwards.
+          no printing or emailing needed. Logos, photos, screenshots and documents can be attached
+          right in the form where you see an <strong>Attach files</strong> button.
           This form is thorough on purpose: every answer saves a revision round later. Skip anything
           you&apos;re unsure of and we&apos;ll cover it on the kickoff call.
         </p>

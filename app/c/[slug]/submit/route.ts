@@ -4,12 +4,20 @@
 // client isn't kept waiting on Claude.
 import { NextResponse, after } from "next/server";
 import { getClient, putAsset, saveClient } from "@/lib/store";
-import { validIds } from "@/lib/questions";
+import { buildSections, validIds } from "@/lib/questions";
 import { renderAnswers } from "@/lib/templates/answers";
 import { renderPdf } from "@/lib/pdf";
 import { emailStudio, emailAddresses } from "@/lib/email";
 import { nowLabel, runStage2 } from "@/lib/pipeline";
-import type { Answers } from "@/lib/types";
+import { esc } from "@/lib/templates/shell";
+import {
+  MAX_FILES_PER_FIELD,
+  fmtSize,
+  isOwnAttachmentUrl,
+  parseAttachment,
+  type AttachmentRef,
+} from "@/lib/attachments";
+import type { Answers, Attachment } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -33,11 +41,25 @@ export async function POST(
   }
 
   const ids = validIds(client);
+  const uploadIds = new Set(
+    buildSections(client).flatMap((s) => s.fields.filter((f) => f.type === "upload").map((f) => f.id)),
+  );
   const answers: Answers = {};
+  const attachments: Attachment[] = [];
   if (body.answers && typeof body.answers === "object") {
     for (const [k, v] of Object.entries(body.answers as Record<string, unknown>)) {
       if (!ids.has(k)) continue;
-      if (typeof v === "string") answers[k] = v.slice(0, 8000);
+      if (uploadIds.has(k)) {
+        // Upload fields carry JSON-encoded refs; only refs pointing back into
+        // this client's own attachments folder survive.
+        if (!Array.isArray(v)) continue;
+        const refs = v
+          .slice(0, MAX_FILES_PER_FIELD)
+          .map(parseAttachment)
+          .filter((a): a is AttachmentRef => !!a && isOwnAttachmentUrl(a.u, slug));
+        answers[k] = refs.map((a) => JSON.stringify(a));
+        attachments.push(...refs.map((a) => ({ name: a.n, url: a.u, size: a.s })));
+      } else if (typeof v === "string") answers[k] = v.slice(0, 8000);
       else if (Array.isArray(v) && v.every((x) => typeof x === "string")) {
         answers[k] = v.slice(0, 40).map((x) => x.slice(0, 300));
       }
@@ -79,7 +101,13 @@ export async function POST(
         : []);
     client.submissions = [
       ...history,
-      { at: submittedAt, by: contactName, answersUrl, pdfUrl: answersPdfUrl },
+      {
+        at: submittedAt,
+        by: contactName,
+        answersUrl,
+        pdfUrl: answersPdfUrl,
+        ...(attachments.length ? { attachments } : {}),
+      },
     ];
     if (client.status === "created") client.status = "answers_in";
     await saveClient(client);
@@ -91,10 +119,15 @@ export async function POST(
     const filename = `Questionnaire - ${client.company} - LUM-QST-${client.docNoBase}.pdf`;
     const contactEmail = typeof answers.contactEmail === "string" ? answers.contactEmail.trim() : "";
 
+    const attachmentsHtml = attachments.length
+      ? `<p><strong>${attachments.length} file${attachments.length > 1 ? "s" : ""} attached by the client:</strong></p>
+<ul>${attachments.map((a) => `<li><a href="${esc(a.url)}">${esc(a.name)}</a> (${fmtSize(a.size)})</li>`).join("")}</ul>`
+      : "";
+
     await emailStudio(
       `Questionnaire submitted — ${client.company}${submissionNo > 1 ? ` (submission #${submissionNo})` : ""}`,
       `<p><strong>${contactName}</strong> submitted the ${client.company} discovery questionnaire at ${submittedAt} (Colombo)${submissionNo > 1 ? ` — this is submission #${submissionNo} for this client` : ""}.</p>
-<p>Full answers attached. ${
+${attachmentsHtml}<p>Full answers attached. ${
         willDraft
           ? "The quotation, proposal and contract are being drafted now — a second email lands when they're ready."
           : "Your existing quotation/proposal/contract were left untouched. To incorporate these new answers, use Revise on a document, or delete the drafts and press Draft now in the console."
@@ -120,8 +153,19 @@ export async function POST(
     // immediately while Claude drafts in the background. Only for the first
     // submission; later ones must not overwrite reviewed documents.
     if (willDraft) {
+      // Drafting sees file names, not raw JSON refs / blob URLs.
+      const draftAnswers: Answers = { ...answers };
+      for (const id of uploadIds) {
+        const v = draftAnswers[id];
+        if (Array.isArray(v)) {
+          draftAnswers[id] = v
+            .map(parseAttachment)
+            .filter((a): a is AttachmentRef => !!a)
+            .map((a) => `${a.n} (attached file)`);
+        }
+      }
       after(async () => {
-        await runStage2(slug, answers, submittedAt);
+        await runStage2(slug, draftAnswers, submittedAt);
       });
     }
 

@@ -96,6 +96,19 @@ export default async function ClientPage({
                 <a href={sub.pdfUrl} target="_blank" rel="noopener noreferrer">
                   answers PDF →
                 </a>
+                {"attachments" in sub && sub.attachments && sub.attachments.length > 0 && (
+                  <div style={{ marginTop: 4, marginLeft: 16, fontSize: 13 }}>
+                    {sub.attachments.length} file{sub.attachments.length > 1 ? "s" : ""} attached:{" "}
+                    {sub.attachments.map((a, j) => (
+                      <span key={j}>
+                        {j > 0 && " · "}
+                        <a href={a.url} target="_blank" rel="noopener noreferrer">
+                          {a.name}
+                        </a>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             <div style={{ marginTop: 8, fontSize: 12, color: "var(--muted)" }}>

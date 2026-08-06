@@ -144,6 +144,31 @@ table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font
 .q-other { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; max-width: 100%; }
 .q-other .q-line { width: 220px; max-width: 100%; padding: 4px 2px; font-size: 13.5px; }
 
+/* Questionnaire file attachments */
+.q-files { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.q-file-btn {
+  font: 600 13px var(--sans); color: var(--a-text); background: var(--a-dim);
+  border: 1px dashed var(--a-border); border-radius: 10px; padding: 9px 16px; cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.q-file-btn:hover:not(:disabled) { border-color: var(--a-text); }
+.q-file-btn:disabled { opacity: .6; cursor: wait; }
+.q-file-note { font-size: 11.5px; color: var(--subtle); font-family: var(--mono); }
+.q-file-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.q-file-list li {
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+  border: 1px solid var(--border-hi); border-radius: 10px; padding: 7px 10px 7px 12px; font-size: 13px;
+}
+.q-file-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.q-file-size { color: var(--muted); font-size: 11.5px; font-family: var(--mono); flex-shrink: 0; margin-left: auto; }
+.q-file-x {
+  flex-shrink: 0; width: 22px; height: 22px; display: grid; place-items: center;
+  border: none; background: none; color: var(--muted); font-size: 16px; line-height: 1;
+  border-radius: 6px; cursor: pointer;
+}
+.q-file-x:hover { color: #ef4444; background: rgba(239,68,68,.1); }
+.q-file-err { font-size: 12.5px; color: #ef4444; line-height: 1.5; }
+
 .copy-block { margin-top: 30px; padding: 16px 18px; background: var(--off); border: 1px solid var(--border); border-radius: 12px; }
 .submit-bar { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .submit-note { font-size: 12.5px; color: var(--muted); max-width: 420px; }

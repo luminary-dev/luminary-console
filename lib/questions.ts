@@ -22,6 +22,12 @@ export type Field =
       options: string[];
       grid?: boolean;
       other?: boolean;
+    }
+  | {
+      id: string;
+      type: "upload";
+      label: string;
+      hint?: string;
     };
 
 export type Section = {
@@ -92,10 +98,11 @@ export function buildSections(client: ClientRecord): Section[] {
     {
       id: "brand",
       eyebrow: "Section 04 · Logo & brand assets",
-      title: "What you have — you can email files after submitting",
+      title: "What you have — attach files right here",
       fields: [
-        { id: "logo", type: "checks", grid: true, label: "Your logo — tick all that apply:", hint: "Email the best files you have after submitting — even a letterhead or business card scan helps.", options: ["We have a logo and will email it", "We have vector files (AI / SVG / EPS / PDF)", "We only have images (PNG / JPG / from documents)", "We have light & dark versions", "We'd like the logo cleaned up / redrawn", "We don't have a logo — please design one"] },
+        { id: "logo", type: "checks", grid: true, label: "Your logo — tick all that apply:", hint: "Attach the best files you have below — even a letterhead or business card scan helps.", options: ["We have a logo (attaching it below)", "We have vector files (AI / SVG / EPS / PDF)", "We only have images (PNG / JPG / from documents)", "We have light & dark versions", "We'd like the logo cleaned up / redrawn", "We don't have a logo — please design one"] },
         { id: "assets", type: "checks", grid: true, label: "Other brand assets — tick everything you can send:", options: ["Brand guidelines / colour codes document", "Company profile / brochure (PDF)", "Photos of projects or work", "Photos of team / premises", "Letterheads, business cards, signage photos", "Client testimonials or reviews", "Videos (site work, promos, walkthroughs)", "Awards / certificates (scans)"] },
+        { id: "brandFiles", type: "upload", label: "Attach your brand files here.", hint: "Logo files, brand guidelines, brochures, letterheads, photos — images, PDFs, Word, PowerPoint, anything up to 15 MB per file." },
         { id: "certifications", type: "text", label: "Certifications & registrations to display." },
         { id: "clients", type: "textarea", rows: 2, label: "Notable clients or projects we're allowed to name or show.", hint: "Only what you have permission to publish." },
       ],
@@ -106,7 +113,8 @@ export function buildSections(client: ClientRecord): Section[] {
       title: "How it should look and feel",
       sub: "This is the section that shapes the design most — the more specific you are here, the closer the first draft lands.",
       fields: [
-        { id: "inspirations", type: "textarea", rows: 4, label: "Inspirations — websites you like, any industry.", hint: "Paste links, and for each one a few words on WHY. Screenshots can be emailed after submitting.", placeholder: "https://…  — what we like about it" },
+        { id: "inspirations", type: "textarea", rows: 4, label: "Inspirations — websites you like, any industry.", hint: "Paste links, and for each one a few words on WHY. Screenshots go in the next question.", placeholder: "https://…  — what we like about it" },
+        { id: "inspirationFiles", type: "upload", label: "Attach inspiration screenshots.", hint: "Screenshots of sites or designs you like — mark them up if you can." },
         { id: "dislikes", type: "textarea", rows: 2, label: "Websites or styles you DON'T like.", hint: "Just as useful as the likes." },
         { id: "feel", type: "checks", label: "The site should feel… (tick up to 2)", options: ["Corporate & precise", "Modern & bold", "Warm & approachable", "Technical & detailed", "Premium & understated"] },
         { id: "colourTheme", type: "checks", label: "Overall colour theme:", options: ["Light & clean", "Dark & premium", "Follow our logo colours", "Designer's choice — surprise us"] },
@@ -127,7 +135,8 @@ export function buildSections(client: ClientRecord): Section[] {
         { id: "sections", type: "checks", grid: true, label: "Sections to include — tick all you want:", hint: "A landing page works best with 6–8 focused sections — we'll advise on the final set.", options: ["Hero (headline + main action)", "About us / who we are", "Vision & mission", "Services / products", "Completed projects / portfolio", "Certifications & registrations", "Clients & partners", "Testimonials", "Our team", "Process — how we work", "FAQ", "Contact & enquiry form"] },
         { id: "copywriter", type: "checks", label: "Who writes the text?", options: ["We'll send our own text", "Luminary writes it from this form (recommended)", "Mix — we'll send notes, you polish"] },
         { id: "enquiryForm", type: "textarea", rows: 2, label: "Enquiry form — what should it ask, and where do submissions go?" },
-        { id: "existingContent", type: "text", label: "Existing content we can pull from.", hint: "Old website, Facebook page, brochure — links here, files by email." },
+        { id: "existingContent", type: "text", label: "Existing content we can pull from.", hint: "Old website, Facebook page — links here; files below." },
+        { id: "contentFiles", type: "upload", label: "Attach any content documents.", hint: "Company profile, price lists, text drafts — Word, PDF, spreadsheets." },
       ],
     },
     {

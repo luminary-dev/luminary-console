@@ -106,7 +106,10 @@ export type Submission = {
   by: string;
   answersUrl: string;
   pdfUrl: string;
+  attachments?: Attachment[];
 };
+
+export type Attachment = { name: string; url: string; size: number };
 
 export type IndexEntry = {
   slug: string;
