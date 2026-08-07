@@ -147,7 +147,7 @@ export type ClientRecord = {
   answersBy?: string;
   /** Full history — the questionnaire may be submitted more than once. */
   submissions?: Submission[];
-  /** Invoices & receipts across the payment arc (advance → final). */
+  /** Invoices & receipts across the 50/30/20 payment arc (advance → progress → final). */
   billing?: BillingDoc[];
   /** Highest sequence ever issued per billing kind. Without it, deleting the
    *  newest invoice frees its number for the next one — and a deleted
@@ -177,9 +177,11 @@ export type ClientRecord = {
 
 export type BillingDoc = {
   kind: BillingKind;
-  /** Where in the payment arc this sits. Handover packs are always "other" —
-   *  they bill nothing, so the money math (lib/money.ts) skips them. */
-  stage: "advance" | "final" | "other";
+  /** Where in the 50/30/20 payment arc this sits: "advance" is the 50% signing
+   *  milestone, "progress" the 30% design-approval milestone, "final" the 20%
+   *  launch milestone (plus any change orders). Handover packs are always
+   *  "other" — they bill nothing, so the money math (lib/money.ts) skips them. */
+  stage: "advance" | "progress" | "final" | "other";
   /** URL segment on the client site, e.g. "invoice-1". */
   slug: string;
   no: string;

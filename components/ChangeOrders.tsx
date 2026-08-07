@@ -88,14 +88,18 @@ export default function ChangeOrders({
         </div>
         <div className="q-field half">
           <span className="q-label">Amount (LKR)</span>
-          <input className="q-line" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="4,500" />
+          <input className="q-line" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Leave blank to price automatically" />
         </div>
       </div>
+      <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 6 }}>
+        Leave the amount blank to apply the aftercare default: the first 5 change requests are free,
+        then LKR 6,000 each. Enter an amount to override (e.g. a larger change quoted first).
+      </p>
       {error && <div className="form-error">{error}</div>}
       <button
         className="btn small"
         style={{ marginTop: 14 }}
-        disabled={busy || !desc.trim() || !amount.trim()}
+        disabled={busy || !desc.trim()}
         onClick={() => call({ action: "add", desc, amount })}
       >
         {busy ? "Saving…" : "Add change order"}

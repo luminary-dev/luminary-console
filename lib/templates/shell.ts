@@ -137,11 +137,12 @@ html[data-reveal] *{transition:none!important;}
 // Studio-standard commercial terms — rendered by the TEMPLATES (not the AI),
 // so no generated document can ever omit them.
 export const POLICY_ITEMS = [
-  "50% advance to begin; the balance falls due on delivery and is payable before final handover (DNS cutover / file transfer).",
-  "Every fixed price includes two revision rounds at design stage and one at build stage.",
-  "Changes beyond the agreed scope — at any stage, including after the advance is paid — are quoted first as a written change order and built only once approved; change orders may adjust the timeline.",
-  "A 30-day post-launch warranty covers defects at no charge (new features excluded); ongoing hosting & care is available as a monthly plan.",
-  "Intellectual property transfers to you on receipt of full payment.",
+  "Payment is staged 50/30/20: 50% on signing (covers discovery and the 3 prototype concepts, non-refundable once design begins), 30% on design approval (development starts), 20% on launch and handover.",
+  "Design delivers 3 prototype concepts; you pick 1, then we run up to 2 revision rounds on it. Refinements to the approved design during development are included.",
+  "New pages, features or direction changes are billable and are quoted first as a written change order; approved change orders may adjust the timeline.",
+  "Aftercare: the first 5 change requests are free, then LKR 6,000 per change request. Additional requirements are quoted per item, or LKR 20,000 per working day.",
+  "A 30-day post-launch warranty covers defects at no charge (new features excluded); ongoing hosting and care is available as a monthly plan.",
+  "Intellectual property transfers to you on full payment. Once the SOW is signed the price is fixed unless you request additional pages or requirements.",
 ];
 
 export function policyBox(title = "How payment & changes work"): string {

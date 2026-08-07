@@ -24,7 +24,19 @@ export type EstimateData = {
 export type QuotationData = {
   validUntil: string;
   scopeSummary: string;
-  items: { title: string; desc: string; amount: string }[];
+  /** Line items. `pageType`/`qty`/`unitRate` are the optional structured
+   *  pricing hooks: when present, lib/pipeline reconciles the amount and the
+   *  quote total against lib/pricing.ts so money can never drift from the
+   *  fixed per-page model. `amount` stays a pre-formatted string ("65,000")
+   *  the renderer prints verbatim. */
+  items: {
+    title: string;
+    desc: string;
+    amount: string;
+    pageType?: "primary" | "standard" | "functional" | null;
+    qty?: number | null;
+    unitRate?: number | null;
+  }[];
   total: string;
   paymentTerms: string[];
   notes: string;

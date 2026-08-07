@@ -196,14 +196,16 @@ export default function BillingCard({
         // Advance/final normally exist once — a duplicate is usually a mis-click.
         const dup = billing.find((b) => b.kind === kind && b.stage === stage);
         if (dup) {
+          const stageWord =
+            stage === "advance" ? "signing" : stage === "progress" ? "design-approval" : "launch";
           const ok = await confirm({
             title: "Already generated",
             confirmLabel: "Generate another",
             message: (
               <>
-                {stage === "advance" ? "An advance" : "A final"} {kind} already exists (
-                <b>{dup.no}</b>). For extra work billed after the project settled, use{" "}
-                <b>Additional {kind}</b> instead. Generate another {stage} {kind} anyway?
+                A {stageWord} {kind} already exists (<b>{dup.no}</b>). For extra work billed after
+                the project settled, use <b>Additional {kind}</b> instead. Generate another{" "}
+                {stageWord} {kind} anyway?
               </>
             ),
           });
@@ -220,16 +222,19 @@ export default function BillingCard({
     <div className="card">
       <h3>Billing</h3>
       <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-        The payment arc: advance invoice when the quotation is accepted → receipt when paid →
-        final invoice at delivery (remaining balance + any change orders) → final receipt. Work
-        requested <i>after</i> the account is settled gets its own additional invoice/receipt.
+        The 50/30/20 payment arc: 50% signing invoice when the quotation is accepted, 30%
+        design-approval invoice when development begins, then the 20% launch invoice at delivery
+        (remaining balance + any change orders), each with its receipt when paid. Work requested{" "}
+        <i>after</i> the account is settled gets its own additional invoice/receipt.
         {!hasQuotation && " Available once a quotation exists."}
       </p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
-        {gen("invoice", "advance", "Generate advance invoice")}
-        {gen("receipt", "advance", "Generate advance receipt")}
-        {gen("invoice", "final", "Generate final invoice")}
-        {gen("receipt", "final", "Generate final receipt")}
+        {gen("invoice", "advance", "Signing invoice (50%)")}
+        {gen("receipt", "advance", "Signing receipt")}
+        {gen("invoice", "progress", "Design-approval invoice (30%)")}
+        {gen("receipt", "progress", "Design-approval receipt")}
+        {gen("invoice", "final", "Launch invoice (20%)")}
+        {gen("receipt", "final", "Launch receipt")}
         <button
           className="btn ghost small"
           disabled={!!busy || !hasQuotation}

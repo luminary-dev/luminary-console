@@ -5,7 +5,13 @@
 import { BILLING_LABELS, DOC_LABELS, type BillingDoc, type ClientRecord, type DocType } from "./types";
 
 export const billingStageLabel = (s: string) =>
-  s === "advance" ? "Advance " : s === "final" ? "Final " : "Additional ";
+  s === "advance"
+    ? "Advance "
+    : s === "progress"
+      ? "Progress "
+      : s === "final"
+        ? "Final "
+        : "Additional ";
 
 /** Human name for one entry of `client.billing`, e.g. "Advance invoice" or
  *  "Handover pack". The stage prefix only makes sense for money documents —

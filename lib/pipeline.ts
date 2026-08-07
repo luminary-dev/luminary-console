@@ -13,6 +13,8 @@ import { renderPdf } from "./pdf";
 import { emailStudio } from "./email";
 import { ensureClientDomain } from "./domains";
 import { stage1, stage2 } from "./generate";
+import { fmtLKR, parseAmount } from "./money";
+import { pageLineItem, quotationPaymentTerms, type PageType } from "./pricing";
 
 const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
 const CONSOLE_HOST = process.env.CONSOLE_HOST || `console.${ROOT}`;
@@ -220,12 +222,46 @@ Console: <a href="https://${CONSOLE_HOST}/clients/${client.slug}">https://${CONS
   return client;
 }
 
+/** Deterministically reconcile a drafted quotation's money against the fixed
+ *  pricing model (lib/pricing.ts) so the total and the 50/30/20 schedule can
+ *  never drift from what the model wrote. Only engages when the model tagged
+ *  its line items with a pageType — a prose-only quotation is left untouched,
+ *  and if any non-page line's amount can't be parsed we bail rather than risk
+ *  a wrong total. Mutates the quotation in place. */
+export function reconcileQuotation(q: QuotationData): void {
+  if (!q || !Array.isArray(q.items) || q.items.length === 0) return;
+  const isPage = (t: unknown): t is PageType =>
+    t === "primary" || t === "standard" || t === "functional";
+  if (!q.items.some((it) => isPage(it.pageType))) return;
+
+  let total = 0;
+  for (const it of q.items) {
+    if (isPage(it.pageType)) {
+      const qty = Math.max(1, Math.round(Number(it.qty) || 1));
+      const line = pageLineItem(it.pageType);
+      const amount = line.amount * qty;
+      it.unitRate = line.unitRate;
+      it.qty = qty;
+      it.amount = amount.toLocaleString("en-US");
+      total += amount;
+    } else {
+      const n = parseAmount(it.amount);
+      if (n === null) return; // unparsable non-page line, don't guess the total
+      total += n;
+    }
+  }
+  q.total = fmtLKR(total);
+  q.paymentTerms = quotationPaymentTerms(total);
+}
+
 export async function runStage2(slug: string, answers: Answers, submittedAt: string): Promise<void> {
   const client = await getClient(slug);
   if (!client) return;
   try {
     const estimate = (client.docs.estimate?.data as EstimateData) ?? null;
     const drafts = await stage2(client, answers, estimate, todayLabel());
+    // Lock the quotation's money to the fixed pricing model before rendering.
+    reconcileQuotation(drafts.quotation);
 
     // Re-drafting (the console's retry) replaces all three, so keep the
     // render each is losing. Every other overwrite path archives, and a
