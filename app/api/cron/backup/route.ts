@@ -114,7 +114,7 @@ export async function GET(req: Request) {
     }
     const zip = buildZip(files);
     const stamp = new Date().toISOString().slice(0, 10);
-    await emailStudio(
+    const delivered = await emailStudio(
       `Console backup — ${stamp} (${index.length} client${index.length === 1 ? "" : "s"})`,
       `<p>Weekly automatic backup of the Luminary Console attached.</p>
 <p>It contains the client index and every client record as JSON (${files.length} files, ${(zip.length / 1024).toFixed(1)} KB zipped). Generated documents (PDFs/HTML) aren't included — they can be regenerated from these records.</p>
@@ -139,9 +139,18 @@ export async function GET(req: Request) {
       "system",
       "ran weekly backup",
       "console",
-      `${index.length} clients backed up; DNS ${issues.length ? `${issues.length} issue(s) emailed` : "healthy"}`,
+      `${index.length} clients ${delivered ? "backed up" : "ZIPPED BUT NOT EMAILED"}; DNS ${issues.length ? `${issues.length} issue(s) emailed` : "healthy"}`,
     );
 
+    // A backup that was never delivered is not a backup. Fail the invocation
+    // so it shows up as a failed cron run instead of a green one — Resend
+    // errors are only console.error'd inside emailStudio.
+    if (!delivered) {
+      return NextResponse.json(
+        { error: "Backup built but the email did not go out.", clients: index.length, zipBytes: zip.length },
+        { status: 502 },
+      );
+    }
     return NextResponse.json({ ok: true, clients: index.length, zipBytes: zip.length, dnsIssues: issues.length });
   } catch (e) {
     console.error("Cron backup failed:", e);

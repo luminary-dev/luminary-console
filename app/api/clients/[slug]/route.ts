@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { parseUsers, hashPassword } from "@/lib/users";
+import { rateLimit } from "@/lib/ratelimit";
 import { getClient, deleteClient, fetchAsset } from "@/lib/store";
 import { removeClientDomain } from "@/lib/domains";
 import { emailStudio } from "@/lib/email";
@@ -27,6 +28,11 @@ export async function DELETE(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  // Rate-limited like the login it re-verifies against: this is the one
+  // irreversible endpoint and an 800ms sleep is not a guessing defence.
+  const limited = rateLimit(req, "auth");
+  if (limited) return limited;
+
   const { slug } = await params;
   const body = await req.json().catch(() => ({}));
   // Any operator's password confirms (see lib/users).
