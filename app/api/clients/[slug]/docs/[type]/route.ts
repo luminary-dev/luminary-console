@@ -1,7 +1,7 @@
 // Document actions from the console: publish / unpublish / regenerate with
 // instructions / generate billing docs (invoice, receipt) / retry stage-2.
 import { NextResponse } from "next/server";
-import { fetchAsset, getClient, saveClient } from "@/lib/store";
+import { deleteAssets, fetchAsset, getClient, saveClient } from "@/lib/store";
 import { archiveVersion, saveDoc, runStage2, todayLabel } from "@/lib/pipeline";
 import { reviseDoc } from "@/lib/generate";
 import { logActivity } from "@/lib/activity";
@@ -40,6 +40,29 @@ export async function POST(
       await saveClient(client);
       await logActivity("operator", `${action}ed ${docType}`, slug, meta.no);
       return NextResponse.json({ ok: true, status: meta.status });
+    }
+
+    if (action === "delete") {
+      const meta = client.docs[docType];
+      if (!meta) return NextResponse.json({ error: "Document not generated yet" }, { status: 404 });
+      // Same rule as billing: a published document has a live URL the client
+      // may hold, so it must be unpublished first (the console does that as a
+      // separate confirmed step).
+      if (meta.status === "published") {
+        return NextResponse.json(
+          { error: "This document is published — unpublish it before deleting." },
+          { status: 400 },
+        );
+      }
+      await deleteAssets([
+        meta.htmlUrl,
+        meta.pdfUrl,
+        ...(meta.history ?? []).flatMap((h) => [h.htmlUrl, h.pdfUrl]),
+      ]);
+      delete client.docs[docType];
+      await saveClient(client);
+      await logActivity("operator", `deleted ${docType}`, slug, meta.no);
+      return NextResponse.json({ ok: true });
     }
 
     if (action === "regenerate") {

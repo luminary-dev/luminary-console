@@ -200,7 +200,15 @@ export default async function ClientPage({
                   </td>
                   <td style={{ minWidth: 220 }}>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
-                      <DocActions slug={slug} type={t} exists={!!meta} status={meta?.status} billing={false} />
+                      <DocActions
+                        slug={slug}
+                        type={t}
+                        label={DOC_LABELS[t]}
+                        no={meta?.no}
+                        exists={!!meta}
+                        status={meta?.status}
+                        billing={false}
+                      />
                       {meta && <EmailDocButton slug={slug} docKey={t} label={DOC_LABELS[t]} email={client.email} />}
                     </div>
                     <DocHistory history={meta?.history} />
