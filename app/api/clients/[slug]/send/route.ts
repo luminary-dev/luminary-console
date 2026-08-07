@@ -6,7 +6,7 @@
 // published. PDFs are attached for every generated doc; page links are
 // included only for published ones (drafts have no public URL).
 import { NextResponse } from "next/server";
-import { getClient, saveClient } from "@/lib/store";
+import { fetchAsset, getClient, saveClient } from "@/lib/store";
 import { emailAddresses } from "@/lib/email";
 import { logActivity } from "@/lib/activity";
 import { DOC_LABELS, type DocType } from "@/lib/types";
@@ -84,7 +84,7 @@ export async function POST(
       docs
         .filter((d) => d.pdfUrl)
         .map(async (d) => {
-          const res = await fetch(d.pdfUrl!, { cache: "no-store" }).catch(() => null);
+          const res = await fetchAsset(d.pdfUrl!).catch(() => null);
           if (!res || !res.ok) return null;
           return {
             filename: `${d.label} - ${client.company} - ${d.no}.pdf`,

@@ -1,4 +1,4 @@
-// Email OTP as the second factor: 6-digit code, blob-backed so it's
+// Email OTP as the second factor: 6-digit code, store-backed so it's
 // single-use, expiring, attempt-limited and resend-throttled.
 import { readState, writeState, clearState } from "./store";
 

@@ -2,9 +2,11 @@
 // costs no JavaScript and still collapses — the rows below it are already
 // dense enough without permanently listing old versions.
 //
-// The links point straight at the archived blobs: every save writes a fresh
-// random-suffixed URL, so an old version stays byte-identical and reachable
+// The links point straight at the archived assets: every save writes a fresh
+// random-suffixed key, so an old version stays byte-identical and reachable
 // forever, and the /preview route only ever knows about the current one.
+// They go through /api/asset, which serves stored HTML as a download rather
+// than rendering client-influenced markup on the console's own origin.
 import type { DocVersion } from "@/lib/types";
 import { whenLabel } from "@/lib/time";
 

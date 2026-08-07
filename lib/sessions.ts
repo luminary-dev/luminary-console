@@ -1,14 +1,14 @@
-// Session registry + revocation list, blob-backed like all console state.
+// Session registry + revocation list, store-backed like all console state.
 //
 // - "console/sessions.json": every OTP redemption appends {sid, email, ua, at}
 //   (cap 50, entries older than the 24h absolute session cap are pruned on
 //   write — their tokens can't be valid anymore).
 // - "console/revoked.json": sids whose tokens must stop working. proxy.ts
 //   checks it with a 60s module-scope cache, so revocation takes effect
-//   within a minute without a blob read per request.
+//   within a minute without a store read per request.
 //
 // Writes are sequential per the store's contract (no concurrency control);
-// registry updates are best-effort — a blob hiccup must never block a login.
+// registry updates are best-effort — a store hiccup must never block a login.
 import { readState, writeState } from "./store";
 import { SESSION_ABS_MAX_AGE } from "./auth";
 

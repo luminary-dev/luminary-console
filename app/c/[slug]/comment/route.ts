@@ -26,7 +26,7 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  // Rate-check before the blob read so unknown-slug floods stay cheap.
+  // Rate-check before the record read so unknown-slug floods stay cheap.
   const limited = rateLimit(req, "comment");
   if (limited) return limited;
 

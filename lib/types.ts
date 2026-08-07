@@ -1,5 +1,5 @@
-// Shared data model. Client records + generated documents live in Vercel Blob
-// (see lib/store.ts); these types are the contract between the console, the
+// Shared data model. Client records + generated documents live in Cloudflare
+// R2 (see lib/store.ts); these types are the contract between the console, the
 // AI generation layer, the template renderers, and the client-facing sites.
 
 export type DocType =
@@ -31,8 +31,8 @@ export const DOC_NO_PREFIX: Record<DocType, string> = {
 export type DocStatus = "draft" | "published";
 
 /** One archived render of a document, pushed onto `history` just before a
- *  revise/regenerate overwrites it. Blob assets are written to fresh
- *  random-suffixed URLs on every save, so the old URLs stay valid forever —
+ *  revise/regenerate overwrites it. Assets are written to fresh
+ *  random-suffixed keys on every save, so the old URLs stay valid forever —
  *  archiving is only a matter of remembering them. */
 export type DocVersion = {
   no: string;
@@ -47,7 +47,8 @@ export type DocMeta = {
   no: string;
   status: DocStatus;
   updatedAt: string;
-  /** Blob URLs — server-side pointers, never shown to clients directly. */
+  /** Asset URLs ("/api/asset/<key>") — pointers into the private store,
+   *  resolved server-side with fetchAsset; never shown to clients directly. */
   htmlUrl: string;
   pdfUrl: string;
   /** The structured data Claude produced — kept so docs can be revised. */

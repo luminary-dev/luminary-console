@@ -1,6 +1,6 @@
 // Weekly ops cron (vercel.json schedules it Mondays 03:00 UTC):
 //   1. Backup — zips the client index + every client record (JSON only, no
-//      PDFs: those are regenerable blobs) and emails it to the studio.
+//      PDFs: those re-render from the records) and emails it to the studio.
 //   2. DNS health — verifies each client's Cloudflare CNAME still exists and
 //      the subdomain is still attached to the Vercel project; any mismatch
 //      is emailed as a warning.

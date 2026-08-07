@@ -7,12 +7,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "seed:ecomech": "tsx scripts/seed-ecomech.ts"
+    "r2:init": "tsx scripts/r2-init.ts",
+    "recreate:ecomech": "tsx scripts/recreate-ecomech.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",
+    "@aws-sdk/client-s3": "^3.1105.0",
+    "@aws-sdk/s3-request-presigner": "^3.1105.0",
     "@sparticuz/chromium": "^149.0.0",
-    "@vercel/blob": "^2.0.0",
     "next": "16.3.0",
     "puppeteer-core": "^25.5.0",
     "react": "19.2.8",
@@ -20,10 +22,10 @@
     "resend": "^6.18.1"
   },
   "devDependencies": {
-    "dotenv": "^17.0.0",
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.0.0",
     "tsx": "^4.19.0",
     "typescript": "^6.0.3"
   }

@@ -3,7 +3,7 @@
 // client copy) — then kicks off stage-2 drafting AFTER the response, so the
 // client isn't kept waiting on Claude.
 import { NextResponse, after } from "next/server";
-import { getClient, putAsset, saveClient } from "@/lib/store";
+import { getClient, putAsset, saveClient, signedAssetUrl } from "@/lib/store";
 import { buildSections, validIds } from "@/lib/questions";
 import { renderAnswers } from "@/lib/templates/answers";
 import { renderPdf } from "@/lib/pdf";
@@ -126,9 +126,22 @@ export async function POST(
     const filename = `Questionnaire - ${client.company} - LUM-QST-${client.docNoBase}.pdf`;
     const contactEmail = typeof answers.contactEmail === "string" ? answers.contactEmail.trim() : "";
 
+    // Attachments are stored in a PRIVATE bucket and the record only holds an
+    // authed app URL, which is useless inside an email. Sign a direct link per
+    // file at send time instead — 7 days is SigV4's ceiling and long enough
+    // for the studio to pull them down; after that the console still has them.
+    const attachmentLinks = await Promise.all(
+      attachments.map(async (a) => ({ ...a, href: await signedAssetUrl(a.url).catch(() => null) })),
+    );
     const attachmentsHtml = attachments.length
       ? `<p><strong>${attachments.length} file${attachments.length > 1 ? "s" : ""} attached by the client:</strong></p>
-<ul>${attachments.map((a) => `<li><a href="${esc(a.url)}">${esc(a.name)}</a> (${fmtSize(a.size)})</li>`).join("")}</ul>`
+<ul>${attachmentLinks
+          .map((a) =>
+            a.href
+              ? `<li><a href="${esc(a.href)}">${esc(a.name)}</a> (${fmtSize(a.size)}) — link expires in 7 days</li>`
+              : `<li>${esc(a.name)} (${fmtSize(a.size)}) — open it from the console</li>`,
+          )
+          .join("")}</ul>`
       : "";
 
     await emailStudio(
@@ -160,7 +173,7 @@ ${attachmentsHtml}<p>Full answers attached. ${
     // immediately while Claude drafts in the background. Only for the first
     // submission; later ones must not overwrite reviewed documents.
     if (willDraft) {
-      // Drafting sees file names, not raw JSON refs / blob URLs.
+      // Drafting sees file names, not raw JSON refs / asset URLs.
       const draftAnswers: Answers = { ...answers };
       for (const id of uploadIds) {
         const v = draftAnswers[id];

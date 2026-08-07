@@ -1,7 +1,7 @@
 // Document actions from the console: publish / unpublish / regenerate with
 // instructions / generate billing docs (invoice, receipt) / retry stage-2.
 import { NextResponse } from "next/server";
-import { getClient, saveClient } from "@/lib/store";
+import { fetchAsset, getClient, saveClient } from "@/lib/store";
 import { archiveVersion, saveDoc, runStage2, todayLabel } from "@/lib/pipeline";
 import { reviseDoc } from "@/lib/generate";
 import { logActivity } from "@/lib/activity";
@@ -60,7 +60,7 @@ export async function POST(
 
     if (action === "retry-stage2") {
       if (!client.answersUrl) return NextResponse.json({ error: "No answers submitted yet" }, { status: 400 });
-      const res = await fetch(client.answersUrl, { cache: "no-store" });
+      const res = await fetchAsset(client.answersUrl);
       const answers = await res.json();
       await runStage2(slug, answers, client.answersAt || "");
       return NextResponse.json({ ok: true });

@@ -1,5 +1,5 @@
-// Append-only audit log. One JSON array in Blob state ("console/activity.json",
-// ms-versioned via readState/writeState like all state), capped to the last
+// Append-only audit log. One JSON array in store state ("activity.json" via
+// readState/writeState, one fixed key overwritten in place), capped to the last
 // 500 entries. Logging is strictly best-effort: a failure here must never
 // break the action being logged, so every write is wrapped and swallowed.
 import { readState, writeState } from "./store";

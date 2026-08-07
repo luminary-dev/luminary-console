@@ -6,7 +6,7 @@
 // Map, so they are PER FUNCTION INSTANCE. Vercel may run several instances
 // concurrently, and a cold start resets the counts — so the real ceiling an
 // attacker sees is `max × instances`. That's fine for this console's threat
-// model (stop naive abuse/scripts, protect the blob store and email quota);
+// model (stop naive abuse/scripts, protect the object store and email quota);
 // a shared store (Upstash/KV) can replace the Map later without changing
 // call sites.
 import { NextResponse } from "next/server";

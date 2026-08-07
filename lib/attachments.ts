@@ -1,9 +1,12 @@
-// Questionnaire file attachments. Uploaded files live in Blob under
-// clients/<slug>/attachments/ (so client deletion sweeps them too); inside
-// the Answers map each upload-field value is a string[] of JSON-encoded refs
-// ({n: name, u: url, s: bytes}) so the existing Answers type, storage and
-// sanitization keep working unchanged. Shared by the form (client) and the
-// submit/upload routes (server) — keep this module isomorphic.
+// Questionnaire file attachments. Uploaded files live in R2 under
+// console/clients/<slug>/attachments/ (so client deletion sweeps the whole
+// prefix with them); inside the Answers map each upload-field value is a
+// string[] of JSON-encoded refs ({n: name, u: asset URL, s: bytes}) so the
+// existing Answers type, storage and sanitization keep working unchanged.
+// Shared by the form (client) and the submit/upload routes (server) — keep
+// this module isomorphic (no S3 SDK; see lib/assets.ts).
+import { ASSET_ROUTE, assetKey, STORE_PREFIX } from "./assets";
+
 export type AttachmentRef = { n: string; u: string; s: number };
 
 export const MAX_FILE_BYTES = 15 * 1024 * 1024;
@@ -22,20 +25,23 @@ export function parseAttachment(raw: unknown): AttachmentRef | null {
   }
 }
 
-/** Only accept refs that point at OUR blob store, inside THIS client's
- *  attachments folder — submitted answers are rendered into documents the
- *  studio opens, so arbitrary URLs must not survive. */
+/** The only key shape the upload route ever hands out: a flat
+ *  "<16 hex>-<sanitised name>" directly inside one client's folder. */
+const ATTACHMENT_KEY = /^console\/clients\/[a-z0-9-]+\/attachments\/[\w.\- ()[\]]{1,180}$/;
+
+/** Only accept refs that point at OUR store, inside THIS client's attachments
+ *  folder — submitted answers are rendered into documents the studio opens,
+ *  and the attachment links are served back from the console origin, so
+ *  arbitrary references must not survive. ONLY the app-relative form is
+ *  accepted — an absolute "https://evil.example/api/asset/console/…" resolves
+ *  to a legitimate-looking key but would send a clicking operator off-site,
+ *  and legacy public Blob links are dead anyway. `assetKey` refuses traversal
+ *  on top of that. */
 export function isOwnAttachmentUrl(url: string, slug: string): boolean {
-  try {
-    const u = new URL(url);
-    return (
-      u.protocol === "https:" &&
-      u.hostname.endsWith(".public.blob.vercel-storage.com") &&
-      u.pathname.startsWith(`/console/clients/${slug}/attachments/`)
-    );
-  } catch {
-    return false;
-  }
+  if (typeof url !== "string" || !url.startsWith(ASSET_ROUTE)) return false;
+  const key = assetKey(url);
+  if (!key) return false;
+  return ATTACHMENT_KEY.test(key) && key.startsWith(`${STORE_PREFIX}clients/${slug}/attachments/`);
 }
 
 export function fmtSize(bytes: number): string {

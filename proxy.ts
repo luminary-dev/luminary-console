@@ -7,16 +7,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { SESSION_COOKIE, SESSION_MAX_AGE, makeSessionToken, verifySessionToken } from "@/lib/auth";
-import { revokedSids } from "@/lib/sessions";
 
-// Revoked-sid cache: one blob read per instance per minute instead of per
+// Revoked-sid cache: one store read per instance per minute instead of per
 // request. Revocation therefore takes up to ~60s to propagate — acceptable
 // staleness for "sign that device out". Fails open (treats the list as
-// empty) so a blob hiccup can't lock the operator out of the console.
+// empty) so a store hiccup can't lock the operator out of the console.
+//
+// lib/sessions is imported lazily because it reaches the S3 SDK through the
+// store: the proxy runs on EVERY request, and there is no reason to load a
+// storage client on the ~59 seconds in 60 that this answers from cache, or
+// on client-host requests, which never consult it at all.
 let revokedCache: { at: number; sids: Set<string> } | null = null;
 async function sidRevoked(sid: string): Promise<boolean> {
   if (!revokedCache || Date.now() - revokedCache.at > 60_000) {
     try {
+      const { revokedSids } = await import("@/lib/sessions");
       revokedCache = { at: Date.now(), sids: new Set(await revokedSids()) };
     } catch {
       revokedCache = { at: Date.now(), sids: new Set() };

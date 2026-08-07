@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { parseUsers, hashPassword } from "@/lib/users";
-import { getClient, deleteClient } from "@/lib/store";
+import { getClient, deleteClient, fetchAsset } from "@/lib/store";
 import { removeClientDomain } from "@/lib/domains";
 import { emailStudio } from "@/lib/email";
 import { logActivity } from "@/lib/activity";
@@ -55,7 +55,7 @@ export async function DELETE(
   const attachments = (
     await Promise.all(
       files.map(async (f) => {
-        const res = await fetch(f.pdfUrl, { cache: "no-store" }).catch(() => null);
+        const res = await fetchAsset(f.pdfUrl).catch(() => null);
         if (!res || !res.ok) return null;
         return { filename: `${client.company} - ${f.filename}`, content: Buffer.from(await res.arrayBuffer()) };
       }),
@@ -71,9 +71,9 @@ export async function DELETE(
   );
 
   const domainNotes = await removeClientDomain(slug);
-  const blobsDeleted = await deleteClient(slug);
+  const objectsDeleted = await deleteClient(slug);
   await logActivity("operator", "deleted client", slug, client.company);
-  return NextResponse.json({ ok: true, blobsDeleted, domainNotes, archived: attachments.length });
+  return NextResponse.json({ ok: true, objectsDeleted, domainNotes, archived: attachments.length });
 }
 
 async function anyUserPassword(password: string): Promise<boolean> {

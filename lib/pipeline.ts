@@ -5,7 +5,7 @@
 // proposal / contract for review.
 import type { Answers, BillingDoc, ClientRecord, DocMeta, DocType, DocVersion } from "./types";
 import { DOC_NO_PREFIX } from "./types";
-import { getClient, nextDocNoBase, putAsset, saveClient } from "./store";
+import { fetchAsset, getClient, nextDocNoBase, putAsset, saveClient } from "./store";
 import { renderDoc, type EstimateData, type QuotationData } from "./templates/docs";
 import { renderAnswers } from "./templates/answers";
 import { renderPdf } from "./pdf";
@@ -43,7 +43,7 @@ export const HISTORY_CAP = 10;
 
 /** Remember the render a document is about to lose. Call this immediately
  *  before a revise/regenerate re-renders `doc` — every save writes brand-new
- *  random-suffixed blobs, so the URLs already on the record keep resolving
+ *  random-suffixed keys, so the URLs already on the record keep resolving
  *  and archiving them costs nothing but the pointer. Oldest entries fall off
  *  at HISTORY_CAP; a doc that has never been rendered is skipped. */
 export function archiveVersion(doc: {
@@ -182,7 +182,7 @@ export async function runStage1(input: {
   await saveClient(client);
 
   // 4. Studio email with the estimate PDF + all links.
-  const pdfRes = await fetch(estimateMeta.pdfUrl);
+  const pdfRes = await fetchAsset(estimateMeta.pdfUrl);
   const pdfBuf = Buffer.from(await pdfRes.arrayBuffer());
   await emailStudio(
     `New client set up — ${client.company} (${estimateMeta.no})`,
@@ -215,7 +215,7 @@ export async function runStage2(slug: string, answers: Answers, submittedAt: str
     const attachments = await Promise.all(
       (["quotation", "proposal", "contract"] as DocType[]).map(async (t) => {
         const meta = client.docs[t]!;
-        const res = await fetch(meta.pdfUrl);
+        const res = await fetchAsset(meta.pdfUrl);
         return {
           filename: `${t[0].toUpperCase()}${t.slice(1)} DRAFT - ${client.company} - ${meta.no}.pdf`,
           content: Buffer.from(await res.arrayBuffer()),

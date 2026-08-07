@@ -24,7 +24,9 @@ Luminary Studio's client-document platform, end to end:
   Server-side refusal fallbacks are enabled.
 - `lib/templates/` — the Luminary business-doc design system; renders each
   contract to branded HTML (web + print) — PDFs via headless Chromium.
-- `lib/store.ts` — Vercel Blob persistence (immutable versioned writes).
+- `lib/store.ts` — Cloudflare R2 persistence over the S3 API: state on fixed
+  keys (one GET / one PUT, no listing), assets on unique keys behind the
+  authed `/api/asset/…` stream. `lib/r2.ts` builds the client.
 - `lib/domains.ts` — Cloudflare DNS + Vercel domain automation.
 - `app/c/[slug]/…` — the public client sites; `app/…` — the console.
 
@@ -35,7 +37,7 @@ Luminary Studio's client-document platform, end to end:
 | `ADMIN_PASSWORD` / `SESSION_SECRET` | console auth |
 | `ANTHROPIC_API_KEY` | document drafting |
 | `RESEND_API_KEY` / `SENDER` / `STUDIO_EMAIL` | email |
-| `BLOB_READ_WRITE_TOKEN` | storage (auto via Vercel Blob) |
+| `R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_BUCKET` | storage (Cloudflare R2, private bucket) |
 | `CLOUDFLARE_API_TOKEN` (+ optional `CLOUDFLARE_ZONE_ID`) | DNS automation |
 | `VERCEL_TOKEN` / `VERCEL_PROJECT_ID` / `VERCEL_TEAM_ID` | domain attach |
 | `ROOT_DOMAIN` / `CONSOLE_HOST` | defaults: `luminary-dev.xyz` / `console.…` |
@@ -48,3 +50,17 @@ client record shows the manual CNAME to add.
 ```bash
 npm install && vercel env pull && npm run dev
 ```
+
+## Storage
+
+Cloudflare R2 via its S3-compatible API (endpoint
+`https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`, region `auto`). The bucket
+is **private** — no public access, no `r2.dev` domain. Console-side links go
+through `GET /api/asset/<key>`, which the proxy's session gate protects and
+which refuses to render stored HTML/SVG on the console origin; the few links
+that end up in emails are presigned GETs (7 days).
+
+Browser-direct questionnaire uploads need a CORS policy on the bucket
+(`PUT`, `content-type`, origins = console host + `*.luminary-dev.xyz` +
+localhost). `npm run r2:init` verifies the credentials with a probe object and
+prints the exact policy to paste.

@@ -11,7 +11,7 @@
 // English — so switching language mid-form is lossless and the generation
 // pipeline sees identical data either way.
 import { useRef, useState } from "react";
-import { upload } from "@vercel/blob/client";
+import { assetUrl } from "@/lib/assets";
 import type { Field, Section } from "@/lib/questions";
 import {
   fieldText,
@@ -32,19 +32,24 @@ import {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Content types the upload token whitelists; anything else (and anything
-// markup-ish) uploads as a plain binary so the blob host never renders it.
-function safeContentType(type: string): string {
-  if (!type || /html|xml|javascript/i.test(type)) return "application/octet-stream";
+// Content types the upload route whitelists; anything else (and anything
+// markup-ish) uploads as a plain binary so nothing stored can render.
+function safeContentType(raw: string): string {
+  // Lowercased because the presigned PUT signs this exact string — the header
+  // the browser sends has to match byte for byte.
+  const type = (raw || "").toLowerCase();
+  if (!type || /html|xml|javascript|svg/i.test(type)) return "application/octet-stream";
   if (/^(image|video|audio|font|application)\//.test(type)) return type;
   if (["text/plain", "text/csv", "text/markdown", "text/rtf"].includes(type)) return type;
   return "application/octet-stream";
 }
 
-// Files upload straight from the browser to Blob (the sibling "upload"
-// endpoint only signs a token scoped to this client's attachments folder —
+// Files upload straight from the browser to R2 (the sibling "upload" endpoint
+// only mints a presigned PUT scoped to this client's attachments folder —
 // routing bytes through a function would cap files at 4.5 MB); each uploaded
 // file becomes a JSON-encoded ref in answers[field.id] (see lib/attachments).
+// The signed PUT pins content type AND length, so the header below must match
+// what was sent to the signing route exactly.
 function UploadControl({
   slug,
   field,
@@ -89,12 +94,23 @@ function UploadControl({
       }
       try {
         const name = (f.name || "attachment").replace(/[^\w.\- ()[\]]+/g, "_").slice(0, 120) || "attachment";
-        const blob = await upload(`console/clients/${slug}/attachments/${name}`, f, {
-          access: "public",
-          handleUploadUrl: "upload",
-          contentType: safeContentType(f.type),
+        const contentType = safeContentType(f.type);
+        const signRes = await fetch("upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, contentType, size: f.size }),
         });
-        added.push(JSON.stringify({ n: name, u: blob.url, s: f.size }));
+        const signed = await signRes.json().catch(() => null);
+        if (!signRes.ok || !signed?.url || !signed?.key) {
+          throw new Error(signed?.error || `Upload failed (${signRes.status}).`);
+        }
+        const put = await fetch(signed.url, {
+          method: "PUT",
+          headers: { "Content-Type": signed.contentType || contentType },
+          body: f,
+        });
+        if (!put.ok) throw new Error(`Upload failed (${put.status}).`);
+        added.push(JSON.stringify({ n: name, u: assetUrl(signed.key), s: f.size }));
       } catch (e) {
         setErr(
           (e instanceof Error ? e.message : "Upload failed.") +

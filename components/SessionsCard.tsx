@@ -1,6 +1,6 @@
 "use client";
 
-// Dashboard "Sessions" card: every signed-in device (from the blob-backed
+// Dashboard "Sessions" card: every signed-in device (from the store-backed
 // session registry) with per-session Revoke and a "Sign out everywhere"
 // action. Revocation propagates through the proxy's revoked-sid cache within
 // ~a minute; revoking your own session also clears the cookie and returns

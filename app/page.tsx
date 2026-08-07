@@ -19,7 +19,7 @@ const STATUS_LABEL: Record<string, string> = {
 export default async function Dashboard() {
   const index = (await getIndex()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   // Stage + money live on the full records, not the index — fetch them all
-  // (a handful of clients; each is one small blob read).
+  // (a handful of clients; each is one small object read, cached 5s).
   const records = await Promise.all(index.map((e) => getClient(e.slug)));
   const stageOf = new Map<string, ClientStage>();
   const counts = Object.fromEntries(STAGES.map((s) => [s, 0])) as Record<ClientStage, number>;
