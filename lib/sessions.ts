@@ -34,12 +34,22 @@ export async function listSessions(): Promise<SessionEntry[]> {
   }
 }
 
-/** Record a fresh login (best-effort — never blocks the sign-in). */
+/** Record a fresh login (best-effort — never blocks the sign-in).
+ *  One entry per device: signing in again from the same browser (same email +
+ *  user-agent) REPLACES that device's previous session rather than appending a
+ *  new one, so the Sessions card shows a stable row per device instead of a
+ *  new "session" on every sign-in (e.g. after an idle sign-out). Sessions on
+ *  other devices are left untouched. */
 export async function registerSession(sid: string, email: string, ua: string): Promise<void> {
   try {
+    const cleanUa = ua.slice(0, 300);
     const all = (await readState<SessionEntry[]>(SESSIONS_PATH)) ?? [];
-    const kept = all.filter((s) => Date.parse(s.at) > liveSince());
-    kept.push({ sid, email, ua: ua.slice(0, 300), at: new Date().toISOString() });
+    const kept = all.filter(
+      (s) =>
+        Date.parse(s.at) > liveSince() && // drop expired
+        !(s.email === email && s.ua === cleanUa), // drop this device's previous session
+    );
+    kept.push({ sid, email, ua: cleanUa, at: new Date().toISOString() });
     await writeState(SESSIONS_PATH, kept.slice(-CAP));
   } catch (e) {
     console.error("Session registry write failed:", e);
