@@ -41,7 +41,10 @@ export async function POST(req: Request) {
       .slice(0, 2)
       .join("-");
   }
-  if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(slug)) {
+  // A slug becomes a DNS label, so it may not END in a hyphen either —
+  // Cloudflare rejects "acme-" and the client would be created with a
+  // subdomain that can never be provisioned.
+  if (!/^[a-z0-9][a-z0-9-]{0,39}[a-z0-9]$/.test(slug)) {
     return NextResponse.json({ error: "Slug must be lowercase letters, digits and dashes." }, { status: 400 });
   }
   if (RESERVED_SLUGS.has(slug) || slug.startsWith("_")) {
@@ -56,9 +59,12 @@ export async function POST(req: Request) {
   let reg = str(body.reg);
   if (!reg) {
     const m =
-      brief.match(/reg(?:istration)?\.?\s*no\.?\s*:?\s*([A-Z]{1,3}\s?\d{4,8})/i) ||
+      brief.match(/\breg(?:istration)?\.?\s*no\.?\s*:?\s*([A-Z]{1,3}\s?\d{4,8})/i) ||
       brief.match(/\b(P[VBQ]\s?\d{5,8})\b/i);
-    if (m) reg = m[1].replace(/\s+/g, "");
+    // Uppercase it: the regexes are case-insensitive, so a brief that says
+    // "reg no pv110496" would otherwise print lowercase on the letterhead of
+    // every document this client ever gets.
+    if (m) reg = m[1].replace(/\s+/g, "").toUpperCase();
   }
 
   try {

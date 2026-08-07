@@ -63,13 +63,30 @@ export async function DELETE(
     )
   ).filter(Boolean) as { filename: string; content: Buffer }[];
 
-  await emailStudio(
+  // If any PDF couldn't be pulled, or the archive mail didn't go out, STOP.
+  // The comment above promises deletion never loses a document; running the
+  // teardown after a silently-failed send would make that false, and the
+  // teardown is irreversible.
+  if (attachments.length !== files.length) {
+    return NextResponse.json(
+      { error: `Couldn't read ${files.length - attachments.length} of ${files.length} document(s) for the archive — nothing was deleted.` },
+      { status: 502 },
+    );
+  }
+  const archived = await emailStudio(
     `Archive before deletion — ${client.company}`,
     `<p><strong>${client.company}</strong> (${client.slug}) is being deleted from the console. Every document the project produced is attached for your records:</p>
 <ul>${attachments.map((a) => `<li>${a.filename}</li>`).join("")}</ul>
 <p>Brief, for the record:</p><p style="color:#6b7280;">${client.brief}</p>`,
     attachments,
   );
+
+  if (!archived) {
+    return NextResponse.json(
+      { error: "The archive email didn't go out — nothing was deleted. Check the mail provider and try again." },
+      { status: 502 },
+    );
+  }
 
   const domainNotes = await removeClientDomain(slug);
   const objectsDeleted = await deleteClient(slug);

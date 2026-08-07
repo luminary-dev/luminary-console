@@ -125,10 +125,17 @@ export async function saveBillingDoc(
   if (!doc) {
     // Max existing sequence + 1, not count + 1: deleting a middle document
     // must never make the next one collide with a surviving slug/number.
+    // And max against a per-kind highwater kept on the record, because
+    // deleting the NEWEST one would otherwise hand its number straight back
+    // — including LUM-HOP-<base> itself, whose first issue carries no suffix.
     const seq =
-      client.billing
-        .filter((b) => b.kind === kind)
-        .reduce((m, b) => Math.max(m, parseInt(b.slug.split("-").pop() ?? "", 10) || 0), 0) + 1;
+      Math.max(
+        client.billing
+          .filter((b) => b.kind === kind)
+          .reduce((m, b) => Math.max(m, parseInt(b.slug.split("-").pop() ?? "", 10) || 0), 0),
+        client.billingSeq?.[kind] ?? 0,
+      ) + 1;
+    client.billingSeq = { ...(client.billingSeq ?? {}), [kind]: seq };
     const suffix = kind === "handover" && seq === 1 ? "" : `-${String(seq).padStart(2, "0")}`;
     doc = {
       kind,
@@ -220,6 +227,13 @@ export async function runStage2(slug: string, answers: Answers, submittedAt: str
     const estimate = (client.docs.estimate?.data as EstimateData) ?? null;
     const drafts = await stage2(client, answers, estimate, todayLabel());
 
+    // Re-drafting (the console's retry) replaces all three, so keep the
+    // render each is losing. Every other overwrite path archives, and a
+    // retry is the one most likely to be regretted.
+    for (const t of ["quotation", "proposal", "contract"] as DocType[]) {
+      const prev = client.docs[t];
+      if (prev) archiveVersion(prev);
+    }
     await saveDoc(client, "quotation", drafts.quotation, "draft");
     await saveDoc(client, "proposal", drafts.proposal, "draft");
     await saveDoc(client, "contract", drafts.contract, "draft");

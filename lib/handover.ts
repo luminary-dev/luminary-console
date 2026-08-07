@@ -65,10 +65,13 @@ export function buildHandoverData(client: ClientRecord): HandoverData {
   const quotation = client.docs.quotation?.data as QuotationData | undefined;
   const proposal = client.docs.proposal?.data as ProposalData | undefined;
 
+  // Deliberately NOT falling back to client.brief: the brief is the
+  // operator's private intake note — /clients/new asks for internal figures
+  // ("UX 5–10k, development 30–40k LKR") right in its hint — and this
+  // document is signed by the client.
   const summary =
     quotation?.scopeSummary?.trim() ||
     proposal?.overview?.trim() ||
-    client.brief?.trim() ||
     `The ${client.projectLabel || "project"} for ${client.company} is complete and handed over.`;
 
   // Prefer the proposal's explicit deliverables list, then the quotation's
@@ -115,6 +118,23 @@ export function buildHandoverData(client: ClientRecord): HandoverData {
       };
     });
 
+  // Per-invoice "received" only counts payments tagged with that invoice's
+  // slug, but "Total received" counts every payment. Without this line the
+  // two disagree on the same page whenever a payment was recorded without
+  // picking an invoice (the field is optional).
+  const attributed = (client.billing ?? [])
+    .filter((b) => b.kind === "invoice" && b.status === "published")
+    .reduce((s, b) => s + paidAgainst(client.payments, b.slug), 0);
+  const otherPaid = money.paid - attributed;
+  if (lines.length && otherPaid > 0) {
+    lines.push({
+      no: "Not assigned to an invoice",
+      label: "Other payments received",
+      amount: "—",
+      paid: fmtLKR(otherPaid),
+    });
+  }
+
   return {
     projectLabel: client.projectLabel || "—",
     summary,
@@ -135,7 +155,11 @@ export function buildHandoverData(client: ClientRecord): HandoverData {
       invoiced: fmtLKR(money.invoiced),
       paid: fmtLKR(money.paid),
       outstanding: fmtLKR(money.outstanding),
-      settled: money.outstanding <= 0 && money.unparsable.length === 0,
+      // "Settled in full" is a statement about invoices that were actually
+      // issued. With nothing published, invoiced/outstanding are both 0 and
+      // this used to declare a project with no invoices at all "Account
+      // settled in full · IP transferred" — on a signed document.
+      settled: money.invoiced > 0 && money.outstanding <= 0 && money.unparsable.length === 0,
       lines,
       unparsable: money.unparsable,
     },

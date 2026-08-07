@@ -34,6 +34,19 @@ export async function POST(
           { status: 400 },
         );
       }
+      // Advance/final billing is arithmetic ON the quotation — the default
+      // instruction is literally "invoice the standard 50% advance against
+      // the quotation total". With no quotation there is nothing to ground
+      // on and the amount on a real invoice would be invented.
+      if (stage !== "other" && !client.docs.quotation) {
+        return NextResponse.json(
+          {
+            error:
+              "There's no quotation to bill against — draft the quotation first, or use an additional invoice with explicit instructions.",
+          },
+          { status: 400 },
+        );
+      }
       const context = {
         quotation: (client.docs.quotation?.data as QuotationData) ?? null,
         priorBilling: (client.billing ?? []).map((b) => ({

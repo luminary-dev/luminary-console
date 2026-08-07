@@ -92,16 +92,21 @@ export function renderHandover(d: HandoverData, ctx: Ctx): string {
     }
     <div class="section">
       <div class="sec-k">Documents issued</div>
-      <div class="tbl-head" style="grid-template-columns:1fr 150px 110px;">
-        <div>Document</div><div>Number</div><div style="text-align:right;">Date</div>
-      </div>
-      ${docRows}
+      ${
+        // Same guard as the payment table below: an unconditional header over
+        // an empty list rendered as a dangling rule with nothing under it.
+        d.docIndex.length
+          ? `<div class="tbl-head" style="grid-template-columns:1fr 150px 110px;">
+              <div>Document</div><div>Number</div><div style="text-align:right;">Date</div>
+            </div>${docRows}`
+          : `<div class="small">No documents have been published to your portal for this project.</div>`
+      }
     </div>
     <div class="section">
       <div class="sec-k">Access &amp; credentials</div>
       <div class="small">Completed by Luminary at handover. Once these are transferred, change every password
       and enable two-factor authentication where the service offers it — we keep no copy.</div>
-      <div class="tbl-head" style="grid-template-columns:190px 1fr 150px;margin-top:10px;">
+      <div class="tbl-head tbl-head--keep" style="grid-template-columns:190px 1fr 150px;margin-top:10px;">
         <div>System</div><div>Location / username</div><div>Handed over</div>
       </div>
       ${credRows}
@@ -123,12 +128,20 @@ export function renderHandover(d: HandoverData, ctx: Ctx): string {
             </div>${payRows}`
           : `<div class="small">No invoices have been issued against this project.</div>`
       }
-      <div class="totals"><div class="totals-box">
+      ${
+        // Totals only mean something once something was invoiced. With no
+        // published invoice the box read "Total invoiced LKR 0 / Total
+        // received LKR 47,000 / Balance LKR 0" — three numbers that
+        // contradict each other on a document the client signs.
+        d.payment.lines.length
+          ? `<div class="totals"><div class="totals-box">
         <div class="t-row"><span>Total invoiced</span><span>${esc(d.payment.invoiced)}</span></div>
         <div class="t-row"><span>Total received</span><span>${esc(d.payment.paid)}</span></div>
         <div class="t-main"><b>${d.payment.settled ? "Balance" : "Outstanding"}</b><span class="val">${esc(d.payment.outstanding)}</span></div>
         <div class="t-note">${d.payment.settled ? "Account settled in full · IP transferred" : "Payable before final handover"}</div>
-      </div></div>
+      </div></div>`
+          : ""
+      }
       ${
         d.payment.unparsable.length
           ? `<div class="small" style="margin-top:8px;">Not included in the totals above (amount stated in words on the document): ${esc(d.payment.unparsable.join(", "))}.</div>`

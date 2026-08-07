@@ -27,6 +27,11 @@ html{color-scheme:light;}
 html[data-theme="dark"]{color-scheme:dark;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--desk);font-family:var(--sans);color:var(--text);font-size:13.5px;line-height:1.6;}
+/* Documents carry client-typed text — pasted links, long file names, long
+   addresses — into a 354px-wide content box on a phone. One unbreakable
+   token would otherwise widen the whole sheet, so break anywhere rather than
+   scroll sideways. */
+.meta-detail,.item-t,.item-d,.q,.a,.ticks li,.sow td,.lead{overflow-wrap:anywhere;}
 a{color:var(--a-text);text-decoration:none;}
 .sheet{width:820px;max-width:100%;margin:0 auto;background:var(--bg);padding:44px 52px 34px;min-height:100vh;}
 .web .sheet{margin:32px auto 60px;border:1px solid var(--border);border-radius:18px;min-height:auto;}
@@ -112,10 +117,17 @@ html[data-reveal] *{transition:none!important;}
  .sheet{padding:28px 18px;}
  .meta,.cols2,.sig{grid-template-columns:1fr;gap:18px;}
  .doc-title,.head>div:last-child{text-align:left;}
- .tbl-head{display:none;}
+ /* Column headers go: on a phone the rows read as label + amount and the
+    header is noise. Except where the cells are BLANK signature lines with no
+    self-evident meaning (the handover credentials table) — those keep theirs. */
+ .tbl-head:not(.tbl-head--keep){display:none;}
+ .tbl-head--keep{display:flex!important;flex-wrap:wrap;gap:4px 12px;}
  .tbl-row{display:flex!important;flex-wrap:wrap;gap:4px 12px;align-items:baseline;border-top:1px solid var(--border);border-bottom:none;padding:12px 0;}
  .tbl-row>div{min-width:0;}
- .tbl-row>.mono:first-child{display:none;}
+ /* Only the estimate's ordinal (01, 02…) is dropped. This used to match
+    .mono:first-child, which also swallowed the proposal's phase labels —
+    "Phase 01…05" — leaving its scope of work unlabelled on every phone. */
+ .tbl-row>.rownum{display:none;}
  .tbl-row .amt{margin-left:auto;}
  .totals-box{width:100%;}
  .toolbar{top:auto;bottom:14px;right:14px;}

@@ -270,6 +270,22 @@ export default function QuestionnaireForm({
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
+    // The schema marks three questions required and each renders a star, but
+    // only the name was ever checked — so "describe" and "services", the two
+    // answers the whole drafting pipeline is built on, could be submitted
+    // blank while the form implied they could not.
+    const missing = sections
+      .flatMap((s) => s.fields)
+      .filter((f) => "required" in f && f.required && f.id !== "contactName")
+      .filter((f) => {
+        const v = answers[f.id];
+        return Array.isArray(v) ? v.length === 0 : !String(v ?? "").trim();
+      });
+    if (missing.length) {
+      setError(t.errRequired + missing.map((f) => fieldText(f, lang, co).label).join(" · "));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     if (sendCopy) {
       const valid = copyEmails.split(/[,;\s]+/).filter((e) => EMAIL_RE.test(e.trim()));
       if (valid.length === 0) {

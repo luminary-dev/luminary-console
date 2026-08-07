@@ -9,6 +9,7 @@
 // THIS route's bearer check is the only guard. Vercel Cron automatically
 // sends "Authorization: Bearer <CRON_SECRET>" when that env var exists, and
 // manual runs can send the same header.
+import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getIndex, getClient } from "@/lib/store";
 import { buildZip, type ZipFile } from "@/lib/zip";
@@ -24,7 +25,11 @@ const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
 function authorized(req: Request): boolean {
   const secret = process.env.CRON_SECRET;
   if (!secret) return false;
-  return (req.headers.get("authorization") || "") === `Bearer ${secret}`;
+  // Constant-time compare: this bearer is the route's ONLY guard (the proxy
+  // waves /api/cron/* past the session gate) and the route is public.
+  const got = Buffer.from(req.headers.get("authorization") || "", "utf8");
+  const want = Buffer.from(`Bearer ${secret}`, "utf8");
+  return got.length === want.length && timingSafeEqual(got, want);
 }
 
 // ——— DNS health ———

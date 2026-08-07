@@ -149,6 +149,11 @@ export type ClientRecord = {
   submissions?: Submission[];
   /** Invoices & receipts across the payment arc (advance → final). */
   billing?: BillingDoc[];
+  /** Highest sequence ever issued per billing kind. Without it, deleting the
+   *  newest invoice frees its number for the next one — and a deleted
+   *  document may already have been published, so its number is spent.
+   *  See lib/pipeline.saveBillingDoc. */
+  billingSeq?: Partial<Record<BillingKind, number>>;
   /** Changes requested after the cost was finalised — billed on the final invoice. */
   changeOrders?: ChangeOrder[];
   /** Lifecycle stage (see ClientStage) — absent on records that predate it. */

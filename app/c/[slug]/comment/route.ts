@@ -85,7 +85,10 @@ export async function POST(
 <p>Reply to them directly${client.email ? ` at <a href="mailto:${esc(client.email)}">${esc(client.email)}</a>` : ""} — the portal doesn't send replies.</p>
 <p><a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open ${esc(client.company)} in the console →</a></p>`,
     [],
-    STUDIO,
+    // Reply-To the client, not ourselves: the body tells the operator to
+    // "reply to them directly", and STUDIO here is the same mailbox the mail
+    // is addressed to, so Reply went straight back to support@.
+    client.email || STUDIO,
   );
 
   return NextResponse.json({ ok: true, at: comment.at });

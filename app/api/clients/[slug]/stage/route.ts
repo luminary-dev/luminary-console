@@ -26,9 +26,16 @@ export async function POST(
   if (stageRank(stage) < stageRank("delivered")) {
     // Moving back before delivery resets the warranty clock.
     delete client.deliveredAt;
-  } else if (!client.deliveredAt) {
+  } else if (stage === "delivered" || stage === "warranty") {
+    // Re-stamp, don't merely fill a gap. currentStage() drifts delivered →
+    // warranty → closed off deliveredAt, so keeping a month-old timestamp
+    // made "put this back to Delivered" snap to Closed on the very next
+    // read — the one thing a manual override exists to prevent.
     client.deliveredAt = new Date().toISOString();
   }
+  // "Closed" deliberately stamps nothing: it is also how a lead is closed
+  // out unwon, and inventing a delivery date there would put a fabricated
+  // delivery and a 30-day warranty commitment on the handover pack.
   await saveClient(client);
   await logActivity("operator", "set stage", slug, STAGE_LABELS[stage]);
   return NextResponse.json({ ok: true, stage });

@@ -88,7 +88,7 @@ export function renderEstimate(d: EstimateData, ctx: Ctx): string {
   const rows = d.items.map(
     (it, i) =>
       `<div class="tbl-row" style="grid-template-columns:30px 1fr 84px 140px;">
-        <div class="mono" style="font-size:11.5px;color:var(--subtle);">${String(i + 1).padStart(2, "0")}</div>
+        <div class="mono rownum" style="font-size:11.5px;color:var(--subtle);">${String(i + 1).padStart(2, "0")}</div>
         <div><div class="item-t">${esc(it.title)}</div><div class="item-d">${esc(it.desc)}</div></div>
         <div style="text-align:center;font-family:var(--mono);font-size:12px;">${esc(it.effort)}</div>
         <div class="amt">${esc(it.range)}</div>

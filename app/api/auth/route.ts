@@ -86,9 +86,20 @@ export async function POST(req: Request) {
   }
   const issued = await issueOtp(verified);
   if ("retryInMs" in issued) {
-    return NextResponse.json(
-      { ok: true, step: "otp", note: `A code was already sent — wait ${Math.ceil(issued.retryInMs / 1000)}s to resend.` },
-    );
+    // Hand out the pending cookie here too. This branch sends the browser to
+    // the code screen, so a browser that doesn't already hold one — a second
+    // device, a private window, or the same window right after a sign-out —
+    // would type the correct code and be told "Login expired" instead, with
+    // no way forward until the 60s resend window elapsed.
+    const res = NextResponse.json({
+      ok: true,
+      step: "otp",
+      note: `A code was already sent — wait ${Math.ceil(issued.retryInMs / 1000)}s to resend.`,
+    });
+    res.cookies.set(PENDING_COOKIE, await makePending(secret, verified), {
+      httpOnly: true, secure: true, sameSite: "lax", maxAge: PENDING_MAX_AGE, path: "/",
+    });
+    return res;
   }
   const sent = await emailAddresses(
     [verified],

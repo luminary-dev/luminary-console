@@ -47,8 +47,9 @@ export async function POST(
   }
 
   const ids = validIds(client);
+  const sections = buildSections(client);
   const uploadIds = new Set(
-    buildSections(client).flatMap((s) => s.fields.filter((f) => f.type === "upload").map((f) => f.id)),
+    sections.flatMap((s) => s.fields.filter((f) => f.type === "upload").map((f) => f.id)),
   );
   const answers: Answers = {};
   const attachments: Attachment[] = [];
@@ -74,6 +75,22 @@ export async function POST(
   const contactName = typeof answers.contactName === "string" ? answers.contactName.trim() : "";
   if (!contactName) {
     return NextResponse.json({ error: "Please fill in your name before submitting." }, { status: 400 });
+  }
+  // Enforce the schema's own `required` flags server-side too — the form
+  // stars them, so a submission missing one is a bug or a bypass, not a
+  // choice. (The client-side check gives the translated version of this.)
+  const missing = sections
+    .flatMap((s) => s.fields)
+    .filter((f) => "required" in f && f.required && f.id !== "contactName")
+    .filter((f) => {
+      const v = answers[f.id];
+      return Array.isArray(v) ? v.length === 0 : !String(v ?? "").trim();
+    });
+  if (missing.length) {
+    return NextResponse.json(
+      { error: `These questions still need an answer: ${missing.map((f) => f.label).join(" · ")}` },
+      { status: 400 },
+    );
   }
 
   const copyTo =
@@ -124,7 +141,13 @@ export async function POST(
     const willDraft = !client.docs.quotation && !client.docs.proposal && !client.docs.contract;
 
     const filename = `Questionnaire - ${client.company} - LUM-QST-${client.docNoBase}.pdf`;
-    const contactEmail = typeof answers.contactEmail === "string" ? answers.contactEmail.trim() : "";
+    // Only a real address may become the studio email's Reply-To. Clients
+    // type "n/a", a phone number or two addresses into this field, and Resend
+    // rejects the WHOLE send on a malformed replyTo — which emailStudio only
+    // console.errors, so the submission would look fine to everyone while the
+    // studio was never told it arrived.
+    const rawContactEmail = typeof answers.contactEmail === "string" ? answers.contactEmail.trim() : "";
+    const contactEmail = EMAIL_RE.test(rawContactEmail) ? rawContactEmail : "";
 
     // Attachments are stored in a PRIVATE bucket and the record only holds an
     // authed app URL, which is useless inside an email. Sign a direct link per
@@ -146,7 +169,7 @@ export async function POST(
 
     await emailStudio(
       `Questionnaire submitted — ${client.company}${submissionNo > 1 ? ` (submission #${submissionNo})` : ""}`,
-      `<p><strong>${contactName}</strong> submitted the ${client.company} discovery questionnaire at ${submittedAt} (Colombo)${submissionNo > 1 ? ` — this is submission #${submissionNo} for this client` : ""}.</p>
+      `<p><strong>${esc(contactName)}</strong> submitted the ${esc(client.company)} discovery questionnaire at ${submittedAt} (Colombo)${submissionNo > 1 ? ` — this is submission #${submissionNo} for this client` : ""}.</p>
 ${attachmentsHtml}<p>Full answers attached. ${
         willDraft
           ? "The quotation, proposal and contract are being drafted now — a second email lands when they're ready."
@@ -161,7 +184,7 @@ ${attachmentsHtml}<p>Full answers attached. ${
       copySent = await emailAddresses(
         copyTo,
         `Your questionnaire answers — Luminary × ${client.company}`,
-        `<p>Hi ${contactName},</p>
+        `<p>Hi ${esc(contactName)},</p>
 <p>Thanks for completing the project questionnaire — your answers are attached as a PDF for your records.</p>
 <p>Our studio has the same document and will come back within one business day with the confirmed scope and fixed quotation. If you have logos, photos or inspiration screenshots to share, just reply to this email.</p>
 <p>— Luminary Studio<br>support@luminary-dev.xyz · +94 77 16 18 093 · <a href="https://luminary-dev.xyz">luminary-dev.xyz</a></p>`,

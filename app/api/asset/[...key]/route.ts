@@ -22,13 +22,22 @@ export const dynamic = "force-dynamic";
 /** Types safe to render in a tab. HTML and SVG are deliberately absent. */
 const INLINE = new Set(["application/pdf", "image/png", "image/jpeg", "image/gif", "image/webp"]);
 
+/** The four things `putAsset` actually writes. The store prefix alone also
+ *  covered console/index.json, console/counter.json, every client's
+ *  record.json (PII plus the operator's private notes) and console/state/*
+ *  — including the session registry — none of which is an "asset" and none
+ *  of which has any business being downloadable through this route. */
+const ASSET_SUBTREE = /^console\/clients\/[^/]+\/(docs|billing|attachments)\/|^console\/clients\/[^/]+\/answers[.-]/;
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ key: string[] }> },
 ) {
   const { key } = await params;
   const ref = (key ?? []).join("/");
-  if (!ref.startsWith(STORE_PREFIX)) return new Response("Not found", { status: 404 });
+  if (!ref.startsWith(STORE_PREFIX) || !ASSET_SUBTREE.test(ref)) {
+    return new Response("Not found", { status: 404 });
+  }
 
   const object = await assetStream(ref).catch(() => null);
   if (!object) return new Response("Not found", { status: 404 });

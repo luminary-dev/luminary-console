@@ -58,6 +58,8 @@ export type UIStrings = {
   doneCopy2: string;
 
   errName: string;
+  /** Prefix for the list of unanswered starred questions. */
+  errRequired: string;
   errCopy: string;
   errGeneric: string;
   errSuffix: string;
@@ -412,6 +414,7 @@ export const SI_UI: UIStrings = {
   doneCopy2: " වෙත යමින් පවතී — inbox එක (සහ පළමු වතාවේ spam එකත්) බලන්න.",
 
   errName: "කරුණාකර ඔබේ නම (පළමු ප්‍රශ්නය) සඳහන් කරන්න — පිළිතුරු දිය යුත්තේ කාටදැයි අපි දැනගන්නට.",
+  errRequired: "තරුවකින් (*) සලකුණු කළ මේ ප්‍රශ්නවලට තවම පිළිතුරු නැත: ",
   errCopy: "ඔබ පිටපතක් ඉල්ලා ඇත — කරුණාකර ඒ සඳහා වලංගු email ලිපිනයක් වත් ඇතුළත් කරන්න.",
   errGeneric: "යම් වරදක් සිදු විය.",
   errSuffix:

@@ -18,6 +18,9 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
   const res = await fetchAsset(meta.htmlUrl);
+  // A published document whose stored render has gone missing must 404, not
+  // serve an empty 200 — fetchAsset answers a missing key with a null body.
+  if (!res.ok) return new Response("Not found", { status: 404 });
   return new Response(await res.arrayBuffer(), {
     headers: {
       "Content-Type": "text/html; charset=utf-8",

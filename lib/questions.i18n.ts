@@ -56,6 +56,7 @@ export const EN_UI: UIStrings = {
   doneCopy2: " — check the inbox (and spam, the first time).",
 
   errName: "Please tell us your name (first question) so we know who to reply to.",
+  errRequired: "These starred questions still need an answer: ",
   errCopy: "You asked for a copy — please enter at least one valid email address for it.",
   errGeneric: "Something went wrong.",
   errSuffix:

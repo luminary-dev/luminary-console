@@ -121,13 +121,18 @@ export async function proxy(request: NextRequest) {
   const secret = process.env.SESSION_SECRET || "";
   const session = await verifySessionToken(secret, request.cookies.get(SESSION_COOKIE)?.value);
   if (!session || (await sidRevoked(session.sid))) {
+    // These are console responses too. Skipping harden() here left the most
+    // requested path on the host — an unauthenticated GET / — with no
+    // nosniff, no X-Frame-Options, no HSTS of ours and a cacheable
+    // Cache-Control, which is exactly the response a shared cache or a
+    // framing attack would want.
     if (pathname.startsWith("/api/")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return harden(NextResponse.json({ error: "Unauthorized" }, { status: 401 }), true);
     }
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.search = "";
-    return NextResponse.redirect(url);
+    return harden(NextResponse.redirect(url), true);
   }
 
   // Slide the idle window (capped at the absolute expiry).

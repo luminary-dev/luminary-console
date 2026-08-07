@@ -2,9 +2,10 @@
 
 // Portal question box. One box with a document picker rather than a box per
 // row: at 390px six stacked forms would bury the documents themselves, and
-// the client almost always has one question at a time. Posts to the relative
-// "comment" endpoint so it works on the client subdomain and in the console
-// preview alike.
+// the client almost always has one question at a time. The endpoint is
+// passed in (`base` + "/comment") rather than resolved relatively: from the
+// console preview path /c/<slug> — no trailing slash — a relative "comment"
+// resolves to /c/comment and 404s.
 import { useState } from "react";
 
 export type PortalDoc = { key: string; label: string; no: string };
@@ -12,10 +13,13 @@ export type PortalDoc = { key: string; label: string; no: string };
 export default function PortalComments({
   docs,
   initialDoc,
+  base = "",
 }: {
   docs: PortalDoc[];
   /** Preselected document — the newest thing they were sent. */
   initialDoc?: string;
+  /** "" on the client subdomain, "/c/<slug>" in the console preview. */
+  base?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [doc, setDoc] = useState(initialDoc ?? docs[0]?.key ?? "");
@@ -33,7 +37,7 @@ export default function PortalComments({
     if (!text.trim()) return setError("Please type your question.");
     setStatus("sending");
     try {
-      const res = await fetch("comment", {
+      const res = await fetch(`${base}/comment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ doc, by, text, company }),

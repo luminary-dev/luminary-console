@@ -35,7 +35,19 @@ export default async function ClientHome({
   // would already be in there and nothing would ever look new). Empty = first
   // visit, and nothing is flagged: a portal shouting "New" at every row on
   // first sight means nothing.
-  const lastVisit = Number((await headers()).get("x-lum-last-visit") ?? "");
+  const h = await headers();
+  // Root-absolute hrefs are correct on the client subdomain, where the proxy
+  // rewrites "/" into "/c/<slug>/". They are NOT correct at /c/<slug> on the
+  // console host — the documented operator preview — where every link landed
+  // on the console root and 404'd or bounced to /login. Derive the prefix the
+  // same way the proxy decides the host is a client host.
+  const host = (h.get("host") || "").split(":")[0].toLowerCase();
+  const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
+  const CONSOLE_HOST = process.env.CONSOLE_HOST || `console.${ROOT}`;
+  const onClientHost = host.endsWith(`.${ROOT}`) && host !== CONSOLE_HOST && host !== ROOT;
+  const base = onClientHost ? "" : `/c/${slug}`;
+
+  const lastVisit = Number(h.get("x-lum-last-visit") ?? "");
   const isNew = (updatedAt: string) =>
     Number.isFinite(lastVisit) &&
     lastVisit > 0 &&
@@ -74,12 +86,12 @@ export default async function ClientHome({
       <div className="card">
         <h3>Your documents</h3>
         <div className="portal-links">
-          <Link className="portal-link" href="/questionnaire">
+          <Link className="portal-link" href={`${base}/questionnaire`}>
             <span>Project questionnaire</span>
             <span className="no">LUM-QST-{client.docNoBase} →</span>
           </Link>
           {published.map((t) => (
-            <Link className="portal-link" key={t} href={`/${t}`}>
+            <Link className="portal-link" key={t} href={`${base}/${t}`}>
               <span>
                 {DOC_LABELS[t]}
                 {isNew(client.docs[t]!.updatedAt) && <span className="new-pill">New</span>}
@@ -88,7 +100,7 @@ export default async function ClientHome({
             </Link>
           ))}
           {publishedBilling.map((b) => (
-            <Link className="portal-link" key={b.slug} href={`/${b.slug}`}>
+            <Link className="portal-link" key={b.slug} href={`${base}/${b.slug}`}>
               <span>
                 {billingLabel(b)}
                 {isNew(b.updatedAt) && <span className="new-pill">New</span>}
@@ -99,7 +111,7 @@ export default async function ClientHome({
         </div>
       </div>
 
-      <PortalComments docs={askable} initialDoc={newest} />
+      <PortalComments docs={askable} initialDoc={newest} base={base} />
 
       <div className="foot">
         <div className="foot-links">

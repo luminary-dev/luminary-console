@@ -83,7 +83,23 @@ export async function POST(
 
     if (action === "retry-stage2") {
       if (!client.answersUrl) return NextResponse.json({ error: "No answers submitted yet" }, { status: 400 });
+      // runStage2 replaces quotation/proposal/contract with fresh DRAFTS. The
+      // questionnaire route already refuses to re-run for exactly this reason
+      // (`willDraft`), but the API did not — so a replayed or stale POST could
+      // silently demote a published, possibly already-accepted quotation.
+      const live = (["quotation", "proposal", "contract"] as DocType[]).filter(
+        (t) => client.docs[t]?.status === "published",
+      );
+      if (live.length) {
+        return NextResponse.json(
+          { error: `Already published: ${live.join(", ")}. Unpublish or delete those first — re-drafting replaces them.` },
+          { status: 409 },
+        );
+      }
       const res = await fetchAsset(client.answersUrl);
+      // fetchAsset answers a missing object with a 404 and a null body, which
+      // would otherwise blow up in res.json() and surface as a raw 500.
+      if (!res.ok) return NextResponse.json({ error: "The stored answers are missing." }, { status: 404 });
       const answers = await res.json();
       await runStage2(slug, answers, client.answersAt || "");
       return NextResponse.json({ ok: true });
