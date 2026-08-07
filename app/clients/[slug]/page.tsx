@@ -18,7 +18,10 @@ import NotesCard from "@/components/NotesCard";
 import TasksCard from "@/components/TasksCard";
 import CommentsCard from "@/components/CommentsCard";
 import EmailHistoryCard from "@/components/EmailHistoryCard";
+import AssistantCard from "@/components/AssistantCard";
+import HandoverCard from "@/components/HandoverCard";
 import { currentStage } from "@/lib/stage";
+import { deliveredAtIso, handoverEligible } from "@/lib/handover";
 
 export const dynamic = "force-dynamic";
 
@@ -234,7 +237,19 @@ export default async function ClientPage({
         email={client.email}
       />
 
+      <HandoverCard
+        slug={slug}
+        eligible={handoverEligible(client)}
+        existing={(() => {
+          const h = (client.billing ?? []).find((b) => b.kind === "handover");
+          return h ? { no: h.no, slug: h.slug, status: h.status } : undefined;
+        })()}
+        deliveredOn={deliveredAtIso(client)}
+      />
+
       <ChangeOrders slug={slug} changeOrders={client.changeOrders ?? []} />
+
+      <AssistantCard slug={slug} />
 
       <CommentsCard client={client} />
 

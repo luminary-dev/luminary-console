@@ -88,6 +88,14 @@ export async function POST(
     }
 
     if (action === "regenerate") {
+      // The handover pack has no AI-drafted data to revise — it is rebuilt
+      // from the record by its own endpoint.
+      if (doc.kind === "handover") {
+        return NextResponse.json(
+          { error: "Handover packs are rebuilt from the record — use Regenerate on the Handover pack card." },
+          { status: 400 },
+        );
+      }
       if (!instructions) return NextResponse.json({ error: "Revision instructions required" }, { status: 400 });
       const data = await reviseDoc(client, doc.kind, doc.data, instructions, todayLabel());
       // Keep the render being replaced so the operator can compare/roll back.

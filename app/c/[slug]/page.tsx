@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getClient } from "@/lib/store";
 import { currentStage } from "@/lib/stage";
-import { billingStageLabel } from "@/lib/doclabels";
+import { billingLabel } from "@/lib/doclabels";
 import { DOC_LABELS, type DocType } from "@/lib/types";
 import PortalProgress from "@/components/PortalProgress";
 import PortalComments, { type PortalDoc } from "@/components/PortalComments";
@@ -49,11 +49,7 @@ export default async function ClientHome({
   // Everything the client can point a question at, newest doc preselected.
   const askable: PortalDoc[] = [
     ...published.map((t) => ({ key: t, label: DOC_LABELS[t], no: client.docs[t]!.no })),
-    ...publishedBilling.map((b) => ({
-      key: b.slug,
-      label: `${billingStageLabel(b.stage)}${DOC_LABELS[b.kind]}`,
-      no: b.no,
-    })),
+    ...publishedBilling.map((b) => ({ key: b.slug, label: billingLabel(b), no: b.no })),
     { key: "questionnaire", label: "Project questionnaire", no: `LUM-QST-${client.docNoBase}` },
   ];
   const newest = [
@@ -94,8 +90,7 @@ export default async function ClientHome({
           {publishedBilling.map((b) => (
             <Link className="portal-link" key={b.slug} href={`/${b.slug}`}>
               <span>
-                {billingStageLabel(b.stage)}
-                {DOC_LABELS[b.kind]}
+                {billingLabel(b)}
                 {isNew(b.updatedAt) && <span className="new-pill">New</span>}
               </span>
               <span className="no">{b.no} →</span>

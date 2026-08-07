@@ -17,14 +17,19 @@ const windows = new Map<string, Window>();
 
 export const WINDOW_MS = 10 * 60 * 1000; // one shared 10-minute window size
 
-/** Per-bucket ceilings per IP per 10 minutes. Future buckets (e.g. "comment"
- *  for portal doc comments) just add a line here and call `rateLimit`. */
+/** Per-bucket ceilings per IP per 10 minutes. Future buckets just add a line
+ *  here and call `rateLimit`. */
 export const LIMITS = {
   submit: 5,
   upload: 30,
   accept: 5,
   auth: 10,
-  comment: 10, // reserved for the Wave 4 portal comment box
+  comment: 10, // portal doc comment box
+  // Operator-only and already behind the session gate, so this is a cost
+  // guard rather than an abuse guard: each call is a full-context model
+  // request, and a stuck retry loop in the browser shouldn't be able to run
+  // up the bill unattended.
+  assist: 20,
 } as const;
 
 export type Bucket = keyof typeof LIMITS;

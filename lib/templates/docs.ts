@@ -65,7 +65,9 @@ export type ProposalData = {
   nextSteps: string;
 };
 
-type Ctx = {
+/** Everything a renderer needs besides its own data. Exported so documents
+ *  rendered outside this file (the handover pack) share the exact contract. */
+export type Ctx = {
   client: ClientRecord;
   docNo: string;
   issued: string;

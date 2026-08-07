@@ -4,9 +4,10 @@
 // Stage 2 (answers in): answers PDF + emails, then Claude drafts quotation /
 // proposal / contract for review.
 import type { Answers, BillingDoc, ClientRecord, DocMeta, DocType, DocVersion } from "./types";
-import { DOC_NO_PREFIX } from "./types";
+import { BILLING_NO_PREFIX, DOC_NO_PREFIX } from "./types";
 import { fetchAsset, getClient, nextDocNoBase, putAsset, saveClient } from "./store";
-import { renderDoc, type EstimateData, type QuotationData } from "./templates/docs";
+import { renderDoc, type Ctx, type EstimateData, type QuotationData } from "./templates/docs";
+import { renderHandover, type HandoverData } from "./templates/handover";
 import { renderAnswers } from "./templates/answers";
 import { renderPdf } from "./pdf";
 import { emailStudio } from "./email";
@@ -97,8 +98,20 @@ export async function saveDoc(
   return meta;
 }
 
-/** Render + persist an invoice/receipt. New docs get the next sequence
- *  number (LUM-INV-0044-01, -02…); pass `existingSlug` to re-render one. */
+/** Renderer for one `billing[]` entry. Invoices and receipts go through the
+ *  shared DocType renderer; the handover pack has its own (and its own data
+ *  contract), but the same shell, so everything downstream is identical. */
+function renderBilling(kind: BillingDoc["kind"], data: unknown, ctx: Ctx): string {
+  return kind === "handover"
+    ? renderHandover(data as HandoverData, ctx)
+    : renderDoc(kind, data, ctx);
+}
+
+/** Render + persist an invoice/receipt/handover pack. New docs get the next
+ *  sequence number (LUM-INV-0044-01, -02…); pass `existingSlug` to re-render
+ *  one. The first handover pack is plain LUM-HOP-0044 (there is normally only
+ *  ever one) and later ones fall back to the suffixed form so a number is
+ *  never reused. */
 export async function saveBillingDoc(
   client: ClientRecord,
   kind: BillingDoc["kind"],
@@ -116,11 +129,12 @@ export async function saveBillingDoc(
       client.billing
         .filter((b) => b.kind === kind)
         .reduce((m, b) => Math.max(m, parseInt(b.slug.split("-").pop() ?? "", 10) || 0), 0) + 1;
+    const suffix = kind === "handover" && seq === 1 ? "" : `-${String(seq).padStart(2, "0")}`;
     doc = {
       kind,
       stage,
       slug: `${kind}-${seq}`,
-      no: `${DOC_NO_PREFIX[kind]}${client.docNoBase}-${String(seq).padStart(2, "0")}`,
+      no: `${BILLING_NO_PREFIX[kind]}${client.docNoBase}${suffix}`,
       status,
       updatedAt: "",
       htmlUrl: "",
@@ -130,8 +144,8 @@ export async function saveBillingDoc(
     client.billing.push(doc);
   }
   const ctx = { client, docNo: doc.no, issued: todayLabel() };
-  const webHtml = renderDoc(kind, data, { ...ctx, mode: "web", pdfHref: `${doc.slug}/pdf` });
-  const pdfHtml = renderDoc(kind, data, { ...ctx, mode: "pdf" });
+  const webHtml = renderBilling(kind, data, { ...ctx, mode: "web", pdfHref: `${doc.slug}/pdf` });
+  const pdfHtml = renderBilling(kind, data, { ...ctx, mode: "pdf" });
   const pdf = await renderPdf(pdfHtml);
   doc.htmlUrl = await putAsset(`clients/${client.slug}/billing/${doc.slug}.html`, webHtml, "text/html; charset=utf-8");
   doc.pdfUrl = await putAsset(`clients/${client.slug}/billing/${doc.slug}.pdf`, pdf, "application/pdf");

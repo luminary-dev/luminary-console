@@ -9,13 +9,13 @@ import { NextResponse } from "next/server";
 import { fetchAsset, getClient, saveClient } from "@/lib/store";
 import { emailAddresses } from "@/lib/email";
 import { logActivity } from "@/lib/activity";
+import { billingLabel } from "@/lib/doclabels";
 import { DOC_LABELS, type DocType } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
 const CORE: DocType[] = ["estimate", "quotation", "proposal", "contract", "invoice", "receipt"];
-const stageLabel = (s: string) => (s === "advance" ? "Advance " : s === "final" ? "Final " : "Additional ");
 
 type Resolved = {
   key: string;
@@ -49,7 +49,7 @@ export async function POST(
     }
     const b = (client.billing ?? []).find((x) => x.slug === key);
     if (b) {
-      return { key, label: `${stageLabel(b.stage)}${DOC_LABELS[b.kind]}`, no: b.no, pdfUrl: b.pdfUrl, published: b.status === "published" };
+      return { key, label: billingLabel(b), no: b.no, pdfUrl: b.pdfUrl, published: b.status === "published" };
     }
     return null;
   };

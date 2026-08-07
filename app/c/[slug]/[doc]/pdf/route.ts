@@ -1,4 +1,5 @@
 import { fetchAsset, getClient } from "@/lib/store";
+import { billingLabel } from "@/lib/doclabels";
 import type { DocType } from "@/lib/types";
 import { DOC_LABELS } from "@/lib/types";
 
@@ -16,9 +17,7 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
   const res = await fetchAsset(meta.pdfUrl);
-  const label = billing
-    ? `${billing.stage === "advance" ? "Advance " : billing.stage === "final" ? "Final " : ""}${DOC_LABELS[billing.kind]}`
-    : DOC_LABELS[doc as DocType];
+  const label = billing ? billingLabel(billing) : DOC_LABELS[doc as DocType];
   return new Response(await res.arrayBuffer(), {
     headers: {
       "Content-Type": "application/pdf",

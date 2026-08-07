@@ -28,6 +28,27 @@ export const DOC_NO_PREFIX: Record<DocType, string> = {
   proposal: "LUM-P-",
 };
 
+/** What a `BillingDoc` can be. Invoices and receipts are AI-drafted from the
+ *  quotation; "handover" is the end-of-project pack, rendered deterministically
+ *  from the record (see lib/handover.ts). It rides in `billing[]` rather than
+ *  `docs` because everything a handover pack needs — a portal URL of its own,
+ *  publish/unpublish, per-doc email, delete — is already implemented for the
+ *  billing array and keyed off `slug`, whereas `docs` is a fixed one-slot-per-
+ *  type map whose slots are wired into the AI drafting pipeline. */
+export type BillingKind = "invoice" | "receipt" | "handover";
+
+export const BILLING_LABELS: Record<BillingKind, string> = {
+  invoice: "Invoice",
+  receipt: "Receipt",
+  handover: "Handover pack",
+};
+
+export const BILLING_NO_PREFIX: Record<BillingKind, string> = {
+  invoice: "LUM-INV-",
+  receipt: "LUM-RCP-",
+  handover: "LUM-HOP-",
+};
+
 export type DocStatus = "draft" | "published";
 
 /** One archived render of a document, pushed onto `history` just before a
@@ -150,7 +171,9 @@ export type ClientRecord = {
 };
 
 export type BillingDoc = {
-  kind: "invoice" | "receipt";
+  kind: BillingKind;
+  /** Where in the payment arc this sits. Handover packs are always "other" —
+   *  they bill nothing, so the money math (lib/money.ts) skips them. */
   stage: "advance" | "final" | "other";
   /** URL segment on the client site, e.g. "invoice-1". */
   slug: string;

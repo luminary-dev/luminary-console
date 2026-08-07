@@ -7,8 +7,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { BillingDoc, Payment } from "@/lib/types";
 import { fmtLKR, invoiceTotal, paidAgainst, parseAmount, summarizeMoney } from "@/lib/money";
-
-const STAGE_LABEL: Record<string, string> = { advance: "Advance", final: "Final", other: "Additional" };
+// One naming rule for billing documents, shared with the portal, the email
+// route and the comment box — "Advance invoice", "Handover pack".
+import { billingLabel } from "@/lib/doclabels";
 
 import EmailDocButton from "./EmailDocButton";
 import DocHistory from "./DocHistory";
@@ -62,7 +63,7 @@ export default function BillingCard({
   // document must be unpublished first (confirmed), then deletion itself is
   // confirmed again; a draft just confirms once.
   const remove = async (b: BillingDoc) => {
-    const label = `the ${STAGE_LABEL[b.stage].toLowerCase()} ${b.kind} ${b.no}`;
+    const label = `the ${billingLabel(b).toLowerCase()} ${b.no}`;
     if (b.status === "published") {
       const step1 = await confirm({
         title: "Unpublish first",
@@ -289,9 +290,7 @@ export default function BillingCard({
                 const dueDate = isInvoice ? (b.data as { dueDate?: string })?.dueDate : undefined;
                 return (
                 <tr key={b.slug}>
-                  <td style={{ fontWeight: 600 }}>
-                    {STAGE_LABEL[b.stage]} {b.kind}
-                  </td>
+                  <td style={{ fontWeight: 600 }}>{billingLabel(b)}</td>
                   <td className="mono">{b.no}</td>
                   <td>
                     <span className={`pill${b.status === "draft" ? " grey" : ""}`}>
@@ -343,10 +342,14 @@ export default function BillingCard({
                           {busy === `pay-${b.slug}` ? "…" : "Mark paid"}
                         </button>
                       )}
-                      <button className="btn ghost small" disabled={!!busy} onClick={() => setReviseFor(reviseFor === b.slug ? null : b.slug)}>
-                        Revise
-                      </button>
-                      <EmailDocButton slug={slug} docKey={b.slug} label={`${STAGE_LABEL[b.stage].toLowerCase()} ${b.kind}`} email={email} />
+                      {/* The handover pack has no drafted data to revise — it
+                          is rebuilt from the record by its own card. */}
+                      {b.kind !== "handover" && (
+                        <button className="btn ghost small" disabled={!!busy} onClick={() => setReviseFor(reviseFor === b.slug ? null : b.slug)}>
+                          Revise
+                        </button>
+                      )}
+                      <EmailDocButton slug={slug} docKey={b.slug} label={billingLabel(b).toLowerCase()} email={email} />
                       <button
                         className="btn ghost small"
                         style={{ color: "#ef4444", borderColor: "rgba(239,68,68,.35)" }}

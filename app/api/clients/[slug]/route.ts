@@ -4,6 +4,7 @@ import { getClient, deleteClient, fetchAsset } from "@/lib/store";
 import { removeClientDomain } from "@/lib/domains";
 import { emailStudio } from "@/lib/email";
 import { logActivity } from "@/lib/activity";
+import { billingLabel } from "@/lib/doclabels";
 import { DOC_LABELS } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -44,7 +45,7 @@ export async function DELETE(
     if (meta) files.push({ filename: `${DOC_LABELS[meta.type]} - ${meta.no}.pdf`, pdfUrl: meta.pdfUrl });
   }
   for (const b of client.billing ?? []) {
-    files.push({ filename: `${b.stage} ${DOC_LABELS[b.kind]} - ${b.no}.pdf`, pdfUrl: b.pdfUrl });
+    files.push({ filename: `${billingLabel(b)} - ${b.no}.pdf`, pdfUrl: b.pdfUrl });
   }
   for (const [i, sub] of (client.submissions ?? []).entries()) {
     files.push({ filename: `Questionnaire answers ${i + 1} (${sub.by}).pdf`, pdfUrl: sub.pdfUrl });
