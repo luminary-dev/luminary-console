@@ -3,7 +3,7 @@
 // + PDF → publish → domain automation → studio email.
 // Stage 2 (answers in): answers PDF + emails, then Claude drafts quotation /
 // proposal / contract for review.
-import type { Answers, BillingDoc, ClientRecord, DocMeta, DocType } from "./types";
+import type { Answers, BillingDoc, ClientRecord, DocMeta, DocType, DocVersion } from "./types";
 import { DOC_NO_PREFIX } from "./types";
 import { getClient, nextDocNoBase, putAsset, saveClient } from "./store";
 import { renderDoc, type EstimateData, type QuotationData } from "./templates/docs";
@@ -38,6 +38,31 @@ export function docNo(client: ClientRecord, type: DocType): string {
   return `${DOC_NO_PREFIX[type]}${client.docNoBase}`;
 }
 
+/** How many superseded renders of one document we keep. */
+export const HISTORY_CAP = 10;
+
+/** Remember the render a document is about to lose. Call this immediately
+ *  before a revise/regenerate re-renders `doc` — every save writes brand-new
+ *  random-suffixed blobs, so the URLs already on the record keep resolving
+ *  and archiving them costs nothing but the pointer. Oldest entries fall off
+ *  at HISTORY_CAP; a doc that has never been rendered is skipped. */
+export function archiveVersion(doc: {
+  no: string;
+  htmlUrl: string;
+  pdfUrl: string;
+  updatedAt: string;
+  history?: DocVersion[];
+}): void {
+  if (!doc.htmlUrl || !doc.pdfUrl) return;
+  const entry: DocVersion = {
+    no: doc.no,
+    htmlUrl: doc.htmlUrl,
+    pdfUrl: doc.pdfUrl,
+    at: doc.updatedAt || new Date().toISOString(),
+  };
+  doc.history = [...(doc.history ?? []), entry].slice(-HISTORY_CAP);
+}
+
 /** Render + persist a document (HTML page, PDF) and update the record.
  *  `issued` overrides the printed issue date (used when re-rendering an
  *  already-issued document, e.g. stamping an acceptance onto a quotation). */
@@ -55,7 +80,19 @@ export async function saveDoc(
   const pdf = await renderPdf(pdfHtml);
   const htmlUrl = await putAsset(`clients/${client.slug}/docs/${type}.html`, webHtml, "text/html; charset=utf-8");
   const pdfUrl = await putAsset(`clients/${client.slug}/docs/${type}.pdf`, pdf, "application/pdf");
-  const meta: DocMeta = { type, no, status, updatedAt: new Date().toISOString(), htmlUrl, pdfUrl, data };
+  // This replaces the meta wholesale, so carry the archive across explicitly
+  // — losing it here would silently empty the history on every re-render.
+  const history = client.docs[type]?.history;
+  const meta: DocMeta = {
+    type,
+    no,
+    status,
+    updatedAt: new Date().toISOString(),
+    htmlUrl,
+    pdfUrl,
+    data,
+    ...(history?.length ? { history } : {}),
+  };
   client.docs[type] = meta;
   return meta;
 }

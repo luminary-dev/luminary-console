@@ -4,9 +4,23 @@
 // props from the server (per-client, with Claude's extra questions spliced
 // in), and submission posts to the relative "submit" endpoint so the same
 // component works on the client subdomain and in console preview.
+//
+// Bilingual: `lang` swaps every visible string through lib/questions.i18n
+// (labels/hints by field id, checkbox labels by English option text). The
+// ANSWERS never change — they're keyed by field id and checkbox values stay
+// English — so switching language mid-form is lossless and the generation
+// pipeline sees identical data either way.
 import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import type { Field, Section } from "@/lib/questions";
+import {
+  fieldText,
+  hasExtras,
+  optionText,
+  sectionText,
+  strings,
+  type Lang,
+} from "@/lib/questions.i18n";
 import type { Answers } from "@/lib/types";
 import {
   MAX_FILE_BYTES,
@@ -36,12 +50,15 @@ function UploadControl({
   field,
   answers,
   setAnswer,
+  lang,
 }: {
   slug: string;
   field: Field;
   answers: Answers;
   setAnswer: (id: string, value: string | string[]) => void;
+  lang: Lang;
 }) {
+  const t = strings(lang);
   const stored = (answers[field.id] as string[] | undefined) ?? [];
   const files = stored.map(parseAttachment).filter(Boolean) as AttachmentRef[];
   const [uploading, setUploading] = useState(0);
@@ -100,7 +117,7 @@ function UploadControl({
               <button
                 type="button"
                 className="q-file-x"
-                aria-label={`Remove ${f.n}`}
+                aria-label={t.removeFile(f.n)}
                 onClick={() => setAnswer(field.id, stored.filter((_, j) => j !== i))}
               >
                 ×
@@ -116,13 +133,9 @@ function UploadControl({
         disabled={uploading > 0}
         onClick={() => inputRef.current?.click()}
       >
-        {uploading > 0
-          ? `Uploading ${uploading} file${uploading > 1 ? "s" : ""}…`
-          : files.length > 0
-            ? "+ Attach more files"
-            : "+ Attach files"}
+        {uploading > 0 ? t.uploading(uploading) : files.length > 0 ? t.attachMore : t.attach}
       </button>
-      <span className="q-file-note">Any file type · up to 15 MB each</span>
+      <span className="q-file-note">{t.fileNote}</span>
       {err && <div className="q-file-err">{err}</div>}
     </div>
   );
@@ -133,14 +146,18 @@ function FieldControl({
   field,
   answers,
   setAnswer,
+  lang,
+  placeholder,
 }: {
   slug: string;
   field: Field;
   answers: Answers;
   setAnswer: (id: string, value: string | string[]) => void;
+  lang: Lang;
+  placeholder?: string;
 }) {
   if (field.type === "upload") {
-    return <UploadControl slug={slug} field={field} answers={answers} setAnswer={setAnswer} />;
+    return <UploadControl slug={slug} field={field} answers={answers} setAnswer={setAnswer} lang={lang} />;
   }
 
   if (field.type === "checks") {
@@ -156,14 +173,14 @@ function FieldControl({
         {field.options.map((option) => (
           <label className="q-check" key={option}>
             <input type="checkbox" checked={selected.includes(option)} onChange={() => toggle(option)} />
-            {option}
+            {optionText(option, lang)}
           </label>
         ))}
         {field.other && (
           <span className="q-other">
             <label className="q-check">
               <input type="checkbox" checked={otherValue.length > 0} readOnly />
-              Other:
+              {strings(lang).other}
             </label>
             <input
               className="q-line"
@@ -183,7 +200,7 @@ function FieldControl({
       <textarea
         className="q-box"
         rows={field.rows ?? 3}
-        placeholder={field.placeholder}
+        placeholder={placeholder}
         value={value}
         onChange={(e) => setAnswer(field.id, e.target.value)}
         onInput={(e) => {
@@ -198,14 +215,26 @@ function FieldControl({
     <input
       className="q-line"
       type="text"
-      placeholder={field.placeholder}
+      placeholder={placeholder}
       value={value}
       onChange={(e) => setAnswer(field.id, e.target.value)}
     />
   );
 }
 
-export default function QuestionnaireForm({ slug, sections }: { slug: string; sections: Section[] }) {
+export default function QuestionnaireForm({
+  slug,
+  sections,
+  lang = "en",
+  co = "",
+}: {
+  slug: string;
+  sections: Section[];
+  lang?: Lang;
+  /** Short company name — fills the {co} slot in translated labels. */
+  co?: string;
+}) {
+  const t = strings(lang);
   const [answers, setAnswers] = useState<Answers>({});
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -221,14 +250,14 @@ export default function QuestionnaireForm({ slug, sections }: { slug: string; se
     setError(null);
     const name = ((answers.contactName as string) || "").trim();
     if (!name) {
-      setError("Please tell us your name (first question) so we know who to reply to.");
+      setError(t.errName);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     if (sendCopy) {
       const valid = copyEmails.split(/[,;\s]+/).filter((e) => EMAIL_RE.test(e.trim()));
       if (valid.length === 0) {
-        setError("You asked for a copy — please enter at least one valid email address for it.");
+        setError(t.errCopy);
         return;
       }
     }
@@ -246,10 +275,7 @@ export default function QuestionnaireForm({ slug, sections }: { slug: string; se
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
       setStatus("idle");
-      setError(
-        (e instanceof Error ? e.message : "Something went wrong.") +
-          " Your answers are still here — please try again, or email us at support@luminary-dev.xyz.",
-      );
+      setError((e instanceof Error ? e.message : t.errGeneric) + t.errSuffix);
     }
   };
 
@@ -257,17 +283,17 @@ export default function QuestionnaireForm({ slug, sections }: { slug: string; se
     return (
       <div className="done">
         <div className="done-mark">✓</div>
-        <h2>Thank you — we&apos;ve got it.</h2>
+        <h2>{t.doneTitle}</h2>
         <p>
-          Your answers — and every file you attached — are with the studio as a PDF. We&apos;ll
-          review them and come back within one business day with the confirmed scope and fixed
-          quotation. Anything you forgot to attach can be emailed to{" "}
-          <a href="mailto:support@luminary-dev.xyz">support@luminary-dev.xyz</a> any time.
+          {t.doneBody}
+          <a href="mailto:support@luminary-dev.xyz">support@luminary-dev.xyz</a>
+          {t.doneBodyEnd}
         </p>
         {copySent && (
           <p>
-            A copy of your answers is on its way to <strong>{copyEmails}</strong> — check the inbox
-            (and spam, the first time).
+            {t.doneCopy1}
+            <strong>{copyEmails}</strong>
+            {t.doneCopy2}
           </p>
         )}
       </div>
@@ -287,27 +313,41 @@ export default function QuestionnaireForm({ slug, sections }: { slug: string; se
         style={{ position: "absolute", left: "-9999px", height: 0, width: 0, opacity: 0 }}
       />
 
-      {sections.map((section) => (
-        <section className="q-section" key={section.id}>
-          <div className="q-eyebrow">{section.eyebrow}</div>
-          <h2 className="q-h">{section.title}</h2>
-          {section.sub && <p className="q-sub">{section.sub}</p>}
-          <div className="q-fields">
-            {section.fields.map((field) => (
-              <div className={`q-field${"width" in field && field.width === "half" ? " half" : ""}`} key={field.id}>
-                <div>
-                  <span className="q-label">
-                    {field.label}
-                    {"required" in field && field.required && <span className="req"> *</span>}
-                  </span>
-                  {field.hint && <div className="q-hint">{field.hint}</div>}
-                </div>
-                <FieldControl slug={slug} field={field} answers={answers} setAnswer={setAnswer} />
-              </div>
-            ))}
-          </div>
-        </section>
-      ))}
+      {sections.map((section) => {
+        const st = sectionText(section, lang, co);
+        return (
+          <section className="q-section" key={section.id}>
+            <div className="q-eyebrow">{st.eyebrow}</div>
+            <h2 className="q-h">{st.title}</h2>
+            {st.sub && <p className="q-sub">{st.sub}</p>}
+            {lang === "si" && hasExtras(section) && <p className="q-sub">{t.langNote}</p>}
+            <div className="q-fields">
+              {section.fields.map((field) => {
+                const ft = fieldText(field, lang, co);
+                return (
+                  <div className={`q-field${"width" in field && field.width === "half" ? " half" : ""}`} key={field.id}>
+                    <div>
+                      <span className="q-label">
+                        {ft.label}
+                        {"required" in field && field.required && <span className="req"> *</span>}
+                      </span>
+                      {ft.hint && <div className="q-hint">{ft.hint}</div>}
+                    </div>
+                    <FieldControl
+                      slug={slug}
+                      field={field}
+                      answers={answers}
+                      setAnswer={setAnswer}
+                      lang={lang}
+                      placeholder={ft.placeholder}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
 
       <div className="copy-block">
         <label className="q-check">
@@ -321,13 +361,13 @@ export default function QuestionnaireForm({ slug, sections }: { slug: string; se
               }
             }}
           />
-          Email a copy of my answers (PDF) to me / my team
+          {t.copyLabel}
         </label>
         {sendCopy && (
           <div className="q-field" style={{ marginTop: 14 }}>
             <div>
-              <span className="q-label">Send the copy to</span>
-              <div className="q-hint">One or more email addresses, separated by commas.</div>
+              <span className="q-label">{t.copyTo}</span>
+              <div className="q-hint">{t.copyHint}</div>
             </div>
             <input
               className="q-line"
@@ -343,12 +383,9 @@ export default function QuestionnaireForm({ slug, sections }: { slug: string; se
       {error && <div className="form-error">{error}</div>}
 
       <div className="submit-bar">
-        <div className="submit-note">
-          Pressing submit sends your answers directly to Luminary Studio as a PDF. Nothing is
-          published anywhere.
-        </div>
+        <div className="submit-note">{t.submitNote}</div>
         <button className="btn" type="submit" disabled={status === "sending"}>
-          {status === "sending" ? "Sending…" : "Submit questionnaire"}
+          {status === "sending" ? t.sending : t.submit}
         </button>
       </div>
     </form>

@@ -2,7 +2,7 @@
 // instructions / generate billing docs (invoice, receipt) / retry stage-2.
 import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
-import { saveDoc, runStage2, todayLabel } from "@/lib/pipeline";
+import { archiveVersion, saveDoc, runStage2, todayLabel } from "@/lib/pipeline";
 import { reviseDoc } from "@/lib/generate";
 import { logActivity } from "@/lib/activity";
 import { advanceStage } from "@/lib/stage";
@@ -47,6 +47,8 @@ export async function POST(
       if (!meta) return NextResponse.json({ error: "Document not generated yet" }, { status: 404 });
       if (!instructions) return NextResponse.json({ error: "Revision instructions required" }, { status: 400 });
       const data = await reviseDoc(client, docType, meta.data, instructions, todayLabel());
+      // Keep the render being replaced so the operator can compare/roll back.
+      archiveVersion(meta);
       const updated = await saveDoc(client, docType, data, meta.status);
       await saveClient(client);
       await logActivity("operator", `regenerated ${docType}`, slug, updated.no);

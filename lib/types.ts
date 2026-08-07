@@ -30,6 +30,18 @@ export const DOC_NO_PREFIX: Record<DocType, string> = {
 
 export type DocStatus = "draft" | "published";
 
+/** One archived render of a document, pushed onto `history` just before a
+ *  revise/regenerate overwrites it. Blob assets are written to fresh
+ *  random-suffixed URLs on every save, so the old URLs stay valid forever —
+ *  archiving is only a matter of remembering them. */
+export type DocVersion = {
+  no: string;
+  htmlUrl: string;
+  pdfUrl: string;
+  /** When that version was rendered (the meta.updatedAt it carried). */
+  at: string;
+};
+
 export type DocMeta = {
   type: DocType;
   no: string;
@@ -40,6 +52,8 @@ export type DocMeta = {
   pdfUrl: string;
   /** The structured data Claude produced — kept so docs can be revised. */
   data: unknown;
+  /** Superseded renders, oldest first (capped — see HISTORY_CAP). */
+  history?: DocVersion[];
 };
 
 export type ExtraQuestion = {
@@ -80,6 +94,11 @@ export type Task = { text: string; done: boolean; at: string };
 
 /** One client-facing email sent from the console (send route). */
 export type EmailLogEntry = { at: string; to: string; subject: string; docs?: string[] };
+
+/** A question the client typed against one document in their portal.
+ *  `doc` is a portal document key — a DocType, a billing slug
+ *  ("invoice-1"), or "questionnaire". */
+export type Comment = { doc: string; by: string; text: string; at: string };
 
 export type ClientRecord = {
   slug: string;
@@ -125,6 +144,8 @@ export type ClientRecord = {
   tasks?: Task[];
   /** Every client-facing email sent via the send route, newest last. */
   emailLog?: EmailLogEntry[];
+  /** Questions left on documents from the client portal, newest last. */
+  comments?: Comment[];
 };
 
 export type BillingDoc = {
@@ -138,6 +159,8 @@ export type BillingDoc = {
   htmlUrl: string;
   pdfUrl: string;
   data: unknown;
+  /** Superseded renders, oldest first (capped — see HISTORY_CAP). */
+  history?: DocVersion[];
 };
 
 export type ChangeOrder = {

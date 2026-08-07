@@ -1,0 +1,133 @@
+"use client";
+
+// Per-client checklist. Optimistic on every mutation: the server answers
+// with the authoritative list, and a failure puts the previous list straight
+// back with the reason, so the checkbox never lies about what was stored.
+import { useState } from "react";
+import type { Task } from "@/lib/types";
+import { useConfirm } from "./ConfirmDialog";
+
+export default function TasksCard({ slug, tasks }: { slug: string; tasks: Task[] }) {
+  const [list, setList] = useState<Task[]>(tasks);
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { confirm, dialog } = useConfirm();
+
+  const call = async (payload: Record<string, unknown>, optimistic: Task[]) => {
+    const before = list;
+    setList(optimistic);
+    setBusy(true);
+    setError(null);
+    const res = await fetch(`/api/clients/${slug}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }).catch(() => null);
+    const data = res ? await res.json().catch(() => null) : null;
+    setBusy(false);
+    if (!res?.ok) {
+      setList(before);
+      setError(data?.error || "That didn't save — please try again.");
+      return;
+    }
+    if (Array.isArray(data?.tasks)) setList(data.tasks);
+  };
+
+  const add = async () => {
+    const t = text.trim();
+    if (!t) return;
+    setText("");
+    await call({ action: "add", text: t.slice(0, 300) }, [
+      ...list,
+      { text: t, done: false, at: new Date().toISOString() },
+    ]);
+  };
+
+  const toggle = (i: number) =>
+    call(
+      { action: "toggle", index: i },
+      list.map((t, j) => (j === i ? { ...t, done: !t.done } : t)),
+    );
+
+  const remove = async (i: number) => {
+    const sure = await confirm({
+      title: "Remove task",
+      danger: true,
+      confirmLabel: "Remove",
+      message: (
+        <>
+          Remove <b>{list[i].text}</b> from the checklist?
+        </>
+      ),
+    });
+    if (!sure) return;
+    await call({ action: "remove", index: i }, list.filter((_, j) => j !== i));
+  };
+
+  const open = list.filter((t) => !t.done).length;
+
+  return (
+    <div className="card">
+      {dialog}
+      <div className="ask-head">
+        <h3>Tasks</h3>
+        {list.length > 0 && (
+          <span className="save-state">
+            {open} open · {list.length - open} done
+          </span>
+        )}
+      </div>
+      {list.length === 0 ? (
+        <p className="empty-note">
+          Nothing on the list. Add what this client is waiting on — assets, a callback, a domain
+          transfer.
+        </p>
+      ) : (
+        <div style={{ marginTop: 10 }}>
+          {list.map((t, i) => (
+            <div className={`task-row${t.done ? " done" : ""}`} key={`${t.at}-${i}`}>
+              <input
+                type="checkbox"
+                checked={t.done}
+                disabled={busy}
+                onChange={() => toggle(i)}
+                aria-label={t.text}
+              />
+              <span className="task-text">{t.text}</span>
+              <button
+                type="button"
+                className="task-x"
+                aria-label={`Remove ${t.text}`}
+                disabled={busy}
+                onClick={() => remove(i)}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="task-add">
+        <input
+          className="q-line"
+          type="text"
+          maxLength={300}
+          placeholder="Add a task…"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              add();
+            }
+          }}
+        />
+        <button className="btn small" type="button" disabled={busy || !text.trim()} onClick={add}>
+          Add
+        </button>
+      </div>
+      {error && <div className="form-error">{error}</div>}
+    </div>
+  );
+}

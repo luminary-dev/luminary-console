@@ -3,7 +3,7 @@
 // publish/unpublish, revise.
 import { NextResponse } from "next/server";
 import { deleteAssets, getClient, saveClient } from "@/lib/store";
-import { saveBillingDoc, todayLabel } from "@/lib/pipeline";
+import { archiveVersion, saveBillingDoc, todayLabel } from "@/lib/pipeline";
 import { generateBilling, reviseDoc } from "@/lib/generate";
 import { logActivity } from "@/lib/activity";
 import { advanceStage } from "@/lib/stage";
@@ -76,7 +76,11 @@ export async function POST(
           { status: 400 },
         );
       }
-      await deleteAssets([doc.htmlUrl, doc.pdfUrl]);
+      await deleteAssets([
+        doc.htmlUrl,
+        doc.pdfUrl,
+        ...(doc.history ?? []).flatMap((v) => [v.htmlUrl, v.pdfUrl]),
+      ]);
       client.billing = (client.billing ?? []).filter((b) => b.slug !== doc.slug);
       await saveClient(client);
       await logActivity("operator", `deleted ${doc.stage} ${doc.kind}`, slug, doc.no);
@@ -86,6 +90,8 @@ export async function POST(
     if (action === "regenerate") {
       if (!instructions) return NextResponse.json({ error: "Revision instructions required" }, { status: 400 });
       const data = await reviseDoc(client, doc.kind, doc.data, instructions, todayLabel());
+      // Keep the render being replaced so the operator can compare/roll back.
+      archiveVersion(doc);
       await saveBillingDoc(client, doc.kind, doc.stage, data, doc.status, doc.slug);
       await saveClient(client);
       await logActivity("operator", `regenerated ${doc.stage} ${doc.kind}`, slug, doc.no);

@@ -219,3 +219,104 @@ table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font
 .foot-links { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; font-family: var(--font-mono), monospace; font-size: 12px; font-weight: 500; }
 .foot-links i { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
 .foot-note { font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+/* ——— Wave 4: portal progress, "new" badges, question box, console cards ——— */
+
+/* Stage stepper. Six columns share ~300px inside a card at 390px, so the
+   labels carry a short form for narrow screens instead of breaking words. */
+.pstep-track { list-style: none; margin: 16px 0 0; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); }
+.pstep { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; min-width: 0; }
+.pstep::before {
+  content: ""; position: absolute; top: 11px; left: -50%; width: 100%; height: 2px;
+  background: var(--border-hi);
+}
+.pstep:first-child::before { display: none; }
+.pstep.is-done::before, .pstep.is-now::before { background: var(--accent); }
+.pstep-dot {
+  position: relative; z-index: 1; width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  border: 1px solid var(--border-hi); background: var(--bg);
+  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600; color: var(--muted);
+}
+.pstep.is-done .pstep-dot { background: var(--accent); border-color: var(--accent); color: #0d0d0f; }
+.pstep.is-now .pstep-dot { border-color: var(--accent); background: var(--a-dim); color: var(--a-text); box-shadow: 0 0 0 3px var(--a-dim); }
+.pstep-label { font-size: 11px; line-height: 1.3; color: var(--muted); }
+.pstep.is-now .pstep-label { color: var(--text); font-weight: 700; }
+.pstep-short { display: none; }
+@media (max-width: 560px) {
+  .pstep-label { font-size: 9.5px; }
+  .pstep-long { display: none; }
+  .pstep-short { display: inline; }
+}
+.pstep-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.pstep-caption { margin-top: 18px; font-size: 13.5px; line-height: 1.6; }
+.pstep-note { margin-top: 8px; font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+
+/* "New since your last visit" badge on a portal row. */
+.new-pill {
+  display: inline-block; margin-left: 8px; vertical-align: 2px;
+  font-family: var(--font-mono), monospace; font-size: 9.5px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--a-text);
+  background: var(--a-dim); border: 1px solid var(--a-border);
+  border-radius: 100px; padding: 2px 8px;
+}
+
+/* Portal question box. */
+.ask-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ask-intro, .ask-sent { margin-top: 8px; font-size: 13.5px; line-height: 1.65; color: var(--muted); }
+.ask-sent { color: var(--text); }
+.ask-sent span { color: var(--a-text); font-weight: 700; margin-right: 4px; }
+.ask-again { background: none; border: none; padding: 0; font: inherit; color: var(--a-text); cursor: pointer; text-decoration: underline; }
+.ask-form { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+.ask-field { display: flex; flex-direction: column; gap: 8px; }
+.ask-form .btn { align-self: flex-start; }
+select.q-line { appearance: none; background: transparent; padding-right: 18px; }
+
+/* Console: revision history expander inside a document row. */
+.hist { margin-top: 8px; }
+.hist > summary {
+  cursor: pointer; list-style: none; font-family: var(--font-mono), monospace;
+  font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+}
+.hist > summary::-webkit-details-marker { display: none; }
+.hist > summary::before { content: "▸ "; }
+.hist[open] > summary::before { content: "▾ "; }
+.hist > summary:hover { color: var(--text); }
+.hist-list { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.hist-row { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+
+/* Console: notes / tasks / comments / email history cards. */
+.save-state { font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--subtle); }
+.save-state.on { color: var(--a-text); }
+.task-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13.5px; }
+.task-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-top: 3px; }
+.task-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
+.task-row.done .task-text { text-decoration: line-through; color: var(--muted); }
+.task-x { background: none; border: none; cursor: pointer; color: var(--subtle); font-size: 16px; line-height: 1; padding: 0 4px; }
+.task-x:hover { color: var(--danger); }
+.task-add { display: flex; gap: 10px; align-items: flex-end; margin-top: 12px; flex-wrap: wrap; }
+.task-add .q-line { flex: 1 1 180px; min-width: 0; }
+.log-row { padding: 10px 0; border-top: 1px solid var(--border); font-size: 13.5px; line-height: 1.55; }
+.log-row:first-child { border-top: none; }
+.log-meta { font-size: 12px; color: var(--muted); margin-top: 3px; overflow-wrap: anywhere; }
+.quote-text { margin-top: 6px; padding-left: 12px; border-left: 2px solid var(--a-border); white-space: pre-wrap; overflow-wrap: anywhere; }
+.empty-note { color: var(--muted); margin-top: 10px; font-size: 13.5px; line-height: 1.6; }
+
+/* Questionnaire language switch (EN / සිංහල). */
+.sheet-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.lang-switch { display: inline-flex; border: 1px solid var(--border-hi); border-radius: 100px; padding: 2px; gap: 2px; }
+.lang-btn {
+  background: none; border: none; cursor: pointer; font: inherit; font-size: 12.5px; font-weight: 600;
+  color: var(--muted); border-radius: 100px; padding: 5px 14px; line-height: 1.5;
+  transition: background .15s ease, color .15s ease;
+}
+.lang-btn:hover { color: var(--text); }
+.lang-btn.on { background: var(--a-dim); color: var(--a-text); }
+/* Sinhala glyphs sit taller than Latin — keep the sheet's rhythm intact.
+   Tracking and uppercase are Latin-display devices: Sinhala has no case, and
+   letter-spacing visually breaks its conjuncts, so the mono eyebrows/pills
+   drop both when the text is Sinhala. */
+:lang(si) { line-height: 1.75; }
+:lang(si) .q-eyebrow, :lang(si) .k, :lang(si) .pill {
+  letter-spacing: 0; text-transform: none;
+}

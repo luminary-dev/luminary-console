@@ -11,6 +11,7 @@ import { fmtLKR, invoiceTotal, paidAgainst, parseAmount, summarizeMoney } from "
 const STAGE_LABEL: Record<string, string> = { advance: "Advance", final: "Final", other: "Additional" };
 
 import EmailDocButton from "./EmailDocButton";
+import DocHistory from "./DocHistory";
 import { useConfirm } from "./ConfirmDialog";
 
 export default function BillingCard({
@@ -355,6 +356,7 @@ export default function BillingCard({
                         {busy === `del-${b.slug}` ? "…" : "Delete"}
                       </button>
                     </div>
+                    <DocHistory history={b.history} />
                     {reviseFor === b.slug && (
                       <div style={{ marginTop: 10 }}>
                         <textarea

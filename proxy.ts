@@ -39,6 +39,40 @@ function harden(res: NextResponse, console_: boolean) {
 const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
 const CONSOLE_HOST = process.env.CONSOLE_HOST || `console.${ROOT}`;
 
+// Portal "last visit" stamp — the portal page compares each published
+// document's updatedAt against it to decide what gets a "New" badge. It is
+// written here rather than in the page because a Server Component can read
+// cookies but not set them, and doing it client-side would need JS for a
+// badge that is otherwise pure server markup. Per-slug, so console-side
+// previews of several clients don't overwrite each other.
+//
+// The PREVIOUS value travels to the page in a request header, not in the
+// cookie: Next propagates cookies set on a middleware response back onto the
+// request, so by render time `cookies()` already holds the stamp we just
+// wrote and every document would look old. The header is overwritten
+// unconditionally (empty on a first visit) so a client can't forge one.
+const VISIT_COOKIE_PREFIX = "lum_visit_";
+const VISIT_HEADER = "x-lum-last-visit";
+const VISIT_MAX_AGE = 60 * 60 * 24 * 365;
+
+/** Request headers carrying the previous visit stamp for `slug`. */
+function visitHeaders(request: NextRequest, slug: string): Headers {
+  const headers = new Headers(request.headers);
+  headers.set(VISIT_HEADER, request.cookies.get(`${VISIT_COOKIE_PREFIX}${slug}`)?.value ?? "");
+  return headers;
+}
+
+function stampVisit(res: NextResponse, slug: string): NextResponse {
+  res.cookies.set(`${VISIT_COOKIE_PREFIX}${slug}`, String(Date.now()), {
+    httpOnly: false, // no secret in it; readable is harmless
+    secure: true,
+    sameSite: "lax",
+    maxAge: VISIT_MAX_AGE,
+    path: "/",
+  });
+  return res;
+}
+
 export async function proxy(request: NextRequest) {
   const host = (request.headers.get("host") || "").split(":")[0].toLowerCase();
   const { pathname } = request.nextUrl;
@@ -55,7 +89,11 @@ export async function proxy(request: NextRequest) {
     // Client hosts may only reach client-site routes.
     const url = request.nextUrl.clone();
     url.pathname = `/c/${slug}${pathname === "/" ? "" : pathname}`;
-    return harden(NextResponse.rewrite(url), false);
+    if (pathname !== "/") return harden(NextResponse.rewrite(url), false);
+    return stampVisit(
+      harden(NextResponse.rewrite(url, { request: { headers: visitHeaders(request, slug) } }), false),
+      slug,
+    );
   }
 
   // Console host: public paths first.
@@ -89,7 +127,16 @@ export async function proxy(request: NextRequest) {
 
   // Slide the idle window (capped at the absolute expiry).
   const { absExp, sid } = session;
-  const res = harden(NextResponse.next(), true);
+  // Previewing a portal from the console stamps the same visit cookie, so the
+  // "New" badges behave identically to what the client sees.
+  const preview = /^\/c\/([a-z0-9-]+)\/?$/.exec(pathname);
+  let res = harden(
+    preview
+      ? NextResponse.next({ request: { headers: visitHeaders(request, preview[1]) } })
+      : NextResponse.next(),
+    true,
+  );
+  if (preview) res = stampVisit(res, preview[1]);
   res.cookies.set(SESSION_COOKIE, await makeSessionToken(secret, sid, absExp), {
     httpOnly: true,
     secure: true,

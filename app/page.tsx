@@ -48,6 +48,9 @@ export default async function Dashboard() {
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <ThemeToggle />
           <SignOut />
+          <Link className="btn ghost small" href="/activity">
+            Activity
+          </Link>
           <Link className="btn" href="/clients/new">
             + New client
           </Link>

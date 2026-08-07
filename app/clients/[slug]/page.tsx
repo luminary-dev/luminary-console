@@ -13,6 +13,11 @@ import BillingCard from "@/components/BillingCard";
 import EmailDocButton from "@/components/EmailDocButton";
 import ChangeOrders from "@/components/ChangeOrders";
 import StageSelect from "@/components/StageSelect";
+import DocHistory from "@/components/DocHistory";
+import NotesCard from "@/components/NotesCard";
+import TasksCard from "@/components/TasksCard";
+import CommentsCard from "@/components/CommentsCard";
+import EmailHistoryCard from "@/components/EmailHistoryCard";
 import { currentStage } from "@/lib/stage";
 
 export const dynamic = "force-dynamic";
@@ -198,6 +203,7 @@ export default async function ClientPage({
                       <DocActions slug={slug} type={t} exists={!!meta} status={meta?.status} billing={false} />
                       {meta && <EmailDocButton slug={slug} docKey={t} label={DOC_LABELS[t]} email={client.email} />}
                     </div>
+                    <DocHistory history={meta?.history} />
                   </td>
                 </tr>
               );
@@ -221,6 +227,14 @@ export default async function ClientPage({
       />
 
       <ChangeOrders slug={slug} changeOrders={client.changeOrders ?? []} />
+
+      <CommentsCard client={client} />
+
+      <NotesCard slug={slug} notes={client.notes} />
+
+      <TasksCard slug={slug} tasks={client.tasks ?? []} />
+
+      <EmailHistoryCard client={client} />
 
       <div className="card">
         <h3>Brief</h3>
