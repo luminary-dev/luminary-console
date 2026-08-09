@@ -196,22 +196,18 @@ export type BillingDoc = {
   history?: DocVersion[];
 };
 
-/** A design prototype preview: a single self-contained HTML file served on its
- *  own subdomain (<slug>-d<id>.ROOT). While "draft" the subdomain shows a
- *  holding page publicly and is previewed from the console (authed); when
- *  "published" it serves the file to anyone. Up to MAX_DESIGNS per client. */
+/** A design prototype preview: a single self-contained HTML file served at a
+ *  PATH under the client's existing subdomain (<slug>.ROOT/design/<id>), so no
+ *  per-design DNS is needed. While "draft" that path shows a holding page in
+ *  public and is previewed from the console (authed); when "published" it
+ *  serves the file to anyone. Up to MAX_DESIGNS per client. */
 export type DesignEntry = {
-  /** Slot, "1" | "2" | "3". */
+  /** Slot, "1" | "2" | "3" — also the last path segment (/design/<id>). */
   id: string;
-  /** Subdomain slug, `${clientSlug}-d${id}`. */
-  dslug: string;
-  /** Full host, `${dslug}.${ROOT}`. */
-  domain: string;
   title: string;
   status: DocStatus;
   /** Asset URL ("/api/asset/<key>") of the stored HTML. */
   htmlUrl: string;
-  dnsStatus: "automated" | "manual_required" | "error";
   updatedAt: string;
 };
 

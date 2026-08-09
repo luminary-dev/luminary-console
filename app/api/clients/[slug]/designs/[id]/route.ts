@@ -1,9 +1,9 @@
 // One design slot: authed raw preview (GET), publish/unpublish (POST), and
-// delete (DELETE, which also tears down the subdomain). All behind the console
-// session gate via proxy.ts.
+// delete (DELETE). All behind the console session gate via proxy.ts. Designs
+// are served as paths under the client subdomain, so there is no per-design DNS
+// to tear down here.
 import { NextResponse } from "next/server";
 import { getClient, saveClient, fetchAsset, deleteAssets } from "@/lib/store";
-import { removeClientDomain } from "@/lib/domains";
 import type { ClientRecord, DesignEntry } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -16,8 +16,8 @@ async function find(slug: string, id: string): Promise<{ client: ClientRecord; d
 }
 
 /** Authed preview of the real file, whatever its status — this is how the team
- *  reviews a draft before publishing (the public subdomain shows a holding
- *  page until then). */
+ *  reviews a draft before publishing (the public path shows a holding page
+ *  until then). */
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ slug: string; id: string }> },
@@ -67,11 +67,6 @@ export async function DELETE(
   // Idempotent: deleting an already-gone slot is a success.
   if (design) {
     await deleteAssets([design.htmlUrl]);
-    try {
-      await removeClientDomain(design.dslug); // Cloudflare CNAME + Vercel domain
-    } catch {
-      /* best effort — the record is the source of truth */
-    }
     client.designs = (client.designs ?? []).filter((d) => d.id !== id);
     await saveClient(client);
   }

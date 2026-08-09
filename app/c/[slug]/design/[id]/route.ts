@@ -1,9 +1,8 @@
-// Public serving for a design preview subdomain (<slug>-d<id>.ROOT), reached
-// via proxy.ts which rewrites design hosts here. A published design serves its
-// file to anyone; a draft (or unknown) shows a noindex holding page so guessing
-// the URL never leaks unpublished work.
+// Public serving for a design preview at <slug>.ROOT/design/<id> (the proxy
+// rewrites the client host + path here). A published design serves its file to
+// anyone; a draft (or unknown) shows a noindex holding page so guessing the
+// path never leaks unpublished work.
 import { fetchAsset, getClient } from "@/lib/store";
-import { parseDesignSub } from "@/lib/designs";
 
 export const runtime = "nodejs";
 
@@ -28,14 +27,11 @@ p{margin:0;color:#9aa096;font-size:.95rem;line-height:1.6}</style></head>
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ dslug: string }> },
+  { params }: { params: Promise<{ slug: string; id: string }> },
 ) {
-  const { dslug } = await params;
-  const parsed = parseDesignSub(dslug);
-  if (!parsed) return new Response("Not found", { status: 404 });
-
-  const client = await getClient(parsed.clientSlug);
-  const design = client?.designs?.find((d) => d.dslug === dslug);
+  const { slug, id } = await params;
+  const client = await getClient(slug);
+  const design = client?.designs?.find((d) => d.id === id);
   if (!client || !design) return new Response("Not found", { status: 404 });
   if (design.status !== "published") return holding();
 

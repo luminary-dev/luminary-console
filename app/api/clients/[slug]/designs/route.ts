@@ -1,12 +1,11 @@
 // Design previews for a client: add (or replace) a single self-contained HTML
-// file into a slot (up to MAX_DESIGNS). Each slot gets its own subdomain
-// (<slug>-d<id>.ROOT), provisioned here; it stays a draft (holding page in
-// public, previewable from the console) until it is published.
+// file into a slot (up to MAX_DESIGNS). Each is served at a path under the
+// client's existing subdomain (<slug>.ROOT/design/<id>) — no per-design DNS.
+// A design stays a draft (holding page in public, previewable from the console)
+// until it is published.
 import { NextResponse } from "next/server";
 import { getClient, saveClient, putAsset, deleteAssets } from "@/lib/store";
-import { ensureClientDomain } from "@/lib/domains";
-import { MAX_DESIGNS, DESIGN_HTML_MAX_BYTES, designSlug, designHost } from "@/lib/designs";
-import type { DesignEntry } from "@/lib/types";
+import { MAX_DESIGNS, DESIGN_HTML_MAX_BYTES } from "@/lib/designs";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -49,40 +48,18 @@ export async function POST(
     }
   }
 
-  const dslug = designSlug(slug, id);
   const htmlUrl = await putAsset(`clients/${slug}/designs/design-${id}.html`, html, "text/html; charset=utf-8");
-
-  // Provision the subdomain (best-effort — the design still previews from the
-  // console if DNS automation is unavailable; the record says what to do).
-  let dnsStatus: DesignEntry["dnsStatus"] = existing?.dnsStatus ?? "manual_required";
-  try {
-    dnsStatus = (await ensureClientDomain(dslug)).status;
-  } catch {
-    dnsStatus = "error";
-  }
-
   const now = new Date().toISOString();
+
   if (existing) {
-    // Re-upload: swap the file, reset to draft, keep the slot + subdomain.
+    // Re-upload: swap the file, reset to draft, keep the slot.
     await deleteAssets([existing.htmlUrl]);
     existing.htmlUrl = htmlUrl;
     existing.status = "draft";
     existing.updatedAt = now;
-    existing.dnsStatus = dnsStatus;
-    existing.dslug = dslug;
-    existing.domain = designHost(dslug);
     if (title) existing.title = title;
   } else {
-    designs.push({
-      id,
-      dslug,
-      domain: designHost(dslug),
-      title: title || `Design ${id}`,
-      status: "draft",
-      htmlUrl,
-      dnsStatus,
-      updatedAt: now,
-    });
+    designs.push({ id, title: title || `Design ${id}`, status: "draft", htmlUrl, updatedAt: now });
     designs.sort((a, b) => Number(a.id) - Number(b.id));
   }
   client.designs = designs;

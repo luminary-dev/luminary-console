@@ -57,6 +57,7 @@ export default async function ClientHome({
     (t) => client.docs[t]?.status === "published",
   );
   const publishedBilling = (client.billing ?? []).filter((b) => b.status === "published");
+  const publishedDesigns = (client.designs ?? []).filter((d) => d.status === "published");
 
   // Everything the client can point a question at, newest doc preselected.
   const askable: PortalDoc[] = [
@@ -110,6 +111,23 @@ export default async function ClientHome({
           ))}
         </div>
       </div>
+
+      {publishedDesigns.length > 0 && (
+        <div className="card">
+          <h3>Design previews</h3>
+          <div className="portal-links">
+            {publishedDesigns.map((d) => (
+              <Link className="portal-link" key={d.id} href={`${base}/design/${d.id}`}>
+                <span>
+                  {d.title}
+                  {isNew(d.updatedAt) && <span className="new-pill">New</span>}
+                </span>
+                <span className="no">View →</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <PortalComments docs={askable} initialDoc={newest} base={base} />
 
