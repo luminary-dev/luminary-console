@@ -7,6 +7,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { SESSION_COOKIE, SESSION_MAX_AGE, makeSessionToken, verifySessionToken } from "@/lib/auth";
+import { isDesignSub } from "@/lib/designs";
 
 // Revoked-sid cache: one store read per instance per minute instead of per
 // request. Revocation therefore takes up to ~60s to propagate — acceptable
@@ -91,6 +92,14 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
     const slug = host.slice(0, -(ROOT.length + 1));
+    // Design preview hosts (<client>-d<N>.ROOT) serve a single stored HTML file
+    // via /design/<slug>; a draft shows a holding page there, not the file.
+    if (isDesignSub(slug)) {
+      const durl = request.nextUrl.clone();
+      durl.pathname = `/design/${slug}`;
+      durl.search = "";
+      return harden(NextResponse.rewrite(durl), false);
+    }
     // Client hosts may only reach client-site routes.
     const url = request.nextUrl.clone();
     url.pathname = `/c/${slug}${pathname === "/" ? "" : pathname}`;

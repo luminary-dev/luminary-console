@@ -1,0 +1,91 @@
+// Design previews for a client: add (or replace) a single self-contained HTML
+// file into a slot (up to MAX_DESIGNS). Each slot gets its own subdomain
+// (<slug>-d<id>.ROOT), provisioned here; it stays a draft (holding page in
+// public, previewable from the console) until it is published.
+import { NextResponse } from "next/server";
+import { getClient, saveClient, putAsset, deleteAssets } from "@/lib/store";
+import { ensureClientDomain } from "@/lib/domains";
+import { MAX_DESIGNS, DESIGN_HTML_MAX_BYTES, designSlug, designHost } from "@/lib/designs";
+import type { DesignEntry } from "@/lib/types";
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+export async function POST(
+  req: Request,
+  { params }: { params: Promise<{ slug: string }> },
+) {
+  const { slug } = await params;
+  const client = await getClient(slug);
+  if (!client) return NextResponse.json({ error: "Client not found" }, { status: 404 });
+
+  const body = await req.json().catch(() => ({}));
+  const html = typeof body.html === "string" ? body.html : "";
+  const title = typeof body.title === "string" ? body.title.trim().slice(0, 80) : "";
+
+  if (!html.trim()) return NextResponse.json({ error: "Upload an HTML file." }, { status: 400 });
+  if (Buffer.byteLength(html, "utf8") > DESIGN_HTML_MAX_BYTES) {
+    return NextResponse.json({ error: "That file is over 3 MB. Inline or shrink its assets." }, { status: 400 });
+  }
+  if (!/<!doctype html|<html|<body/i.test(html)) {
+    return NextResponse.json({ error: "That does not look like an HTML page." }, { status: 400 });
+  }
+
+  const designs = client.designs ?? [];
+
+  // Pick the slot: an explicit id replaces that slot (re-upload); otherwise the
+  // lowest free slot 1..MAX_DESIGNS.
+  let id = typeof body.id === "string" && /^[1-9]\d*$/.test(body.id) ? body.id : "";
+  const existing = id ? designs.find((d) => d.id === id) : undefined;
+  if (!id) {
+    for (let n = 1; n <= MAX_DESIGNS; n++) {
+      if (!designs.some((d) => d.id === String(n))) { id = String(n); break; }
+    }
+    if (!id) {
+      return NextResponse.json(
+        { error: `You can add up to ${MAX_DESIGNS} designs. Delete one first.` },
+        { status: 400 },
+      );
+    }
+  }
+
+  const dslug = designSlug(slug, id);
+  const htmlUrl = await putAsset(`clients/${slug}/designs/design-${id}.html`, html, "text/html; charset=utf-8");
+
+  // Provision the subdomain (best-effort — the design still previews from the
+  // console if DNS automation is unavailable; the record says what to do).
+  let dnsStatus: DesignEntry["dnsStatus"] = existing?.dnsStatus ?? "manual_required";
+  try {
+    dnsStatus = (await ensureClientDomain(dslug)).status;
+  } catch {
+    dnsStatus = "error";
+  }
+
+  const now = new Date().toISOString();
+  if (existing) {
+    // Re-upload: swap the file, reset to draft, keep the slot + subdomain.
+    await deleteAssets([existing.htmlUrl]);
+    existing.htmlUrl = htmlUrl;
+    existing.status = "draft";
+    existing.updatedAt = now;
+    existing.dnsStatus = dnsStatus;
+    existing.dslug = dslug;
+    existing.domain = designHost(dslug);
+    if (title) existing.title = title;
+  } else {
+    designs.push({
+      id,
+      dslug,
+      domain: designHost(dslug),
+      title: title || `Design ${id}`,
+      status: "draft",
+      htmlUrl,
+      dnsStatus,
+      updatedAt: now,
+    });
+    designs.sort((a, b) => Number(a.id) - Number(b.id));
+  }
+  client.designs = designs;
+  await saveClient(client);
+  return NextResponse.json({ ok: true, designs: client.designs });
+}

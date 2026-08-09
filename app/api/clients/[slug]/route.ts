@@ -95,6 +95,15 @@ export async function DELETE(
   }
 
   const domainNotes = await removeClientDomain(slug);
+  // Tear down every design preview subdomain too, so deleting a client never
+  // leaves orphaned CNAMEs / Vercel domains behind.
+  for (const d of client.designs ?? []) {
+    try {
+      domainNotes.push(...(await removeClientDomain(d.dslug)).map((n) => `${d.dslug}: ${n}`));
+    } catch {
+      /* best effort */
+    }
+  }
   const objectsDeleted = await deleteClient(slug);
   await logActivity("operator", "deleted client", slug, client.company);
   return NextResponse.json({ ok: true, objectsDeleted, domainNotes, archived: attachments.length });

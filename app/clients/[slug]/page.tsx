@@ -20,6 +20,7 @@ import CommentsCard from "@/components/CommentsCard";
 import EmailHistoryCard from "@/components/EmailHistoryCard";
 import AssistantCard from "@/components/AssistantCard";
 import HandoverCard from "@/components/HandoverCard";
+import DesignsCard from "@/components/DesignsCard";
 import { currentStage } from "@/lib/stage";
 import { deliveredAtIso, handoverEligible } from "@/lib/handover";
 
@@ -228,6 +229,8 @@ export default async function ClientPage({
           </div>
         )}
       </div>
+
+      <DesignsCard slug={slug} initial={client.designs ?? []} />
 
       <BillingCard
         slug={slug}

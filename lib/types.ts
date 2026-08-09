@@ -156,6 +156,8 @@ export type ClientRecord = {
   billingSeq?: Partial<Record<BillingKind, number>>;
   /** Changes requested after the cost was finalised — billed on the final invoice. */
   changeOrders?: ChangeOrder[];
+  /** The 3 design concept previews (SOW deliverable), each on its own subdomain. */
+  designs?: DesignEntry[];
   /** Lifecycle stage (see ClientStage) — absent on records that predate it. */
   stage?: ClientStage;
   /** When delivery happened (final receipt published, or manual override) —
@@ -192,6 +194,25 @@ export type BillingDoc = {
   data: unknown;
   /** Superseded renders, oldest first (capped — see HISTORY_CAP). */
   history?: DocVersion[];
+};
+
+/** A design prototype preview: a single self-contained HTML file served on its
+ *  own subdomain (<slug>-d<id>.ROOT). While "draft" the subdomain shows a
+ *  holding page publicly and is previewed from the console (authed); when
+ *  "published" it serves the file to anyone. Up to MAX_DESIGNS per client. */
+export type DesignEntry = {
+  /** Slot, "1" | "2" | "3". */
+  id: string;
+  /** Subdomain slug, `${clientSlug}-d${id}`. */
+  dslug: string;
+  /** Full host, `${dslug}.${ROOT}`. */
+  domain: string;
+  title: string;
+  status: DocStatus;
+  /** Asset URL ("/api/asset/<key>") of the stored HTML. */
+  htmlUrl: string;
+  dnsStatus: "automated" | "manual_required" | "error";
+  updatedAt: string;
 };
 
 export type ChangeOrder = {
