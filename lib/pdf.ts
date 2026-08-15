@@ -189,9 +189,18 @@ export async function renderPdf(html: string, opts: RenderPdfOptions = {}): Prom
         }
         return Math.ceil(docBottom);
       });
+      const pageH = Math.min(Math.max(height, 200), MAX_PAGE_PX);
+      // Resolve viewport units against the laptop width. page.pdf() otherwise
+      // resolves `vw` against a default ~794px print width, which makes the
+      // design's clamp(min, Xvw, max) section spacing collapse to its min and
+      // packs the content far shorter than the laptop view — leaving a big
+      // empty tail on a page whose height we sized to the (correct) screen
+      // layout. Declaring an @page box at LAPTOP_WIDTH and printing with
+      // preferCSSPageSize makes vw resolve against 1280px, so the printed
+      // layout matches the screen exactly and the content fills the page.
+      await page.addStyleTag({ content: `@page{size:${LAPTOP_WIDTH}px ${pageH}px;margin:0}` });
       const pdf = await page.pdf({
-        width: `${LAPTOP_WIDTH}px`,
-        height: `${Math.min(Math.max(height, 200), MAX_PAGE_PX)}px`,
+        preferCSSPageSize: true,
         printBackground: true,
         pageRanges: "1", // guard against a rounding-induced trailing blank page
       });
