@@ -107,11 +107,16 @@ async function hydrateForCapture(page: any): Promise<void> {
     }),
   );
 
+  // Wait (generously) for web fonts to actually load. This matters a lot on
+  // serverless: Google Fonts arrive well after the load event, and if we
+  // measure the page height before they apply, the fallback-font layout is
+  // taller — the real fonts then reflow the content shorter, leaving a big
+  // empty tail below the footer on a page whose height is already locked.
   await step("fonts", () =>
     page.evaluate(() =>
       Promise.race([
         (document as Document & { fonts: FontFaceSet }).fonts.ready,
-        new Promise((r) => setTimeout(r, 5_000)),
+        new Promise((r) => setTimeout(r, 20_000)),
       ]),
     ),
   );
@@ -154,7 +159,21 @@ export async function renderPdf(html: string, opts: RenderPdfOptions = {}): Prom
       // One page as tall as the whole (now hydrated) document — but end at the
       // footer's bottom when there is one, so trailing empty space below it
       // (extra body height, off-screen decorations) doesn't pad the page.
-      const height = await page.evaluate(() => {
+      const height = await page.evaluate(async () => {
+        // Belt-and-suspenders: ensure fonts are applied and the layout has
+        // fully reflowed BEFORE measuring, so the height matches what page.pdf
+        // will actually paint (otherwise a late font reflow leaves an empty
+        // tail). Two rAFs guarantee a post-reflow frame.
+        try {
+          await Promise.race([
+            (document as Document & { fonts: FontFaceSet }).fonts.ready,
+            new Promise((r) => setTimeout(r, 20_000)),
+          ]);
+        } catch {
+          /* ignore — measure whatever we have */
+        }
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => r(null))));
+
         const docBottom = Math.max(
           document.documentElement.scrollHeight,
           document.body?.scrollHeight ?? 0,
