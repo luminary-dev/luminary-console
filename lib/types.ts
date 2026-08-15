@@ -147,7 +147,9 @@ export type ClientRecord = {
   answersBy?: string;
   /** Full history — the questionnaire may be submitted more than once. */
   submissions?: Submission[];
-  /** Invoices & receipts across the 50/30/20 payment arc (advance → progress → final). */
+  /** Invoices & receipts across the 30/70 payment arc (progress → final).
+   *  ("advance" is a legacy stage from the old 50/30/20 model — no longer
+   *  generated, but kept so existing records still resolve.) */
   billing?: BillingDoc[];
   /** Highest sequence ever issued per billing kind. Without it, deleting the
    *  newest invoice frees its number for the next one — and a deleted
@@ -163,7 +165,7 @@ export type ClientRecord = {
   /** When delivery happened (final receipt published, or manual override) —
    *  starts the 30-day warranty clock (delivered → warranty → closed). */
   deliveredAt?: string;
-  /** Payments received (advance/final/other) — drives outstanding-balance math. */
+  /** Payments received (design-approval / delivery / additional) — drives outstanding-balance math. */
   payments?: Payment[];
   /** Set once when the client accepts the quotation from the portal. */
   acceptance?: Acceptance;
@@ -179,10 +181,13 @@ export type ClientRecord = {
 
 export type BillingDoc = {
   kind: BillingKind;
-  /** Where in the 50/30/20 payment arc this sits: "advance" is the 50% signing
-   *  milestone, "progress" the 30% design-approval milestone, "final" the 20%
-   *  launch milestone (plus any change orders). Handover packs are always
-   *  "other" — they bill nothing, so the money math (lib/money.ts) skips them. */
+  /** Where in the 30/70 payment arc this sits: "progress" is the 30% design-
+   *  approval milestone (development begins), "final" the 70% delivery
+   *  milestone. Post-delivery change orders are billed as "other" additional
+   *  invoices once completed. "advance" is a legacy 50%-signing stage from the
+   *  old 50/30/20 model — no longer generated, kept for existing records.
+   *  Handover packs are always "other" — they bill nothing, so the money math
+   *  (lib/money.ts) skips them. */
   stage: "advance" | "progress" | "final" | "other";
   /** URL segment on the client site, e.g. "invoice-1". */
   slug: string;

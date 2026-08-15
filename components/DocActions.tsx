@@ -133,7 +133,7 @@ export default function DocActions({
             placeholder={
               exists
                 ? "Revision instructions — e.g. 'drop the total to 40,000 and add a maintenance line'"
-                : "What to bill — e.g. '50% advance against the quotation' or 'receipt for 22,500 received today by bank transfer'"
+                : "What to bill — e.g. '30% design-approval against the quotation' or 'receipt for 22,500 received today by bank transfer'"
             }
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}

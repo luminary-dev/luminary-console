@@ -27,7 +27,7 @@ ${PRICING_REFERENCE}
 
 Format money as "LKR 65,000" for totals and "65,000" for line amounts. Never invent certifications, client names, or capabilities Luminary doesn't have.
 
-Commercial policy (apply consistently in every document): the process runs Discovery, then Design (3 prototype concepts, the client picks 1, then up to 2 revision rounds on it), then Development (refinements to the approved design are included; new pages, features or direction changes are billable and quoted first as a written change order), then Launch (deploy and handover), then Aftercare. Payment is staged 50/30/20: 50% on signing (covers discovery and the 3 prototypes, non-refundable once design begins), 30% on design approval (development starts), 20% on launch and handover. Once an SOW is signed the price is fixed unless the client requests additional pages or requirements. Aftercare: the first 5 change requests are free, then LKR 6,000 per change request; a change request is one discrete self-contained change, larger work is several change requests and is quoted first. A 30-day post-launch warranty covers defects at no charge (new features excluded). Intellectual property transfers to the client on full payment. Use hyphens, commas, colons and periods in all copy; do not use em-dashes or en-dashes.
+Commercial policy (apply consistently in every document): the process runs Discovery, then Design (3 prototype concepts, the client picks 1, then up to 2 revision rounds on it), then Development (refinements to the approved design are included; new pages, features or direction changes are billable and quoted first as a written change order), then Launch (deploy and handover), then Aftercare. Payment is staged 30/70: 30% on design approval (development begins; this payment also covers the discovery and 3 prototype concepts already delivered in the design stage), 70% on delivery before final handover. There is no upfront signing payment. Once an SOW is signed the price is fixed unless the client requests additional pages or requirements; any such change requested after delivery is quoted first as a written change order and invoiced once that change is completed. Aftercare: the first 5 change requests are free, then LKR 6,000 per change request; a change request is one discrete self-contained change, larger work is several change requests and is quoted first. A 30-day post-launch warranty covers defects at no charge (new features excluded). Intellectual property transfers to the client on full payment. Use hyphens, commas, colons and periods in all copy; do not use em-dashes or en-dashes.
 
 Tone: confident, warm, plain-spoken, precise — a senior studio writing to a client, never salesy or padded. Keep line-item descriptions to one line. British-adjacent Sri Lankan business English ("colour", "itemised").
 
@@ -130,7 +130,7 @@ const QUOTATION_SCHEMA = S.obj(
       unitRate: S.nullable({ type: "number", description: "The per-page base rate in LKR for this tier (65000 / 22000 / 42000). null for non-page lines." }),
     })),
     total: { type: "string", description: "Sum of all line amounts, e.g. 'LKR 195,000'. Must equal the fixed per-page prices added up." },
-    paymentTerms: { type: "array", items: S.str, description: "4-7 short terms covering the FULL money lifecycle under the 50/30/20 model: 50% on signing (covers discovery and the 3 prototypes, non-refundable once design begins); 30% on design approval (development begins); 20% on launch and handover; the 3 prototypes + pick 1 + up to 2 revision rounds and refinements during development are included; new pages/features/direction changes are quoted as written change orders; aftercare first 5 change requests free then LKR 6,000 each; 30-day post-launch defect warranty; IP transfers on full payment; price fixed once signed. The system may overwrite these with exact 50/30/20 amounts." },
+    paymentTerms: { type: "array", items: S.str, description: "4-7 short terms covering the FULL money lifecycle under the 30/70 model: 30% on design approval (development begins; also covers the discovery and 3 prototypes delivered in the design stage); 70% on delivery before final handover; no upfront signing payment; the 3 prototypes + pick 1 + up to 2 revision rounds and refinements during development are included; new pages/features/changes requested after delivery are quoted as written change orders and invoiced once each change is completed; aftercare first 5 change requests free then LKR 6,000 each; 30-day post-launch defect warranty; IP transfers on full payment; price fixed once signed. The system may overwrite these with exact 30/70 amounts." },
     notes: { type: "string", description: "One short paragraph: exclusions/assumptions." },
   },
 );
@@ -158,11 +158,11 @@ const CONTRACT_SCHEMA = S.obj(["agreementDate", "sow", "clauses"], {
     engagement: S.str,
     term: { type: "string", description: "e.g. '≈ 3 weeks · Aug–Sep 2026'" },
     deliverables: { type: "string", description: "Compact list, ' · ' separated" },
-    fees: { type: "string", description: "The fixed total and the 50/30/20 split, e.g. 'LKR 195,000 fixed · 50% on signing / 30% on design approval / 20% on launch'." },
+    fees: { type: "string", description: "The fixed total and the 30/70 split, e.g. 'LKR 195,000 fixed · 30% on design approval / 70% on delivery'." },
   }),
   clauses: {
     type: "array",
-    description: "9-11 clauses, plain-language but real: Scope of Services (fixed per-page build); Fees & Payment (fixed price; 50% on signing, non-refundable once design begins; 30% on design approval; 20% on launch and handover; late-payment handling); Design & Revisions (3 prototype concepts, client picks 1, up to 2 revision rounds; refinements to the approved design during development are included); Change Requests & Additional Scope (new pages, features or direction changes are billable, quoted first as a written change order, and may move the timeline; price fixed once signed unless the client adds pages or requirements); Timeline & Client Responsibilities; Intellectual Property (transfers on full payment); Confidentiality; Support, Aftercare & Warranty (30-day post-launch defect window; first 5 change requests free then LKR 6,000 each; additional requirements per item or LKR 20,000 per working day; ongoing care as separate plan); Warranties & Liability; Termination; Governing Law (Sri Lanka). Use hyphens, commas, colons and periods only, never em-dashes or en-dashes.",
+    description: "9-11 clauses, plain-language but real: Scope of Services (fixed per-page build); Fees & Payment (fixed price; no upfront signing payment; 30% on design approval, which begins development and covers the discovery and 3 prototypes delivered in the design stage; 70% on delivery before final handover; late-payment handling); Design & Revisions (3 prototype concepts, client picks 1, up to 2 revision rounds; refinements to the approved design during development are included); Change Requests & Additional Scope (new pages, features or changes requested after delivery are billable, quoted first as a written change order, invoiced once the change is completed, and may move the timeline; price fixed once signed unless the client adds pages or requirements); Timeline & Client Responsibilities; Intellectual Property (transfers on full payment); Confidentiality; Support, Aftercare & Warranty (30-day post-launch defect window; first 5 change requests free then LKR 6,000 each; additional requirements per item or LKR 20,000 per working day; ongoing care as separate plan); Warranties & Liability; Termination; Governing Law (Sri Lanka). Use hyphens, commas, colons and periods only, never em-dashes or en-dashes.",
     items: S.obj(["title", "body"], { title: S.str, body: { type: "string", description: "2-5 sentences; newlines allowed" } }),
   },
 });
@@ -187,7 +187,7 @@ const PROPOSAL_SCHEMA = S.obj(
     deliverables: S.arr(S.str),
     investment: { type: "string", description: "e.g. 'LKR 65,000 fixed'" },
     whyUs: { type: "string", description: "One short paragraph, no invented claims." },
-    nextSteps: { type: "string", description: "One short paragraph: sign contract, pay advance, kickoff." },
+    nextSteps: { type: "string", description: "One short paragraph: sign contract, approve the design, settle the 30% design-approval invoice, kickoff development." },
   },
 );
 
@@ -277,9 +277,9 @@ CLIENT'S QUESTIONNAIRE ANSWERS (ground every document in these — quote their g
 ${JSON.stringify(answers)}
 
 Draft the three follow-up documents as DRAFTS for the studio to review:
-1. quotation — fixed, itemised price built from the fixed per-page prices above. One line item per page (or per group of same-tier pages), each with pageType, qty and unitRate set from the tier and amount = unitRate x qty. The total must be the sum of those fixed prices. Payment terms follow the 50/30/20 split.
+1. quotation — fixed, itemised price built from the fixed per-page prices above. One line item per page (or per group of same-tier pages), each with pageType, qty and unitRate set from the tier and amount = unitRate x qty. The total must be the sum of those fixed prices. Payment terms follow the 30/70 split.
 2. proposal — objectives from their stated goals; phases aligned to Discovery, Design (3 prototypes, pick 1, up to 2 revision rounds), Development, Launch, Aftercare, with timeframes respecting their target launch date; deliverables from the sections/features they ticked.
-3. contract — Services Agreement & SOW matching the quotation's scope and fixed price, with the 50/30/20 fees.
+3. contract — Services Agreement & SOW matching the quotation's scope and fixed price, with the 30/70 fees.
 Document numbers are added by the system — do not invent any.`;
   return generate<Stage2Result>(prompt, STAGE2_SCHEMA);
 }
@@ -317,35 +317,36 @@ export async function generateBilling(
   instructions: string,
   today: string,
 ): Promise<unknown> {
-  // The 50/30/20 arc: advance = 50% signing milestone, progress = 30% design-
-  // approval milestone, final = 20% launch milestone (plus change orders).
-  // Amounts come from lib/pricing.paymentSchedule so the invoices reconcile to
-  // the quotation total exactly and never drift from the model's arithmetic.
+  // The 30/70 arc: progress = 30% design-approval milestone (development
+  // begins), final = 70% delivery milestone. There is no signing/advance
+  // milestone anymore, and change orders are NOT bundled onto the final
+  // invoice — post-delivery work is billed as separate additional invoices
+  // once each change is completed. Amounts come from lib/pricing.paymentSchedule
+  // so the invoices reconcile to the quotation total exactly.
   const quoteTotal = parseAmount(context.quotation?.total ?? null);
   const sched = quoteTotal !== null ? paymentSchedule(quoteTotal) : null;
-  const idx = stage === "advance" ? 0 : stage === "progress" ? 1 : 2;
-  const milestone = sched ? sched[idx] : null;
+  // schedule is [designApproval (30%), delivery (70%)]: progress -> 0, final -> 1.
+  const idx = stage === "progress" ? 0 : stage === "final" ? 1 : -1;
+  const milestone = sched && idx >= 0 ? sched[idx] : null;
   const exact = milestone ? ` exactly ${fmtLKR(milestone.amount)} (${Math.round(milestone.pct * 100)}% of the fixed quotation total of ${fmtLKR(quoteTotal as number)})` : "";
   const defaults: Record<string, string> = {
-    "invoice-advance": `Invoice the 50% signing milestone against the quotation total:${exact || " 50% of the fixed quotation total"}. This first payment covers discovery and the 3 prototype concepts and is non-refundable once design begins.`,
-    "invoice-progress": `Invoice the 30% design-approval milestone:${exact || " 30% of the fixed quotation total"}. It falls due as the design is approved and development begins.`,
-    "invoice-final": `Final invoice at launch: the 20% launch-and-handover milestone${milestone ? ` (${fmtLKR(milestone.amount)})` : " (20% of the fixed quotation total)"} PLUS one line item per approved change order listed below. Make each change order its own line ('Change order - <desc>'). Do not re-bill any change order already itemised in the billing history.`,
-    "receipt-advance": "Receipt for the 50% signing payment received by bank transfer today, referencing the signing (advance) invoice.",
-    "receipt-progress": "Receipt for the 30% design-approval payment received by bank transfer today, referencing the design-approval (progress) invoice. The balance note should state the remaining 20% falls due on launch.",
+    "invoice-progress": `Invoice the 30% design-approval milestone:${exact || " 30% of the fixed quotation total"}. It falls due once the client approves the design and development begins, and it covers the discovery and 3 prototype concepts delivered in the design stage.`,
+    "invoice-final": `Final invoice on delivery: the 70% delivery milestone${milestone ? ` (${fmtLKR(milestone.amount)})` : " (70% of the fixed quotation total)"}. This is the remaining balance of the fixed quotation total. Do NOT add change orders to this invoice — post-delivery changes are billed separately as additional invoices once each change is completed.`,
+    "receipt-progress": "Receipt for the 30% design-approval payment received by bank transfer today, referencing the design-approval (progress) invoice. The balance note should state the remaining 70% falls due on delivery.",
     "receipt-final":
-      "Receipt for the final launch payment received by bank transfer today, referencing the final invoice. The balance note should confirm the account is fully settled and that IP has transferred.",
+      "Receipt for the final delivery payment received by bank transfer today, referencing the final invoice. The balance note should confirm the account is fully settled and that IP has transferred.",
   };
-  // Due dates follow the schedule's per-milestone offsets (signing +7,
-  // design-approval +7, launch +14); additional invoices default to +14.
-  // Operator instructions override.
-  const dueDays = milestone ? milestone.dueOffsetDays : stage === "advance" || stage === "progress" ? 7 : 14;
+  // Due dates follow the schedule's per-milestone offsets (design-approval +7,
+  // delivery +14); additional invoices default to +14. Operator instructions
+  // override.
+  const dueDays = milestone ? milestone.dueOffsetDays : stage === "progress" ? 7 : 14;
   const dueDefault = new Date(Date.now() + dueDays * 86_400_000).toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
     timeZone: "Asia/Colombo",
   });
-  const stageWord = stage === "advance" ? "signing" : stage === "progress" ? "design-approval" : stage === "final" ? "launch" : "additional";
+  const stageWord = stage === "progress" ? "design-approval" : stage === "final" ? "delivery" : "additional";
   const duePolicy =
     kind === "invoice"
       ? `\n\nDUE DATE: unless the operator instructions specify a different due date, set dueDate to exactly "${dueDefault}" (${dueDays} days from today, the standard term for the ${stageWord} invoice).`
@@ -360,7 +361,7 @@ ${JSON.stringify(context.quotation)}
 BILLING HISTORY SO FAR (stay arithmetically consistent with these):
 ${JSON.stringify(context.priorBilling)}
 
-APPROVED CHANGE ORDERS (work added after the cost was finalised — billed on the FINAL invoice; a change order already itemised on an invoice in the billing history has been billed, NEVER bill the same change order twice):
+APPROVED CHANGE ORDERS (work added after the cost was finalised — each is billed as its own ADDITIONAL invoice once that change is completed, NOT on the final/delivery invoice; a change order already itemised on an invoice in the billing history has been billed, NEVER bill the same change order twice):
 ${JSON.stringify(context.changeOrders)}
 
 OPERATOR INSTRUCTIONS:

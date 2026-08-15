@@ -1,8 +1,8 @@
 // Payments recorded against the project (usually settling an invoice) — the
 // numbers behind per-invoice paid state and the outstanding-balance math
 // (outstanding = published invoices − payments). Recording a payment
-// auto-advances the lifecycle to "development" (the advance is what starts
-// the build).
+// auto-advances the lifecycle to "development" (the 30% design-approval
+// payment is what starts the build).
 import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { advanceStage } from "@/lib/stage";

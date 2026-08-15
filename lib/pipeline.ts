@@ -223,7 +223,7 @@ Console: <a href="https://${CONSOLE_HOST}/clients/${client.slug}">https://${CONS
 }
 
 /** Deterministically reconcile a drafted quotation's money against the fixed
- *  pricing model (lib/pricing.ts) so the total and the 50/30/20 schedule can
+ *  pricing model (lib/pricing.ts) so the total and the 30/70 schedule can
  *  never drift from what the model wrote. Only engages when the model tagged
  *  its line items with a pageType — a prose-only quotation is left untouched,
  *  and if any non-page line's amount can't be parsed we bail rather than risk

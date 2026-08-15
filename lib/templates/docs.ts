@@ -175,10 +175,10 @@ function quotationAcceptBlock(ctx: Ctx): string {
     return `<div class="box" style="background:var(--a-dim);border-color:var(--a-border);break-inside:avoid;">
       <div class="sec-k">Acceptance</div>
       <div style="font-size:13.5px;"><b>Accepted by ${esc(acc.name)} on ${esc(acceptedDate(acc.at))}</b></div>
-      <div class="small" style="margin-top:4px;">Recorded via the client portal — the scope, price and payment terms above are confirmed. Next step: the advance invoice.</div>
+      <div class="small" style="margin-top:4px;">Recorded via the client portal — the scope, price and payment terms above are confirmed. Next step: the 30% design-approval invoice once the design is approved.</div>
     </div>`;
   }
-  const note = `<div class="section"><div class="sec-k">Accepting this quotation</div><div class="small">Reply by email confirming acceptance${ctx.mode === "web" ? ", or accept right here with your full name below" : ""}, or sign the accompanying Services Agreement — we'll then send the advance invoice and book your slot. The payment terms above form part of this quotation.</div></div>`;
+  const note = `<div class="section"><div class="sec-k">Accepting this quotation</div><div class="small">Reply by email confirming acceptance${ctx.mode === "web" ? ", or accept right here with your full name below" : ""}, or sign the accompanying Services Agreement — we'll then move into the design stage, and the 30% design-approval invoice follows once you approve the design. The payment terms above form part of this quotation.</div></div>`;
   if (ctx.mode !== "web") return note;
   const inputStyle =
     "flex:1 1 220px;min-width:0;border:1px solid var(--border-hi);background:var(--bg);color:var(--text);border-radius:10px;padding:10px 14px;font-family:var(--sans);font-size:14px;";
@@ -209,7 +209,7 @@ btn.disabled=true;btn.style.opacity='.6';btn.textContent='SENDING\\u2026';
 fetch('/accept',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,company:f.elements.company.value})})
 .then(function(r){return r.json().then(function(d){return{ok:r.ok,d:d}}).catch(function(){return{ok:r.ok,d:{}}})})
 .then(function(x){
-if(x.ok){f.style.display='none';msg.style.display='block';msg.innerHTML='<b>Thank you \\u2014 quotation accepted.</b> '+((x.d&&x.d.already)?'(It was already accepted earlier, so nothing changed.) ':'')+'We\\u2019ll be in touch with the advance invoice shortly.';}
+if(x.ok){f.style.display='none';msg.style.display='block';msg.innerHTML='<b>Thank you \\u2014 quotation accepted.</b> '+((x.d&&x.d.already)?'(It was already accepted earlier, so nothing changed.) ':'')+'We\\u2019ll be in touch to start the design stage.';}
 else{say((x.d&&x.d.error)||'Something went wrong \\u2014 please try again, or reply by email.');idle();}
 })
 .catch(function(){say('Network problem \\u2014 please try again.');idle();});

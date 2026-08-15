@@ -1,6 +1,6 @@
 // Deterministic pricing engine. This is the single source of truth for
 // Luminary's commercial model: fixed per-page build prices, phase multipliers
-// for pages added later, the aftercare change-request fee, and the 50/30/20
+// for pages added later, the aftercare change-request fee, and the 30/70
 // payment split. Everything here is pure and testable — the AI layer imports
 // these numbers so it quotes them verbatim instead of inventing figures, and
 // the pipeline reconciles generated quotations against them so money never
@@ -34,11 +34,12 @@ export const DAY_RATE = 20000;
 export const CHANGE_REQUEST_FEE = 6000;
 export const FREE_CHANGE_REQUESTS = 5;
 
-/** Payment split: 50% on signing, 30% on design approval, 20% on launch. */
+/** Payment split: 30% on design approval (development begins), 70% on
+ *  delivery. There is no upfront signing payment — the design work is done
+ *  first, and the 30% falls due once the client approves the design. */
 export const PAYMENT_SPLIT = {
-  signing: 0.5,
   designApproval: 0.3,
-  launch: 0.2,
+  delivery: 0.7,
 } as const;
 
 export type PageType = keyof typeof PAGE_RATES;
@@ -73,7 +74,7 @@ export function computeQuoteTotal(items: { amount: number }[]): number {
   return items.reduce((s, it) => s + (Number.isFinite(it.amount) ? it.amount : 0), 0);
 }
 
-export type PaymentStageKey = "signing" | "progress" | "launch";
+export type PaymentStageKey = "designApproval" | "delivery";
 export type PaymentStage = {
   stage: PaymentStageKey;
   label: string;
@@ -83,33 +84,25 @@ export type PaymentStage = {
   dueOffsetDays: number;
 };
 
-/** The 50/30/20 schedule for a fixed total. The launch amount is the exact
- *  remainder, so the three milestones always sum back to the total even after
+/** The 30/70 schedule for a fixed total. The delivery amount is the exact
+ *  remainder, so the two milestones always sum back to the total even after
  *  rounding. */
 export function paymentSchedule(total: number): PaymentStage[] {
-  const signing = Math.round(total * PAYMENT_SPLIT.signing);
-  const progress = Math.round(total * PAYMENT_SPLIT.designApproval);
-  const launch = total - signing - progress;
+  const designApproval = Math.round(total * PAYMENT_SPLIT.designApproval);
+  const delivery = total - designApproval;
   return [
     {
-      stage: "signing",
-      label: "On signing",
-      pct: PAYMENT_SPLIT.signing,
-      amount: signing,
-      dueOffsetDays: 7,
-    },
-    {
-      stage: "progress",
+      stage: "designApproval",
       label: "On design approval (development begins)",
       pct: PAYMENT_SPLIT.designApproval,
-      amount: progress,
+      amount: designApproval,
       dueOffsetDays: 7,
     },
     {
-      stage: "launch",
-      label: "On launch and handover",
-      pct: PAYMENT_SPLIT.launch,
-      amount: launch,
+      stage: "delivery",
+      label: "On delivery",
+      pct: PAYMENT_SPLIT.delivery,
+      amount: delivery,
       dueOffsetDays: 14,
     },
   ];
@@ -122,16 +115,15 @@ export function changeOrderAmount(indexAfterLaunch: number): number {
 }
 
 /** Ordered payment-terms lines for a quotation at a fixed total: the exact
- *  50/30/20 amounts followed by the standing policy. Deterministic, so the
+ *  30/70 amounts followed by the standing policy. Deterministic, so the
  *  quotation's money can be reconciled to it without model drift. */
 export function quotationPaymentTerms(total: number): string[] {
   const s = paymentSchedule(total);
   return [
-    `50% on signing: ${fmtLKR(s[0].amount)}. Covers discovery and the 3 prototype concepts, and is non-refundable once design begins.`,
-    `30% on design approval: ${fmtLKR(s[1].amount)}. Development begins once this is settled.`,
-    `20% on launch and handover: ${fmtLKR(s[2].amount)}.`,
+    `30% on design approval: ${fmtLKR(s[0].amount)}. Falls due once you approve the design; development begins once it is settled. It covers the discovery and the 3 prototype concepts delivered in the design stage.`,
+    `70% on delivery: ${fmtLKR(s[1].amount)}. Due on delivery, payable before final handover.`,
     "Included: 3 prototype concepts, selection plus up to 2 revision rounds, and refinements to the approved design during development.",
-    "New pages, features or direction changes are billable and are quoted first as a written change order.",
+    "New pages, features or changes requested after delivery are quoted first as a written change order and invoiced once that change is completed.",
     "Aftercare: the first 5 change requests are free, then LKR 6,000 per change request; additional requirements are quoted per item or LKR 20,000 per working day.",
     "A 30-day post-launch warranty covers defects at no charge. Intellectual property transfers to you on full payment. Once signed the price is fixed unless you add pages or requirements.",
   ];
@@ -140,9 +132,9 @@ export function quotationPaymentTerms(total: number): string[] {
 /** The commercial model in plain language. Reused wherever the policy has to
  *  be stated verbatim (templates, prompts). No em-dashes or en-dashes. */
 export const POLICY: string[] = [
-  "Payment is staged 50/30/20: 50% on signing (covers discovery and the 3 prototype concepts, non-refundable once design begins), 30% on design approval (development starts), 20% on launch and handover.",
+  "Payment is staged 30/70: 30% on design approval (development begins; this also covers the discovery and 3 prototype concepts delivered in the design stage), 70% on delivery before final handover.",
   "Design stage delivers 3 prototype concepts; you pick 1, then we run up to 2 revision rounds on it.",
-  "Development includes refinements to the approved design; new pages, features or direction changes are billable and quoted first.",
+  "Development includes refinements to the approved design; new pages, features or changes requested after delivery are billable, quoted first as a written change order, and invoiced once the change is completed.",
   "Aftercare: the first 5 change requests are free, then LKR 6,000 per change request. A change request is one discrete self-contained change; larger work is several change requests and is quoted first.",
   "Additional requirements are quoted per item, or LKR 20,000 per working day.",
   "A 30-day post-launch warranty covers defects at no charge; new features are excluded.",
@@ -159,4 +151,4 @@ export const PRICING_REFERENCE = `FIXED PRICING MODEL (use these exact figures, 
 - Pages added later use a multiplier on the page base rate by phase: Design x${PHASE_MULTIPLIERS.design}, Development x${PHASE_MULTIPLIERS.development}, Late development / pre-launch x${PHASE_MULTIPLIERS.prelaunch}.
 - Additional requirements: quoted per item, or ${fmtLKR(DAY_RATE)} per working day.
 - Aftercare: first ${FREE_CHANGE_REQUESTS} change requests free, then ${fmtLKR(CHANGE_REQUEST_FEE)} per change request.
-- Payment split: 50% on signing, 30% on design approval, 20% on launch and handover.`;
+- Payment split: 30% on design approval (development begins), 70% on delivery before final handover. No upfront signing payment.`;

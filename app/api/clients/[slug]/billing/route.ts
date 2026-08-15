@@ -1,4 +1,4 @@
-// Billing actions: generate advance/final invoices and receipts (Claude,
+// Billing actions: generate design-approval/final invoices and receipts (Claude,
 // arithmetic grounded in the quotation + billing history + change orders),
 // publish/unpublish, revise.
 import { NextResponse } from "next/server";
@@ -34,10 +34,10 @@ export async function POST(
           { status: 400 },
         );
       }
-      // Advance/final billing is arithmetic ON the quotation — the default
-      // instruction is literally "invoice the standard 50% advance against
-      // the quotation total". With no quotation there is nothing to ground
-      // on and the amount on a real invoice would be invented.
+      // Design-approval/final billing is arithmetic ON the quotation — the
+      // default instruction is literally "invoice the standard 30% design-
+      // approval milestone against the quotation total". With no quotation
+      // there is nothing to ground on and the amount would be invented.
       if (stage !== "other" && !client.docs.quotation) {
         return NextResponse.json(
           {

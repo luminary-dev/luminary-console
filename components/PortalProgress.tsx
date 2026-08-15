@@ -30,10 +30,10 @@ const STEPS: Step[] = [
     now: "Your quotation is ready to read and accept.",
   },
   {
-    label: "Advance",
-    short: "Advance",
+    label: "Design",
+    short: "Design",
     stage: "accepted",
-    now: "The advance invoice is next — the build starts once it's settled.",
+    now: "Next we prepare your 3 design concepts. Once you approve one, the 30% design-approval invoice settles and the build begins.",
   },
   {
     label: "Development",

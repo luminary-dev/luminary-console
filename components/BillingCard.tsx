@@ -1,14 +1,15 @@
 "use client";
 
-// The payment arc, in one card: generate the advance invoice → receipt →
-// (change orders accumulate meanwhile) → final invoice (balance + change
-// orders) → final receipt. Each doc can be previewed, revised, published.
+// The payment arc, in one card: generate the design-approval invoice (30%) →
+// receipt → final delivery invoice (70%) → final receipt. Post-delivery change
+// orders are billed as their own additional invoices once completed. Each doc
+// can be previewed, revised, published.
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { BillingDoc, Payment } from "@/lib/types";
 import { fmtLKR, invoiceTotal, paidAgainst, parseAmount, summarizeMoney } from "@/lib/money";
 // One naming rule for billing documents, shared with the portal, the email
-// route and the comment box — "Advance invoice", "Handover pack".
+// route and the comment box — "Final invoice", "Handover pack".
 import { billingLabel } from "@/lib/doclabels";
 
 import EmailDocButton from "./EmailDocButton";
@@ -193,11 +194,11 @@ export default function BillingCard({
       className="btn ghost small"
       disabled={!!busy || !hasQuotation}
       onClick={async () => {
-        // Advance/final normally exist once — a duplicate is usually a mis-click.
+        // Design-approval/final normally exist once — a duplicate is usually a mis-click.
         const dup = billing.find((b) => b.kind === kind && b.stage === stage);
         if (dup) {
           const stageWord =
-            stage === "advance" ? "signing" : stage === "progress" ? "design-approval" : "launch";
+            stage === "progress" ? "design-approval" : stage === "final" ? "delivery" : "additional";
           const ok = await confirm({
             title: "Already generated",
             confirmLabel: "Generate another",
@@ -222,19 +223,17 @@ export default function BillingCard({
     <div className="card">
       <h3>Billing</h3>
       <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-        The 50/30/20 payment arc: 50% signing invoice when the quotation is accepted, 30%
-        design-approval invoice when development begins, then the 20% launch invoice at delivery
-        (remaining balance + any change orders), each with its receipt when paid. Work requested{" "}
-        <i>after</i> the account is settled gets its own additional invoice/receipt.
+        The 30/70 payment arc: the 30% design-approval invoice once the client approves the design
+        and development begins, then the 70% delivery invoice at delivery, each with its receipt when
+        paid. There is no upfront signing payment. Post-delivery changes requested{" "}
+        <i>after</i> the account is settled get their own additional invoice/receipt once completed.
         {!hasQuotation && " Available once a quotation exists."}
       </p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
-        {gen("invoice", "advance", "Signing invoice (50%)")}
-        {gen("receipt", "advance", "Signing receipt")}
         {gen("invoice", "progress", "Design-approval invoice (30%)")}
         {gen("receipt", "progress", "Design-approval receipt")}
-        {gen("invoice", "final", "Launch invoice (20%)")}
-        {gen("receipt", "final", "Launch receipt")}
+        {gen("invoice", "final", "Delivery invoice (70%)")}
+        {gen("receipt", "final", "Delivery receipt")}
         <button
           className="btn ghost small"
           disabled={!!busy || !hasQuotation}

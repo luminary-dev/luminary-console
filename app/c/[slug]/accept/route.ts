@@ -91,7 +91,7 @@ export async function POST(
     `Quotation accepted — ${client.company} (${quotation.no})`,
     `<p><strong>${esc(name)}</strong> accepted the ${esc(client.company)} quotation <b>${esc(quotation.no)}</b> from the client portal.</p>
 <p>The acceptance is stamped on the quotation and the client is now at stage <b>accepted</b>.</p>
-<p>Next step: generate and publish the <b>advance invoice</b>:</p>
+<p>Next step: move into the design stage; the <b>30% design-approval invoice</b> follows once the client approves the design:</p>
 <p><a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open ${esc(client.company)} in the console →</a></p>`,
   );
 

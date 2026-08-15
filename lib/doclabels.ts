@@ -13,7 +13,7 @@ export const billingStageLabel = (s: string) =>
         ? "Final "
         : "Additional ";
 
-/** Human name for one entry of `client.billing`, e.g. "Advance invoice" or
+/** Human name for one entry of `client.billing`, e.g. "Final invoice" or
  *  "Handover pack". The stage prefix only makes sense for money documents —
  *  there is no "additional handover pack" — so handovers carry their label
  *  alone. Every surface that names a billing document goes through this. */
