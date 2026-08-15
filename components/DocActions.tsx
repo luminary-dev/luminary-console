@@ -14,6 +14,7 @@ export default function DocActions({
   billing,
   label,
   no,
+  relatedDocs = [],
 }: {
   slug: string;
   type: string;
@@ -22,6 +23,9 @@ export default function DocActions({
   billing?: boolean;
   label?: string;
   no?: string;
+  /** Labels of the other project documents this edit can be applied to as
+   *  well (empty for docs with no cascade family, e.g. billing). */
+  relatedDocs?: string[];
 }) {
   const router = useRouter();
   const { confirm, dialog } = useConfirm();
@@ -29,6 +33,7 @@ export default function DocActions({
   const [error, setError] = useState<string | null>(null);
   const [showRevise, setShowRevise] = useState(false);
   const [instructions, setInstructions] = useState("");
+  const [cascade, setCascade] = useState(false);
 
   const act = async (action: string, extra: Record<string, unknown> = {}): Promise<boolean> => {
     setBusy(action);
@@ -46,6 +51,7 @@ export default function DocActions({
     }
     setShowRevise(false);
     setInstructions("");
+    setCascade(false);
     router.refresh();
     return true;
   };
@@ -138,13 +144,38 @@ export default function DocActions({
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
           />
+          {exists && relatedDocs.length > 0 && (
+            <label
+              style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 8, fontSize: 13, color: "var(--muted)", cursor: "pointer" }}
+            >
+              <input
+                type="checkbox"
+                checked={cascade}
+                onChange={(e) => setCascade(e.target.checked)}
+                style={{ marginTop: 2 }}
+              />
+              <span>
+                Also apply this change to <b>{relatedDocs.join(", ")}</b> — each is revised the same
+                way and kept consistent with this one (prior version archived so you can roll back).
+                Your other edits on them stay.
+              </span>
+            </label>
+          )}
           <button
             className="btn small"
             style={{ marginTop: 8 }}
             disabled={!!busy || (exists && !instructions.trim())}
-            onClick={() => act(exists ? "regenerate" : "generate", { instructions })}
+            onClick={() => act(exists ? "regenerate" : "generate", { instructions, cascade })}
           >
-            {busy ? "Working… (takes ~30s)" : exists ? "Regenerate" : "Generate"}
+            {busy
+              ? cascade
+                ? "Working… (updating related docs, ~1 min)"
+                : "Working… (takes ~30s)"
+              : exists
+                ? cascade
+                  ? "Regenerate + apply to related"
+                  : "Regenerate"
+                : "Generate"}
           </button>
         </div>
       )}

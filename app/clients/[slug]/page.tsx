@@ -213,6 +213,15 @@ export default async function ClientPage({
                         exists={!!meta}
                         status={meta?.status}
                         billing={false}
+                        relatedDocs={
+                          // The project-doc family that a revision can cascade to:
+                          // the other existing docs among estimate/quotation/proposal/contract.
+                          (["estimate", "quotation", "proposal", "contract"] as DocType[]).includes(t)
+                            ? (["estimate", "quotation", "proposal", "contract"] as DocType[])
+                                .filter((x) => x !== t && client.docs[x])
+                                .map((x) => DOC_LABELS[x])
+                            : []
+                        }
                       />
                       {meta && <EmailDocButton slug={slug} docKey={t} label={DOC_LABELS[t]} email={client.email} />}
                     </div>

@@ -69,13 +69,45 @@ export async function POST(
       const meta = client.docs[docType];
       if (!meta) return NextResponse.json({ error: "Document not generated yet" }, { status: 404 });
       if (!instructions) return NextResponse.json({ error: "Revision instructions required" }, { status: 400 });
-      const data = await reviseDoc(client, docType, meta.data, instructions, todayLabel());
+      const today = todayLabel();
+      const data = await reviseDoc(client, docType, meta.data, instructions, today);
       // Keep the render being replaced so the operator can compare/roll back.
       archiveVersion(meta);
       const updated = await saveDoc(client, docType, data, meta.status);
+
+      // Cascade: apply the SAME instruction to the other project documents so
+      // one edit propagates instead of being re-typed into each. Each sibling
+      // is revised with the just-revised primary doc as context (so they stay
+      // consistent), archived, and re-rendered keeping its own status. Only the
+      // estimate/quotation/proposal/contract family cascades; billing is out.
+      const cascaded: string[] = [];
+      if (body.cascade) {
+        const FAMILY: DocType[] = ["estimate", "quotation", "proposal", "contract"];
+        if (FAMILY.includes(docType)) {
+          const siblings = FAMILY.filter((t) => t !== docType && client.docs[t]);
+          for (const t of siblings) {
+            const sMeta = client.docs[t];
+            if (!sMeta) continue;
+            const ctx = `${instructions}
+
+Apply the SAME change to this ${t} and keep it fully consistent with the ${docType} that was just revised. Only change what this instruction implies; leave everything else as-is. The revised ${docType} now reads:
+${JSON.stringify(data)}`;
+            const sData = await reviseDoc(client, t, sMeta.data, ctx, today);
+            archiveVersion(sMeta);
+            await saveDoc(client, t, sData, sMeta.status);
+            cascaded.push(t);
+          }
+        }
+      }
+
       await saveClient(client);
-      await logActivity("operator", `regenerated ${docType}`, slug, updated.no);
-      return NextResponse.json({ ok: true, status: updated.status });
+      await logActivity(
+        "operator",
+        `regenerated ${docType}${cascaded.length ? ` + applied to ${cascaded.join(", ")}` : ""}`,
+        slug,
+        updated.no,
+      );
+      return NextResponse.json({ ok: true, status: updated.status, cascaded });
     }
 
     // (Invoice/receipt generation moved to /api/clients/[slug]/billing —
