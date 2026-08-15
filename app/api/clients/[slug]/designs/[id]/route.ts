@@ -60,7 +60,8 @@ export async function POST(
     try {
       const pdf = await renderPdf(await res.text(), { laptop: true });
       pdfUrl = await putAsset(`clients/${slug}/designs/design-${id}.pdf`, pdf, "application/pdf");
-    } catch {
+    } catch (e) {
+      console.error(`[designs] PDF render failed for ${slug}/design-${id}:`, e);
       return NextResponse.json({ error: "Could not render the PDF. Try again." }, { status: 502 });
     }
     if (design.pdfUrl) await deleteAssets([design.pdfUrl]);
