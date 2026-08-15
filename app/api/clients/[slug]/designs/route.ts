@@ -52,9 +52,11 @@ export async function POST(
   const now = new Date().toISOString();
 
   if (existing) {
-    // Re-upload: swap the file, reset to draft, keep the slot.
-    await deleteAssets([existing.htmlUrl]);
+    // Re-upload: swap the file, reset to draft, keep the slot. The old cached
+    // PDF is now stale — drop it; re-publishing renders a fresh one.
+    await deleteAssets([existing.htmlUrl, ...(existing.pdfUrl ? [existing.pdfUrl] : [])]);
     existing.htmlUrl = htmlUrl;
+    existing.pdfUrl = undefined;
     existing.status = "draft";
     existing.updatedAt = now;
     if (title) existing.title = title;

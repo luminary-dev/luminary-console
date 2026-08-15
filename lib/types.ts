@@ -208,6 +208,11 @@ export type DesignEntry = {
   status: DocStatus;
   /** Asset URL ("/api/asset/<key>") of the stored HTML. */
   htmlUrl: string;
+  /** Asset URL of the PDF rendered from the HTML at publish time — the only
+   *  form a client ever receives. Absent on drafts and on records published
+   *  before caching existed (the public route renders on the fly as a
+   *  fallback). Regenerated on every publish; cleared on unpublish/replace. */
+  pdfUrl?: string;
   updatedAt: string;
 };
 

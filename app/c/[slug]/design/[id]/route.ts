@@ -1,16 +1,19 @@
 // Public serving for a design preview at <slug>.ROOT/design/<id> (the proxy
-// rewrites the client host + path here). A published design serves its file to
-// anyone; a draft (or unknown) shows a noindex holding page so guessing the
-// path never leaks unpublished work.
+// rewrites the client host + path here). The design source is an HTML
+// prototype, but a client may only ever take away a flat PDF of it — never the
+// HTML itself — so a *published* slot serves the PDF that was rendered and
+// stored at publish time (see the publish action). Records published before
+// caching, or a missing cache file, fall back to rendering on the fly. A draft
+// (or unknown) shows a noindex holding page so guessing the path never leaks
+// unpublished work, and the HTML source is never exposed on the client host.
+// The team still reviews the real HTML through the authed console preview
+// (/api/clients/<slug>/designs/<id>).
 import { fetchAsset, getClient } from "@/lib/store";
+import { renderPdf } from "@/lib/pdf";
 
 export const runtime = "nodejs";
-
-const HTML_HEADERS = {
-  "Content-Type": "text/html; charset=utf-8",
-  "X-Robots-Tag": "noindex, nofollow",
-  "Cache-Control": "no-store",
-};
+// Rendering launches headless Chromium — match the doc PDF routes' ceiling.
+export const maxDuration = 300;
 
 function holding(): Response {
   const body = `<!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -22,7 +25,14 @@ font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 p{margin:0;color:#9aa096;font-size:.95rem;line-height:1.6}</style></head>
 <body><div class="b"><h1>This preview is not published yet</h1>
 <p>The design is still being prepared. Please check back once it has been shared with you.</p></div></body></html>`;
-  return new Response(body, { status: 200, headers: HTML_HEADERS });
+  return new Response(body, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "X-Robots-Tag": "noindex, nofollow",
+      "Cache-Control": "no-store",
+    },
+  });
 }
 
 export async function GET(
@@ -35,7 +45,26 @@ export async function GET(
   if (!client || !design) return new Response("Not found", { status: 404 });
   if (design.status !== "published") return holding();
 
+  const filename = `${slug}-design-${id}.pdf`;
+  const headers = {
+    "Content-Type": "application/pdf",
+    // inline: opens in the browser's PDF viewer (and is saveable from there);
+    // the client gets the design as a PDF and nothing else.
+    "Content-Disposition": `inline; filename="${filename}"`,
+    "X-Robots-Tag": "noindex, nofollow",
+    "Cache-Control": "no-store",
+  };
+
+  // Fast path: serve the PDF rendered and stored at publish time.
+  if (design.pdfUrl) {
+    const cached = await fetchAsset(design.pdfUrl);
+    if (cached.ok) return new Response(await cached.arrayBuffer(), { headers });
+  }
+
+  // Fallback: no cached PDF (published before caching, or the file went
+  // missing) — render from the HTML on the fly.
   const res = await fetchAsset(design.htmlUrl);
   if (!res.ok) return holding();
-  return new Response(await res.arrayBuffer(), { headers: HTML_HEADERS });
+  const pdf = await renderPdf(await res.text());
+  return new Response(pdf as unknown as BodyInit, { headers });
 }
