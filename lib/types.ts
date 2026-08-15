@@ -122,6 +122,12 @@ export type EmailLogEntry = { at: string; to: string; subject: string; docs?: st
  *  ("invoice-1"), or "questionnaire". */
 export type Comment = { doc: string; by: string; text: string; at: string };
 
+/** A file the client uploaded from their portal for the studio to receive
+ *  (contracts, brand assets, photos, references). Stored in R2 under the same
+ *  attachments prefix as questionnaire uploads; `url` is the app-relative
+ *  asset URL. Available on the portal for the whole engagement. */
+export type PortalUpload = { at: string; by?: string; name: string; url: string; size: number; note?: string };
+
 export type ClientRecord = {
   slug: string;
   company: string;
@@ -177,6 +183,8 @@ export type ClientRecord = {
   emailLog?: EmailLogEntry[];
   /** Questions left on documents from the client portal, newest last. */
   comments?: Comment[];
+  /** Files the client uploaded from their portal for us to receive, newest last. */
+  uploads?: PortalUpload[];
 };
 
 export type BillingDoc = {

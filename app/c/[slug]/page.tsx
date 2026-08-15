@@ -10,6 +10,7 @@ import { billingLabel } from "@/lib/doclabels";
 import { DOC_LABELS, type DocType } from "@/lib/types";
 import PortalProgress from "@/components/PortalProgress";
 import PortalComments, { type PortalDoc } from "@/components/PortalComments";
+import PortalUploads from "@/components/PortalUploads";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
@@ -137,6 +138,13 @@ export default async function ClientHome({
       )}
 
       <PortalComments docs={askable} initialDoc={newest} base={base} />
+
+      <PortalUploads
+        base={base}
+        initial={[...(client.uploads ?? [])]
+          .reverse()
+          .map((u) => ({ name: u.name, size: u.size, at: u.at }))}
+      />
 
       <div className="foot">
         <div className="foot-links">

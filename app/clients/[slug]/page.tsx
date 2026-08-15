@@ -23,6 +23,7 @@ import HandoverCard from "@/components/HandoverCard";
 import DesignsCard from "@/components/DesignsCard";
 import { currentStage } from "@/lib/stage";
 import { deliveredAtIso, handoverEligible } from "@/lib/handover";
+import { fmtSize } from "@/lib/attachments";
 
 export const dynamic = "force-dynamic";
 
@@ -255,6 +256,36 @@ export default async function ClientPage({
       <AssistantCard slug={slug} />
 
       <CommentsCard client={client} />
+
+      {(client.uploads?.length ?? 0) > 0 && (
+        <div className="card">
+          <h3>Client uploads</h3>
+          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
+            Files the client sent from their portal. Stored in the private bucket — links open on the console.
+          </p>
+          <div style={{ marginTop: 8 }}>
+            {[...client.uploads!].reverse().map((u, i) => (
+              <div
+                key={`${u.url}-${i}`}
+                style={{
+                  display: "flex", gap: 12, alignItems: "baseline", flexWrap: "wrap",
+                  padding: "9px 0", borderTop: "1px solid var(--border)",
+                }}
+              >
+                <a href={u.url} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600, fontSize: 13.5 }}>
+                  {u.name}
+                </a>
+                <span className="mono" style={{ fontSize: 12, color: "var(--muted)" }}>{fmtSize(u.size)}</span>
+                <span style={{ fontSize: 12, color: "var(--muted)" }}>
+                  {u.at.slice(0, 10)}
+                  {u.by ? ` · ${u.by}` : ""}
+                  {u.note ? ` · ${u.note}` : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <NotesCard slug={slug} notes={client.notes} />
 
