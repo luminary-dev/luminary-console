@@ -51,22 +51,24 @@ export async function POST(
   const body = await req.json().catch(() => ({}));
   const action = String(body.action || "");
   if (action === "publish") {
-    // Render the concept to PDF once, now, so the public route serves a stored
-    // file instead of launching Chromium on every client click. A stale PDF
-    // from a previous publish is replaced.
-    const res = await fetchAsset(design.htmlUrl);
-    if (!res.ok) return NextResponse.json({ error: "The design file is missing." }, { status: 409 });
-    let pdfUrl: string;
-    try {
-      const pdf = await renderPdf(await res.text(), { laptop: true });
-      pdfUrl = await putAsset(`clients/${slug}/designs/design-${id}.pdf`, pdf, "application/pdf");
-    } catch (e) {
-      console.error(`[designs] PDF render failed for ${slug}/design-${id}:`, e);
-      return NextResponse.json({ error: "Could not render the PDF. Try again." }, { status: 502 });
-    }
-    if (design.pdfUrl) await deleteAssets([design.pdfUrl]);
-    design.pdfUrl = pdfUrl;
     design.status = "published";
+    // Best-effort PDF caching: render a laptop-width PDF now so client
+    // downloads are instant. Publishing must NOT depend on it — if the render
+    // or upload fails, the design still goes live and the public download route
+    // renders on the fly (the proven fallback). Drop any prior/stale PDF so we
+    // never serve an out-of-date cache.
+    const old = design.pdfUrl;
+    design.pdfUrl = undefined;
+    try {
+      const res = await fetchAsset(design.htmlUrl);
+      if (!res.ok) throw new Error(`design HTML asset not readable (status ${res.status})`);
+      const pdf = await renderPdf(await res.text(), { laptop: true });
+      design.pdfUrl = await putAsset(`clients/${slug}/designs/design-${id}.pdf`, pdf, "application/pdf");
+    } catch (e) {
+      // Logged so we can still diagnose the cache path; the client is unaffected.
+      console.error(`[designs] PDF cache failed for ${slug}/design-${id} — serving on the fly:`, e);
+    }
+    if (old && old !== design.pdfUrl) await deleteAssets([old]).catch(() => {});
   } else if (action === "unpublish") {
     // Drop the cached PDF — the public route falls back to the holding page.
     if (design.pdfUrl) await deleteAssets([design.pdfUrl]);
