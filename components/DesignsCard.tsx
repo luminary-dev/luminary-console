@@ -117,10 +117,10 @@ export default function DesignsCard({
         </button>
       </div>
       <p style={{ color: "var(--muted)", marginTop: 6, fontSize: 13 }}>
-        Up to {MAX_DESIGNS} concept previews, each uploaded as a single HTML file. Clients only ever get
-        it as a downloadable PDF at <span className="mono">{domain}/design/&lt;n&gt;</span> — never the HTML.
-        Drafts show a holding page in public and can be previewed here (raw HTML); publishing makes the PDF
-        live.
+        Up to {MAX_DESIGNS} concept previews, each a single HTML file at{" "}
+        <span className="mono">{domain}/design/&lt;n&gt;</span>. Once published the client can view it live
+        and download a laptop-width PDF of it. Drafts show a holding page in public and can be previewed
+        here; publishing renders the PDF and makes both live.
       </p>
       {error && (
         <p className="notice" style={{ marginTop: 10, color: "var(--danger, #d33)", fontSize: 13 }}>

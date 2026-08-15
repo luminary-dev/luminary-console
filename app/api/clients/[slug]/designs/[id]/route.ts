@@ -58,7 +58,7 @@ export async function POST(
     if (!res.ok) return NextResponse.json({ error: "The design file is missing." }, { status: 409 });
     let pdfUrl: string;
     try {
-      const pdf = await renderPdf(await res.text());
+      const pdf = await renderPdf(await res.text(), { laptop: true });
       pdfUrl = await putAsset(`clients/${slug}/designs/design-${id}.pdf`, pdf, "application/pdf");
     } catch {
       return NextResponse.json({ error: "Could not render the PDF. Try again." }, { status: 502 });

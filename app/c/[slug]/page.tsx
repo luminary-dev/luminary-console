@@ -117,21 +117,20 @@ export default async function ClientHome({
           <h3>Design previews</h3>
           <div className="portal-links">
             {publishedDesigns.map((d) => (
-              // Design previews leave the portal only as a PDF — the route at
-              // /design/<id> renders the concept to PDF and serves nothing else.
-              <a
-                className="portal-link"
-                key={d.id}
-                href={`${base}/design/${d.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              // Each concept can be viewed live (HTML) and downloaded as a
+              // laptop-width PDF (/design/<id>/pdf).
+              <div className="portal-link" key={d.id}>
                 <span>
                   {d.title}
                   {isNew(d.updatedAt) && <span className="new-pill">New</span>}
                 </span>
-                <span className="no">Download PDF →</span>
-              </a>
+                <span className="no" style={{ display: "inline-flex", gap: 14 }}>
+                  <a href={`${base}/design/${d.id}`} target="_blank" rel="noopener noreferrer">
+                    Preview →
+                  </a>
+                  <a href={`${base}/design/${d.id}/pdf`}>Download PDF ↓</a>
+                </span>
+              </div>
             ))}
           </div>
         </div>
