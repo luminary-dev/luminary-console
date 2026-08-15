@@ -51,8 +51,7 @@ async function hydrateForCapture(page: any): Promise<void> {
         [data-aos],.aos-init,.aos-animate,.wow,.reveal,.fade-in,.fade-up,
         [data-animate],[data-scroll],.animate,.animated,.is-inview,.gsap-reveal{
           opacity:1!important;transform:none!important;visibility:visible!important;
-          filter:none!important;clip-path:none!important;}
-        html,body{overflow:visible!important;}`,
+          filter:none!important;clip-path:none!important;}`,
     }),
   );
 
@@ -152,15 +151,25 @@ export async function renderPdf(html: string, opts: RenderPdfOptions = {}): Prom
       await page.setContent(html, { waitUntil: "load", timeout: 30_000 });
       await hydrateForCapture(page);
 
-      // One page as tall as the whole (now hydrated) document.
-      const height = await page.evaluate(() =>
-        Math.ceil(
-          Math.max(
-            document.documentElement.scrollHeight,
-            document.body?.scrollHeight ?? 0,
-          ),
-        ),
-      );
+      // One page as tall as the whole (now hydrated) document — but end at the
+      // footer's bottom when there is one, so trailing empty space below it
+      // (extra body height, off-screen decorations) doesn't pad the page.
+      const height = await page.evaluate(() => {
+        const docBottom = Math.max(
+          document.documentElement.scrollHeight,
+          document.body?.scrollHeight ?? 0,
+        );
+        const footer = document.querySelector(
+          'footer, [role="contentinfo"], .footer, #footer, .site-footer',
+        );
+        if (footer) {
+          const b = footer.getBoundingClientRect().bottom + window.scrollY;
+          // Only trim (never extend past the real document), and ignore a
+          // footer that sits suspiciously near the very top.
+          if (b > 200 && b < docBottom) return Math.ceil(b);
+        }
+        return Math.ceil(docBottom);
+      });
       const pdf = await page.pdf({
         width: `${LAPTOP_WIDTH}px`,
         height: `${Math.min(Math.max(height, 200), MAX_PAGE_PX)}px`,
