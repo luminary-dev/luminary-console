@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { deleteAssets, getClient, saveClient } from "@/lib/store";
 import { archiveVersion, saveBillingDoc, todayLabel } from "@/lib/pipeline";
 import { generateBilling, reviseDoc } from "@/lib/generate";
-import { logActivity } from "@/lib/activity";
+import { logOperatorActivity } from "@/lib/operator";
 import { advanceStage } from "@/lib/stage";
 import type { QuotationData } from "@/lib/templates/docs";
 
@@ -60,7 +60,7 @@ export async function POST(
       const data = await generateBilling(client, kind, stage, context, instructions, todayLabel());
       const doc = await saveBillingDoc(client, kind, stage, data, "draft");
       await saveClient(client);
-      await logActivity("operator", `generated ${stage} ${kind}`, slug, doc.no);
+      await logOperatorActivity(`generated ${stage} ${kind}`, slug, doc.no);
       return NextResponse.json({ ok: true, slug: doc.slug, no: doc.no });
     }
 
@@ -76,7 +76,7 @@ export async function POST(
         advanceStage(client, "delivered");
       }
       await saveClient(client);
-      await logActivity("operator", `${action}ed ${doc.stage} ${doc.kind}`, slug, doc.no);
+      await logOperatorActivity(`${action}ed ${doc.stage} ${doc.kind}`, slug, doc.no);
       return NextResponse.json({ ok: true, status: doc.status });
     }
 
@@ -96,7 +96,7 @@ export async function POST(
       ]);
       client.billing = (client.billing ?? []).filter((b) => b.slug !== doc.slug);
       await saveClient(client);
-      await logActivity("operator", `deleted ${doc.stage} ${doc.kind}`, slug, doc.no);
+      await logOperatorActivity(`deleted ${doc.stage} ${doc.kind}`, slug, doc.no);
       return NextResponse.json({ ok: true });
     }
 
@@ -115,7 +115,7 @@ export async function POST(
       archiveVersion(doc);
       await saveBillingDoc(client, doc.kind, doc.stage, data, doc.status, doc.slug);
       await saveClient(client);
-      await logActivity("operator", `regenerated ${doc.stage} ${doc.kind}`, slug, doc.no);
+      await logOperatorActivity(`regenerated ${doc.stage} ${doc.kind}`, slug, doc.no);
       return NextResponse.json({ ok: true });
     }
 

@@ -8,7 +8,7 @@
 import { NextResponse } from "next/server";
 import { fetchAsset, getClient, saveClient } from "@/lib/store";
 import { emailAddresses } from "@/lib/email";
-import { logActivity } from "@/lib/activity";
+import { logOperatorActivity } from "@/lib/operator";
 import { billingLabel } from "@/lib/doclabels";
 import { DOC_LABELS, type DocType } from "@/lib/types";
 
@@ -121,6 +121,6 @@ ${intro}
     { at: new Date().toISOString(), to: client.email, subject, docs: sentDocs },
   ];
   await saveClient(client);
-  await logActivity("operator", "emailed documents", slug, sentDocs.join(", "));
+  await logOperatorActivity("emailed documents", slug, sentDocs.join(", "));
   return NextResponse.json({ ok: true, sentTo: client.email, docs: sentDocs });
 }

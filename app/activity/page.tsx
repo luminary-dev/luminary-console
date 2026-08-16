@@ -5,7 +5,7 @@
 import Link from "next/link";
 import { recentActivity, markNotificationsSeen } from "@/lib/activity";
 import { getIndex } from "@/lib/store";
-import { relTime, whenLabel } from "@/lib/time";
+import ActivityList from "@/components/ActivityList";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -20,9 +20,9 @@ export default async function ActivityPage() {
   // Opening the log is the acknowledgement — clear the dashboard's client
   // notification badge for the team. Best-effort; never blocks the render.
   await markNotificationsSeen();
-  // Slugs that still exist get a link; deleted clients and "console" (login
-  // events) stay plain text rather than 404-ing the operator.
-  const known = new Map(index.map((e) => [e.slug, e.company]));
+  // Slugs that still exist get a link; deleted clients stay plain text rather
+  // than 404-ing the operator.
+  const clients = Object.fromEntries(index.map((e) => [e.slug, e.company]));
   const now = Date.now();
 
   return (
@@ -44,52 +44,10 @@ export default async function ActivityPage() {
       <div className="card">
         <h3>Recent activity</h3>
         <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-          The last {entries.length} entries, newest first — document actions, payments, portal
-          acceptances, questions and uploads. The log keeps the most recent 500.
+          The last 24 hours by default — document actions, payments, portal acceptances, questions
+          and uploads. Use <b>See more</b> for older entries; the log keeps the most recent 500.
         </p>
-        {entries.length === 0 ? (
-          <p className="empty-note">
-            Nothing logged yet. Entries appear from the next sign-in or document action.
-          </p>
-        ) : (
-          <div className="table-scroll">
-            <table className="list">
-              <thead>
-                <tr>
-                  <th>When</th>
-                  <th>Who</th>
-                  <th>Action</th>
-                  <th>Where</th>
-                  <th>Detail</th>
-                </tr>
-              </thead>
-              <tbody>
-                {entries.map((e, i) => {
-                  const company = known.get(e.target);
-                  return (
-                    <tr key={`${e.at}-${i}`}>
-                      <td style={{ whiteSpace: "nowrap", color: "var(--muted)" }} title={whenLabel(e.at)}>
-                        {relTime(e.at, now)}
-                      </td>
-                      <td style={{ overflowWrap: "anywhere" }}>{e.actor}</td>
-                      <td style={{ fontWeight: 600 }}>{e.action}</td>
-                      <td>
-                        {company ? (
-                          <Link href={`/clients/${e.target}`}>{company}</Link>
-                        ) : (
-                          <span style={{ color: "var(--muted)" }}>{e.target}</span>
-                        )}
-                      </td>
-                      <td className="mono" style={{ fontSize: 12, color: "var(--muted)", overflowWrap: "anywhere" }}>
-                        {e.detail ?? "—"}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <ActivityList entries={entries} now={now} clients={clients} />
       </div>
     </main>
   );

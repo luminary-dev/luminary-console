@@ -3,7 +3,7 @@
 import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { STAGES, STAGE_LABELS, stageRank } from "@/lib/stage";
-import { logActivity } from "@/lib/activity";
+import { logOperatorActivity } from "@/lib/operator";
 import type { ClientStage } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -37,6 +37,6 @@ export async function POST(
   // out unwon, and inventing a delivery date there would put a fabricated
   // delivery and a 30-day warranty commitment on the handover pack.
   await saveClient(client);
-  await logActivity("operator", "set stage", slug, STAGE_LABELS[stage]);
+  await logOperatorActivity("set stage", slug, STAGE_LABELS[stage]);
   return NextResponse.json({ ok: true, stage });
 }

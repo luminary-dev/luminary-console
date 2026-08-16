@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { deleteAssets, fetchAsset, getClient, saveClient } from "@/lib/store";
 import { archiveVersion, saveDoc, runStage2, todayLabel } from "@/lib/pipeline";
 import { reviseDoc } from "@/lib/generate";
-import { logActivity } from "@/lib/activity";
+import { logOperatorActivity } from "@/lib/operator";
 import { advanceStage } from "@/lib/stage";
 import type { DocType } from "@/lib/types";
 
@@ -38,7 +38,7 @@ export async function POST(
       // Lifecycle: a published quotation means the client is "quoted".
       if (action === "publish" && docType === "quotation") advanceStage(client, "quoted");
       await saveClient(client);
-      await logActivity("operator", `${action}ed ${docType}`, slug, meta.no);
+      await logOperatorActivity(`${action}ed ${docType}`, slug, meta.no);
       return NextResponse.json({ ok: true, status: meta.status });
     }
 
@@ -61,7 +61,7 @@ export async function POST(
       ]);
       delete client.docs[docType];
       await saveClient(client);
-      await logActivity("operator", `deleted ${docType}`, slug, meta.no);
+      await logOperatorActivity(`deleted ${docType}`, slug, meta.no);
       return NextResponse.json({ ok: true });
     }
 
@@ -101,8 +101,7 @@ ${JSON.stringify(data)}`;
       }
 
       await saveClient(client);
-      await logActivity(
-        "operator",
+      await logOperatorActivity(
         `regenerated ${docType}${cascaded.length ? ` + applied to ${cascaded.join(", ")}` : ""}`,
         slug,
         updated.no,

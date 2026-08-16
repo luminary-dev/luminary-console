@@ -4,7 +4,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { getClient, deleteClient, fetchAsset } from "@/lib/store";
 import { removeClientDomain } from "@/lib/domains";
 import { emailStudio } from "@/lib/email";
-import { logActivity } from "@/lib/activity";
+import { logOperatorActivity } from "@/lib/operator";
 import { billingLabel } from "@/lib/doclabels";
 import { DOC_LABELS } from "@/lib/types";
 
@@ -96,7 +96,7 @@ export async function DELETE(
 
   const domainNotes = await removeClientDomain(slug);
   const objectsDeleted = await deleteClient(slug);
-  await logActivity("operator", "deleted client", slug, client.company);
+  await logOperatorActivity("deleted client", slug, client.company);
   return NextResponse.json({ ok: true, objectsDeleted, domainNotes, archived: attachments.length });
 }
 

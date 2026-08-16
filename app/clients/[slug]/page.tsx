@@ -25,7 +25,7 @@ import { currentStage } from "@/lib/stage";
 import { deliveredAtIso, handoverEligible } from "@/lib/handover";
 import { fmtSize } from "@/lib/attachments";
 import { activityFor } from "@/lib/activity";
-import { relTime, whenLabel } from "@/lib/time";
+import ActivityList from "@/components/ActivityList";
 
 export const dynamic = "force-dynamic";
 
@@ -310,35 +310,10 @@ export default async function ClientPage({
         <div className="card">
           <h3>Activity</h3>
           <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            Everything that has happened on this project — client actions and operator work, newest
-            first.
+            This project&apos;s history — client actions and operator work. The last 24 hours by
+            default; use <b>See more</b> for older entries.
           </p>
-          <div className="table-scroll">
-            <table className="list">
-              <thead>
-                <tr>
-                  <th>When</th>
-                  <th>Who</th>
-                  <th>Action</th>
-                  <th>Detail</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activity.map((e, i) => (
-                  <tr key={`${e.at}-${i}`}>
-                    <td style={{ whiteSpace: "nowrap", color: "var(--muted)" }} title={whenLabel(e.at)}>
-                      {relTime(e.at, now)}
-                    </td>
-                    <td style={{ overflowWrap: "anywhere" }}>{e.actor}</td>
-                    <td style={{ fontWeight: 600 }}>{e.action}</td>
-                    <td className="mono" style={{ fontSize: 12, color: "var(--muted)", overflowWrap: "anywhere" }}>
-                      {e.detail ?? "—"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ActivityList entries={activity} now={now} />
         </div>
       )}
 

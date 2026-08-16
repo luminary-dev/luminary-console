@@ -9,7 +9,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { fetchAsset, getClient } from "@/lib/store";
-import { logActivity } from "@/lib/activity";
+import { logOperatorActivity } from "@/lib/operator";
 import { rateLimit } from "@/lib/ratelimit";
 import { currentStage, STAGE_LABELS } from "@/lib/stage";
 import { fmtLKR, invoiceTotal, paidAgainst, summarizeMoney } from "@/lib/money";
@@ -260,7 +260,7 @@ export async function POST(
       return NextResponse.json({ error: "The assistant returned an empty answer — try again." }, { status: 502 });
     }
 
-    await logActivity("operator", "asked the studio assistant", slug, clip(prompt, 120));
+    await logOperatorActivity("asked the studio assistant", slug, clip(prompt, 120));
     return NextResponse.json({ text });
   } catch (e) {
     console.error("Assist failed:", e);
