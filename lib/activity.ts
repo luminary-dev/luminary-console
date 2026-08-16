@@ -79,6 +79,32 @@ export async function markNotificationsSeen(): Promise<void> {
   }
 }
 
+// Per-client "last viewed" marks for the project Activity card — one small
+// map ({ [slug]: ISO }) so each project's card can default to unread. Shared
+// across admins, like the global mark above.
+const CLIENT_SEEN_PATH = "activity_seen.json";
+
+/** When this client's Activity card was last opened ("" if never). */
+export async function getClientSeenAt(slug: string): Promise<string> {
+  try {
+    const map = (await readState<Record<string, string>>(CLIENT_SEEN_PATH)) ?? {};
+    return map[slug] ?? "";
+  } catch {
+    return "";
+  }
+}
+
+/** Mark this client's Activity card seen as of now (best-effort). */
+export async function markClientSeen(slug: string): Promise<void> {
+  try {
+    const map = (await readState<Record<string, string>>(CLIENT_SEEN_PATH)) ?? {};
+    map[slug] = new Date().toISOString();
+    await writeState(CLIENT_SEEN_PATH, map);
+  } catch (e) {
+    console.error("Client seen write failed:", e);
+  }
+}
+
 /** Most recent entries, newest first (best-effort — returns [] on failure). */
 export async function recentActivity(limit = 100): Promise<ActivityEntry[]> {
   try {

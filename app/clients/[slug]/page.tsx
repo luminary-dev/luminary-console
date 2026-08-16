@@ -24,7 +24,7 @@ import DesignsCard from "@/components/DesignsCard";
 import { currentStage } from "@/lib/stage";
 import { deliveredAtIso, handoverEligible } from "@/lib/handover";
 import { fmtSize } from "@/lib/attachments";
-import { activityFor } from "@/lib/activity";
+import { activityFor, getClientSeenAt, markClientSeen } from "@/lib/activity";
 import ActivityList from "@/components/ActivityList";
 
 export const dynamic = "force-dynamic";
@@ -47,7 +47,10 @@ export default async function ClientPage({
   const client = await getClient(slug);
   if (!client) notFound();
   const base = `https://${client.domain}`;
-  const activity = await activityFor(slug);
+  // Read this project's last-viewed mark BEFORE clearing it, so the Activity
+  // card can default to what's unread since the last visit to this page.
+  const [activity, activitySeenAt] = await Promise.all([activityFor(slug), getClientSeenAt(slug)]);
+  await markClientSeen(slug);
   const now = Date.now();
 
   return (
@@ -310,10 +313,10 @@ export default async function ClientPage({
         <div className="card">
           <h3>Activity</h3>
           <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            This project&apos;s history — client actions and operator work. The last 24 hours by
-            default; use <b>See more</b> for older entries.
+            This project&apos;s history — client actions and operator work. New since your last visit
+            by default; use <b>See more</b> for the rest.
           </p>
-          <ActivityList entries={activity} now={now} />
+          <ActivityList entries={activity} now={now} seenAt={activitySeenAt} />
         </div>
       )}
 
