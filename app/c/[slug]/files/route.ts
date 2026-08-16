@@ -5,7 +5,7 @@
 // same shape as the comment route. The ref is re-validated against THIS
 // client's attachments prefix, so nothing outside their folder can be pinned.
 import { NextResponse } from "next/server";
-import { getClient, saveClient } from "@/lib/store";
+import { getClient, saveClient, signedAssetUrl } from "@/lib/store";
 import { emailStudio } from "@/lib/email";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
@@ -71,11 +71,20 @@ export async function POST(
   await saveClient(client);
   await logActivity(by || "client", "uploaded a file", slug, name);
 
+  // Files live in a PRIVATE bucket; the stored url is an authed app link that
+  // is useless inside an email. Sign a direct link at send time (same as the
+  // questionnaire attachment mail) — 7 days is SigV4's ceiling, and the file
+  // stays reachable from the console after that.
+  const href = await signedAssetUrl(url).catch(() => null);
+  const linkLine = href
+    ? `<p><a href="${esc(href)}">Download ${esc(name)}</a> — link expires in 7 days.</p>`
+    : `<p>Open it from the console (the portal stores files in the private bucket).</p>`;
+
   await emailStudio(
     `File uploaded — ${client.company}`,
     `<p><strong>${esc(by || "The client")}</strong> uploaded a file from the ${esc(client.company)} client portal:</p>
 <p><b>${esc(name)}</b> (${esc(fmtSize(size))})${note ? ` — ${esc(note)}` : ""}</p>
-<p>Open the client in the console to download it (the portal stores files in the private bucket).</p>
+${linkLine}
 <p><a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open ${esc(client.company)} in the console →</a></p>`,
     [],
     client.email || STUDIO,

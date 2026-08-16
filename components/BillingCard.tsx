@@ -188,36 +188,23 @@ export default function BillingCard({
   const money = summarizeMoney(billing, payments);
   const hasPublishedInvoice = billing.some((b) => b.kind === "invoice" && b.status === "published");
 
-  const gen = (kind: string, stage: string, label: string) => (
-    <button
-      key={label}
-      className="btn ghost small"
-      disabled={!!busy || !hasQuotation}
-      onClick={async () => {
-        // Design-approval/final normally exist once — a duplicate is usually a mis-click.
-        const dup = billing.find((b) => b.kind === kind && b.stage === stage);
-        if (dup) {
-          const stageWord =
-            stage === "progress" ? "design-approval" : stage === "final" ? "delivery" : "additional";
-          const ok = await confirm({
-            title: "Already generated",
-            confirmLabel: "Generate another",
-            message: (
-              <>
-                A {stageWord} {kind} already exists (<b>{dup.no}</b>). For extra work billed after
-                the project settled, use <b>Additional {kind}</b> instead. Generate another{" "}
-                {stageWord} {kind} anyway?
-              </>
-            ),
-          });
-          if (!ok) return;
-        }
-        call({ action: "generate", kind, stage }, label);
-      }}
-    >
-      {busy === label ? "Working… ~20s" : label}
-    </button>
-  );
+  // A fixed milestone document (design-approval / delivery invoice or receipt)
+  // exists once. Once it has been generated, hide its button — there is no
+  // reason to make another, and extra work billed after settlement uses the
+  // Additional invoice/receipt below.
+  const gen = (kind: string, stage: string, label: string) => {
+    if (billing.some((b) => b.kind === kind && b.stage === stage)) return null;
+    return (
+      <button
+        key={label}
+        className="btn ghost small"
+        disabled={!!busy || !hasQuotation}
+        onClick={() => call({ action: "generate", kind, stage }, label)}
+      >
+        {busy === label ? "Working… ~20s" : label}
+      </button>
+    );
+  };
 
   return (
     <div className="card">
