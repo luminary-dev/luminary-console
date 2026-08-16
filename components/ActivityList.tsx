@@ -89,11 +89,18 @@ export default function ActivityList({
         </div>
       )}
 
-      {remaining > 0 && (
-        <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center" }}>
-          <button className="btn ghost small" onClick={() => setShown((s) => Math.min(entries.length, s + PAGE))}>
-            See more
-          </button>
+      {(remaining > 0 || shown > initial) && (
+        <div style={{ marginTop: 12, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          {remaining > 0 && (
+            <button className="btn ghost small" onClick={() => setShown((s) => Math.min(entries.length, s + PAGE))}>
+              See more
+            </button>
+          )}
+          {shown > initial && (
+            <button className="btn ghost small" onClick={() => setShown(initial)}>
+              Show less
+            </button>
+          )}
           <span style={{ fontSize: 12, color: "var(--muted)" }}>
             Showing {visible.length} of {entries.length}
           </span>
