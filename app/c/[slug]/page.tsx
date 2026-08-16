@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getClient } from "@/lib/store";
 import { currentStage } from "@/lib/stage";
+import { STAGE_LABELS } from "@/lib/stage";
 import { billingLabel } from "@/lib/doclabels";
 import { DOC_LABELS, type DocType } from "@/lib/types";
 import PortalProgress from "@/components/PortalProgress";
@@ -71,21 +72,46 @@ export default async function ClientHome({
     ...publishedBilling.map((b) => ({ key: b.slug, at: b.updatedAt })),
   ].sort((a, b) => b.at.localeCompare(a.at))[0]?.key;
 
+  const stage = currentStage(client);
+  const docCount = published.length + publishedBilling.length + 1; // + questionnaire
+
   return (
-    <main className="sheet sheet--narrow">
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
-        <ThemeToggle />
-      </div>
-      <div className="brand" style={{ fontSize: 26 }}>
-        Luminary<span>.</span>
-      </div>
-      <div className="k" style={{ marginTop: 8, letterSpacing: ".16em" }}>
-        Client portal — {client.company}
-      </div>
+    <main className="portal">
+      <header className="portal-hero">
+        <div className="portal-hero__inner">
+          <div className="portal-hero__top">
+            <div className="brand" style={{ fontSize: 24 }}>
+              Luminary<span>.</span>
+            </div>
+            <ThemeToggle />
+          </div>
+          <div className="k portal-hero__eyebrow">Client portal</div>
+          <h1>{client.company}</h1>
+          <p className="portal-hero__sub">
+            Your project with Luminary, all in one place — documents, design previews and
+            everything we need from you, kept here for the whole build.
+          </p>
+          <div className="portal-stats">
+            <span className="portal-stat">
+              <span className="dot" aria-hidden="true" />
+              <span className="k">Stage</span> <b>{STAGE_LABELS[stage]}</b>
+            </span>
+            <span className="portal-stat">
+              <span className="k">Documents</span> <b>{docCount}</b>
+            </span>
+            {publishedDesigns.length > 0 && (
+              <span className="portal-stat">
+                <span className="k">Design concepts</span> <b>{publishedDesigns.length}</b>
+              </span>
+            )}
+          </div>
+        </div>
+      </header>
 
-      <PortalProgress stage={currentStage(client)} />
+      <div className="portal-body">
+        <PortalProgress stage={stage} />
 
-      <div className="card">
+        <div className="card">
         <h3>Your documents</h3>
         <div className="portal-links">
           <Link className="portal-link" href={`${base}/questionnaire`}>
@@ -146,11 +172,12 @@ export default async function ClientHome({
           .map((u) => ({ name: u.name, size: u.size, at: u.at }))}
       />
 
-      <div className="foot">
-        <div className="foot-links">
-          <a href="mailto:support@luminary-dev.xyz">support@luminary-dev.xyz</a>
-          <i />
-          <a href="https://luminary-dev.xyz">luminary-dev.xyz</a>
+        <div className="foot">
+          <div className="foot-links">
+            <a href="mailto:support@luminary-dev.xyz">support@luminary-dev.xyz</a>
+            <i />
+            <a href="https://luminary-dev.xyz">luminary-dev.xyz</a>
+          </div>
         </div>
       </div>
     </main>

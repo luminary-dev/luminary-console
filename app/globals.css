@@ -220,6 +220,25 @@ table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font
 .foot-links i { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
 .foot-note { font-size: 11px; color: var(--muted); margin-top: 8px; }
 
+/* Client portal — branded landing-page layout. A full-width hero band over a
+   centred content column; all colours are tokens so light/dark both hold. */
+.portal { width: 100%; margin: 0; }
+.portal-hero { background: linear-gradient(180deg, var(--a-dim), transparent 78%); border-bottom: 1px solid var(--border); }
+.portal-hero__inner { width: 880px; max-width: calc(100% - 32px); margin: 0 auto; padding: 20px 0 36px; }
+.portal-hero__top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.portal-hero__eyebrow { margin-top: 34px; }
+.portal-hero h1 { font-size: clamp(28px, 5.2vw, 46px); font-weight: 800; letter-spacing: -0.035em; line-height: 1.04; margin: 12px 0 0; }
+.portal-hero__sub { color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 54ch; margin: 13px 0 0; }
+.portal-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.portal-stat { display: inline-flex; align-items: center; gap: 9px; border: 1px solid var(--border-hi); border-radius: 100px; padding: 8px 15px; font-size: 13px; background: var(--bg); }
+.portal-stat b { font-weight: 700; letter-spacing: -0.01em; }
+.portal-stat .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.portal-body { width: 880px; max-width: calc(100% - 32px); margin: 0 auto; padding: 4px 0 80px; }
+@media (max-width: 720px) {
+  .portal-hero__inner { padding: 16px 0 26px; }
+  .portal-hero__eyebrow { margin-top: 22px; }
+}
+
 /* ——— Wave 4: portal progress, "new" badges, question box, console cards ——— */
 
 /* Stage stepper. Six columns share ~300px inside a card at 390px, so the
