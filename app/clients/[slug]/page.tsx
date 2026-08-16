@@ -247,7 +247,7 @@ export default async function ClientPage({
         )}
       </div>
 
-      <DesignsCard slug={slug} domain={client.domain} initial={client.designs ?? []} />
+      <DesignsCard slug={slug} domain={client.domain} initial={client.designs ?? []} selectedId={client.selectedDesign?.id} />
 
       <BillingCard
         slug={slug}

@@ -185,6 +185,8 @@ export type ClientRecord = {
   comments?: Comment[];
   /** Files the client uploaded from their portal for us to receive, newest last. */
   uploads?: PortalUpload[];
+  /** The design concept the client chose from the portal previews. */
+  selectedDesign?: { id: string; title: string; by?: string; at: string };
 };
 
 export type BillingDoc = {

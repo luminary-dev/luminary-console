@@ -49,6 +49,7 @@ export const CLIENT_ACTIONS = new Set([
   "submitted questionnaire",
   "asked about a document",
   "uploaded a file",
+  "selected a design",
 ]);
 
 /** Is this a client-initiated portal event (vs an operator/console action)? */

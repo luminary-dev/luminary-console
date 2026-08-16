@@ -21,10 +21,13 @@ export default function DesignsCard({
   slug,
   domain,
   initial,
+  selectedId,
 }: {
   slug: string;
   domain: string;
   initial: DesignEntry[];
+  /** The concept the client picked from their portal, if any. */
+  selectedId?: string;
 }) {
   const [designs, setDesigns] = useState<DesignEntry[]>(initial);
   const [busy, setBusy] = useState(false);
@@ -151,6 +154,11 @@ export default function DesignsCard({
                 <div style={{ minWidth: 0, flex: "1 1 240px" }}>
                   <div style={{ fontSize: 13.5, fontWeight: 600, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                     {d.title}
+                    {selectedId === d.id && (
+                      <span className="pill" style={{ background: "var(--accent)", color: "#0d0d0f", borderColor: "var(--accent)" }}>
+                        ★ Client&apos;s choice
+                      </span>
+                    )}
                     {d.status === "published" ? (
                       <span className="pill"><i />Published</span>
                     ) : (

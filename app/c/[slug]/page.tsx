@@ -12,6 +12,7 @@ import { DOC_LABELS, type DocType } from "@/lib/types";
 import PortalProgress from "@/components/PortalProgress";
 import PortalComments, { type PortalDoc } from "@/components/PortalComments";
 import PortalUploads from "@/components/PortalUploads";
+import PortalDesigns from "@/components/PortalDesigns";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export const dynamic = "force-dynamic";
@@ -140,27 +141,11 @@ export default async function ClientHome({
       </div>
 
       {publishedDesigns.length > 0 && (
-        <div className="card">
-          <h3>Design previews</h3>
-          <div className="portal-links">
-            {publishedDesigns.map((d) => (
-              // Each concept can be viewed live (HTML) and downloaded as a
-              // laptop-width PDF (/design/<id>/pdf).
-              <div className="portal-link" key={d.id}>
-                <span>
-                  {d.title}
-                  {isNew(d.updatedAt) && <span className="new-pill">New</span>}
-                </span>
-                <span className="no" style={{ display: "inline-flex", gap: 14 }}>
-                  <a href={`${base}/design/${d.id}`} target="_blank" rel="noopener noreferrer">
-                    Preview →
-                  </a>
-                  <a href={`${base}/design/${d.id}/pdf`}>Download PDF ↓</a>
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <PortalDesigns
+          base={base}
+          designs={publishedDesigns.map((d) => ({ id: d.id, title: d.title, isNew: isNew(d.updatedAt) }))}
+          initialSelectedId={client.selectedDesign?.id}
+        />
       )}
 
       <PortalComments docs={askable} initialDoc={newest} base={base} />
