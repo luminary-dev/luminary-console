@@ -258,7 +258,10 @@ table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font
   font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600; color: var(--muted);
 }
 .pstep.is-done .pstep-dot { background: var(--accent); border-color: var(--accent); color: #0d0d0f; }
-.pstep.is-now .pstep-dot { border-color: var(--accent); background: var(--a-dim); color: var(--a-text); box-shadow: 0 0 0 3px var(--a-dim); }
+/* The connecting line runs behind the dots; the current dot's tint must sit on
+   an OPAQUE base, or the green line shows through it and looks like it cuts
+   through the circle. Layer the translucent tint over --bg to stay opaque. */
+.pstep.is-now .pstep-dot { border-color: var(--accent); background: linear-gradient(var(--a-dim), var(--a-dim)), var(--bg); color: var(--a-text); box-shadow: 0 0 0 3px var(--a-dim); }
 .pstep-label { font-size: 11px; line-height: 1.3; color: var(--muted); }
 .pstep.is-now .pstep-label { color: var(--text); font-weight: 700; }
 .pstep-short { display: none; }
