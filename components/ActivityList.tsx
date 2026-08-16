@@ -8,6 +8,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { relTime, whenLabel } from "@/lib/time";
+import { displayName } from "@/lib/admins";
 
 export type ActivityRow = { at: string; actor: string; action: string; target: string; detail?: string };
 
@@ -55,7 +56,7 @@ export default function ActivityList({
                   <td style={{ whiteSpace: "nowrap", color: "var(--muted)" }} title={whenLabel(e.at)}>
                     {relTime(e.at, now)}
                   </td>
-                  <td style={{ overflowWrap: "anywhere" }}>{e.actor}</td>
+                  <td style={{ overflowWrap: "anywhere" }} title={e.actor}>{displayName(e.actor)}</td>
                   <td style={{ fontWeight: 600 }}>{e.action}</td>
                   {showWhere && (
                     <td>
