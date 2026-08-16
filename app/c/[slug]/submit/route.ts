@@ -8,7 +8,7 @@ import { buildSections, validIds } from "@/lib/questions";
 import { renderAnswers } from "@/lib/templates/answers";
 import { renderPdf } from "@/lib/pdf";
 import { emailStudio, emailAddresses } from "@/lib/email";
-import { sendTelegram, tgEsc } from "@/lib/telegram";
+import { sendTelegram, tgEsc, tgNotice } from "@/lib/telegram";
 import { nowLabel, runStage2 } from "@/lib/pipeline";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
@@ -183,7 +183,13 @@ ${attachmentsHtml}<p>Full answers attached. ${
     );
 
     await sendTelegram(
-      `📝 <b>${tgEsc(client.company)}</b> — ${tgEsc(contactName)} submitted the questionnaire${submissionNo > 1 ? ` (#${submissionNo})` : ""}.\n<a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open in console →</a>`,
+      tgNotice({
+        emoji: "📝",
+        title: "Questionnaire submitted",
+        company: client.company,
+        lines: [`${tgEsc(contactName)}${submissionNo > 1 ? ` · submission #${submissionNo}` : ""}`],
+        url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
+      }),
     );
 
     let copySent = false;

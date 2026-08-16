@@ -5,7 +5,7 @@
 import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { emailStudio } from "@/lib/email";
-import { sendTelegram, tgEsc } from "@/lib/telegram";
+import { sendTelegram, tgEsc, tgNotice } from "@/lib/telegram";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
@@ -93,7 +93,16 @@ export async function POST(
   );
 
   await sendTelegram(
-    `💬 <b>${tgEsc(client.company)}</b> — ${tgEsc(by)} asked about ${tgEsc(docLabel)} ${tgEsc(docNo)}:\n"${tgEsc(rawText.slice(0, 500))}"\n<a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open in console →</a>`,
+    tgNotice({
+      emoji: "💬",
+      title: "Question asked",
+      company: client.company,
+      lines: [
+        `${tgEsc(by)} asked about ${tgEsc(docLabel)} ${tgEsc(docNo)}`,
+        `“${tgEsc(rawText.slice(0, 500))}”`,
+      ],
+      url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
+    }),
   );
 
   return NextResponse.json({ ok: true, at: comment.at });

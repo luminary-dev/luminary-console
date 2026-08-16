@@ -10,6 +10,31 @@ export function tgEsc(s: string): string {
   return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+/** Build a studio notification with one consistent shape across every event:
+ *
+ *   {emoji} <b>{Title}</b> · {Company}
+ *   {blank line}
+ *   {detail line 1}
+ *   {detail line 2}
+ *   {blank line}
+ *   Open in console →
+ *
+ * Sections are separated by a blank line (\n\n); detail lines by a single
+ * newline. Pass detail `lines` already escaped (via tgEsc); title and company
+ * are escaped here. Empty lines are dropped so spacing never doubles up. */
+export function tgNotice(opts: {
+  emoji: string;
+  title: string;
+  company: string;
+  lines?: string[];
+  url: string;
+}): string {
+  const header = `${opts.emoji} <b>${tgEsc(opts.title)}</b> · ${tgEsc(opts.company)}`;
+  const body = (opts.lines ?? []).filter((l) => l && l.trim()).join("\n");
+  const link = `<a href="${opts.url}">Open in console →</a>`;
+  return [header, body, link].filter((s) => s && s.trim()).join("\n\n");
+}
+
 /** Send a notification to the studio Telegram chat. Returns whether it sent. */
 export async function sendTelegram(text: string): Promise<boolean> {
   const token = process.env.TELEGRAM_BOT_TOKEN;

@@ -7,7 +7,7 @@
 import { NextResponse } from "next/server";
 import { getClient, saveClient, signedAssetUrl } from "@/lib/store";
 import { emailStudio } from "@/lib/email";
-import { sendTelegram, tgEsc } from "@/lib/telegram";
+import { sendTelegram, tgEsc, tgNotice } from "@/lib/telegram";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
@@ -92,7 +92,16 @@ ${linkLine}
   );
 
   await sendTelegram(
-    `📎 <b>${tgEsc(client.company)}</b> — ${tgEsc(by || "Client")} uploaded a file: ${tgEsc(name)} (${tgEsc(fmtSize(size))})${note ? `\n"${tgEsc(note)}"` : ""}\n<a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open in console →</a>`,
+    tgNotice({
+      emoji: "📎",
+      title: "File uploaded",
+      company: client.company,
+      lines: [
+        `${tgEsc(by || "Client")} uploaded ${tgEsc(name)} (${tgEsc(fmtSize(size))})`,
+        note ? `Note: ${tgEsc(note)}` : "",
+      ],
+      url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
+    }),
   );
 
   return NextResponse.json({ ok: true, at: upload.at });

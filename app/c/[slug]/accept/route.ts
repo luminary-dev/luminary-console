@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { saveDoc } from "@/lib/pipeline";
 import { emailStudio } from "@/lib/email";
-import { sendTelegram, tgEsc } from "@/lib/telegram";
+import { sendTelegram, tgEsc, tgNotice } from "@/lib/telegram";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { advanceStage } from "@/lib/stage";
@@ -97,7 +97,13 @@ export async function POST(
   );
 
   await sendTelegram(
-    `✅ <b>${tgEsc(client.company)}</b> — ${tgEsc(name)} accepted the quotation ${tgEsc(quotation.no)}.\n<a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open in console →</a>`,
+    tgNotice({
+      emoji: "✅",
+      title: "Quotation accepted",
+      company: client.company,
+      lines: [`${tgEsc(name)} accepted ${tgEsc(quotation.no)}`],
+      url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
+    }),
   );
 
   return NextResponse.json({ ok: true, name, at: client.acceptance.at });
