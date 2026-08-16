@@ -89,3 +89,15 @@ export async function recentActivity(limit = 100): Promise<ActivityEntry[]> {
     return [];
   }
 }
+
+/** Entries for one client (target === slug), newest first — powers the
+ *  per-project activity view. Best-effort; returns [] on failure. */
+export async function activityFor(slug: string, limit = 100): Promise<ActivityEntry[]> {
+  try {
+    const entries = (await readState<ActivityEntry[]>(PATH)) ?? [];
+    return entries.filter((e) => e.target === slug).slice(-limit).reverse();
+  } catch (e) {
+    console.error("Activity log read failed:", e);
+    return [];
+  }
+}
