@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { saveDoc } from "@/lib/pipeline";
 import { emailStudio } from "@/lib/email";
+import { sendTelegram, tgEsc } from "@/lib/telegram";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { advanceStage } from "@/lib/stage";
@@ -93,6 +94,10 @@ export async function POST(
 <p>The acceptance is stamped on the quotation and the client is now at stage <b>accepted</b>.</p>
 <p>Next step: move into the design stage; the <b>30% design-approval invoice</b> follows once the client approves the design:</p>
 <p><a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open ${esc(client.company)} in the console →</a></p>`,
+  );
+
+  await sendTelegram(
+    `✅ <b>${tgEsc(client.company)}</b> — ${tgEsc(name)} accepted the quotation ${tgEsc(quotation.no)}.\n<a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open in console →</a>`,
   );
 
   return NextResponse.json({ ok: true, name, at: client.acceptance.at });

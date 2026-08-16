@@ -8,6 +8,7 @@ import { buildSections, validIds } from "@/lib/questions";
 import { renderAnswers } from "@/lib/templates/answers";
 import { renderPdf } from "@/lib/pdf";
 import { emailStudio, emailAddresses } from "@/lib/email";
+import { sendTelegram, tgEsc } from "@/lib/telegram";
 import { nowLabel, runStage2 } from "@/lib/pipeline";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
@@ -25,6 +26,8 @@ export const runtime = "nodejs";
 export const maxDuration = 300;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
+const CONSOLE_HOST = process.env.CONSOLE_HOST || `console.${ROOT}`;
 
 export async function POST(
   req: Request,
@@ -177,6 +180,10 @@ ${attachmentsHtml}<p>Full answers attached. ${
       }</p>`,
       [{ filename, content: pdf }],
       contactEmail || undefined,
+    );
+
+    await sendTelegram(
+      `📝 <b>${tgEsc(client.company)}</b> — ${tgEsc(contactName)} submitted the questionnaire${submissionNo > 1 ? ` (#${submissionNo})` : ""}.\n<a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open in console →</a>`,
     );
 
     let copySent = false;

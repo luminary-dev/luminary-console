@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { emailStudio } from "@/lib/email";
+import { sendTelegram, tgEsc } from "@/lib/telegram";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
@@ -89,6 +90,10 @@ export async function POST(
     // "reply to them directly", and STUDIO here is the same mailbox the mail
     // is addressed to, so Reply went straight back to support@.
     client.email || STUDIO,
+  );
+
+  await sendTelegram(
+    `💬 <b>${tgEsc(client.company)}</b> — ${tgEsc(by)} asked about ${tgEsc(docLabel)} ${tgEsc(docNo)}:\n"${tgEsc(rawText.slice(0, 500))}"\n<a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open in console →</a>`,
   );
 
   return NextResponse.json({ ok: true, at: comment.at });
