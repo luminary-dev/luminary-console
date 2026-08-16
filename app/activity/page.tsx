@@ -3,7 +3,7 @@
 // server-side so there is no loading state to design. Authed by the proxy
 // like every console route.
 import Link from "next/link";
-import { recentActivity, markNotificationsSeen } from "@/lib/activity";
+import { recentActivity, markNotificationsSeen, getNotificationsSeenAt } from "@/lib/activity";
 import { getIndex } from "@/lib/store";
 import ActivityList from "@/components/ActivityList";
 import SignOut from "@/components/SignOut";
@@ -13,7 +13,13 @@ export const metadata = { title: "Activity" };
 export const dynamic = "force-dynamic";
 
 export default async function ActivityPage() {
-  const [all, index] = await Promise.all([recentActivity(100), getIndex()]);
+  // Read the last-seen mark BEFORE clearing it, so the list can default to
+  // what's unread since the previous visit.
+  const [all, index, seenAt] = await Promise.all([
+    recentActivity(100),
+    getIndex(),
+    getNotificationsSeenAt(),
+  ]);
   // Sign-in / session ("console") events are noise here — they're covered by
   // the Sessions card on the dashboard. Show client and document activity only.
   const entries = all.filter((e) => e.target !== "console");
@@ -44,10 +50,11 @@ export default async function ActivityPage() {
       <div className="card">
         <h3>Recent activity</h3>
         <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-          The last 24 hours by default — document actions, payments, portal acceptances, questions
-          and uploads. Use <b>See more</b> for older entries; the log keeps the most recent 500.
+          What&apos;s new since your last visit — document actions, payments, portal acceptances,
+          questions and uploads. Use <b>See more</b> for everything already seen; the log keeps the
+          most recent 500.
         </p>
-        <ActivityList entries={entries} now={now} clients={clients} />
+        <ActivityList entries={entries} now={now} clients={clients} seenAt={seenAt} />
       </div>
     </main>
   );

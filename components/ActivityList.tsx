@@ -19,15 +19,25 @@ export default function ActivityList({
   entries,
   now,
   clients,
+  seenAt,
 }: {
   entries: ActivityRow[];
   now: number;
   /** slug → company. When given, a linked "Where" column is shown. */
   clients?: Record<string, string>;
+  /** When provided, the list defaults to UNREAD entries (newer than seenAt);
+   *  "See more" reveals the read ones. Without it, defaults to the last 24h. */
+  seenAt?: string;
 }) {
-  // Entries within the last 24h are the leading run (list is newest-first).
-  const within24h = entries.filter((e) => now - Date.parse(e.at) <= DAY_MS).length;
-  const [shown, setShown] = useState(within24h);
+  const unreadMode = seenAt !== undefined;
+  // How many entries are shown before "See more". Unread mode: everything newer
+  // than the last-seen mark (the leading run, since the list is newest-first).
+  // Otherwise: the last 24h.
+  const seenMs = seenAt && Number.isFinite(Date.parse(seenAt)) ? Date.parse(seenAt) : 0;
+  const initial = unreadMode
+    ? entries.filter((e) => Date.parse(e.at) > seenMs).length
+    : entries.filter((e) => now - Date.parse(e.at) <= DAY_MS).length;
+  const [shown, setShown] = useState(initial);
   const visible = entries.slice(0, shown);
   const remaining = entries.length - shown;
   const showWhere = !!clients;
@@ -37,7 +47,9 @@ export default function ActivityList({
       {entries.length === 0 ? (
         <p className="empty-note">Nothing logged yet.</p>
       ) : visible.length === 0 ? (
-        <p className="empty-note">Nothing in the last 24 hours.</p>
+        <p className="empty-note">
+          {unreadMode ? "You're all caught up — nothing new since your last visit." : "Nothing in the last 24 hours."}
+        </p>
       ) : (
         <div className="table-scroll">
           <table className="list">
