@@ -25,11 +25,12 @@ export default async function Dashboard() {
   const records = await Promise.all(index.map((e) => getClient(e.slug)));
 
   // Client-portal notifications: uploads, questions, acceptances, submissions.
-  // "Unread" = anything since the feed was last opened on the Activity page.
-  const [activity, seenAt] = await Promise.all([recentActivity(100), getNotificationsSeenAt()]);
-  const clientEvents = activity.filter(isClientEvent);
-  const unread = clientEvents.filter((e) => e.at > seenAt).length;
+  // Only for clients that still exist (so deleted/test clients never show), and
+  // "unread" = anything since the feed was last opened on the Activity page.
   const companyOf = new Map(index.map((e) => [e.slug, e.company]));
+  const [activity, seenAt] = await Promise.all([recentActivity(100), getNotificationsSeenAt()]);
+  const clientEvents = activity.filter((e) => isClientEvent(e) && companyOf.has(e.target));
+  const unread = clientEvents.filter((e) => e.at > seenAt).length;
   const now = Date.now();
   const stageOf = new Map<string, ClientStage>();
   const counts = Object.fromEntries(STAGES.map((s) => [s, 0])) as Record<ClientStage, number>;

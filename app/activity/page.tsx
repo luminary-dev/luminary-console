@@ -13,7 +13,10 @@ export const metadata = { title: "Activity" };
 export const dynamic = "force-dynamic";
 
 export default async function ActivityPage() {
-  const [entries, index] = await Promise.all([recentActivity(100), getIndex()]);
+  const [all, index] = await Promise.all([recentActivity(100), getIndex()]);
+  // Sign-in / session ("console") events are noise here — they're covered by
+  // the Sessions card on the dashboard. Show client and document activity only.
+  const entries = all.filter((e) => e.target !== "console");
   // Opening the log is the acknowledgement — clear the dashboard's client
   // notification badge for the team. Best-effort; never blocks the render.
   await markNotificationsSeen();
@@ -41,8 +44,8 @@ export default async function ActivityPage() {
       <div className="card">
         <h3>Recent activity</h3>
         <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-          The last {entries.length} entries, newest first — logins, document actions, payments,
-          portal acceptances and client questions. The log keeps the most recent 500.
+          The last {entries.length} entries, newest first — document actions, payments, portal
+          acceptances, questions and uploads. The log keeps the most recent 500.
         </p>
         {entries.length === 0 ? (
           <p className="empty-note">
