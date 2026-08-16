@@ -269,6 +269,8 @@ export const BANK_DETAILS: { label: string; value: string }[] = [
   { label: "Account number", value: "8003636417" },
   { label: "Bank", value: "Commercial Bank of Ceylon PLC" },
   { label: "Branch", value: "Kaduwela" },
+  { label: "Bank code", value: "7056" },
+  { label: "Branch code", value: "042" },
   { label: "SWIFT / BIC", value: "CCEYLKLX" },
   { label: "Country", value: "Sri Lanka" },
   { label: "Currency", value: "LKR (Sri Lankan Rupees)" },
