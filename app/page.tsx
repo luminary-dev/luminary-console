@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getClient, getIndex } from "@/lib/store";
 import { STAGES, STAGE_LABELS, currentStage } from "@/lib/stage";
 import { clientMoney, fmtLKR } from "@/lib/money";
+import { recentActivity, isClientEvent, getNotificationsSeenAt } from "@/lib/activity";
+import { relTime } from "@/lib/time";
 import type { ClientStage } from "@/lib/types";
 import SessionsCard from "@/components/SessionsCard";
 import SignOut from "@/components/SignOut";
@@ -21,6 +23,14 @@ export default async function Dashboard() {
   // Stage + money live on the full records, not the index — fetch them all
   // (a handful of clients; each is one small object read, cached 5s).
   const records = await Promise.all(index.map((e) => getClient(e.slug)));
+
+  // Client-portal notifications: uploads, questions, acceptances, submissions.
+  // "Unread" = anything since the feed was last opened on the Activity page.
+  const [activity, seenAt] = await Promise.all([recentActivity(100), getNotificationsSeenAt()]);
+  const clientEvents = activity.filter(isClientEvent);
+  const unread = clientEvents.filter((e) => e.at > seenAt).length;
+  const companyOf = new Map(index.map((e) => [e.slug, e.company]));
+  const now = Date.now();
   const stageOf = new Map<string, ClientStage>();
   const counts = Object.fromEntries(STAGES.map((s) => [s, 0])) as Record<ClientStage, number>;
   let outstandingTotal = 0;
@@ -49,13 +59,69 @@ export default async function Dashboard() {
           <ThemeToggle />
           <SignOut />
           <Link className="btn ghost small" href="/activity">
-            Activity
+            Activity{unread > 0 ? ` · ${unread}` : ""}
           </Link>
           <Link className="btn" href="/clients/new">
             + New client
           </Link>
         </div>
       </div>
+
+      {clientEvents.length > 0 && (
+        <div className="card">
+          <h3>
+            From your clients
+            {unread > 0 && (
+              <span className="new-pill" style={{ marginLeft: 8 }}>
+                {unread} new
+              </span>
+            )}
+          </h3>
+          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
+            Uploads, questions, acceptances and questionnaire submissions from the client portals.
+            {unread > 0 ? (
+              <>
+                {" "}
+                Open <Link href="/activity">Activity</Link> to mark them seen.
+              </>
+            ) : null}
+          </p>
+          <div style={{ marginTop: 8 }}>
+            {clientEvents.slice(0, 8).map((e, i) => {
+              const fresh = e.at > seenAt;
+              const company = companyOf.get(e.target);
+              return (
+                <div
+                  key={`${e.at}-${i}`}
+                  style={{
+                    display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap",
+                    padding: "10px 0", borderTop: "1px solid var(--border)",
+                  }}
+                >
+                  {fresh && <span className="new-pill">New</span>}
+                  <span style={{ fontWeight: 600, fontSize: 13.5 }}>{e.actor}</span>
+                  <span style={{ fontSize: 13.5 }}>{e.action}</span>
+                  {e.detail && (
+                    <span className="mono" style={{ fontSize: 12, color: "var(--muted)", overflowWrap: "anywhere" }}>
+                      {e.detail}
+                    </span>
+                  )}
+                  <span style={{ marginLeft: "auto", display: "flex", gap: 12, alignItems: "baseline", whiteSpace: "nowrap" }}>
+                    <span style={{ fontSize: 12, color: "var(--muted)" }} title={e.at}>
+                      {relTime(e.at, now)}
+                    </span>
+                    {company ? (
+                      <Link href={`/clients/${e.target}`}>Open →</Link>
+                    ) : (
+                      <span style={{ color: "var(--muted)" }}>{e.target}</span>
+                    )}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {index.length > 0 && (
         <div className="card">

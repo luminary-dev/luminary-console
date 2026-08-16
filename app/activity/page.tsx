@@ -3,7 +3,7 @@
 // server-side so there is no loading state to design. Authed by the proxy
 // like every console route.
 import Link from "next/link";
-import { recentActivity } from "@/lib/activity";
+import { recentActivity, markNotificationsSeen } from "@/lib/activity";
 import { getIndex } from "@/lib/store";
 import { relTime, whenLabel } from "@/lib/time";
 import SignOut from "@/components/SignOut";
@@ -14,6 +14,9 @@ export const dynamic = "force-dynamic";
 
 export default async function ActivityPage() {
   const [entries, index] = await Promise.all([recentActivity(100), getIndex()]);
+  // Opening the log is the acknowledgement — clear the dashboard's client
+  // notification badge for the team. Best-effort; never blocks the render.
+  await markNotificationsSeen();
   // Slugs that still exist get a link; deleted clients and "console" (login
   // events) stay plain text rather than 404-ing the operator.
   const known = new Map(index.map((e) => [e.slug, e.company]));

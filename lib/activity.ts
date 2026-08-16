@@ -42,6 +42,43 @@ export async function logActivity(
   }
 }
 
+/** Actions that originate from a client on their portal (not operator work) —
+ *  the things admins want to be notified about. */
+export const CLIENT_ACTIONS = new Set([
+  "accepted quotation",
+  "submitted questionnaire",
+  "asked about a document",
+  "uploaded a file",
+]);
+
+/** Is this a client-initiated portal event (vs an operator/console action)? */
+export function isClientEvent(e: ActivityEntry): boolean {
+  return CLIENT_ACTIONS.has(e.action) && e.target !== "console";
+}
+
+// A single shared "admins have looked" marker for the client-activity feed.
+// Global (not per-admin) — opening Activity clears the badge for the team.
+const NOTIF_PATH = "notifications.json";
+
+/** ISO time the client-activity feed was last marked seen ("" if never). */
+export async function getNotificationsSeenAt(): Promise<string> {
+  try {
+    const s = await readState<{ seenAt?: string }>(NOTIF_PATH);
+    return s?.seenAt ?? "";
+  } catch {
+    return "";
+  }
+}
+
+/** Mark the client-activity feed seen as of now (best-effort — never throws). */
+export async function markNotificationsSeen(): Promise<void> {
+  try {
+    await writeState(NOTIF_PATH, { seenAt: new Date().toISOString() });
+  } catch (e) {
+    console.error("Notifications seen write failed:", e);
+  }
+}
+
 /** Most recent entries, newest first (best-effort — returns [] on failure). */
 export async function recentActivity(limit = 100): Promise<ActivityEntry[]> {
   try {
