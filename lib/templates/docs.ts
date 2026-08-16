@@ -260,6 +260,20 @@ export function renderQuotation(d: QuotationData, ctx: Ctx): string {
   });
 }
 
+// Studio bank account shown on every invoice. Kept in one place so it stays
+// identical across documents and is trivial to update. SWIFT/BIC is included
+// because the payer group banks abroad; Currency + a payment reference round
+// out what a local or international transfer needs.
+export const BANK_DETAILS: { label: string; value: string }[] = [
+  { label: "Account name", value: "RHDA Kumarasiri" },
+  { label: "Account number", value: "8003636417" },
+  { label: "Bank", value: "Commercial Bank of Ceylon PLC" },
+  { label: "Branch", value: "Kaduwela" },
+  { label: "SWIFT / BIC", value: "CCEYLKLX" },
+  { label: "Country", value: "Sri Lanka" },
+  { label: "Currency", value: "LKR (Sri Lankan Rupees)" },
+];
+
 export function renderInvoice(d: InvoiceData, ctx: Ctx): string {
   const rows = d.items.map(
     (it) => `<div class="tbl-row" style="grid-template-columns:1fr 150px;">
@@ -275,10 +289,14 @@ export function renderInvoice(d: InvoiceData, ctx: Ctx): string {
       <div class="t-main"><b>Amount due</b><span class="val">${esc(d.total)}</span></div>
       <div class="t-note">Due ${esc(d.dueDate)}</div>
     </div></div>
-    <div class="box"><div class="sec-k">Payment</div><div class="small">${paras(d.paymentNote)}${
-      process.env.BANK_DETAILS ? `<div style="margin-top:8px;">${paras(process.env.BANK_DETAILS)}</div>` : ""
-    }</div></div>
-    <div class="section"><div class="small">Please reference <b>${esc(ctx.docNo)}</b> with your transfer. Any remaining balance falls due on delivery, payable before final handover. Work beyond the agreed scope is quoted separately as a written change order.</div></div>`;
+    <div class="box"><div class="sec-k">Payment</div><div class="small">${paras(d.paymentNote)}</div></div>
+    <div class="box"><div class="sec-k">Bank transfer details</div>
+      <div class="small" style="margin-top:6px;line-height:1.95;">${BANK_DETAILS.map(
+        (r) => `${esc(r.label)}: <b>${esc(r.value)}</b>`,
+      ).join("<br>")}</div>
+      <div class="small" style="margin-top:10px;">Please use <b>${esc(ctx.docNo)}</b> as the payment reference so we can match your transfer.</div>
+    </div>
+    <div class="section"><div class="small">Any remaining balance falls due on delivery, payable before final handover. Work beyond the agreed scope is quoted separately as a written change order.</div></div>`;
   return shell({
     mode: ctx.mode,
     title: `Invoice ${ctx.docNo} — ${ctx.client.company}`,
