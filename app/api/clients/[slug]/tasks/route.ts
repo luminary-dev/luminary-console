@@ -3,6 +3,7 @@
 // re-validates them against the stored array before touching it.
 import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
+import { ADMIN_NAMES } from "@/lib/admins";
 import type { Task } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -31,7 +32,15 @@ export async function POST(
         { status: 400 },
       );
     }
-    const task: Task = { text, done: false, at: new Date().toISOString() };
+    const due = typeof body.due === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.due) ? body.due : undefined;
+    const assignee = typeof body.assignee === "string" && body.assignee in ADMIN_NAMES ? body.assignee : undefined;
+    const task: Task = {
+      text,
+      done: false,
+      at: new Date().toISOString(),
+      ...(due ? { due } : {}),
+      ...(assignee ? { assignee } : {}),
+    };
     client.tasks = [...tasks, task];
     await saveClient(client);
     return NextResponse.json({ ok: true, tasks: client.tasks });

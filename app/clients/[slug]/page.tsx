@@ -294,7 +294,7 @@ export default async function ClientPage({
 
       <ChangeOrders slug={slug} changeOrders={client.changeOrders ?? []} />
 
-      <AssistantCard slug={slug} />
+      <AssistantCard slug={slug} email={client.email} />
 
       <CommentsCard client={client} />
 

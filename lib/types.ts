@@ -112,7 +112,15 @@ export type Payment = {
 /** Client's typed acceptance of the published quotation (portal action). */
 export type Acceptance = { name: string; at: string; ip?: string };
 
-export type Task = { text: string; done: boolean; at: string };
+export type Task = {
+  text: string;
+  done: boolean;
+  at: string;
+  /** Optional ISO due date (yyyy-mm-dd) for overdue highlighting + reminders. */
+  due?: string;
+  /** Optional admin email the task is assigned to (rendered via lib/admins). */
+  assignee?: string;
+};
 
 /** One client-facing email sent from the console (send route). */
 export type EmailLogEntry = { at: string; to: string; subject: string; docs?: string[] };

@@ -16,13 +16,18 @@ const PRESETS = [
 
 const MAX_PROMPT = 4000;
 
-export default function AssistantCard({ slug }: { slug: string }) {
+export default function AssistantCard({ slug, email }: { slug: string; email?: string }) {
   const [prompt, setPrompt] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
   const [asked, setAsked] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  // Handoff state: compose an email from the draft, or save it as a task.
+  const [composing, setComposing] = useState(false);
+  const [subject, setSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [handoff, setHandoff] = useState<string | null>(null);
 
   const ask = async (question: string) => {
     const q = question.trim();
@@ -31,6 +36,8 @@ export default function AssistantCard({ slug }: { slug: string }) {
     setError(null);
     setAnswer(null);
     setCopied(false);
+    setComposing(false);
+    setHandoff(null);
     setAsked(q);
     try {
       const res = await fetch(`/api/clients/${slug}/assist`, {
@@ -65,6 +72,51 @@ export default function AssistantCard({ slug }: { slug: string }) {
   const runPreset = (p: string) => {
     setPrompt(p);
     ask(p);
+  };
+
+  const startCompose = () => {
+    if (!answer) return;
+    setSubject("A quick update from Luminary");
+    setEmailBody(answer);
+    setComposing(true);
+    setHandoff(null);
+  };
+
+  const sendEmail = async () => {
+    setBusy(true);
+    setError(null);
+    setHandoff(null);
+    const res = await fetch(`/api/clients/${slug}/send-message`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ subject, body: emailBody }),
+    }).catch(() => null);
+    const data = res ? await res.json().catch(() => null) : null;
+    setBusy(false);
+    if (!res?.ok) {
+      setError(data?.error || "Couldn't send — try again.");
+      return;
+    }
+    setComposing(false);
+    setHandoff(`Sent to ${data?.to ?? "the client"}.`);
+  };
+
+  const addAsTask = async () => {
+    if (!answer) return;
+    const text = answer.split("\n").find((l) => l.trim())?.trim().slice(0, 300) || "Follow up";
+    setBusy(true);
+    setError(null);
+    const res = await fetch(`/api/clients/${slug}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "add", text }),
+    }).catch(() => null);
+    setBusy(false);
+    if (!res?.ok) {
+      setError("Couldn't add the task — try again.");
+      return;
+    }
+    setHandoff(`Added a task: "${text}". Refresh to see it in the Tasks card.`);
   };
 
   const tooLong = prompt.length > MAX_PROMPT;
@@ -120,9 +172,19 @@ export default function AssistantCard({ slug }: { slug: string }) {
         <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
           <div className="ask-head">
             <span className="k">Answer</span>
-            <button className="btn ghost small" style={{ padding: "2px 10px", fontSize: 11 }} onClick={copy}>
-              {copied ? "Copied ✓" : "Copy"}
-            </button>
+            <span style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {email && (
+                <button className="btn ghost small" style={{ padding: "2px 10px", fontSize: 11 }} disabled={busy} onClick={startCompose}>
+                  Use as email
+                </button>
+              )}
+              <button className="btn ghost small" style={{ padding: "2px 10px", fontSize: 11 }} disabled={busy} onClick={addAsTask}>
+                Add as task
+              </button>
+              <button className="btn ghost small" style={{ padding: "2px 10px", fontSize: 11 }} onClick={copy}>
+                {copied ? "Copied ✓" : "Copy"}
+              </button>
+            </span>
           </div>
           {asked && (
             <div className="log-meta" style={{ marginTop: 6 }}>
@@ -140,6 +202,42 @@ export default function AssistantCard({ slug }: { slug: string }) {
           >
             {answer}
           </div>
+
+          {handoff && (
+            <p className="ask-sent" style={{ marginTop: 10 }}>
+              <span aria-hidden="true">✓</span> {handoff}
+            </p>
+          )}
+
+          {composing && (
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
+              <div className="k">Email to {email}</div>
+              <input
+                className="q-line"
+                type="text"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Subject"
+                style={{ width: "100%", marginTop: 8 }}
+              />
+              <textarea
+                className="q-box"
+                rows={6}
+                value={emailBody}
+                onChange={(e) => setEmailBody(e.target.value)}
+                style={{ width: "100%", marginTop: 8 }}
+              />
+              <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 8 }}>
+                <button className="btn small" disabled={busy || !subject.trim() || !emailBody.trim()} onClick={sendEmail}>
+                  {busy ? "Sending…" : "Send to client"}
+                </button>
+                <button className="btn ghost small" disabled={busy} onClick={() => setComposing(false)}>
+                  Cancel
+                </button>
+                <span className="save-state">Reviewed by you before it sends.</span>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

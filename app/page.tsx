@@ -3,6 +3,7 @@ import { getClient, getIndex } from "@/lib/store";
 import { STAGES, STAGE_LABELS, currentStage } from "@/lib/stage";
 import { clientMoney, fmtLKR, overdueSummary } from "@/lib/money";
 import { recentActivity, isClientEvent, getNotificationsSeenAt } from "@/lib/activity";
+import { displayName } from "@/lib/admins";
 import { relTime } from "@/lib/time";
 import type { ClientStage } from "@/lib/types";
 import ClientTable, { type ClientRow } from "@/components/ClientTable";
@@ -40,11 +41,16 @@ export default async function Dashboard() {
   let overdueClients = 0;
   let overdueTotal = 0;
   const rows: ClientRow[] = [];
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const openTasks: { slug: string; company: string; text: string; due?: string; assignee?: string }[] = [];
   index.forEach((e, i) => {
     const rec = records[i];
     if (!rec) return;
     const stage = currentStage(rec);
     counts[stage]++;
+    for (const t of rec.tasks ?? []) {
+      if (!t.done) openTasks.push({ slug: e.slug, company: e.company, text: t.text, due: t.due, assignee: t.assignee });
+    }
     const money = clientMoney(rec);
     if (money.outstanding > 0) {
       outstandingTotal += money.outstanding;
@@ -67,6 +73,8 @@ export default async function Dashboard() {
       overdue: od.count > 0,
     });
   });
+  // Earliest due first (overdue naturally leads); undated tasks last.
+  openTasks.sort((a, b) => (a.due || "9999-99-99").localeCompare(b.due || "9999-99-99"));
 
   return (
     <main className="wrap" style={{ paddingBottom: 80 }}>
@@ -135,6 +143,38 @@ export default async function Dashboard() {
                     ) : (
                       <span style={{ color: "var(--muted)" }}>{e.target}</span>
                     )}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {openTasks.length > 0 && (
+        <div className="card">
+          <h3>Open tasks</h3>
+          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
+            Across all clients, earliest due first. {openTasks.length} open.
+          </p>
+          <div style={{ marginTop: 8 }}>
+            {openTasks.slice(0, 12).map((t, i) => {
+              const overdue = t.due && t.due < todayStr;
+              return (
+                <div
+                  key={`${t.slug}-${i}`}
+                  style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap", padding: "9px 0", borderTop: "1px solid var(--border)" }}
+                >
+                  <span style={{ fontSize: 13.5 }}>{t.text}</span>
+                  {(t.due || t.assignee) && (
+                    <span style={{ fontSize: 12, color: overdue ? "var(--danger, #d33)" : "var(--muted)", fontWeight: overdue ? 700 : 400 }}>
+                      {t.due ? `due ${t.due}${overdue ? " · overdue" : ""}` : ""}
+                      {t.due && t.assignee ? " · " : ""}
+                      {t.assignee ? displayName(t.assignee) : ""}
+                    </span>
+                  )}
+                  <span style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "baseline" }}>
+                    <Link href={`/clients/${t.slug}`}>{t.company} →</Link>
                   </span>
                 </div>
               );
