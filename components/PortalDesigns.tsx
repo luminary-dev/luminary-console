@@ -22,8 +22,33 @@ export default function PortalDesigns({
   const [error, setError] = useState<string | null>(null);
   const [by, setBy] = useState("");
   const [company, setCompany] = useState(""); // honeypot
+  const [feedbackFor, setFeedbackFor] = useState<string>("");
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackSent, setFeedbackSent] = useState<string>("");
 
   if (designs.length === 0) return null;
+
+  const sendFeedback = async (d: PortalDesign) => {
+    if (!feedbackText.trim()) return;
+    setBusy(`fb-${d.id}`);
+    setError(null);
+    try {
+      const res = await fetch(`${base}/design-feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: d.id, text: feedbackText, by, company }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || `Something went wrong (${res.status}).`);
+      setFeedbackSent(d.id);
+      setFeedbackFor("");
+      setFeedbackText("");
+    } catch (e) {
+      setError((e instanceof Error ? e.message : "Something went wrong.") + " You can also email support@luminary-dev.xyz.");
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const select = async (d: PortalDesign) => {
     setBusy(d.id);
@@ -81,34 +106,60 @@ export default function PortalDesigns({
       <div className="portal-links" style={{ marginTop: 6 }}>
         {designs.map((d) => {
           const chosen = selectedId === d.id;
+          const linkBtn = {
+            background: "none", border: "none", padding: 0, cursor: "pointer",
+            fontFamily: "inherit", fontSize: "inherit",
+          } as const;
           return (
-            <div className="portal-link" key={d.id}>
-              <span>
-                {d.title}
-                {chosen && <span className="new-pill" style={{ background: "var(--accent)", color: "#0d0d0f" }}>Selected</span>}
-                {!chosen && d.isNew && <span className="new-pill">New</span>}
-              </span>
-              <span className="no" style={{ display: "inline-flex", gap: 14, alignItems: "center" }}>
-                <a href={`${base}/design/${d.id}`} target="_blank" rel="noopener noreferrer">
-                  Preview →
-                </a>
-                <a href={`${base}/design/${d.id}/pdf`}>Download PDF ↓</a>
-                {chosen ? (
-                  <span style={{ color: "var(--a-text)", fontWeight: 700 }}>✓ Selected</span>
-                ) : (
+            <div key={d.id} style={{ borderTop: "1px solid var(--border)" }}>
+              <div className="portal-link" style={{ borderTop: "none" }}>
+                <span>
+                  {d.title}
+                  {chosen && <span className="new-pill" style={{ background: "var(--accent)", color: "#0d0d0f" }}>Selected</span>}
+                  {!chosen && d.isNew && <span className="new-pill">New</span>}
+                </span>
+                <span className="no" style={{ display: "inline-flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+                  <a href={`${base}/design/${d.id}`} target="_blank" rel="noopener noreferrer">Preview →</a>
+                  <a href={`${base}/design/${d.id}/pdf`}>Download PDF ↓</a>
                   <button
                     type="button"
-                    onClick={() => select(d)}
-                    disabled={!!busy}
-                    style={{
-                      background: "none", border: "none", padding: 0, cursor: "pointer",
-                      color: "var(--a-text)", fontWeight: 700, fontFamily: "inherit", fontSize: "inherit",
-                    }}
+                    style={{ ...linkBtn, color: "var(--muted)" }}
+                    onClick={() => { setFeedbackFor(feedbackFor === d.id ? "" : d.id); setFeedbackText(""); }}
                   >
-                    {busy === d.id ? "Selecting…" : "Select this ✓"}
+                    Request changes
                   </button>
-                )}
-              </span>
+                  {chosen ? (
+                    <span style={{ color: "var(--a-text)", fontWeight: 700 }}>✓ Selected</span>
+                  ) : (
+                    <button type="button" onClick={() => select(d)} disabled={!!busy} style={{ ...linkBtn, color: "var(--a-text)", fontWeight: 700 }}>
+                      {busy === d.id ? "Selecting…" : "Select this ✓"}
+                    </button>
+                  )}
+                </span>
+              </div>
+              {feedbackSent === d.id && (
+                <p className="ask-sent" style={{ margin: "0 0 10px" }}>
+                  <span aria-hidden="true">✓</span> Thanks — your change request is with the studio.
+                </p>
+              )}
+              {feedbackFor === d.id && (
+                <div style={{ margin: "0 0 12px" }}>
+                  <textarea
+                    className="q-box"
+                    rows={3}
+                    maxLength={2000}
+                    placeholder={`What would you like changed on ${d.title}?`}
+                    value={feedbackText}
+                    onChange={(e) => setFeedbackText(e.target.value)}
+                  />
+                  <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                    <button className="btn small" type="button" disabled={busy === `fb-${d.id}` || !feedbackText.trim()} onClick={() => sendFeedback(d)}>
+                      {busy === `fb-${d.id}` ? "Sending…" : "Send request"}
+                    </button>
+                    <button className="btn ghost small" type="button" onClick={() => setFeedbackFor("")}>Cancel</button>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}

@@ -349,6 +349,54 @@ export function renderReceipt(d: ReceiptData, ctx: Ctx): string {
   });
 }
 
+/** The client's electronic-signature block on the Services Agreement: the stamp
+ *  once signed, otherwise (web only) a typed-name sign form posting to the
+ *  public /sign-contract route. Hidden when printing. */
+function contractSignBlock(ctx: Ctx): string {
+  const sig = ctx.client.contractSignature;
+  if (sig) {
+    return `<div class="box" style="background:var(--a-dim);border-color:var(--a-border);break-inside:avoid;">
+      <div class="sec-k">Client signature</div>
+      <div style="font-size:13.5px;"><b>Signed by ${esc(sig.name)} on ${esc(acceptedDate(sig.at))}</b></div>
+      <div class="small" style="margin-top:4px;">Signed electronically via the client portal. Under Sri Lanka's Electronic Transactions Act No. 19 of 2006, this electronic signature has the same legal effect as a handwritten one.</div>
+    </div>`;
+  }
+  if (ctx.mode !== "web") return "";
+  const inputStyle =
+    "flex:1 1 220px;min-width:0;border:1px solid var(--border-hi);background:var(--bg);color:var(--text);border-radius:10px;padding:10px 14px;font-family:var(--sans);font-size:14px;";
+  const btnStyle =
+    "border:none;cursor:pointer;background:var(--text);color:var(--bg);border-radius:100px;padding:11px 22px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;";
+  return `<div class="box" id="signBox" style="break-inside:avoid;">
+    <div class="sec-k">Sign online</div>
+    <div class="small">Type your full name and press sign — this records your acceptance of this Services Agreement and Statement of Work. Legally valid under the Electronic Transactions Act No. 19 of 2006.</div>
+    <form id="signForm" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;">
+      <input type="text" name="company" value="" style="position:absolute;left:-9999px;top:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <input id="signName" type="text" placeholder="Your full name" maxlength="120" autocomplete="name" style="${inputStyle}">
+      <button type="submit" id="signBtn" style="${btnStyle}">SIGN AGREEMENT</button>
+    </form>
+    <div id="signMsg" class="small" style="display:none;margin-top:10px;"></div>
+  </div>
+  <style>@media print{#signBox{display:none!important;}}</style>
+  <script>(function(){
+var f=document.getElementById('signForm');if(!f)return;
+var btn=document.getElementById('signBtn'),msg=document.getElementById('signMsg'),inp=document.getElementById('signName');
+function say(t){msg.style.display='block';msg.textContent=t;}
+function idle(){btn.disabled=false;btn.style.opacity='';btn.textContent='SIGN AGREEMENT';}
+f.addEventListener('submit',function(e){
+e.preventDefault();
+var n=inp.value.trim();
+if(!n){say('Please type your full name first.');return;}
+btn.disabled=true;btn.style.opacity='.6';btn.textContent='SIGNING\\u2026';
+fetch('/sign-contract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,company:f.elements.company.value})})
+.then(function(r){return r.json().then(function(d){return{ok:r.ok,d:d}}).catch(function(){return{ok:r.ok,d:{}}})})
+.then(function(x){
+if(x.ok){f.style.display='none';msg.style.display='block';msg.innerHTML='<b>Thank you \\u2014 agreement signed.</b> '+((x.d&&x.d.already)?'(It was already signed earlier.) ':'')+'We\\u2019ll be in touch with the next steps.';}
+else{say((x.d&&x.d.error)||'Something went wrong \\u2014 please try again, or reply by email.');idle();}
+})
+.catch(function(){say('Network problem \\u2014 please try again.');idle();});
+});})();</script>`;
+}
+
 export function renderContract(d: ContractData, ctx: Ctx): string {
   const body = `
     <div class="section">
@@ -372,6 +420,7 @@ export function renderContract(d: ContractData, ctx: Ctx): string {
         </div>`,
       )
       .join("")}
+    ${contractSignBlock(ctx)}
     <div class="sig">
       <div class="sig-block"><div class="sig-k">For the Studio</div><div class="sig-line"></div><div class="sig-lab">Signature · Luminary Studio</div><div class="sig-line"></div><div class="sig-lab">Name & date</div></div>
       <div class="sig-block"><div class="sig-k">For the Client</div><div class="sig-line"></div><div class="sig-lab">Signature · ${esc(ctx.client.company)}</div><div class="sig-line"></div><div class="sig-lab">Name & date</div></div>

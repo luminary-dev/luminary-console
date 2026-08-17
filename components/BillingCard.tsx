@@ -11,6 +11,7 @@ import { fmtLKR, invoiceStatus, invoiceTotal, paidAgainst, parseAmount, summariz
 // One naming rule for billing documents, shared with the portal, the email
 // route and the comment box — "Final invoice", "Handover pack".
 import { billingLabel } from "@/lib/doclabels";
+import { relTime } from "@/lib/time";
 
 import EmailDocButton from "./EmailDocButton";
 import DocHistory from "./DocHistory";
@@ -22,12 +23,15 @@ export default function BillingCard({
   payments,
   hasQuotation,
   email,
+  views = {},
 }: {
   slug: string;
   billing: BillingDoc[];
   payments: Payment[];
   hasQuotation: boolean;
   email?: string;
+  /** docKey → last-opened ISO (client read-receipts). */
+  views?: Record<string, string>;
 }) {
   const router = useRouter();
   const { confirm, dialog } = useConfirm();
@@ -289,6 +293,11 @@ export default function BillingCard({
                       <i />
                       {b.status}
                     </span>
+                    {b.status === "published" && views[b.slug] && (
+                      <div style={{ marginTop: 5, fontSize: 11, color: "var(--a-text)" }} title={views[b.slug]}>
+                        opened {relTime(views[b.slug], Date.now())}
+                      </div>
+                    )}
                     {isInvoice && (dueDate || paid > 0) && (
                       <div style={{ marginTop: 6, fontSize: 11.5, color: "var(--muted)", whiteSpace: "nowrap" }}>
                         {fullyPaid ? (

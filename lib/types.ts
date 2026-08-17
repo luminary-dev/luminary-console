@@ -195,6 +195,8 @@ export type ClientRecord = {
   uploads?: PortalUpload[];
   /** The design concept the client chose from the portal previews. */
   selectedDesign?: { id: string; title: string; by?: string; at: string };
+  /** The client's electronic signature on the Services Agreement (portal). */
+  contractSignature?: { name: string; at: string; ip?: string };
 };
 
 export type BillingDoc = {

@@ -89,6 +89,11 @@ export default async function Dashboard() {
           <Link className="btn ghost small" href="/activity">
             Activity{unread > 0 ? ` · ${unread}` : ""}
           </Link>
+          {index.length > 0 && (
+            <a className="btn ghost small" href="/api/clients/export">
+              Export CSV
+            </a>
+          )}
           <Link className="btn" href="/clients/new">
             + New client
           </Link>

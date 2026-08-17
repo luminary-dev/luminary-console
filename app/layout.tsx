@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: { default: "Luminary Console", template: "%s — Luminary" },
   description: "Luminary Studio client console.",
   robots: { index: false, follow: false },
+  manifest: "/manifest.webmanifest",
+  icons: { icon: "/icon.svg", apple: "/icon.svg" },
+  appleWebApp: { capable: true, title: "Luminary", statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = {

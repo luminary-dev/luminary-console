@@ -110,7 +110,7 @@ export default async function ClientHome({
       </header>
 
       <div className="portal-body">
-        <PortalProgress stage={stage} />
+        <PortalProgress stage={stage} deliveredAt={client.deliveredAt} />
 
         <div className="card">
         <h3>Your documents</h3>

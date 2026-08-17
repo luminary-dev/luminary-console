@@ -26,6 +26,8 @@ import { deliveredAtIso, handoverEligible } from "@/lib/handover";
 import { fmtSize } from "@/lib/attachments";
 import { activityFor, getClientSeenAt, markClientSeen } from "@/lib/activity";
 import { clientMoney, fmtLKR, overdueSummary } from "@/lib/money";
+import { getDocViews } from "@/lib/receipts";
+import { relTime } from "@/lib/time";
 import ActivityList from "@/components/ActivityList";
 
 export const dynamic = "force-dynamic";
@@ -50,7 +52,11 @@ export default async function ClientPage({
   const base = `https://${client.domain}`;
   // Read this project's last-viewed mark BEFORE clearing it, so the Activity
   // card can default to what's unread since the last visit to this page.
-  const [activity, activitySeenAt] = await Promise.all([activityFor(slug), getClientSeenAt(slug)]);
+  const [activity, activitySeenAt, docViews] = await Promise.all([
+    activityFor(slug),
+    getClientSeenAt(slug),
+    getDocViews(slug),
+  ]);
   await markClientSeen(slug);
   const now = Date.now();
 
@@ -224,6 +230,11 @@ export default async function ClientPage({
                         {billing ? "not generated" : t === "estimate" ? "—" : "awaiting answers"}
                       </span>
                     )}
+                    {meta?.status === "published" && docViews[t] && (
+                      <div style={{ marginTop: 5, fontSize: 11, color: "var(--a-text)" }} title={docViews[t]}>
+                        opened {relTime(docViews[t], now)}
+                      </div>
+                    )}
                   </td>
                   <td>
                     {meta ? (
@@ -280,6 +291,7 @@ export default async function ClientPage({
         payments={client.payments ?? []}
         hasQuotation={!!client.docs.quotation}
         email={client.email}
+        views={docViews}
       />
 
       <HandoverCard

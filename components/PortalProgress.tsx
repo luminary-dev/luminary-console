@@ -55,7 +55,14 @@ const STEPS: Step[] = [
   },
 ];
 
-export default function PortalProgress({ stage }: { stage: ClientStage }) {
+const fmtDate = (iso?: string): string | null => {
+  const t = Date.parse(iso ?? "");
+  return Number.isFinite(t)
+    ? new Date(t).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+    : null;
+};
+
+export default function PortalProgress({ stage, deliveredAt }: { stage: ClientStage; deliveredAt?: string }) {
   // "closed" sits past the last step, so everything reads as done.
   const rank = stageRank(stage);
   const currentIndex = stage === "closed" ? STEPS.length : STEPS.findIndex((s) => s.stage === stage);
@@ -89,6 +96,17 @@ export default function PortalProgress({ stage }: { stage: ClientStage }) {
         })}
       </ol>
       <p className="pstep-caption">{caption}</p>
+      {(() => {
+        const t = Date.parse(deliveredAt ?? "");
+        if (!Number.isFinite(t) || rank < stageRank("delivered")) return null;
+        const delivered = fmtDate(deliveredAt);
+        const warrantyUntil = fmtDate(new Date(t + 30 * 86_400_000).toISOString());
+        return (
+          <p className="pstep-note" style={{ marginTop: 6 }}>
+            Delivered {delivered} · Warranty until {warrantyUntil}
+          </p>
+        );
+      })()}
       {rank < stageRank("delivered") && (
         <p className="pstep-note">
           Questions at any point — reply to any of our emails or write to{" "}
