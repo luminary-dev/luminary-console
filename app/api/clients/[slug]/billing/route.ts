@@ -59,6 +59,13 @@ export async function POST(
       };
       const data = await generateBilling(client, kind, stage, context, instructions, todayLabel());
       const doc = await saveBillingDoc(client, kind, stage, data, "draft");
+      // Machine-readable due date for overdue detection (data.dueDate is the
+      // model's display string). Same offsets generateBilling uses: design-
+      // approval +7, delivery +14, additional +14. Invoices only.
+      if (kind === "invoice") {
+        const dueDays = stage === "progress" ? 7 : 14;
+        doc.dueOn = new Date(Date.now() + dueDays * 86_400_000).toISOString();
+      }
       await saveClient(client);
       await logOperatorActivity(`generated ${stage} ${kind}`, slug, doc.no);
       return NextResponse.json({ ok: true, slug: doc.slug, no: doc.no });

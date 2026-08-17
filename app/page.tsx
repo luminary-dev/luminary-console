@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { getClient, getIndex } from "@/lib/store";
 import { STAGES, STAGE_LABELS, currentStage } from "@/lib/stage";
-import { clientMoney, fmtLKR } from "@/lib/money";
+import { clientMoney, fmtLKR, overdueSummary } from "@/lib/money";
 import { recentActivity, isClientEvent, getNotificationsSeenAt } from "@/lib/activity";
 import { relTime } from "@/lib/time";
 import type { ClientStage } from "@/lib/types";
+import ClientTable, { type ClientRow } from "@/components/ClientTable";
+import CommandPalette from "@/components/CommandPalette";
 import SessionsCard from "@/components/SessionsCard";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -32,21 +34,38 @@ export default async function Dashboard() {
   const clientEvents = activity.filter((e) => isClientEvent(e) && companyOf.has(e.target));
   const unread = clientEvents.filter((e) => e.at > seenAt).length;
   const now = Date.now();
-  const stageOf = new Map<string, ClientStage>();
   const counts = Object.fromEntries(STAGES.map((s) => [s, 0])) as Record<ClientStage, number>;
   let outstandingTotal = 0;
   let outstandingClients = 0;
+  let overdueClients = 0;
+  let overdueTotal = 0;
+  const rows: ClientRow[] = [];
   index.forEach((e, i) => {
     const rec = records[i];
     if (!rec) return;
     const stage = currentStage(rec);
-    stageOf.set(e.slug, stage);
     counts[stage]++;
     const money = clientMoney(rec);
     if (money.outstanding > 0) {
       outstandingTotal += money.outstanding;
       outstandingClients++;
     }
+    const od = overdueSummary(rec);
+    if (od.count > 0) {
+      overdueClients++;
+      overdueTotal += od.total;
+    }
+    rows.push({
+      slug: e.slug,
+      company: e.company,
+      docNoBase: e.docNoBase,
+      status: e.status,
+      statusLabel: STATUS_LABEL[e.status] ?? e.status,
+      stage,
+      createdAt: e.createdAt,
+      outstanding: money.outstanding,
+      overdue: od.count > 0,
+    });
   });
 
   return (
@@ -140,6 +159,15 @@ export default async function Dashboard() {
               <>
                 <b className="mono">{fmtLKR(outstandingTotal)}</b> outstanding across{" "}
                 {outstandingClients} client{outstandingClients > 1 ? "s" : ""}.
+                {overdueClients > 0 && (
+                  <>
+                    {" "}
+                    <b className="mono" style={{ color: "var(--danger, #d33)" }}>{fmtLKR(overdueTotal)}</b>{" "}
+                    <span style={{ color: "var(--danger, #d33)" }}>
+                      overdue across {overdueClients} client{overdueClients > 1 ? "s" : ""}.
+                    </span>
+                  </>
+                )}
               </>
             ) : (
               <span style={{ color: "var(--muted)" }}>
@@ -150,61 +178,20 @@ export default async function Dashboard() {
         </div>
       )}
 
-      <div className="card">
-        <h3>Clients</h3>
-        {index.length === 0 ? (
+      {index.length === 0 ? (
+        <div className="card">
+          <h3>Clients</h3>
           <p style={{ color: "var(--muted)", marginTop: 10, fontSize: 14 }}>
             No clients yet — create the first one and the estimate, questionnaire and subdomain are
             generated automatically.
           </p>
-        ) : (
-          <div className="table-scroll"><table className="list">
-            <thead>
-              <tr>
-                <th>Client</th>
-                <th>Doc no.</th>
-                <th>Status</th>
-                <th>Stage</th>
-                <th>Created</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {index.map((c) => {
-                const stage = stageOf.get(c.slug);
-                return (
-                  <tr key={c.slug}>
-                    <td style={{ fontWeight: 600 }}>{c.company}</td>
-                    <td className="mono">{c.docNoBase}</td>
-                    <td>
-                      <span className={`pill${c.status === "created" ? " grey" : ""}`}>
-                        <i />
-                        {STATUS_LABEL[c.status] ?? c.status}
-                      </span>
-                    </td>
-                    <td>
-                      {stage ? (
-                        <span className={`pill${stage === "lead" || stage === "closed" ? " grey" : ""}`}>
-                          <i />
-                          {STAGE_LABELS[stage]}
-                        </span>
-                      ) : (
-                        <span style={{ color: "var(--subtle)" }}>—</span>
-                      )}
-                    </td>
-                    <td style={{ color: "var(--muted)" }}>{c.createdAt.slice(0, 10)}</td>
-                    <td>
-                      <Link href={`/clients/${c.slug}`}>Open →</Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table></div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <ClientTable rows={rows} />
+      )}
 
       <SessionsCard />
+      <CommandPalette items={rows.map((r) => ({ slug: r.slug, company: r.company, docNoBase: r.docNoBase }))} />
     </main>
   );
 }

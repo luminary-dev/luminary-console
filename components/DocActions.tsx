@@ -15,6 +15,7 @@ export default function DocActions({
   label,
   no,
   relatedDocs = [],
+  email,
 }: {
   slug: string;
   type: string;
@@ -26,6 +27,8 @@ export default function DocActions({
   /** Labels of the other project documents this edit can be applied to as
    *  well (empty for docs with no cascade family, e.g. billing). */
   relatedDocs?: string[];
+  /** Client email — enables the one-click "Publish & email" on a draft. */
+  email?: string;
 }) {
   const router = useRouter();
   const { confirm, dialog } = useConfirm();
@@ -103,6 +106,32 @@ export default function DocActions({
         {exists && status === "draft" && (
           <button className="btn small" disabled={!!busy} onClick={() => act("publish")}>
             {busy === "publish" ? "…" : "Publish"}
+          </button>
+        )}
+        {exists && status === "draft" && email && (
+          <button
+            className="btn ghost small"
+            disabled={!!busy}
+            onClick={async () => {
+              setBusy("pubemail");
+              setError(null);
+              const p = await fetch(`/api/clients/${slug}/docs/${type}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "publish" }),
+              });
+              if (!p.ok) { setBusy(null); setError("Publish failed."); return; }
+              const s = await fetch(`/api/clients/${slug}/send`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ docs: [type] }),
+              });
+              setBusy(null);
+              if (!s.ok) setError("Published, but the email failed — use Email to retry.");
+              router.refresh();
+            }}
+          >
+            {busy === "pubemail" ? "Working…" : "Publish & email"}
           </button>
         )}
         {exists && status === "published" && (

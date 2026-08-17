@@ -7,7 +7,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { BillingDoc, Payment } from "@/lib/types";
-import { fmtLKR, invoiceTotal, paidAgainst, parseAmount, summarizeMoney } from "@/lib/money";
+import { fmtLKR, invoiceStatus, invoiceTotal, paidAgainst, parseAmount, summarizeMoney } from "@/lib/money";
 // One naming rule for billing documents, shared with the portal, the email
 // route and the comment box — "Final invoice", "Handover pack".
 import { billingLabel } from "@/lib/doclabels";
@@ -279,6 +279,7 @@ export default function BillingCard({
                 const paid = isInvoice ? paidAgainst(payments, b.slug) : 0;
                 const fullyPaid = isInvoice && total !== null && total > 0 && paid >= total;
                 const dueDate = isInvoice ? (b.data as { dueDate?: string })?.dueDate : undefined;
+                const st = isInvoice && b.status === "published" ? invoiceStatus(b, payments) : null;
                 return (
                 <tr key={b.slug}>
                   <td style={{ fontWeight: 600 }}>{billingLabel(b)}</td>
@@ -298,6 +299,18 @@ export default function BillingCard({
                         ) : (
                           <>
                             {dueDate && <div>Due {dueDate}</div>}
+                            {st?.overdue && (
+                              <div style={{ marginTop: 3 }}>
+                                <span className="pill" style={{ background: "var(--danger, #d33)", color: "#fff", borderColor: "transparent" }}>
+                                  Overdue by {st.overdueDays} day{st.overdueDays === 1 ? "" : "s"}
+                                </span>
+                              </div>
+                            )}
+                            {st?.dueSoon && (
+                              <div style={{ marginTop: 3 }}>
+                                <span className="pill" style={{ background: "#b45309", color: "#fff", borderColor: "transparent" }}>Due soon</span>
+                              </div>
+                            )}
                             {paid > 0 && (
                               <div className="mono">
                                 {fmtLKR(paid)}{total !== null ? ` of ${fmtLKR(total)}` : ""} paid
@@ -320,9 +333,37 @@ export default function BillingCard({
                   <td style={{ minWidth: 220 }}>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                       {b.status === "draft" ? (
-                        <button className="btn small" disabled={!!busy} onClick={() => call({ action: "publish", doc: b.slug }, `pub-${b.slug}`)}>
-                          {busy === `pub-${b.slug}` ? "…" : "Publish"}
-                        </button>
+                        <>
+                          <button className="btn small" disabled={!!busy} onClick={() => call({ action: "publish", doc: b.slug }, `pub-${b.slug}`)}>
+                            {busy === `pub-${b.slug}` ? "…" : "Publish"}
+                          </button>
+                          {email && (
+                            <button
+                              className="btn ghost small"
+                              disabled={!!busy}
+                              onClick={async () => {
+                                setBusy(`pubemail-${b.slug}`);
+                                setError(null);
+                                const p = await fetch(`/api/clients/${slug}/billing`, {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ action: "publish", doc: b.slug }),
+                                });
+                                if (!p.ok) { setBusy(null); setError("Publish failed."); return; }
+                                const s = await fetch(`/api/clients/${slug}/send`, {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ docs: [b.slug] }),
+                                });
+                                setBusy(null);
+                                if (!s.ok) setError("Published, but the email failed — use Email to retry.");
+                                router.refresh();
+                              }}
+                            >
+                              {busy === `pubemail-${b.slug}` ? "Working…" : "Publish & email"}
+                            </button>
+                          )}
+                        </>
                       ) : (
                         <button className="btn ghost small" disabled={!!busy} onClick={() => call({ action: "unpublish", doc: b.slug }, `unpub-${b.slug}`)}>
                           {busy === `unpub-${b.slug}` ? "…" : "Unpublish"}

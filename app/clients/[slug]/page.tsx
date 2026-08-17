@@ -25,6 +25,7 @@ import { currentStage } from "@/lib/stage";
 import { deliveredAtIso, handoverEligible } from "@/lib/handover";
 import { fmtSize } from "@/lib/attachments";
 import { activityFor, getClientSeenAt, markClientSeen } from "@/lib/activity";
+import { clientMoney, fmtLKR, overdueSummary } from "@/lib/money";
 import ActivityList from "@/components/ActivityList";
 
 export const dynamic = "force-dynamic";
@@ -74,6 +75,29 @@ export default async function ClientPage({
         <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 4 }}>
           {client.projectLabel} · doc no. {client.docNoBase} · created {client.createdAt.slice(0, 10)}
         </p>
+        {(() => {
+          const openTasks = (client.tasks ?? []).filter((t) => !t.done).length;
+          const money = clientMoney(client);
+          const od = overdueSummary(client);
+          return (
+            <p style={{ fontSize: 13, marginTop: 6 }}>
+              <span style={{ color: openTasks > 0 ? "var(--text)" : "var(--muted)", fontWeight: openTasks > 0 ? 600 : 400 }}>
+                {openTasks > 0 ? `${openTasks} task${openTasks > 1 ? "s" : ""} open` : "No open tasks"}
+              </span>
+              <span style={{ color: "var(--muted)" }}> · </span>
+              {money.outstanding > 0 ? (
+                <>
+                  <b className="mono">{fmtLKR(money.outstanding)}</b> outstanding
+                  {od.count > 0 && (
+                    <span style={{ color: "var(--danger, #d33)", fontWeight: 700 }}> · {fmtLKR(od.total)} overdue</span>
+                  )}
+                </>
+              ) : (
+                <span style={{ color: "var(--muted)" }}>settled</span>
+              )}
+            </p>
+          );
+        })()}
         <div style={{ marginTop: 12, display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
           <StageSelect slug={slug} stage={currentStage(client)} />
           {client.acceptance && (
@@ -220,6 +244,7 @@ export default async function ClientPage({
                         exists={!!meta}
                         status={meta?.status}
                         billing={false}
+                        email={client.email}
                         relatedDocs={
                           // The project-doc family that a revision can cascade to:
                           // the other existing docs among estimate/quotation/proposal/contract.

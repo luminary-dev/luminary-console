@@ -61,3 +61,48 @@ export function summarizeMoney(
 }
 
 export const clientMoney = (c: ClientRecord): MoneySummary => summarizeMoney(c.billing, c.payments);
+
+const DAY_MS = 86_400_000;
+
+export type InvoiceStatus = {
+  /** Unpaid remainder (invoice total − payments), 0 when settled/unparsable. */
+  outstanding: number;
+  /** ISO due date if known. */
+  dueOn?: string;
+  /** Whole days past due (0 when not overdue or no due date). */
+  overdueDays: number;
+  /** Unpaid and due within the next 3 days (but not yet overdue). */
+  dueSoon: boolean;
+  /** Unpaid and past its due date. */
+  overdue: boolean;
+};
+
+/** Payment status of one invoice relative to `now`. Only meaningful for
+ *  published invoices with an outstanding balance and a `dueOn`. */
+export function invoiceStatus(b: BillingDoc, payments: Payment[] | undefined, now = Date.now()): InvoiceStatus {
+  const total = invoiceTotal(b);
+  const paid = paidAgainst(payments, b.slug);
+  const outstanding = total === null ? 0 : Math.max(0, total - paid);
+  const dueMs = b.dueOn ? Date.parse(b.dueOn) : NaN;
+  const hasDue = Number.isFinite(dueMs);
+  const unpaid = outstanding > 0;
+  const overdue = unpaid && hasDue && dueMs < now;
+  const overdueDays = overdue ? Math.floor((now - dueMs) / DAY_MS) : 0;
+  const dueSoon = unpaid && hasDue && !overdue && dueMs - now <= 3 * DAY_MS;
+  return { outstanding, dueOn: b.dueOn, overdueDays, dueSoon, overdue };
+}
+
+/** Overdue published invoices for a client: count + total outstanding. */
+export function overdueSummary(c: ClientRecord, now = Date.now()): { count: number; total: number } {
+  let count = 0;
+  let total = 0;
+  for (const b of c.billing ?? []) {
+    if (b.kind !== "invoice" || b.status !== "published") continue;
+    const s = invoiceStatus(b, c.payments, now);
+    if (s.overdue) {
+      count++;
+      total += s.outstanding;
+    }
+  }
+  return { count, total };
+}

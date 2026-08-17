@@ -156,7 +156,7 @@ export default function DesignsCard({
                     {d.title}
                     {selectedId === d.id && (
                       <span className="pill" style={{ background: "var(--accent)", color: "#0d0d0f", borderColor: "var(--accent)" }}>
-                        ★ Client&apos;s choice
+                        Client&apos;s choice
                       </span>
                     )}
                     {d.status === "published" ? (

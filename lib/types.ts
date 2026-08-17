@@ -204,6 +204,10 @@ export type BillingDoc = {
   no: string;
   status: DocStatus;
   updatedAt: string;
+  /** ISO due date for invoices — the machine-readable source of truth for
+   *  overdue/due-soon detection (data.dueDate is the model's display string).
+   *  Set at generation from the payment-schedule offset. Absent on receipts. */
+  dueOn?: string;
   htmlUrl: string;
   pdfUrl: string;
   data: unknown;
