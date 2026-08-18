@@ -14,7 +14,8 @@ import { sendTelegram, tgNotice } from "@/lib/telegram";
 import type { SiteEntry } from "@/lib/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// Uploading a repo's files + creating the deployment can take a while.
+export const maxDuration = 300;
 
 const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
 const CONSOLE_HOST = process.env.CONSOLE_HOST || `console.${ROOT}`;
