@@ -58,6 +58,12 @@ a:hover { color: var(--accent); }
 .pill.grey i { background: var(--subtle); }
 
 .card { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-top: 16px; }
+/* Console pages use .wrap (the portal uses .portal, left untouched): give their
+   stacked cards a roomier rhythm — more gap between cards and more padding
+   inside — so dense pages like the client detail read less cluttered. */
+.wrap > .card { margin-top: 22px; padding: 26px 28px; }
+.wrap > .card > h3 { font-size: 16px; }
+@media (max-width: 720px) { .wrap > .card { margin-top: 16px; padding: 18px 18px; } }
 .card h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
 .k { font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--subtle); }
 

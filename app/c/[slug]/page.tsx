@@ -112,19 +112,24 @@ export default async function ClientHome({
       <div className="portal-body">
         <PortalProgress stage={stage} deliveredAt={client.deliveredAt} />
 
-        {client.site?.status === "published" && client.site.url && (
-          <div className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-            <div>
-              <h3>Your site is live</h3>
-              <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 4 }}>
-                Your finished website is deployed and ready to visit.
-              </p>
+        {client.site && (() => {
+          const live = client.site.status === "published" && client.site.state === "READY";
+          return (
+            <div className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+              <div>
+                <h3>Your website</h3>
+                <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 4 }}>
+                  {live
+                    ? "Your finished website is deployed and ready to visit."
+                    : "Your new website is being prepared — check its progress here."}
+                </p>
+              </div>
+              <a className="btn" href={`${base}/site`} target="_blank" rel="noopener noreferrer">
+                {live ? "Visit your live site →" : "View progress →"}
+              </a>
             </div>
-            <a className="btn" href={client.site.url} target="_blank" rel="noopener noreferrer">
-              Visit your live site →
-            </a>
-          </div>
-        )}
+          );
+        })()}
 
         <div className="card">
         <h3>Your documents</h3>
