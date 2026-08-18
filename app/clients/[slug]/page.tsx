@@ -21,6 +21,7 @@ import EmailHistoryCard from "@/components/EmailHistoryCard";
 import AssistantCard from "@/components/AssistantCard";
 import HandoverCard from "@/components/HandoverCard";
 import DesignsCard from "@/components/DesignsCard";
+import SiteCard from "@/components/SiteCard";
 import { currentStage } from "@/lib/stage";
 import { deliveredAtIso, handoverEligible } from "@/lib/handover";
 import { fmtSize } from "@/lib/attachments";
@@ -284,6 +285,8 @@ export default async function ClientPage({
       </div>
 
       <DesignsCard slug={slug} domain={client.domain} initial={client.designs ?? []} selectedId={client.selectedDesign?.id} />
+
+      <SiteCard slug={slug} initial={client.site} />
 
       <BillingCard
         slug={slug}

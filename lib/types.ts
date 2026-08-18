@@ -197,6 +197,33 @@ export type ClientRecord = {
   selectedDesign?: { id: string; title: string; by?: string; at: string };
   /** The client's electronic signature on the Services Agreement (portal). */
   contractSignature?: { name: string; at: string; ip?: string };
+  /** The finalized project site: a GitHub repo deployed to its own Vercel
+   *  project and served at a branded subdomain. Published/unpublished like the
+   *  other deliverables; when published it appears on the client portal. */
+  site?: SiteEntry;
+};
+
+export type SiteEntry = {
+  /** "org/name" of the source GitHub repo. */
+  repo: string;
+  /** Deployed branch. */
+  ref: string;
+  /** The Vercel project name the repo deploys into. */
+  project: string;
+  /** Branded host it's served at, e.g. "eco-mech-live.luminary-dev.xyz". */
+  host?: string;
+  /** Stable https URL shown to the client (host, or the Vercel deployment URL
+   *  as a fallback until the domain resolves). */
+  url?: string;
+  /** Latest Vercel deployment id + its build state. */
+  deployId?: string;
+  state?: "QUEUED" | "INITIALIZING" | "BUILDING" | "READY" | "ERROR" | "CANCELED";
+  /** Portal visibility. */
+  status: DocStatus;
+  /** Domain-automation note (attached / manual_required / error detail). */
+  domainStatus?: string;
+  updatedAt: string;
+  deployedAt?: string;
 };
 
 export type BillingDoc = {
