@@ -426,7 +426,7 @@ export function renderContract(d: ContractData, ctx: Ctx): string {
       <div class="sig-block">
         <div class="sig-k">For the Studio</div>
         <div style="background:#fff;border-radius:6px;padding:4px 8px;display:inline-block;margin:8px 0 4px;">
-          <img src="${STUDIO_SIGNATURE}" alt="Signature of ${esc(STUDIO_SIGNATURE_NAME)}" style="height:60px;width:auto;max-width:150px;object-fit:contain;display:block;" />
+          <img src="${STUDIO_SIGNATURE}" alt="Signature of ${esc(STUDIO_SIGNATURE_NAME)}" style="height:58px;width:auto;max-width:240px;object-fit:contain;display:block;" />
         </div>
         <div class="sig-lab" style="font-weight:600;color:var(--text);">${esc(STUDIO_SIGNATURE_NAME)}</div>
         <div class="sig-lab">${esc(d.agreementDate)}</div>
