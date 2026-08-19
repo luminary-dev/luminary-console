@@ -8,9 +8,16 @@ import { getClient, saveClient } from "@/lib/store";
 import { advanceStage } from "@/lib/stage";
 import { fmtLKR } from "@/lib/money";
 import { logActivity } from "@/lib/activity";
+import { currentOperator } from "@/lib/operator";
+import { displayName } from "@/lib/admins";
+import { billingLabel } from "@/lib/doclabels";
+import { sendTelegram, tgEsc, tgNotice } from "@/lib/telegram";
 import type { Payment } from "@/lib/types";
 
 export const runtime = "nodejs";
+
+const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
+const CONSOLE_HOST = process.env.CONSOLE_HOST || `console.${ROOT}`;
 
 export async function POST(
   req: Request,
@@ -52,12 +59,36 @@ export async function POST(
     client.payments = [...(client.payments ?? []), payment];
     advanceStage(client, "development");
     await saveClient(client);
+
+    // Attribute to the signed-in admin (not a generic "operator") and label the
+    // invoice by its stage/kind ("30% design-approval invoice") where we can.
+    const actor = await currentOperator();
+    const invoice = invoiceSlug
+      ? (client.billing ?? []).find((b) => b.slug === invoiceSlug)
+      : undefined;
+    const invoiceName = invoice ? billingLabel(invoice) : "";
     await logActivity(
-      "operator",
+      actor,
       "recorded payment",
       slug,
-      `${fmtLKR(payment.amount)}${invoiceSlug ? ` against ${invoiceSlug}` : ""} (${method})`,
+      `${fmtLKR(payment.amount)}${invoiceName ? ` · ${invoiceName}` : ""} (${method})`,
     );
+
+    // Team awareness: ping the studio Telegram so all admins see money in
+    // without opening the console. Best-effort — never blocks the response.
+    await sendTelegram(
+      tgNotice({
+        emoji: "💰",
+        title: "Payment recorded",
+        company: client.company,
+        lines: [
+          `${tgEsc(displayName(actor))} recorded ${tgEsc(fmtLKR(payment.amount))}${invoiceName ? ` for the ${tgEsc(invoiceName)}` : ""}`,
+          `Method: ${tgEsc(method)}`,
+        ],
+        url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
+      }),
+    );
+
     return NextResponse.json({ ok: true, payments: client.payments, stage: client.stage });
   }
 

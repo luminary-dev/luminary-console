@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getClient, getIndex } from "@/lib/store";
 import { STAGES, STAGE_LABELS, currentStage } from "@/lib/stage";
 import { clientMoney, fmtLKR, overdueSummary } from "@/lib/money";
-import { recentActivity, isClientEvent, getNotificationsSeenAt } from "@/lib/activity";
+import { recentActivity, isNotifiable, getNotificationsSeenAt } from "@/lib/activity";
 import { displayName } from "@/lib/admins";
 import { relTime } from "@/lib/time";
 import type { ClientStage } from "@/lib/types";
@@ -32,7 +32,7 @@ export default async function Dashboard() {
   // "unread" = anything since the feed was last opened on the Activity page.
   const companyOf = new Map(index.map((e) => [e.slug, e.company]));
   const [activity, seenAt] = await Promise.all([recentActivity(100), getNotificationsSeenAt()]);
-  const clientEvents = activity.filter((e) => isClientEvent(e) && companyOf.has(e.target));
+  const clientEvents = activity.filter((e) => isNotifiable(e) && companyOf.has(e.target));
   const unread = clientEvents.filter((e) => e.at > seenAt).length;
   const now = Date.now();
   const counts = Object.fromEntries(STAGES.map((s) => [s, 0])) as Record<ClientStage, number>;
@@ -103,7 +103,7 @@ export default async function Dashboard() {
       {clientEvents.length > 0 && (
         <div className="card">
           <h3>
-            From your clients
+            Recent updates
             {unread > 0 && (
               <span className="new-pill" style={{ marginLeft: 8 }}>
                 {unread} new
@@ -111,7 +111,8 @@ export default async function Dashboard() {
             )}
           </h3>
           <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            Uploads, questions, acceptances and questionnaire submissions from the client portals.
+            Uploads, questions, acceptances and questionnaire submissions from the client portals,
+            plus payments recorded by the team.
             {unread > 0 ? (
               <>
                 {" "}

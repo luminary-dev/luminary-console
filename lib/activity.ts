@@ -59,6 +59,17 @@ export function isClientEvent(e: ActivityEntry): boolean {
   return CLIENT_ACTIONS.has(e.action) && e.target !== "console";
 }
 
+/** Team-side actions that still warrant a dashboard notification + Telegram
+ *  ping, so all three admins see money movement without opening the client —
+ *  even though they're operator actions, not client-portal events. */
+export const TEAM_NOTIFY_ACTIONS = new Set(["recorded payment"]);
+
+/** Should this event surface in the dashboard notifications feed / badge?
+ *  Client-portal events plus a small set of team money events. */
+export function isNotifiable(e: ActivityEntry): boolean {
+  return (isClientEvent(e) || TEAM_NOTIFY_ACTIONS.has(e.action)) && e.target !== "console";
+}
+
 // A single shared "admins have looked" marker for the client-activity feed.
 // Global (not per-admin) — opening Activity clears the badge for the team.
 const NOTIF_PATH = "notifications.json";
