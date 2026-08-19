@@ -32,8 +32,11 @@ export default async function Dashboard() {
   // "unread" = anything since the feed was last opened on the Activity page.
   const companyOf = new Map(index.map((e) => [e.slug, e.company]));
   const [activity, seenAt] = await Promise.all([recentActivity(100), getNotificationsSeenAt()]);
-  const clientEvents = activity.filter((e) => isNotifiable(e) && companyOf.has(e.target));
-  const unread = clientEvents.filter((e) => e.at > seenAt).length;
+  // Every action against a client — admin and portal alike — except sign-in
+  // noise (which logs to the "console" target). Deleted-client events still
+  // show (as plain text, no link), so nothing an admin did quietly disappears.
+  const feedEvents = activity.filter((e) => isNotifiable(e));
+  const unread = feedEvents.filter((e) => e.at > seenAt).length;
   const now = Date.now();
   const counts = Object.fromEntries(STAGES.map((s) => [s, 0])) as Record<ClientStage, number>;
   let outstandingTotal = 0;
@@ -100,7 +103,7 @@ export default async function Dashboard() {
         </div>
       </div>
 
-      {clientEvents.length > 0 && (
+      {feedEvents.length > 0 && (
         <div className="card">
           <h3>
             Recent updates
@@ -111,8 +114,8 @@ export default async function Dashboard() {
             )}
           </h3>
           <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            Uploads, questions, acceptances and questionnaire submissions from the client portals,
-            plus payments recorded by the team.
+            Every action across your clients — document publishes, invoices, payments, stage
+            changes and emails, plus uploads, questions and acceptances from the portals.
             {unread > 0 ? (
               <>
                 {" "}
@@ -121,7 +124,7 @@ export default async function Dashboard() {
             ) : null}
           </p>
           <div style={{ marginTop: 8 }}>
-            {clientEvents.slice(0, 8).map((e, i) => {
+            {feedEvents.slice(0, 8).map((e, i) => {
               const fresh = e.at > seenAt;
               const company = companyOf.get(e.target);
               return (

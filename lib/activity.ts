@@ -59,15 +59,13 @@ export function isClientEvent(e: ActivityEntry): boolean {
   return CLIENT_ACTIONS.has(e.action) && e.target !== "console";
 }
 
-/** Team-side actions that still warrant a dashboard notification + Telegram
- *  ping, so all three admins see money movement without opening the client —
- *  even though they're operator actions, not client-portal events. */
-export const TEAM_NOTIFY_ACTIONS = new Set(["recorded payment"]);
-
 /** Should this event surface in the dashboard notifications feed / badge?
- *  Client-portal events plus a small set of team money events. */
+ *  Every action any admin or client takes against a client record — document
+ *  publishes, invoices, payments, stage changes, emails, portal events, and so
+ *  on. The only thing excluded is sign-in / system noise, which logs to the
+ *  "console" target (covered by the Sessions card instead). */
 export function isNotifiable(e: ActivityEntry): boolean {
-  return (isClientEvent(e) || TEAM_NOTIFY_ACTIONS.has(e.action)) && e.target !== "console";
+  return e.target !== "console";
 }
 
 // A single shared "admins have looked" marker for the client-activity feed.
