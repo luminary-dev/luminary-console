@@ -3,6 +3,7 @@
 // model owns rounding/formatting and the templates stay dumb.
 import type { ClientRecord, DocType } from "../types";
 import { esc, paras, clientBlock, metaRow, policyBox, shell, type Mode } from "./shell";
+import { STUDIO_SIGNATURE, STUDIO_SIGNATURE_NAME } from "./signature";
 
 export type EstimateData = {
   confidence: string;
@@ -422,8 +423,23 @@ export function renderContract(d: ContractData, ctx: Ctx): string {
       .join("")}
     ${contractSignBlock(ctx)}
     <div class="sig">
-      <div class="sig-block"><div class="sig-k">For the Studio</div><div class="sig-line"></div><div class="sig-lab">Signature · Luminary Studio</div><div class="sig-line"></div><div class="sig-lab">Name & date</div></div>
-      <div class="sig-block"><div class="sig-k">For the Client</div><div class="sig-line"></div><div class="sig-lab">Signature · ${esc(ctx.client.company)}</div><div class="sig-line"></div><div class="sig-lab">Name & date</div></div>
+      <div class="sig-block">
+        <div class="sig-k">For the Studio</div>
+        <div style="background:#fff;border-radius:6px;padding:4px 8px;display:inline-block;margin:8px 0 4px;">
+          <img src="${STUDIO_SIGNATURE}" alt="Signature of ${esc(STUDIO_SIGNATURE_NAME)}" style="height:60px;width:auto;max-width:150px;object-fit:contain;display:block;" />
+        </div>
+        <div class="sig-lab" style="font-weight:600;color:var(--text);">${esc(STUDIO_SIGNATURE_NAME)}</div>
+        <div class="sig-lab">${esc(d.agreementDate)}</div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-k">For the Client</div>
+        <div class="sig-line"></div>
+        <div class="sig-lab">Signature · ${esc(ctx.client.company)}</div>
+        <div class="sig-line"></div>
+        <div class="sig-lab">Name</div>
+        <div class="sig-line"></div>
+        <div class="sig-lab">Date</div>
+      </div>
     </div>`;
   return shell({
     mode: ctx.mode,
