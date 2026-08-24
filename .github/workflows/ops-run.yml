@@ -4,10 +4,12 @@
 # what the console UI would have done, with the run log as the receipt.
 #
 # Dispatch it directly for anything without a dedicated workflow (payments,
-# stage changes, sends, tasks, notes…), or let the ops-* convenience
-# workflows call it with a pre-built payload.
-name: "Ops: console API"
-run-name: "${{ inputs.method }} ${{ inputs.path }}${{ inputs.actor && format(' — by {0}', inputs.actor) || '' }}"
+# stage changes, sends, tasks, notes…), or let the Ops · * convenience
+# workflows call it with a pre-built payload. When the console UI relays a
+# mutation here (/api/ops/relay), request_id + actor carry the hand-back key
+# and the attribution.
+name: Ops · Console API
+run-name: "Ops · Console API · ${{ inputs.method }} ${{ inputs.path }}${{ inputs.actor && format(' · by {0}', inputs.actor) || '' }}"
 
 on:
   workflow_dispatch:
@@ -59,8 +61,8 @@ on:
         required: false
 
 jobs:
-  call:
-    name: ${{ inputs.method }} ${{ inputs.path }}
+  execute:
+    name: "Execute · ${{ inputs.method }} ${{ inputs.path }}"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -87,13 +89,16 @@ jobs:
       ROOT_DOMAIN: luminary-dev.xyz
       CONSOLE_HOST: console.luminary-dev.xyz
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out
+        uses: actions/checkout@v7
+      - name: Set up Node 24
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
-      - name: Call route
+      - name: Install dependencies
+        run: npm ci
+      - name: Call the route
         env:
           METHOD: ${{ inputs.method }}
           ROUTE: ${{ inputs.path }}

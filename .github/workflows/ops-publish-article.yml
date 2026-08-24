@@ -3,7 +3,8 @@
 # cover in the house Tintin-3D style, then a PR against the landing repo's dev
 # branch. Give a brief and leave title/body empty to let Claude draft;
 # anything you fill in overrides the draft.
-name: "Ops: publish article"
+name: Ops · Publish Article
+run-name: "Ops · Publish Article · ${{ inputs.title || inputs.brief }}"
 
 on:
   workflow_dispatch:
@@ -36,7 +37,7 @@ on:
 
 jobs:
   publish:
-    name: Draft, illustrate & open PR
+    name: Publish the article
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -46,12 +47,15 @@ jobs:
       LANDING_REPO: dhanikaa/luminary-landing-page
       LANDING_REPO_TOKEN: ${{ secrets.LANDING_REPO_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out
+        uses: actions/checkout@v7
+      - name: Set up Node 24
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
       - name: Draft with Claude (when title/body not supplied)
         id: draft
         env:
@@ -71,7 +75,7 @@ jobs:
           REQ=$(jq -cn --arg brief "$BRIEF" '{kind:"article", $brief}')
           RESP=$(npx tsx scripts/ops.ts POST /api/publish/draft "$REQ")
           echo "draft=$(echo "$RESP" | jq -c .draft)" >> "$GITHUB_OUTPUT"
-      - name: Publish (cover + PR to dev)
+      - name: Generate the cover & open the PR
         env:
           DRAFT: ${{ steps.draft.outputs.draft }}
           TITLE: ${{ inputs.title }}

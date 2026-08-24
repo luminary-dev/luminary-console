@@ -53,6 +53,20 @@ npm install && vercel env pull && npm run dev
 
 ## GitHub Actions — CI & ops
 
+**Naming convention** (every workflow follows it):
+- file `<area>-<action>.yml`; workflow `name:` is `Area · Action` in Title
+  Case (`CI`, `Release · Tag`, `Ops · Console API`);
+- `run-name:` appends the runtime context (`Ops · New Client · <company>`,
+  `Ops · Console API · POST /api/… · by <admin>`);
+- job ids are kebab stage verbs; display names are `N · Verb phrase` for
+  sequential stages (`1 · Prepare payload`, `2 · Create client`) or a plain
+  verb phrase for single-job workflows. Exception: job names pinned as
+  required status checks by branch rulesets (`Build` here, `Lint & Build` on
+  the landing repo) never change without updating the ruleset in the same
+  commit;
+- every step carries an explicit Title-Case verb-phrase `name:` — no
+  defaulted step names.
+
 CI (`Build`) runs on every PR and push to `main` (build + typecheck; failures
 on `main` ping Telegram), and `release-tag.yml` tags a release whenever the
 package version changes. `main` is PR-only with `Build` required.
@@ -64,13 +78,13 @@ holds the same backend credentials from Actions secrets), so an ops run is
 byte-for-byte what the console UI would have done; the activity feed
 attributes it to "operator".
 
-- **Ops: console API** — generic: any method + path + JSON body
+- **Ops · Console API** — generic: any method + path + JSON body
   (payments, stage changes, sends, tasks, notes, billing, …).
-- **Ops: new client** — the New-client pipeline (estimate, questionnaire,
+- **Ops · New Client** — the New-client pipeline (estimate, questionnaire,
   PDFs, subdomain, email).
-- **Ops: document action** — publish / unpublish / delete / regenerate
+- **Ops · Document Action** — publish / unpublish / delete / regenerate
   (with instructions + cascade) / retry stage-2.
-- **Ops: publish article** / **Ops: add project** — the landing-page Publish
+- **Ops · Publish Article** / **Ops · Add Project** — the landing-page Publish
   portal: optional Claude draft, gpt-image-2 artwork, PR against the landing
   repo's `dev`.
 
@@ -84,7 +98,7 @@ With `OPS_VIA_ACTIONS=1` and `CONSOLE_REPO_TOKEN` (fine-grained PAT on this
 repo, Actions: write) set, the console UI itself stops executing business
 mutations in the deployment: `lib/ops-fetch.ts` sends every
 POST/PATCH/PUT/DELETE under `/api/clients` and `/api/publish` to
-`/api/ops/relay`, which dispatches the "Ops: console API" workflow (with the
+`/api/ops/relay`, which dispatches the "Ops · Console API" workflow (with the
 signed-in admin as `actor`, so the activity feed keeps attribution), waits for
 `scripts/ops.ts` to write the route's response back into the store
 (`ops-results/<id>.json`), and returns it — the UI behaves as before, just
