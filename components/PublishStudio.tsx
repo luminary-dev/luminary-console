@@ -15,6 +15,7 @@ type PublishResult = {
   prUrl: string;
   slug: string;
   cover?: string;
+  inline?: string[];
   thumbLight?: string;
   thumbDark?: string;
 };
@@ -82,6 +83,9 @@ function ResultCard({ r, kind }: { r: PublishResult; kind: Tab }) {
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         {r.cover && <img src={r.cover} alt="Generated cover" style={{ width: 320, borderRadius: 10 }} />}
+        {(r.inline ?? []).map((src, i) => (
+          <img key={i} src={src} alt={`Inline illustration ${i + 1}`} style={{ width: 320, borderRadius: 10 }} />
+        ))}
         {r.thumbLight && <img src={r.thumbLight} alt="Light thumbnail" style={{ width: 320, borderRadius: 10 }} />}
         {r.thumbDark && <img src={r.thumbDark} alt="Dark thumbnail" style={{ width: 320, borderRadius: 10 }} />}
       </div>
@@ -94,6 +98,7 @@ function ArticleForm() {
   const [brief, setBrief] = useState("");
   const [f, setF] = useState({ title: "", slug: "", tags: "", excerpt: "", imageBrief: "", body: "" });
   const [isDraftPost, setIsDraftPost] = useState(false);
+  const [inlineImages, setInlineImages] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PublishResult | null>(null);
@@ -122,6 +127,7 @@ function ArticleForm() {
           imageBrief: f.imageBrief,
           body: f.body,
           draft: isDraftPost,
+          inlineImages,
           tags: f.tags.split(",").map((t) => t.trim()).filter(Boolean),
         }),
       });
@@ -189,8 +195,20 @@ function ArticleForm() {
             <span className="q-label">Body (markdown) <span className="req">*</span></span>
             <textarea className="q-box" rows={16} value={f.body} onChange={set("body")} required />
           </div>
-          <div className="q-field">
-            <label style={{ display: "flex", gap: 8, alignItems: "center", cursor: "pointer" }}>
+          <div className="q-field half">
+            <span className="q-label">Inline illustrations (placed mid-article)</span>
+            <select
+              className="q-line"
+              value={inlineImages}
+              onChange={(e) => setInlineImages(Number(e.target.value))}
+            >
+              <option value={0}>None — cover only</option>
+              <option value={1}>1 — under a middle section</option>
+              <option value={2}>2 — spaced through the body</option>
+            </select>
+          </div>
+          <div className="q-field half">
+            <label style={{ display: "flex", gap: 8, alignItems: "center", cursor: "pointer", marginTop: 22 }}>
               <input type="checkbox" checked={isDraftPost} onChange={(e) => setIsDraftPost(e.target.checked)} />
               <span className="q-label" style={{ margin: 0 }}>Mark as draft (hidden until the flag is removed)</span>
             </label>

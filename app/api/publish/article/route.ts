@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { coverPrompt, generateImage } from "@/lib/publish/images";
+import { coverPrompt, generateImage, inlinePrompt } from "@/lib/publish/images";
 import { landingBranchExists, landingFileExists, openLandingPR } from "@/lib/publish/github";
+import { draftInlineScenes, type InlineScene } from "@/lib/publish/draft";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -16,7 +17,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
   const title = String(body.title || "").trim();
-  const markdown = String(body.body || "").trim();
+  let markdown = String(body.body || "").trim();
+  // 0, 1 or 2 in-article illustrations, placed under well-spaced sections.
+  const inlineCount = Math.min(2, Math.max(0, Number(body.inlineImages) || 0));
   const excerpt = String(body.excerpt || "").trim();
   const imageBrief = String(body.imageBrief || "").trim();
   const draftFlag = Boolean(body.draft);
@@ -50,6 +53,46 @@ export async function POST(req: Request) {
 
     const cover = await generateImage(coverPrompt(imageBrief || `${title} — ${excerpt || "an engineering story"}`));
 
+    // Inline illustrations: Claude picks the sections and scenes, gpt-image-2
+    // renders them, and each is inserted right under its "## " heading (or at
+    // sensible fallback spots when the heading text doesn't match).
+    const inlineFiles: { path: string; base64: string }[] = [];
+    const inlinePreviews: string[] = [];
+    if (inlineCount > 0) {
+      let scenes: InlineScene[] = [];
+      try {
+        scenes = (await draftInlineScenes(title, markdown, inlineCount)).scenes.slice(0, inlineCount);
+      } catch {
+        scenes = []; // scene drafting is an enhancement — never fail the publish over it
+      }
+      const images = await Promise.all(scenes.map((s) => generateImage(inlinePrompt(s.scene))));
+      const lines = markdown.split("\n");
+      scenes.forEach((s, i) => {
+        const src = `/blog/${slug}/inline-${i + 1}.jpg`;
+        const block = ["", `![${s.alt.replace(/[\[\]]/g, "")}](${src})`, ""];
+        const at = lines.findIndex(
+          (l) => l.startsWith("## ") && l.slice(3).trim().toLowerCase() === s.afterHeading.trim().toLowerCase(),
+        );
+        if (at >= 0) {
+          lines.splice(at + 1, 0, ...block);
+        } else {
+          // Heading drifted — drop the image after the middle-ish blank line.
+          const mid = Math.floor(lines.length * ((i + 1) / (scenes.length + 1)));
+          let insert = lines.length;
+          for (let j = mid; j < lines.length; j++) {
+            if (lines[j].trim() === "") {
+              insert = j;
+              break;
+            }
+          }
+          lines.splice(insert, 0, ...block);
+        }
+        inlineFiles.push({ path: `public/blog/${slug}/inline-${i + 1}.jpg`, base64: images[i].toString("base64") });
+        inlinePreviews.push(`data:image/jpeg;base64,${images[i].toString("base64")}`);
+      });
+      markdown = lines.join("\n");
+    }
+
     const date = new Date().toISOString().slice(0, 10);
     const fm = [
       "---",
@@ -73,6 +116,7 @@ export async function POST(req: Request) {
         "",
         `- \`content/blog/${slug}.md\` — ${markdown.split(/\s+/).length} words, tags: ${tags.join(", ") || "—"}${draftFlag ? ", **draft: true**" : ""}`,
         `- \`public/blog/${slug}/cover.jpg\` — generated cover (house 3D-animation style)`,
+        ...inlineFiles.map((f, i) => `- \`${f.path}\` — inline illustration ${i + 1}, placed in the body`),
         "",
         "Review the copy and the cover on the Vercel preview, then merge to publish on dev.",
         "Remember the version bump if this PR rides to prod on its own.",
@@ -82,6 +126,7 @@ export async function POST(req: Request) {
       files: [
         { path: `content/blog/${slug}.md`, text: fm + markdown + "\n" },
         { path: `public/blog/${slug}/cover.jpg`, base64: cover.toString("base64") },
+        ...inlineFiles,
       ],
     });
 
@@ -90,6 +135,7 @@ export async function POST(req: Request) {
       prUrl: pr.url,
       prNumber: pr.number,
       cover: `data:image/jpeg;base64,${cover.toString("base64")}`,
+      inline: inlinePreviews,
     });
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Publish failed." }, { status: 502 });

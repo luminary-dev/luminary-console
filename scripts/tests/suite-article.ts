@@ -79,11 +79,13 @@ async function main() {
         "a tiny robot quality inspector stamping paper boats with green ticks in a harbour-side workshop",
       body: BODY,
       draft: true,
+      inlineImages: 1,
     });
     expect(r.status === 200, `got ${r.status}: ${r.text}`);
     expect(r.json?.slug === SLUG, `slug mismatch: ${r.json?.slug}`);
     expect(String(r.json?.prUrl).includes("/pull/"), `no PR url: ${r.json?.prUrl}`);
     expect(String(r.json?.cover).startsWith("data:image/jpeg;base64,"), "no cover preview");
+    expect(Array.isArray(r.json?.inline) && (r.json!.inline as string[]).length === 1, "no inline preview");
     prNumber = Number(String(r.json?.prUrl).split("/pull/")[1]);
     note(`PR #${prNumber}`);
   });
@@ -108,6 +110,16 @@ async function main() {
     expect(img, "cover missing from branch");
     expect(img.length > 20_000, `cover suspiciously small: ${img.length}B`);
     expect(img[0] === 0xff && img[1] === 0xd8, "not a JPEG");
+  });
+
+  await test("inline illustration lands in the branch and in the body", async () => {
+    const img = await landingFile(BRANCH, `public/blog/${SLUG}/inline-1.jpg`);
+    expect(img, "inline image missing from branch");
+    expect(img[0] === 0xff && img[1] === 0xd8, "inline image not a JPEG");
+    const md = (await landingFile(BRANCH, `content/blog/${SLUG}.md`))!.toString("utf8");
+    expect(md.includes(`](/blog/${SLUG}/inline-1.jpg)`), "inline image not referenced in the body");
+    const fmEnd = md.indexOf("\n---\n", 4);
+    expect(md.indexOf(`inline-1.jpg`) > fmEnd, "inline image reference sits in the frontmatter");
   });
 
   await test("409 while an open PR already claims the slug", async () => {
