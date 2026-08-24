@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { SiteEntry } from "@/lib/types";
 import { useConfirm } from "./ConfirmDialog";
+import { opsFetch } from "@/lib/ops-fetch";
 
 const ROOT = "luminary-dev.xyz";
 
@@ -35,7 +36,7 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
   const call = async (payload: Record<string, unknown>, key: string): Promise<boolean> => {
     setBusy(key);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}/site`, {
+    const res = await opsFetch(`/api/clients/${slug}/site`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

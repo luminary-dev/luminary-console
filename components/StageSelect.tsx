@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ClientStage } from "@/lib/types";
 import { STAGES, STAGE_LABELS } from "@/lib/stage";
+import { opsFetch } from "@/lib/ops-fetch";
 
 export default function StageSelect({ slug, stage }: { slug: string; stage: ClientStage }) {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function StageSelect({ slug, stage }: { slug: string; stage: Clie
         onChange={async (e) => {
           setBusy(true);
           setError(null);
-          const res = await fetch(`/api/clients/${slug}/stage`, {
+          const res = await opsFetch(`/api/clients/${slug}/stage`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ stage: e.target.value }),

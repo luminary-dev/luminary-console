@@ -16,6 +16,7 @@ import { relTime } from "@/lib/time";
 import EmailDocButton from "./EmailDocButton";
 import DocHistory from "./DocHistory";
 import { useConfirm } from "./ConfirmDialog";
+import { opsFetch } from "@/lib/ops-fetch";
 
 export default function BillingCard({
   slug,
@@ -45,7 +46,7 @@ export default function BillingCard({
   const call = async (payload: Record<string, unknown>, key: string): Promise<boolean> => {
     setBusy(key);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}/billing`, {
+    const res = await opsFetch(`/api/clients/${slug}/billing`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -110,7 +111,7 @@ export default function BillingCard({
   const callPayments = async (payload: Record<string, unknown>, key: string): Promise<boolean> => {
     setBusy(key);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}/payments`, {
+    const res = await opsFetch(`/api/clients/${slug}/payments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -353,13 +354,13 @@ export default function BillingCard({
                               onClick={async () => {
                                 setBusy(`pubemail-${b.slug}`);
                                 setError(null);
-                                const p = await fetch(`/api/clients/${slug}/billing`, {
+                                const p = await opsFetch(`/api/clients/${slug}/billing`, {
                                   method: "POST",
                                   headers: { "Content-Type": "application/json" },
                                   body: JSON.stringify({ action: "publish", doc: b.slug }),
                                 });
                                 if (!p.ok) { setBusy(null); setError("Publish failed."); return; }
-                                const s = await fetch(`/api/clients/${slug}/send`, {
+                                const s = await opsFetch(`/api/clients/${slug}/send`, {
                                   method: "POST",
                                   headers: { "Content-Type": "application/json" },
                                   body: JSON.stringify({ docs: [b.slug] }),

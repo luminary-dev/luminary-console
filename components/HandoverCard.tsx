@@ -7,6 +7,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useConfirm } from "./ConfirmDialog";
+import { opsFetch } from "@/lib/ops-fetch";
 
 export default function HandoverCard({
   slug,
@@ -45,7 +46,7 @@ export default function HandoverCard({
     }
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}/handover`, { method: "POST" });
+    const res = await opsFetch(`/api/clients/${slug}/handover`, { method: "POST" });
     const data = await res.json().catch(() => null);
     setBusy(false);
     if (!res.ok) {

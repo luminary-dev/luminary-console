@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
+import { opsFetch } from "@/lib/ops-fetch";
 
 export default function NewClientPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function NewClientPage() {
     e.preventDefault();
     setBusy(true);
     setError(null);
-    const res = await fetch("/api/clients", {
+    const res = await opsFetch("/api/clients", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(f),

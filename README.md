@@ -78,6 +78,21 @@ Secrets: the workflows read the same names as `.env.local` — seed them with
 `gh secret set -f .env.local` (plus `LANDING_REPO_TOKEN` / `OPENAI_API_KEY`
 if not already there).
 
+### Ops-via-Actions (the UI executes on Actions too)
+
+With `OPS_VIA_ACTIONS=1` and `CONSOLE_REPO_TOKEN` (fine-grained PAT on this
+repo, Actions: write) set, the console UI itself stops executing business
+mutations in the deployment: `lib/ops-fetch.ts` sends every
+POST/PATCH/PUT/DELETE under `/api/clients` and `/api/publish` to
+`/api/ops/relay`, which dispatches the "Ops: console API" workflow (with the
+signed-in admin as `actor`, so the activity feed keeps attribution), waits for
+`scripts/ops.ts` to write the route's response back into the store
+(`ops-results/<id>.json`), and returns it — the UI behaves as before, just
+slower (runner spin-up ≈ 30–60s), and every operation has an Actions run as
+its receipt. Unset the flag (or the token) and the UI falls back to direct
+execution automatically. Reads and housekeeping (activity, sessions, search,
+assets, auth) always stay direct.
+
 ## Storage
 
 Cloudflare R2 via its S3-compatible API (endpoint

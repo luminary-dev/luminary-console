@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useConfirm } from "./ConfirmDialog";
+import { opsFetch } from "@/lib/ops-fetch";
 
 export default function SendToClient({
   slug,
@@ -39,7 +40,7 @@ export default function SendToClient({
     setBusy(true);
     setError(null);
     setDone(null);
-    const res = await fetch(`/api/clients/${slug}/send`, { method: "POST" });
+    const res = await opsFetch(`/api/clients/${slug}/send`, { method: "POST" });
     const data = await res.json().catch(() => null);
     setBusy(false);
     if (res.ok) setDone(`Sent to ${data.sentTo}`);

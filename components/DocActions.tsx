@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useConfirm } from "./ConfirmDialog";
+import { opsFetch } from "@/lib/ops-fetch";
 
 export default function DocActions({
   slug,
@@ -41,7 +42,7 @@ export default function DocActions({
   const act = async (action: string, extra: Record<string, unknown> = {}): Promise<boolean> => {
     setBusy(action);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}/docs/${type}`, {
+    const res = await opsFetch(`/api/clients/${slug}/docs/${type}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action, ...extra }),
@@ -115,13 +116,13 @@ export default function DocActions({
             onClick={async () => {
               setBusy("pubemail");
               setError(null);
-              const p = await fetch(`/api/clients/${slug}/docs/${type}`, {
+              const p = await opsFetch(`/api/clients/${slug}/docs/${type}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "publish" }),
               });
               if (!p.ok) { setBusy(null); setError("Publish failed."); return; }
-              const s = await fetch(`/api/clients/${slug}/send`, {
+              const s = await opsFetch(`/api/clients/${slug}/send`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ docs: [type] }),

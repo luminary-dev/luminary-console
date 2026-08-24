@@ -4,6 +4,7 @@
 // (PDF attached; page link included when published) to the client.
 import { useState } from "react";
 import { useConfirm } from "./ConfirmDialog";
+import { opsFetch } from "@/lib/ops-fetch";
 
 export default function EmailDocButton({
   slug,
@@ -35,7 +36,7 @@ export default function EmailDocButton({
     if (!ok) return;
     setBusy(true);
     setState("idle");
-    const res = await fetch(`/api/clients/${slug}/send`, {
+    const res = await opsFetch(`/api/clients/${slug}/send`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ docs: [docKey] }),

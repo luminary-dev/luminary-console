@@ -6,6 +6,7 @@
 // the operator to copy into their mail client and send themselves, which is
 // why the only action on the answer is Copy.
 import { useState } from "react";
+import { opsFetch } from "@/lib/ops-fetch";
 
 const PRESETS = [
   "Summarise the questionnaire answers",
@@ -40,7 +41,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
     setHandoff(null);
     setAsked(q);
     try {
-      const res = await fetch(`/api/clients/${slug}/assist`, {
+      const res = await opsFetch(`/api/clients/${slug}/assist`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: q }),
@@ -86,7 +87,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
     setBusy(true);
     setError(null);
     setHandoff(null);
-    const res = await fetch(`/api/clients/${slug}/send-message`, {
+    const res = await opsFetch(`/api/clients/${slug}/send-message`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ subject, body: emailBody }),
@@ -106,7 +107,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
     const text = answer.split("\n").find((l) => l.trim())?.trim().slice(0, 300) || "Follow up";
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}/tasks`, {
+    const res = await opsFetch(`/api/clients/${slug}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "add", text }),

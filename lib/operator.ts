@@ -10,6 +10,10 @@ import { logActivity } from "./activity";
 
 /** The signed-in admin's email, or "operator" if it can't be resolved. */
 export async function currentOperator(): Promise<string> {
+  // Ops runs on GitHub Actions: ops-run.yml sets OPS_ACTOR (per-process, one
+  // operation per run) to the admin who dispatched from the console, so the
+  // activity log keeps its attribution even though there is no session there.
+  if (process.env.OPS_ACTOR) return process.env.OPS_ACTOR;
   try {
     const token = (await cookies()).get(SESSION_COOKIE)?.value;
     const session = await verifySessionToken(process.env.SESSION_SECRET || "", token);

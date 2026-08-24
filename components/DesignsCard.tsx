@@ -9,6 +9,7 @@ import { useCallback, useRef, useState } from "react";
 import { useConfirm } from "./ConfirmDialog";
 import { MAX_DESIGNS, designUrl } from "@/lib/designs";
 import type { DesignEntry } from "@/lib/types";
+import { opsFetch } from "@/lib/ops-fetch";
 
 function when(at: string): string {
   const d = new Date(at);
@@ -51,7 +52,7 @@ export default function DesignsCard({
     try {
       const html = await file.text();
       const title = file.name.replace(/\.html?$/i, "").slice(0, 80);
-      const res = await fetch(`/api/clients/${slug}/designs`, {
+      const res = await opsFetch(`/api/clients/${slug}/designs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ html, title, id: targetId.current }),
@@ -69,7 +70,7 @@ export default function DesignsCard({
   const act = async (id: string, action: "publish" | "unpublish") => {
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}/designs/${id}`, {
+    const res = await opsFetch(`/api/clients/${slug}/designs/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action }),
@@ -94,7 +95,7 @@ export default function DesignsCard({
     if (!ok) return;
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}/designs/${d.id}`, { method: "DELETE" }).catch(() => null);
+    const res = await opsFetch(`/api/clients/${slug}/designs/${d.id}`, { method: "DELETE" }).catch(() => null);
     const data = res ? await res.json().catch(() => null) : null;
     if (!res || !res.ok) setError(data?.error || "Delete failed.");
     else setDesigns(data.designs ?? []);

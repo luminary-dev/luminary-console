@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ChangeOrder } from "@/lib/types";
+import { opsFetch } from "@/lib/ops-fetch";
 
 export default function ChangeOrders({
   slug,
@@ -22,7 +23,7 @@ export default function ChangeOrders({
   const call = async (payload: Record<string, unknown>) => {
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}/change-orders`, {
+    const res = await opsFetch(`/api/clients/${slug}/change-orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

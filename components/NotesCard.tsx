@@ -4,6 +4,7 @@
 // purpose: notes get typed mid-call, and a button you forget to press is
 // worse than no notes at all. The state line is the whole affordance.
 import { useCallback, useEffect, useRef, useState } from "react";
+import { opsFetch } from "@/lib/ops-fetch";
 
 const DEBOUNCE_MS = 800;
 
@@ -19,7 +20,7 @@ export default function NotesCard({ slug, notes }: { slug: string; notes?: strin
     async (text: string) => {
       if (text === saved.current) return;
       setState("saving");
-      const res = await fetch(`/api/clients/${slug}/notes`, {
+      const res = await opsFetch(`/api/clients/${slug}/notes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ notes: text }),
