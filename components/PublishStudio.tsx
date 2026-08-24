@@ -82,12 +82,12 @@ function ResultCard({ r, kind }: { r: PublishResult; kind: Tab }) {
         </small>
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        {r.cover && <img src={r.cover} alt="Generated cover" style={{ width: 320, borderRadius: 10 }} />}
+        {r.cover && <img src={r.cover} alt="Generated cover" style={{ width: "100%", maxWidth: 320, height: "auto", borderRadius: 10 }} />}
         {(r.inline ?? []).map((src, i) => (
-          <img key={i} src={src} alt={`Inline illustration ${i + 1}`} style={{ width: 320, borderRadius: 10 }} />
+          <img key={i} src={src} alt={`Inline illustration ${i + 1}`} style={{ width: "100%", maxWidth: 320, height: "auto", borderRadius: 10 }} />
         ))}
-        {r.thumbLight && <img src={r.thumbLight} alt="Light thumbnail" style={{ width: 320, borderRadius: 10 }} />}
-        {r.thumbDark && <img src={r.thumbDark} alt="Dark thumbnail" style={{ width: 320, borderRadius: 10 }} />}
+        {r.thumbLight && <img src={r.thumbLight} alt="Light thumbnail" style={{ width: "100%", maxWidth: 320, height: "auto", borderRadius: 10 }} />}
+        {r.thumbDark && <img src={r.thumbDark} alt="Dark thumbnail" style={{ width: "100%", maxWidth: 320, height: "auto", borderRadius: 10 }} />}
       </div>
     </div>
   );
