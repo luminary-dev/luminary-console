@@ -19,6 +19,10 @@ export function coverPrompt(brief: string): string {
   return `Editorial cover illustration for a Luminary engineering blog post. Scene: ${brief}. Favour a clever visual metaphor over literal screenshots — whimsical machinery, workshops, skies, harbours and streets are all in the house vocabulary. ${STYLE}`;
 }
 
+export function inlinePrompt(scene: string): string {
+  return `In-article editorial illustration for a Luminary engineering blog post, sitting mid-read between paragraphs. Scene: ${scene}. Quieter and more focused than a cover — one clear subject, calm composition. ${STYLE}`;
+}
+
 export function thumbPrompts(scene: string): { light: string; dark: string } {
   const base = `Portfolio thumbnail artwork for a Luminary project. Scene: ${scene}. ${STYLE}`;
   return {

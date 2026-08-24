@@ -34,6 +34,11 @@ on:
         description: Mark the post draft:true (hidden until removed)
         type: boolean
         default: false
+      inline_images:
+        description: Inline illustrations placed mid-article
+        type: choice
+        options: ["0", "1", "2"]
+        default: "0"
 
 jobs:
   publish:
@@ -85,19 +90,21 @@ jobs:
           EXCERPT: ${{ inputs.excerpt }}
           IMAGE_BRIEF: ${{ inputs.image_brief }}
           DRAFT_POST: ${{ inputs.draft_post }}
+          INLINE_IMAGES: ${{ inputs.inline_images }}
         run: |
           set -o pipefail
           PAYLOAD=$(echo "$DRAFT" | jq -c \
             --arg title "$TITLE" --arg body "$BODY" --arg slug "$SLUG" \
             --arg tags "$TAGS" --arg excerpt "$EXCERPT" --arg imageBrief "$IMAGE_BRIEF" \
-            --argjson draft "$DRAFT_POST" '{
+            --argjson draft "$DRAFT_POST" --argjson inlineImages "${INLINE_IMAGES:-0}" '{
               title:      (if $title      != "" then $title      else .title      end),
               body:       (if $body       != "" then $body       else .body       end),
               slug:       (if $slug       != "" then $slug       else (.slug // "") end),
               excerpt:    (if $excerpt    != "" then $excerpt    else (.excerpt // "") end),
               imageBrief: (if $imageBrief != "" then $imageBrief else (.imageBrief // "") end),
               tags:       (if $tags != "" then ($tags | split(",") | map(gsub("^\\s+|\\s+$";"")) | map(select(. != ""))) else (.tags // []) end),
-              draft:      $draft
+              draft:      $draft,
+              inlineImages: $inlineImages
             }')
           RESP=$(npx tsx scripts/ops.ts POST /api/publish/article "$PAYLOAD")
           echo "$RESP" | jq 'del(.cover)'

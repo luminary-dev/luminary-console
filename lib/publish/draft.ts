@@ -82,6 +82,46 @@ export function draftArticle(brief: string): Promise<ArticleDraft> {
   );
 }
 
+// ——— Inline article illustrations ———
+
+export type InlineScene = {
+  afterHeading: string;
+  scene: string;
+  alt: string;
+};
+
+const INLINE_SCENES_SCHEMA = S.obj(["scenes"], {
+  scenes: S.arr(
+    S.obj(["afterHeading", "scene", "alt"], {
+      afterHeading: {
+        type: "string",
+        description:
+          "The EXACT text of an existing '## ' heading in the body that this illustration should sit under (copy it verbatim, without the ## marker).",
+      },
+      scene: {
+        type: "string",
+        description:
+          "One-sentence physical scene for the illustration — a whimsical metaphor for that section (machinery, workshops, harbours, skies — never screenshots or UI).",
+      },
+      alt: { type: "string", description: "Short, concrete alt text, e.g. 'Illustration: …'." },
+    }),
+  ),
+});
+
+/** Pick `count` well-spaced sections of the article and draft an illustration
+ *  scene for each — used when a publish asks for inline images. */
+export function draftInlineScenes(
+  title: string,
+  body: string,
+  count: number,
+): Promise<{ scenes: InlineScene[] }> {
+  return draft<{ scenes: InlineScene[] }>(
+    BLOG_SYSTEM,
+    `This post is being illustrated. Pick exactly ${count} of its "## " sections — well spaced through the article, never the first or the last section when there are enough to choose from — and give each an illustration scene in the house style (3D-animated-film metaphors).\n\nTitle: ${title}\n\nBody:\n${body.slice(0, 12_000)}`,
+    INLINE_SCENES_SCHEMA,
+  );
+}
+
 // ——— Projects ———
 
 export type ProjectDraft = {
