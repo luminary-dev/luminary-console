@@ -7,6 +7,7 @@
 # stage changes, sends, tasks, notes…), or let the ops-* convenience
 # workflows call it with a pre-built payload.
 name: "Ops: console API"
+run-name: "${{ inputs.method }} ${{ inputs.path }}${{ inputs.actor && format(' — by {0}', inputs.actor) || '' }}"
 
 on:
   workflow_dispatch:
@@ -28,6 +29,14 @@ on:
         description: jq filter applied to the response before display
         type: string
         default: "."
+      request_id:
+        description: Relay id (set by the console UI's /api/ops/relay — leave blank for manual runs)
+        type: string
+        required: false
+      actor:
+        description: Who dispatched it (attribution in the activity feed)
+        type: string
+        required: false
   workflow_call:
     inputs:
       method:
@@ -42,6 +51,12 @@ on:
       filter:
         type: string
         default: "."
+      request_id:
+        type: string
+        required: false
+      actor:
+        type: string
+        required: false
 
 jobs:
   call:
@@ -84,6 +99,8 @@ jobs:
           ROUTE: ${{ inputs.path }}
           BODY: ${{ inputs.body }}
           FILTER: ${{ inputs.filter }}
+          OPS_REQUEST_ID: ${{ inputs.request_id }}
+          OPS_ACTOR: ${{ inputs.actor }}
         run: |
           set -o pipefail
           if [ -n "$BODY" ]; then

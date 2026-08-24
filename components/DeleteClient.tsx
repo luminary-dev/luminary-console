@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useConfirm } from "./ConfirmDialog";
+import { opsFetch } from "@/lib/ops-fetch";
 
 export default function DeleteClient({ slug, company }: { slug: string; company: string }) {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function DeleteClient({ slug, company }: { slug: string; company:
     if (!password) return;
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}`, {
+    const res = await opsFetch(`/api/clients/${slug}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password }),

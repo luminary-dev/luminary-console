@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ArticleDraft, ProjectDraft } from "@/lib/publish/draft";
+import { opsFetch } from "@/lib/ops-fetch";
 
 // The publish portal: drafts (optionally with AI), reviews, and publishes
 // content to the landing page — each publish generates the artwork
@@ -47,7 +48,7 @@ function useDraft<T>(kind: Tab) {
     setDrafting(true);
     setError(null);
     try {
-      const res = await fetch("/api/publish/draft", {
+      const res = await opsFetch("/api/publish/draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ kind, brief }),
@@ -111,7 +112,7 @@ function ArticleForm() {
     setError(null);
     setResult(null);
     try {
-      const res = await fetch("/api/publish/article", {
+      const res = await opsFetch("/api/publish/article", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -242,7 +243,7 @@ function ProjectForm() {
     }
     setBusy(true);
     try {
-      const res = await fetch("/api/publish/project", {
+      const res = await opsFetch("/api/publish/project", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ project, imageBrief }),

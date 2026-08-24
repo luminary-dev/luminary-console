@@ -81,6 +81,26 @@ async function main(): Promise<void> {
   const text = await res.text();
   console.error(`← ${res.status}`);
   console.log(text);
+
+  // Relay hand-back: when the console UI dispatched this run (OPS_REQUEST_ID
+  // set by ops-run.yml), write the response into the store so /api/ops/relay
+  // can return it. Written for error responses too — the UI needs those — and
+  // before the non-zero exit below.
+  const requestId = process.env.OPS_REQUEST_ID;
+  if (requestId && /^[a-f0-9-]{8,64}$/.test(requestId)) {
+    try {
+      const { writeState } = await import("../lib/store");
+      await writeState(`ops-results/${requestId}.json`, {
+        status: res.status,
+        body: text,
+        at: new Date().toISOString(),
+      });
+      console.error(`↳ result stored for relay ${requestId}`);
+    } catch (e) {
+      console.error("Result hand-back failed:", e);
+    }
+  }
+
   if (res.status >= 400) process.exit(1);
 }
 

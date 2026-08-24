@@ -7,6 +7,7 @@ import { useState } from "react";
 import type { Task } from "@/lib/types";
 import { ADMIN_NAMES, displayName } from "@/lib/admins";
 import { useConfirm } from "./ConfirmDialog";
+import { opsFetch } from "@/lib/ops-fetch";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -24,7 +25,7 @@ export default function TasksCard({ slug, tasks }: { slug: string; tasks: Task[]
     setList(optimistic);
     setBusy(true);
     setError(null);
-    const res = await fetch(`/api/clients/${slug}/tasks`, {
+    const res = await opsFetch(`/api/clients/${slug}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

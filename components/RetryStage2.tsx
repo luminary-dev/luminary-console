@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { opsFetch } from "@/lib/ops-fetch";
 
 export default function RetryStage2({ slug }: { slug: string }) {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function RetryStage2({ slug }: { slug: string }) {
         onClick={async () => {
           setBusy(true);
           setError(null);
-          const res = await fetch(`/api/clients/${slug}/docs/quotation`, {
+          const res = await opsFetch(`/api/clients/${slug}/docs/quotation`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "retry-stage2" }),
