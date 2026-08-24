@@ -2,7 +2,8 @@ import Link from "next/link";
 import { getClient, getIndex } from "@/lib/store";
 import { STAGES, STAGE_LABELS, currentStage } from "@/lib/stage";
 import { clientMoney, fmtLKR, overdueSummary } from "@/lib/money";
-import { recentActivity, isNotifiable, getNotificationsSeenAt } from "@/lib/activity";
+import { recentActivity, isNotifiable, getNotificationsSeenAt, getReadKeys, entryKey } from "@/lib/activity";
+import MarkAllRead from "@/components/MarkAllRead";
 import { displayName } from "@/lib/admins";
 import { relTime } from "@/lib/time";
 import type { ClientStage } from "@/lib/types";
@@ -31,12 +32,21 @@ export default async function Dashboard() {
   // Only for clients that still exist (so deleted/test clients never show), and
   // "unread" = anything since the feed was last opened on the Activity page.
   const companyOf = new Map(index.map((e) => [e.slug, e.company]));
-  const [activity, seenAt] = await Promise.all([recentActivity(100), getNotificationsSeenAt()]);
-  // Every action against a client — admin and portal alike — except sign-in
-  // noise (which logs to the "console" target). Deleted-client events still
-  // show (as plain text, no link), so nothing an admin did quietly disappears.
-  const feedEvents = activity.filter((e) => isNotifiable(e));
-  const unread = feedEvents.filter((e) => e.at > seenAt).length;
+  const [activity, seenAt, readKeys] = await Promise.all([
+    recentActivity(100),
+    getNotificationsSeenAt(),
+    getReadKeys(),
+  ]);
+  // The Recent-updates card is an inbox: every action against a client —
+  // admin and portal alike — except sign-in noise (the "console" target),
+  // minus anything already seen (globally marked read, or individually
+  // dismissed by opening it). The full history stays on /activity.
+  // Deleted-client events still show (as plain text, no link), so nothing an
+  // admin did quietly disappears.
+  const feedEvents = activity.filter(
+    (e) => isNotifiable(e) && e.at > seenAt && !readKeys.has(entryKey(e)),
+  );
+  const unread = feedEvents.length;
   const now = Date.now();
   const counts = Object.fromEntries(STAGES.map((s) => [s, 0])) as Record<ClientStage, number>;
   let outstandingTotal = 0;
@@ -108,27 +118,25 @@ export default async function Dashboard() {
 
       {feedEvents.length > 0 && (
         <div className="card">
-          <h3>
-            Recent updates
-            {unread > 0 && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <h3 style={{ margin: 0 }}>
+              Recent updates
               <span className="new-pill" style={{ marginLeft: 8 }}>
                 {unread} new
               </span>
-            )}
-          </h3>
+            </h3>
+            <span style={{ marginLeft: "auto" }}>
+              <MarkAllRead />
+            </span>
+          </div>
           <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            Every action across your clients — document publishes, invoices, payments, stage
+            Unseen actions across your clients — document publishes, invoices, payments, stage
             changes and emails, plus uploads, questions and acceptances from the portals.
-            {unread > 0 ? (
-              <>
-                {" "}
-                Open <Link href="/activity">Activity</Link> to mark them seen.
-              </>
-            ) : null}
+            Opening an update clears it; the full history lives in{" "}
+            <Link href="/activity">Activity</Link>.
           </p>
           <div style={{ marginTop: 8 }}>
             {feedEvents.slice(0, 8).map((e, i) => {
-              const fresh = e.at > seenAt;
               const company = companyOf.get(e.target);
               return (
                 <div
@@ -138,7 +146,6 @@ export default async function Dashboard() {
                     padding: "10px 0", borderTop: "1px solid var(--border)",
                   }}
                 >
-                  {fresh && <span className="new-pill">New</span>}
                   <span style={{ fontWeight: 600, fontSize: 13.5 }}>{e.actor}</span>
                   <span style={{ fontSize: 13.5 }}>{e.action}</span>
                   {e.detail && (
@@ -151,7 +158,14 @@ export default async function Dashboard() {
                       {relTime(e.at, now)}
                     </span>
                     {company ? (
-                      <Link href={`/clients/${e.target}`}>Open →</Link>
+                      /* bare <a>: routes through /api/activity/open, which marks
+                         this one update read and redirects to the client page —
+                         a Link would prefetch and mark it read on hover. */
+                      <a
+                        href={`/api/activity/open?at=${encodeURIComponent(e.at)}&target=${encodeURIComponent(e.target)}&action=${encodeURIComponent(e.action)}`}
+                      >
+                        Open →
+                      </a>
                     ) : (
                       <span style={{ color: "var(--muted)" }}>{e.target}</span>
                     )}

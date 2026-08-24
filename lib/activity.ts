@@ -68,24 +68,59 @@ export function isNotifiable(e: ActivityEntry): boolean {
   return e.target !== "console";
 }
 
-// A single shared "admins have looked" marker for the client-activity feed.
-// Global (not per-admin) — opening Activity clears the badge for the team.
+// A single shared "admins have looked" marker for the client-activity feed,
+// plus per-entry read marks so individual updates can be dismissed (opening
+// an update, or the dashboard's "Mark all as read"). Global (not per-admin) —
+// clearing notifications clears them for the team.
 const NOTIF_PATH = "notifications.json";
+const READ_CAP = 400;
+
+type NotifState = { seenAt?: string; read?: string[] };
+
+/** Stable identity for an activity entry (entries carry no id — the ISO
+ *  timestamp plus target/action is unique in practice). */
+export function entryKey(e: Pick<ActivityEntry, "at" | "target" | "action">): string {
+  return `${e.at}|${e.target}|${e.action}`;
+}
 
 /** ISO time the client-activity feed was last marked seen ("" if never). */
 export async function getNotificationsSeenAt(): Promise<string> {
   try {
-    const s = await readState<{ seenAt?: string }>(NOTIF_PATH);
+    const s = await readState<NotifState>(NOTIF_PATH);
     return s?.seenAt ?? "";
   } catch {
     return "";
   }
 }
 
-/** Mark the client-activity feed seen as of now (best-effort — never throws). */
+/** Keys of individually-read entries (entries newer than seenAt that an admin
+ *  already opened or dismissed). */
+export async function getReadKeys(): Promise<Set<string>> {
+  try {
+    const s = await readState<NotifState>(NOTIF_PATH);
+    return new Set(s?.read ?? []);
+  } catch {
+    return new Set();
+  }
+}
+
+/** Mark one entry read (best-effort — never throws). */
+export async function markEntryRead(key: string): Promise<void> {
+  try {
+    const s = (await readState<NotifState>(NOTIF_PATH)) ?? {};
+    const read = s.read ?? [];
+    if (!read.includes(key)) read.push(key);
+    await writeState(NOTIF_PATH, { ...s, read: read.slice(-READ_CAP) });
+  } catch (e) {
+    console.error("Notification read write failed:", e);
+  }
+}
+
+/** Mark the whole client-activity feed seen as of now (best-effort — never
+ *  throws). Everything at or before now is read, so the per-entry list resets. */
 export async function markNotificationsSeen(): Promise<void> {
   try {
-    await writeState(NOTIF_PATH, { seenAt: new Date().toISOString() });
+    await writeState(NOTIF_PATH, { seenAt: new Date().toISOString(), read: [] });
   } catch (e) {
     console.error("Notifications seen write failed:", e);
   }
