@@ -150,7 +150,7 @@ export async function POST(req: Request) {
       ].join("\n\n"),
     );
     await sendPush({
-      title: `🏗️ Project published → PR · ${p.name}`,
+      title: `Project published → PR · ${p.name}`,
       body: `/work/${slug} — tap to review the PR`,
       url: pr.url,
     });

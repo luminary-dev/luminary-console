@@ -129,7 +129,7 @@ ${flagged
     ].join("\n\n");
     await sendTelegram(tg);
     await sendPush({
-      title: `🔔 Daily digest · ${totalItems} item${totalItems > 1 ? "s" : ""}`,
+      title: `Daily digest · ${totalItems} item${totalItems > 1 ? "s" : ""}`,
       body: flagged.map((f) => `${f.company}: ${f.issues.length}`).join("\n"),
       url: `https://${CONSOLE_HOST}/`,
       tag: "daily-digest", // today's digest replaces yesterday's, never stacks

@@ -11,8 +11,8 @@ export async function POST(request: Request) {
   const endpoint = typeof body?.endpoint === "string" ? body.endpoint : undefined;
   const sent = await sendPush(
     {
-      title: "🔔 Notifications enabled",
-      body: "This device now gets Luminary studio notices.",
+      title: "Notifications enabled",
+      body: "This device now gets studio notices.",
       url: "/",
       tag: "push-test",
     },
