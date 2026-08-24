@@ -19,6 +19,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  // cover exposes env(safe-area-inset-*) so the installed app can clear the
+  // Dynamic Island / home indicator; body picks up the left/right insets in
+  // globals.css, which are 0 in browser portrait — web view unchanged.
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f0f0ee" },
     { media: "(prefers-color-scheme: dark)", color: "#050506" },

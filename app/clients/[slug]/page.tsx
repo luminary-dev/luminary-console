@@ -7,6 +7,7 @@ import CopyLink from "@/components/CopyLink";
 import RetryStage2 from "@/components/RetryStage2";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
+import AppTabBar from "@/components/AppTabBar";
 import DeleteClient from "@/components/DeleteClient";
 import SendToClient from "@/components/SendToClient";
 import BillingCard from "@/components/BillingCard";
@@ -71,7 +72,7 @@ export default async function ClientPage({
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <ThemeToggle />
           <SignOut />
-          <Link className="btn ghost small" href="/">
+          <Link className="btn ghost small app-hide" href="/">
             ← Dashboard
           </Link>
         </div>
@@ -368,6 +369,7 @@ export default async function ClientPage({
       </div>
 
       <DeleteClient slug={slug} company={client.company} />
+      <AppTabBar />
     </main>
   );
 }
