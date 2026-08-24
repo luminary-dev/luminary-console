@@ -1,7 +1,14 @@
 # Merge gate + visibility: build (includes the TypeScript pass) on every PR
 # and every push to main. Vercel still does the deploying — this only tells
 # you, on GitHub, whether the commit is sound. Failures on main ping Telegram.
+#
+# Naming convention (all workflows): see README "GitHub Actions" —
+#   workflow "Area · Action" · run-name adds runtime context · jobs are
+#   "N · Verb phrase" (or a plain verb phrase when single) · every step is
+#   explicitly named. The job name "Build" is a required status check in the
+#   main-pr-only ruleset — rename both together or not at all.
 name: CI
+run-name: "CI · ${{ github.event_name == 'pull_request' && github.event.pull_request.title || github.event.head_commit.message }}"
 
 on:
   push:
@@ -13,14 +20,18 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out
+        uses: actions/checkout@v7
+      - name: Set up Node 24
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
-      - run: npm run build
-      - name: Telegram alert on failure
+      - name: Install dependencies
+        run: npm ci
+      - name: Build & typecheck
+        run: npm run build
+      - name: Notify Telegram of the failure
         if: failure() && github.event_name == 'push'
         env:
           TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

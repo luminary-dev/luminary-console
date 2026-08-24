@@ -1,7 +1,8 @@
 # Document actions from the Actions UI — publish / unpublish / delete /
 # regenerate-with-instructions / retry stage-2, exactly as the console's
 # document buttons do.
-name: "Ops: document action"
+name: Ops · Document Action
+run-name: "Ops · Document Action · ${{ inputs.action }} ${{ inputs.doc }} · ${{ inputs.slug }}"
 
 on:
   workflow_dispatch:
@@ -27,13 +28,14 @@ on:
         default: false
 
 jobs:
-  payload:
-    name: Build payload
+  prepare:
+    name: 1 · Prepare payload
     runs-on: ubuntu-latest
     outputs:
       body: ${{ steps.build.outputs.body }}
     steps:
-      - id: build
+      - name: Build the request payload
+        id: build
         env:
           ACTION: ${{ inputs.action }}
           INSTRUCTIONS: ${{ inputs.instructions }}
@@ -43,12 +45,12 @@ jobs:
             --argjson cascade "$CASCADE" '{$action, $instructions, $cascade}')
           echo "body=$BODY" >> "$GITHUB_OUTPUT"
 
-  act:
-    name: Run action
-    needs: payload
+  execute:
+    name: 2 · Run action
+    needs: prepare
     uses: ./.github/workflows/ops-run.yml
     secrets: inherit
     with:
       method: POST
       path: /api/clients/${{ inputs.slug }}/docs/${{ inputs.doc }}
-      body: ${{ needs.payload.outputs.body }}
+      body: ${{ needs.prepare.outputs.body }}

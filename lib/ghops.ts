@@ -1,4 +1,4 @@
-// Dispatches the "Ops: console API" GitHub Actions workflow — the execution
+// Dispatches the "Ops · Console API" GitHub Actions workflow — the execution
 // plane for console business mutations when OPS_VIA_ACTIONS is on. The proxy
 // rewrites those requests to /api/ops/relay, which calls this and then waits
 // for the runner to write the result back into the store.

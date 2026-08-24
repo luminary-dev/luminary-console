@@ -1,7 +1,8 @@
 # New client from the Actions UI — same pipeline as the console's "New
 # client" form: Claude drafts the estimate + tailored questionnaire, PDFs
 # render, the subdomain provisions, and the studio gets the email.
-name: "Ops: new client"
+name: Ops · New Client
+run-name: "Ops · New Client · ${{ inputs.company }}"
 
 on:
   workflow_dispatch:
@@ -28,13 +29,14 @@ on:
         type: string
 
 jobs:
-  payload:
-    name: Build payload
+  prepare:
+    name: 1 · Prepare payload
     runs-on: ubuntu-latest
     outputs:
       body: ${{ steps.build.outputs.body }}
     steps:
-      - id: build
+      - name: Build the request payload
+        id: build
         env:
           COMPANY: ${{ inputs.company }}
           BRIEF: ${{ inputs.brief }}
@@ -48,12 +50,12 @@ jobs:
             '{$company, $brief, $slug, $contactName, $email, $phone}')
           echo "body=$BODY" >> "$GITHUB_OUTPUT"
 
-  create:
-    name: Create client
-    needs: payload
+  execute:
+    name: 2 · Create client
+    needs: prepare
     uses: ./.github/workflows/ops-run.yml
     secrets: inherit
     with:
       method: POST
       path: /api/clients
-      body: ${{ needs.payload.outputs.body }}
+      body: ${{ needs.prepare.outputs.body }}

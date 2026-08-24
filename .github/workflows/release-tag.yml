@@ -1,6 +1,7 @@
 # Tags a release whenever package.json's version changes on main (skips with
 # a notice if the tag already exists) — same convention as the landing repo.
-name: Release tag
+name: Release · Tag
+run-name: "Release · Tag · ${{ github.event.head_commit.message }}"
 
 on:
   push:
@@ -12,11 +13,12 @@ permissions:
 
 jobs:
   tag:
-    name: Tag release
+    name: Tag & publish release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Create release for the current version
+      - name: Check out
+        uses: actions/checkout@v7
+      - name: Create the release for the current version
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

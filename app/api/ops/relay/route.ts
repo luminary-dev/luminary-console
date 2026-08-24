@@ -1,7 +1,7 @@
 // The GitHub-Actions execution relay. When OPS_VIA_ACTIONS is on, the proxy
 // rewrites every authed business mutation (POST/PATCH/PUT/DELETE under
 // /api/clients and /api/publish) here instead of its route. The relay
-// dispatches the "Ops: console API" workflow with the original method, path
+// dispatches the "Ops · Console API" workflow with the original method, path
 // and body plus a request id, then long-polls the store for the result the
 // runner writes back (scripts/ops.ts) and returns it with the original
 // status — so the UI sees exactly the response it always saw, while the
