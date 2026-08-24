@@ -1,0 +1,28 @@
+# Tags a release whenever package.json's version changes on main (skips with
+# a notice if the tag already exists) — same convention as the landing repo.
+name: Release tag
+
+on:
+  push:
+    branches: [main]
+    paths: [package.json]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    name: Tag release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create release for the current version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="v$(jq -r .version package.json)"
+          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
+            echo "::notice::$VERSION already tagged — skipping."
+            exit 0
+          fi
+          gh release create "$VERSION" --generate-notes --title "$VERSION"

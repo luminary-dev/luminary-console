@@ -1,0 +1,55 @@
+# Add a portfolio project to the landing page from the Actions UI — same as
+# the console's Publish portal: Claude drafts the case-study entry from the
+# brief, gpt-image-2 renders the day/dusk thumbnail pair in the house
+# Tintin-3D style, lib/projects.ts gets the new entry, and a PR opens against
+# the landing repo's dev branch.
+name: "Ops: add project"
+
+on:
+  workflow_dispatch:
+    inputs:
+      brief:
+        description: What was built, for whom, stack, results — include the live URL / repo
+        type: string
+        required: true
+      image_brief:
+        description: Thumbnail scene override (blank = let Claude pick)
+        type: string
+
+jobs:
+  publish:
+    name: Draft, illustrate & open PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_IMAGE_MODEL: gpt-image-2
+      LANDING_REPO: dhanikaa/luminary-landing-page
+      LANDING_REPO_TOKEN: ${{ secrets.LANDING_REPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Draft case study, generate thumbnails, open PR
+        env:
+          BRIEF: ${{ inputs.brief }}
+          IMAGE_BRIEF: ${{ inputs.image_brief }}
+        run: |
+          set -o pipefail
+          REQ=$(jq -cn --arg brief "$BRIEF" '{kind:"project", $brief}')
+          DRAFT=$(npx tsx scripts/ops.ts POST /api/publish/draft "$REQ" | jq -c .draft)
+          echo "Drafted:"; echo "$DRAFT" | jq 'del(.overview,.problem,.approach,.build,.outcomes)'
+          PAYLOAD=$(echo "$DRAFT" | jq -c --arg ib "$IMAGE_BRIEF" \
+            '{project: del(.imageBrief), imageBrief: (if $ib != "" then $ib else .imageBrief end)}')
+          RESP=$(npx tsx scripts/ops.ts POST /api/publish/project "$PAYLOAD")
+          echo "$RESP" | jq 'del(.thumbLight, .thumbDark)'
+          {
+            echo "### Project published → PR"
+            echo "$RESP" | jq -r '"- PR: \(.prUrl)\n- Slug: `/work/\(.slug)`"'
+            echo ""
+            echo "Review the drafted copy and thumbnails on the PR; web-kind projects still need device screenshots (see the PR checklist)."
+          } >> "$GITHUB_STEP_SUMMARY"

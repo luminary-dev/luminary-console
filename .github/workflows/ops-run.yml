@@ -1,0 +1,100 @@
+# The ops engine: runs any console API route from GitHub Actions, no session
+# needed — scripts/ops.ts checks out this repo and invokes the route handler
+# directly with the backend credentials from Actions secrets, so it is exactly
+# what the console UI would have done, with the run log as the receipt.
+#
+# Dispatch it directly for anything without a dedicated workflow (payments,
+# stage changes, sends, tasks, notes…), or let the ops-* convenience
+# workflows call it with a pre-built payload.
+name: "Ops: console API"
+
+on:
+  workflow_dispatch:
+    inputs:
+      method:
+        description: HTTP method
+        type: choice
+        options: [GET, POST, PATCH, PUT, DELETE]
+        default: GET
+      path:
+        description: Route path, e.g. /api/clients/eco-mech/stage
+        type: string
+        required: true
+      body:
+        description: JSON body (POST/PATCH/PUT)
+        type: string
+        required: false
+      filter:
+        description: jq filter applied to the response before display
+        type: string
+        default: "."
+  workflow_call:
+    inputs:
+      method:
+        type: string
+        default: GET
+      path:
+        type: string
+        required: true
+      body:
+        type: string
+        required: false
+      filter:
+        type: string
+        default: "."
+
+jobs:
+  call:
+    name: ${{ inputs.method }} ${{ inputs.path }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      SENDER: ${{ secrets.SENDER }}
+      STUDIO_EMAIL: ${{ secrets.STUDIO_EMAIL }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_IMAGE_MODEL: gpt-image-2
+      LANDING_REPO: dhanikaa/luminary-landing-page
+      LANDING_REPO_TOKEN: ${{ secrets.LANDING_REPO_TOKEN }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      ROOT_DOMAIN: luminary-dev.xyz
+      CONSOLE_HOST: console.luminary-dev.xyz
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Call route
+        env:
+          METHOD: ${{ inputs.method }}
+          ROUTE: ${{ inputs.path }}
+          BODY: ${{ inputs.body }}
+          FILTER: ${{ inputs.filter }}
+        run: |
+          set -o pipefail
+          if [ -n "$BODY" ]; then
+            RESP=$(npx tsx scripts/ops.ts "$METHOD" "$ROUTE" "$BODY")
+          else
+            RESP=$(npx tsx scripts/ops.ts "$METHOD" "$ROUTE")
+          fi
+          echo "$RESP" | jq "${FILTER:-.}" || echo "$RESP"
+          {
+            echo "### $METHOD \`$ROUTE\`"
+            echo '```json'
+            echo "$RESP" | jq "${FILTER:-.}" 2>/dev/null | head -c 4000 || echo "$RESP" | head -c 4000
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

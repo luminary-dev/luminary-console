@@ -1,0 +1,54 @@
+# Document actions from the Actions UI — publish / unpublish / delete /
+# regenerate-with-instructions / retry stage-2, exactly as the console's
+# document buttons do.
+name: "Ops: document action"
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: Client slug
+        type: string
+        required: true
+      doc:
+        description: Document
+        type: choice
+        options: [estimate, quotation, proposal, contract, invoice, receipt]
+      action:
+        description: Action
+        type: choice
+        options: [publish, unpublish, delete, regenerate, retry-stage2]
+      instructions:
+        description: Revision instructions (regenerate only)
+        type: string
+      cascade:
+        description: Apply the same instruction to the sibling documents (regenerate only)
+        type: boolean
+        default: false
+
+jobs:
+  payload:
+    name: Build payload
+    runs-on: ubuntu-latest
+    outputs:
+      body: ${{ steps.build.outputs.body }}
+    steps:
+      - id: build
+        env:
+          ACTION: ${{ inputs.action }}
+          INSTRUCTIONS: ${{ inputs.instructions }}
+          CASCADE: ${{ inputs.cascade }}
+        run: |
+          BODY=$(jq -cn --arg action "$ACTION" --arg instructions "$INSTRUCTIONS" \
+            --argjson cascade "$CASCADE" '{$action, $instructions, $cascade}')
+          echo "body=$BODY" >> "$GITHUB_OUTPUT"
+
+  act:
+    name: Run action
+    needs: payload
+    uses: ./.github/workflows/ops-run.yml
+    secrets: inherit
+    with:
+      method: POST
+      path: /api/clients/${{ inputs.slug }}/docs/${{ inputs.doc }}
+      body: ${{ needs.payload.outputs.body }}

@@ -1,0 +1,59 @@
+# New client from the Actions UI — same pipeline as the console's "New
+# client" form: Claude drafts the estimate + tailored questionnaire, PDFs
+# render, the subdomain provisions, and the studio gets the email.
+name: "Ops: new client"
+
+on:
+  workflow_dispatch:
+    inputs:
+      company:
+        description: Company name
+        type: string
+        required: true
+      brief:
+        description: Project brief (figures given here are authoritative)
+        type: string
+        required: true
+      slug:
+        description: Subdomain slug (blank = auto from name)
+        type: string
+      contact:
+        description: Contact person
+        type: string
+      email:
+        description: Client email
+        type: string
+      phone:
+        description: Client phone
+        type: string
+
+jobs:
+  payload:
+    name: Build payload
+    runs-on: ubuntu-latest
+    outputs:
+      body: ${{ steps.build.outputs.body }}
+    steps:
+      - id: build
+        env:
+          COMPANY: ${{ inputs.company }}
+          BRIEF: ${{ inputs.brief }}
+          SLUG: ${{ inputs.slug }}
+          CONTACT: ${{ inputs.contact }}
+          EMAIL: ${{ inputs.email }}
+          PHONE: ${{ inputs.phone }}
+        run: |
+          BODY=$(jq -cn --arg company "$COMPANY" --arg brief "$BRIEF" --arg slug "$SLUG" \
+            --arg contactName "$CONTACT" --arg email "$EMAIL" --arg phone "$PHONE" \
+            '{$company, $brief, $slug, $contactName, $email, $phone}')
+          echo "body=$BODY" >> "$GITHUB_OUTPUT"
+
+  create:
+    name: Create client
+    needs: payload
+    uses: ./.github/workflows/ops-run.yml
+    secrets: inherit
+    with:
+      method: POST
+      path: /api/clients
+      body: ${{ needs.payload.outputs.body }}

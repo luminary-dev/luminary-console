@@ -1,0 +1,105 @@
+# Publish a blog article to the landing page from the Actions UI — same as
+# the console's Publish portal: optional Claude draft from a brief, gpt-image-2
+# cover in the house Tintin-3D style, then a PR against the landing repo's dev
+# branch. Give a brief and leave title/body empty to let Claude draft;
+# anything you fill in overrides the draft.
+name: "Ops: publish article"
+
+on:
+  workflow_dispatch:
+    inputs:
+      brief:
+        description: Brief for the AI draft (used when title/body are empty)
+        type: string
+      title:
+        description: Title (overrides the draft)
+        type: string
+      body:
+        description: Markdown body (overrides the draft)
+        type: string
+      slug:
+        description: Slug (blank = auto)
+        type: string
+      tags:
+        description: Comma-separated tags
+        type: string
+      excerpt:
+        description: Excerpt
+        type: string
+      image_brief:
+        description: Cover scene (one sentence, physical metaphor)
+        type: string
+      draft_post:
+        description: Mark the post draft:true (hidden until removed)
+        type: boolean
+        default: false
+
+jobs:
+  publish:
+    name: Draft, illustrate & open PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_IMAGE_MODEL: gpt-image-2
+      LANDING_REPO: dhanikaa/luminary-landing-page
+      LANDING_REPO_TOKEN: ${{ secrets.LANDING_REPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Draft with Claude (when title/body not supplied)
+        id: draft
+        env:
+          BRIEF: ${{ inputs.brief }}
+          TITLE: ${{ inputs.title }}
+          BODY: ${{ inputs.body }}
+        run: |
+          set -o pipefail
+          if [ -n "$TITLE" ] && [ -n "$BODY" ]; then
+            echo 'draft={}' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -z "$BRIEF" ]; then
+            echo "::error::Give either a brief (for an AI draft) or a title + body."
+            exit 1
+          fi
+          REQ=$(jq -cn --arg brief "$BRIEF" '{kind:"article", $brief}')
+          RESP=$(npx tsx scripts/ops.ts POST /api/publish/draft "$REQ")
+          echo "draft=$(echo "$RESP" | jq -c .draft)" >> "$GITHUB_OUTPUT"
+      - name: Publish (cover + PR to dev)
+        env:
+          DRAFT: ${{ steps.draft.outputs.draft }}
+          TITLE: ${{ inputs.title }}
+          BODY: ${{ inputs.body }}
+          SLUG: ${{ inputs.slug }}
+          TAGS: ${{ inputs.tags }}
+          EXCERPT: ${{ inputs.excerpt }}
+          IMAGE_BRIEF: ${{ inputs.image_brief }}
+          DRAFT_POST: ${{ inputs.draft_post }}
+        run: |
+          set -o pipefail
+          PAYLOAD=$(echo "$DRAFT" | jq -c \
+            --arg title "$TITLE" --arg body "$BODY" --arg slug "$SLUG" \
+            --arg tags "$TAGS" --arg excerpt "$EXCERPT" --arg imageBrief "$IMAGE_BRIEF" \
+            --argjson draft "$DRAFT_POST" '{
+              title:      (if $title      != "" then $title      else .title      end),
+              body:       (if $body       != "" then $body       else .body       end),
+              slug:       (if $slug       != "" then $slug       else (.slug // "") end),
+              excerpt:    (if $excerpt    != "" then $excerpt    else (.excerpt // "") end),
+              imageBrief: (if $imageBrief != "" then $imageBrief else (.imageBrief // "") end),
+              tags:       (if $tags != "" then ($tags | split(",") | map(gsub("^\\s+|\\s+$";"")) | map(select(. != ""))) else (.tags // []) end),
+              draft:      $draft
+            }')
+          RESP=$(npx tsx scripts/ops.ts POST /api/publish/article "$PAYLOAD")
+          echo "$RESP" | jq 'del(.cover)'
+          {
+            echo "### Article published → PR"
+            echo "$RESP" | jq -r '"- PR: \(.prUrl)\n- Slug: `/blog/\(.slug)`"'
+            echo ""
+            echo "Merging the PR publishes it on dev.luminary-dev.xyz; promote dev → prod to go live."
+          } >> "$GITHUB_STEP_SUMMARY"

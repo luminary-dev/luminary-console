@@ -51,6 +51,33 @@ client record shows the manual CNAME to add.
 npm install && vercel env pull && npm run dev
 ```
 
+## GitHub Actions — CI & ops
+
+CI (`Build`) runs on every PR and push to `main` (build + typecheck; failures
+on `main` ping Telegram), and `release-tag.yml` tags a release whenever the
+package version changes. `main` is PR-only with `Build` required.
+
+Every console operation is also runnable from the Actions tab, with the run
+log as the receipt. `scripts/ops.ts` resolves a path against `app/api/**` and
+invokes that route handler directly on the runner (no session — the runner
+holds the same backend credentials from Actions secrets), so an ops run is
+byte-for-byte what the console UI would have done; the activity feed
+attributes it to "operator".
+
+- **Ops: console API** — generic: any method + path + JSON body
+  (payments, stage changes, sends, tasks, notes, billing, …).
+- **Ops: new client** — the New-client pipeline (estimate, questionnaire,
+  PDFs, subdomain, email).
+- **Ops: document action** — publish / unpublish / delete / regenerate
+  (with instructions + cascade) / retry stage-2.
+- **Ops: publish article** / **Ops: add project** — the landing-page Publish
+  portal: optional Claude draft, gpt-image-2 artwork, PR against the landing
+  repo's `dev`.
+
+Secrets: the workflows read the same names as `.env.local` — seed them with
+`gh secret set -f .env.local` (plus `LANDING_REPO_TOKEN` / `OPENAI_API_KEY`
+if not already there).
+
 ## Storage
 
 Cloudflare R2 via its S3-compatible API (endpoint
