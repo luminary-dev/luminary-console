@@ -13,6 +13,7 @@ import SessionsCard from "@/components/SessionsCard";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
 import PushToggle from "@/components/PushToggle";
+import AppTabBar from "@/components/AppTabBar";
 
 export const metadata = { title: "Clients" };
 export const dynamic = "force-dynamic";
@@ -101,18 +102,20 @@ export default async function Dashboard() {
           <ThemeToggle />
           <PushToggle />
           <SignOut />
-          <Link className="btn ghost small" href="/activity">
+          {/* .app-hide: in the installed app the tab bar owns navigation and
+              CSV export is a desktop affair — hidden there, unchanged on web. */}
+          <Link className="btn ghost small app-hide" href="/activity">
             Activity{unread > 0 ? ` · ${unread}` : ""}
           </Link>
-          <Link className="btn ghost small" href="/publish">
+          <Link className="btn ghost small app-hide" href="/publish">
             Publish
           </Link>
           {index.length > 0 && (
-            <a className="btn ghost small" href="/api/clients/export">
+            <a className="btn ghost small app-hide" href="/api/clients/export">
               Export CSV
             </a>
           )}
-          <Link className="btn" href="/clients/new">
+          <Link className="btn app-hide" href="/clients/new">
             + New client
           </Link>
         </div>
@@ -131,7 +134,7 @@ export default async function Dashboard() {
               <MarkAllRead />
             </span>
           </div>
-          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
+          <p className="app-hide" style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
             Unseen actions across your clients — document publishes, invoices, payments, stage
             changes and emails, plus uploads, questions and acceptances from the portals.
             Opening an update clears it; the full history lives in{" "}
@@ -260,6 +263,7 @@ export default async function Dashboard() {
 
       <SessionsCard />
       <CommandPalette items={rows.map((r) => ({ slug: r.slug, company: r.company, docNoBase: r.docNoBase }))} />
+      <AppTabBar />
     </main>
   );
 }

@@ -8,6 +8,7 @@ import { getIndex } from "@/lib/store";
 import ActivityList from "@/components/ActivityList";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
+import AppTabBar from "@/components/AppTabBar";
 
 export const metadata = { title: "Activity" };
 export const dynamic = "force-dynamic";
@@ -41,7 +42,7 @@ export default async function ActivityPage() {
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <ThemeToggle />
           <SignOut />
-          <Link className="btn ghost small" href="/">
+          <Link className="btn ghost small app-hide" href="/">
             ← Dashboard
           </Link>
         </div>
@@ -49,13 +50,14 @@ export default async function ActivityPage() {
 
       <div className="card">
         <h3>Recent activity</h3>
-        <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
+        <p className="app-hide" style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
           What&apos;s new since your last visit — document actions, payments, portal acceptances,
           questions and uploads. Use <b>See more</b> for everything already seen; the log keeps the
           most recent 500.
         </p>
         <ActivityList entries={entries} now={now} clients={clients} seenAt={seenAt} />
       </div>
+      <AppTabBar />
     </main>
   );
 }
