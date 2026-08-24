@@ -2,8 +2,8 @@
 // no HTTP server and no session: the GitHub Actions "ops" workflows check out
 // this repo and run exactly the code the console UI calls, with the same
 // backend credentials from Actions secrets. Nothing here re-implements a
-// route; the path is resolved against app/api/** and the matching handler is
-// imported and called with a synthetic Request.
+// route; scripts/invoke.ts resolves the path against app/** and calls the
+// matching handler with a synthetic Request.
 //
 //   npx tsx scripts/ops.ts <METHOD> </api/path> [json-body]
 //   npx tsx scripts/ops.ts GET  /api/clients
@@ -12,44 +12,11 @@
 // Prints the handler's JSON (or text) response to stdout — stdout carries the
 // response ONLY, so workflows can pipe it to jq; diagnostics go to stderr.
 // Exits non-zero on a 4xx/5xx response.
-import { existsSync } from "node:fs";
-import { readdir } from "node:fs/promises";
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
-
-const ROOT = join(__dirname, "..");
-const API_DIR = join(ROOT, "app", "api");
-
-type Match = { file: string; params: Record<string, string> };
-
-// Resolve /api/a/b/c against app/api/**: literal directory first, else the
-// single [param] directory — the same matching Next does for these routes.
-async function resolve(pathname: string): Promise<Match | null> {
-  const segs = pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean);
-  let dir = API_DIR;
-  const params: Record<string, string> = {};
-  for (const seg of segs) {
-    const literal = join(dir, seg);
-    if (existsSync(literal)) {
-      dir = literal;
-      continue;
-    }
-    const entries = await readdir(dir, { withFileTypes: true });
-    const dyn = entries.find((e) => e.isDirectory() && /^\[\.{0,3}[^\]]+\]$/.test(e.name));
-    if (!dyn) return null;
-    const name = dyn.name.slice(1, -1);
-    if (name.startsWith("...")) {
-      // catch-all: the rest of the segments belong to it
-      params[name.slice(3)] = segs.slice(segs.indexOf(seg)).join("/");
-      dir = join(dir, dyn.name);
-      break;
-    }
-    params[name] = decodeURIComponent(seg);
-    dir = join(dir, dyn.name);
-  }
-  const file = join(dir, "route.ts");
-  return existsSync(file) ? { file, params } : null;
-}
+//
+// Relay hand-back: when OPS_REQUEST_ID is set (by ops-run.yml when the
+// console UI dispatched the run via /api/ops/relay), the response is written
+// to ops-results/<id>.json in the store so the relay can return it.
+import { callRoute, resolveRoute } from "./invoke";
 
 async function main(): Promise<void> {
   const [method, pathname, body] = process.argv.slice(2);
@@ -58,41 +25,30 @@ async function main(): Promise<void> {
     process.exit(2);
   }
 
-  const match = await resolve(pathname);
+  const match = await resolveRoute(pathname);
   if (!match) {
     console.error(`No route matches ${pathname}`);
     process.exit(2);
   }
-  console.error(`→ ${method.toUpperCase()} ${pathname}  (${match.file.replace(ROOT + "/", "")})`);
+  console.error(`→ ${method.toUpperCase()} ${pathname}`);
 
-  const mod = await import(pathToFileURL(match.file).href);
-  const handler = mod[method.toUpperCase()];
-  if (typeof handler !== "function") {
-    console.error(`Route has no ${method.toUpperCase()} handler.`);
+  let res;
+  try {
+    res = await callRoute(method, pathname, body === undefined ? undefined : body);
+  } catch (e) {
+    console.error(e);
     process.exit(2);
   }
-
-  const req = new Request(`https://ops.local${pathname}`, {
-    method: method.toUpperCase(),
-    headers: { "content-type": "application/json" },
-    ...(body ? { body } : {}),
-  });
-  const res: Response = await handler(req, { params: Promise.resolve(match.params) });
-  const text = await res.text();
   console.error(`← ${res.status}`);
-  console.log(text);
+  console.log(res.text);
 
-  // Relay hand-back: when the console UI dispatched this run (OPS_REQUEST_ID
-  // set by ops-run.yml), write the response into the store so /api/ops/relay
-  // can return it. Written for error responses too — the UI needs those — and
-  // before the non-zero exit below.
   const requestId = process.env.OPS_REQUEST_ID;
   if (requestId && /^[a-f0-9-]{8,64}$/.test(requestId)) {
     try {
       const { writeState } = await import("../lib/store");
       await writeState(`ops-results/${requestId}.json`, {
         status: res.status,
-        body: text,
+        body: res.text,
         at: new Date().toISOString(),
       });
       console.error(`↳ result stored for relay ${requestId}`);
