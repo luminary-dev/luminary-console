@@ -41,9 +41,35 @@ Luminary Studio's client-document platform, end to end:
 | `CLOUDFLARE_API_TOKEN` (+ optional `CLOUDFLARE_ZONE_ID`) | DNS automation |
 | `VERCEL_TOKEN` / `VERCEL_PROJECT_ID` / `VERCEL_TEAM_ID` | domain attach |
 | `ROOT_DOMAIN` / `CONSOLE_HOST` | defaults: `luminary-dev.xyz` / `console.…` |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` (+ optional `VAPID_SUBJECT`) | Web Push to the installed console app |
 
 Missing DNS tokens degrade gracefully: everything still generates, and the
 client record shows the manual CNAME to add.
+
+## iPhone app (installed PWA + push)
+
+The console is an installable web app — same UI, same theme, real push
+notifications (iOS 16.4+), no App Store build to maintain.
+
+**Install on an iPhone**: open the console in Safari, sign in, tap
+**Share → Add to Home Screen**. The app opens full-screen from the home
+screen with the Luminary icon.
+
+**Enable notifications**: inside the installed app (or any desktop browser),
+tap **Alerts: off** in the dashboard topbar and accept the permission prompt.
+A test notification confirms delivery end to end. Every studio notice that
+pings Telegram — payments, acceptances, questionnaire submissions, questions,
+uploads, design picks/feedback, signed agreements, site deploys, publishes,
+the daily digest — also lands on every subscribed device; tapping one opens
+the relevant console page.
+
+Mechanics: `public/sw.js` (service worker: push display + tap routing),
+`lib/push.ts` (VAPID sends, subscriptions in the R2 state file
+`push-subscriptions.json`, expired endpoints self-prune), `lib/notify.ts`
+(one call fans out to Telegram + push), `components/PushToggle.tsx` (per-device
+toggle), `/api/push` (+ `/api/push/test`). Keys were generated with
+`web-push generate-vapid-keys`; rotating them invalidates existing
+subscriptions, so devices must re-toggle after a rotation.
 
 ## Develop
 

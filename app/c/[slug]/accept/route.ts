@@ -8,7 +8,8 @@ import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { saveDoc } from "@/lib/pipeline";
 import { emailStudio } from "@/lib/email";
-import { sendTelegram, tgEsc, tgNotice } from "@/lib/telegram";
+import { tgEsc } from "@/lib/telegram";
+import { studioNotice } from "@/lib/notify";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { advanceStage } from "@/lib/stage";
@@ -96,15 +97,13 @@ export async function POST(
 <p><a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open ${esc(client.company)} in the console →</a></p>`,
   );
 
-  await sendTelegram(
-    tgNotice({
-      emoji: "✅",
-      title: "Quotation accepted",
-      company: client.company,
-      lines: [`${tgEsc(name)} accepted ${tgEsc(quotation.no)}`],
-      url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
-    }),
-  );
+  await studioNotice({
+    emoji: "✅",
+    title: "Quotation accepted",
+    company: client.company,
+    lines: [`${tgEsc(name)} accepted ${tgEsc(quotation.no)}`],
+    url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
+  });
 
   return NextResponse.json({ ok: true, name, at: client.acceptance.at });
 }

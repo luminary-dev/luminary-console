@@ -111,7 +111,17 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/api/cron/") ||
     pathname.startsWith("/_next") ||
     pathname === "/icon.svg" ||
-    pathname === "/favicon.ico"
+    pathname === "/favicon.ico" ||
+    // PWA plumbing must survive a signed-out state: the service worker's
+    // update fetch and the manifest/icon fetches iOS makes while installing
+    // would otherwise get a redirect to /login and break the installed app.
+    // All static public assets, nothing sensitive.
+    pathname === "/manifest.webmanifest" ||
+    pathname === "/sw.js" ||
+    pathname === "/apple-touch-icon.png" ||
+    pathname === "/icon-192.png" ||
+    pathname === "/icon-512.png" ||
+    pathname === "/badge.png"
   ) {
     return harden(NextResponse.next(), pathname === "/login");
   }

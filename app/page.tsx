@@ -12,6 +12,7 @@ import CommandPalette from "@/components/CommandPalette";
 import SessionsCard from "@/components/SessionsCard";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
+import PushToggle from "@/components/PushToggle";
 
 export const metadata = { title: "Clients" };
 export const dynamic = "force-dynamic";
@@ -98,6 +99,7 @@ export default async function Dashboard() {
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <ThemeToggle />
+          <PushToggle />
           <SignOut />
           <Link className="btn ghost small" href="/activity">
             Activity{unread > 0 ? ` · ${unread}` : ""}

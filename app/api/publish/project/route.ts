@@ -3,6 +3,7 @@ import { generateImage, thumbPrompts } from "@/lib/publish/images";
 import { fetchLandingFile, landingBranchExists, openLandingPR } from "@/lib/publish/github";
 import type { ProjectDraft } from "@/lib/publish/draft";
 import { sendTelegram, tgEsc } from "@/lib/telegram";
+import { sendPush } from "@/lib/push";
 import { currentOperator } from "@/lib/operator";
 
 export const runtime = "nodejs";
@@ -148,6 +149,11 @@ export async function POST(req: Request) {
         `<a href="${pr.url}">Review the PR →</a>`,
       ].join("\n\n"),
     );
+    await sendPush({
+      title: `🏗️ Project published → PR · ${p.name}`,
+      body: `/work/${slug} — tap to review the PR`,
+      url: pr.url,
+    });
 
     return NextResponse.json({
       slug,
