@@ -113,7 +113,8 @@ const unesc = (s: string) =>
   String(s ?? "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 
 /** Push twin of tgNotice — same inputs, plain-text rendering:
- *  title "{emoji} {Title} · {Company}", body = detail lines, click opens url. */
+ *  title "{Title} · {Company}", body = detail lines, click opens url.
+ *  The emoji is Telegram styling only — lock-screen titles stay plain. */
 export async function sendPushNotice(opts: {
   emoji: string;
   title: string;
@@ -122,7 +123,7 @@ export async function sendPushNotice(opts: {
   url: string;
 }): Promise<number> {
   return sendPush({
-    title: `${opts.emoji} ${opts.title} · ${opts.company}`,
+    title: `${opts.title} · ${opts.company}`,
     body: (opts.lines ?? []).filter((l) => l && l.trim()).map(unesc).join("\n"),
     url: opts.url,
   });

@@ -18,7 +18,9 @@ self.addEventListener("push", (event) => {
   try {
     data = event.data.json();
   } catch {
-    data = { title: "Luminary", body: event.data.text() };
+    // iOS already labels the notification with the app's name — a neutral
+    // fallback avoids "Luminary" appearing twice.
+    data = { title: "Update", body: event.data.text() };
   }
   const options = {
     body: data.body || "",
@@ -27,7 +29,7 @@ self.addEventListener("push", (event) => {
     tag: data.tag || undefined,
     data: { url: data.url || "/" },
   };
-  event.waitUntil(self.registration.showNotification(data.title || "Luminary", options));
+  event.waitUntil(self.registration.showNotification(data.title || "Update", options));
 });
 
 self.addEventListener("notificationclick", (event) => {
