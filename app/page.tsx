@@ -97,7 +97,7 @@ export default async function Dashboard() {
           Luminary<span>.</span>
           <small>Console</small>
         </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <ThemeToggle />
           <PushToggle />
           <SignOut />
