@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
+import AppTabBar from "@/components/AppTabBar";
 import { opsFetch } from "@/lib/ops-fetch";
 
 export default function NewClientPage() {
@@ -52,7 +53,7 @@ export default function NewClientPage() {
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <ThemeToggle />
           <SignOut />
-          <Link className="btn ghost small" href="/">
+          <Link className="btn ghost small app-hide" href="/">
             ← Dashboard
           </Link>
         </div>
@@ -111,6 +112,7 @@ export default function NewClientPage() {
           {busy ? "Generating…" : "Create client & generate documents"}
         </button>
       </form>
+      <AppTabBar />
     </main>
   );
 }

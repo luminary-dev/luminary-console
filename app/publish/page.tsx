@@ -2,6 +2,7 @@ import Link from "next/link";
 import PublishStudio from "@/components/PublishStudio";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
+import AppTabBar from "@/components/AppTabBar";
 
 export const metadata = { title: "Publish" };
 
@@ -21,12 +22,13 @@ export default function PublishPage() {
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <ThemeToggle />
           <SignOut />
-          <Link className="btn ghost small" href="/">
+          <Link className="btn ghost small app-hide" href="/">
             ← Dashboard
           </Link>
         </div>
       </div>
       <PublishStudio />
+      <AppTabBar />
     </main>
   );
 }
