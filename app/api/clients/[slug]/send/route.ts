@@ -8,7 +8,8 @@
 import { NextResponse } from "next/server";
 import { fetchAsset, getClient, saveClient } from "@/lib/store";
 import { emailAddresses } from "@/lib/email";
-import { logOperatorActivity } from "@/lib/operator";
+import { currentOperator, logOperatorActivity } from "@/lib/operator";
+import { sendPushNotice } from "@/lib/push";
 import { billingLabel } from "@/lib/doclabels";
 import { DOC_LABELS, type DocType } from "@/lib/types";
 
@@ -122,5 +123,12 @@ ${intro}
   ];
   await saveClient(client);
   await logOperatorActivity("emailed documents", slug, sentDocs.join(", "));
+  // Push only — see docs/[type]: operator actions notify phones, not Telegram.
+  await sendPushNotice({
+    title: "Documents emailed",
+    company: client.company,
+    lines: [`${sentDocs.join(", ")} → ${client.email}`, `by ${await currentOperator()}`],
+    url: `https://${process.env.CONSOLE_HOST || `console.${process.env.ROOT_DOMAIN || "luminary-dev.xyz"}`}/clients/${slug}`,
+  });
   return NextResponse.json({ ok: true, sentTo: client.email, docs: sentDocs });
 }

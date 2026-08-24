@@ -4,9 +4,13 @@ import { NextResponse } from "next/server";
 import { deleteAssets, fetchAsset, getClient, saveClient } from "@/lib/store";
 import { archiveVersion, saveDoc, runStage2, todayLabel } from "@/lib/pipeline";
 import { reviseDoc } from "@/lib/generate";
-import { logOperatorActivity } from "@/lib/operator";
+import { currentOperator, logOperatorActivity } from "@/lib/operator";
+import { sendPushNotice } from "@/lib/push";
 import { advanceStage } from "@/lib/stage";
 import type { DocType } from "@/lib/types";
+
+const CONSOLE_HOST =
+  process.env.CONSOLE_HOST || `console.${process.env.ROOT_DOMAIN || "luminary-dev.xyz"}`;
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -39,6 +43,15 @@ export async function POST(
       if (action === "publish" && docType === "quotation") advanceStage(client, "quoted");
       await saveClient(client);
       await logOperatorActivity(`${action}ed ${docType}`, slug, meta.no);
+      // Team phones: (un)publishing changes what the client can see, so the
+      // other admins hear about it. Push only — the Telegram feed stays
+      // curated to client events and money, as designed.
+      await sendPushNotice({
+        title: `${docType[0].toUpperCase()}${docType.slice(1)} ${action}ed`,
+        company: client.company,
+        lines: [`${meta.no} · by ${await currentOperator()}`],
+        url: `https://${CONSOLE_HOST}/clients/${slug}`,
+      });
       return NextResponse.json({ ok: true, status: meta.status });
     }
 

@@ -116,7 +116,8 @@ const unesc = (s: string) =>
  *  title "{Title} · {Company}", body = detail lines, click opens url.
  *  The emoji is Telegram styling only — lock-screen titles stay plain. */
 export async function sendPushNotice(opts: {
-  emoji: string;
+  /** Accepted for studioNotice compatibility; Telegram-only styling. */
+  emoji?: string;
   title: string;
   company: string;
   lines?: string[];
