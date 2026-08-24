@@ -48,13 +48,22 @@ async function relay(req: Request): Promise<Response> {
   const resultKey = `ops-results/${requestId}.json`;
   const actor = await currentOperator();
 
-  await dispatchOps({
-    method: req.method,
-    path: target,
-    ...(body ? { body } : {}),
-    request_id: requestId,
-    actor,
-  });
+  try {
+    await dispatchOps({
+      method: req.method,
+      path: target,
+      ...(body ? { body } : {}),
+      request_id: requestId,
+      actor,
+    });
+  } catch (e) {
+    // A dispatch failure (revoked token, GitHub down) must reach the UI as a
+    // readable error, not an opaque 500.
+    return NextResponse.json(
+      { error: `Ops dispatch failed: ${e instanceof Error ? e.message : String(e)}` },
+      { status: 502 },
+    );
+  }
 
   const deadline = Date.now() + POLL_DEADLINE_MS;
   while (Date.now() < deadline) {
