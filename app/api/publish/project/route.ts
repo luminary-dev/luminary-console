@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { generateImage, thumbPrompts } from "@/lib/publish/images";
 import { fetchLandingFile, landingBranchExists, openLandingPR } from "@/lib/publish/github";
 import type { ProjectDraft } from "@/lib/publish/draft";
+import { sendTelegram, tgEsc } from "@/lib/telegram";
+import { currentOperator } from "@/lib/operator";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -129,6 +131,23 @@ export async function POST(req: Request) {
         { path: `public/work/thumbs/${slug}-dark.jpg`, base64: dark.toString("base64") },
       ],
     });
+
+    // Team awareness — same convention as payments/acceptances: best-effort,
+    // never blocks the publish.
+    await sendTelegram(
+      [
+        `🏗️ <b>Project published → PR</b> · ${tgEsc(p.name)}`,
+        [
+          `/work/${slug} · ${isEng ? "Cloud & DevOps (repo)" : "Web (complete website)"}`,
+          `Day + dusk thumbnails generated`,
+          !isEng ? "Needs device screenshots before merge (see the PR checklist)" : "",
+          `By ${tgEsc(await currentOperator())}`,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        `<a href="${pr.url}">Review the PR →</a>`,
+      ].join("\n\n"),
+    );
 
     return NextResponse.json({
       slug,

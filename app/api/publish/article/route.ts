@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { coverPrompt, generateImage, inlinePrompt } from "@/lib/publish/images";
 import { landingBranchExists, landingFileExists, openLandingPR } from "@/lib/publish/github";
 import { draftInlineScenes, type InlineScene } from "@/lib/publish/draft";
+import { sendTelegram, tgEsc } from "@/lib/telegram";
+import { currentOperator } from "@/lib/operator";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -129,6 +131,25 @@ export async function POST(req: Request) {
         ...inlineFiles,
       ],
     });
+
+    // Team awareness — same convention as payments/acceptances: best-effort,
+    // never blocks the publish.
+    await sendTelegram(
+      [
+        `📝 <b>Article published → PR</b> · ${tgEsc(title)}`,
+        [
+          `/blog/${slug}${draftFlag ? " (draft: true)" : ""}`,
+          tags.length ? `Tags: ${tgEsc(tags.join(", "))}` : "",
+          inlineFiles.length
+            ? `Cover + ${inlineFiles.length} inline illustration${inlineFiles.length > 1 ? "s" : ""}`
+            : "Cover generated",
+          `By ${tgEsc(await currentOperator())}`,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        `<a href="${pr.url}">Review the PR →</a>`,
+      ].join("\n\n"),
+    );
 
     return NextResponse.json({
       slug,
