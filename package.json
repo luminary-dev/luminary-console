@@ -12,7 +12,8 @@
     "test:article": "tsx --env-file=.env.local scripts/tests/suite-article.ts",
     "test:project": "tsx --env-file=.env.local scripts/tests/suite-project.ts",
     "test:client": "tsx --env-file=.env.local scripts/tests/suite-client.ts",
-    "test:ops": "tsx --env-file=.env.local scripts/tests/suite-ops.ts"
+    "test:ops": "tsx --env-file=.env.local scripts/tests/suite-ops.ts",
+    "test:notify": "tsx --env-file=.env.local scripts/tests/suite-notify.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",

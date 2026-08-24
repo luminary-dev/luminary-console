@@ -3,7 +3,8 @@
 import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { STAGES, STAGE_LABELS, stageRank } from "@/lib/stage";
-import { logOperatorActivity } from "@/lib/operator";
+import { currentOperator, logOperatorActivity } from "@/lib/operator";
+import { sendPushNotice } from "@/lib/push";
 import type { ClientStage } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -38,5 +39,12 @@ export async function POST(
   // delivery and a 30-day warranty commitment on the handover pack.
   await saveClient(client);
   await logOperatorActivity("set stage", slug, STAGE_LABELS[stage]);
+  // Push only — see docs/[type]: operator actions notify phones, not Telegram.
+  await sendPushNotice({
+    title: "Stage changed",
+    company: client.company,
+    lines: [`→ ${STAGE_LABELS[stage]} · by ${await currentOperator()}`],
+    url: `https://${process.env.CONSOLE_HOST || `console.${process.env.ROOT_DOMAIN || "luminary-dev.xyz"}`}/clients/${slug}`,
+  });
   return NextResponse.json({ ok: true, stage });
 }
