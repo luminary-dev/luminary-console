@@ -141,6 +141,28 @@ async function main() {
     }
   });
 
+  await test("second submission is recorded but never re-drafts documents", async () => {
+    const rec = (await getRecord())!;
+    const before = rec.docs.quotation.no;
+    const r = await callRoute(
+      "POST",
+      `/c/${SLUG}/submit`,
+      { answers: { contactName: "QA Tester 2", describe: "Second QA submission." }, sendCopy: false },
+      undefined,
+      { "x-forwarded-for": "10.9.9.2" },
+    );
+    // The tailored schema may mark extra fields required — a 400 here is the
+    // schema doing its job; a 200 must land in submissions history.
+    if (r.status === 200) {
+      const after = (await getRecord())!;
+      expect((after.submissions ?? []).length >= 2, "second submission not recorded");
+      expect(after.docs.quotation.no === before, "documents were re-drafted");
+    } else {
+      expect(r.status === 400, `got ${r.status}: ${r.text.slice(0, 160)}`);
+      note("schema required more fields — validation path exercised instead");
+    }
+  });
+
   await test("unknown doc type and unknown action are 400s", async () => {
     const a = await callRoute("POST", `/api/clients/${SLUG}/docs/blueprint`, { action: "publish" });
     expect(a.status === 400, `doc type: got ${a.status}`);
@@ -154,6 +176,44 @@ async function main() {
     const rec = (await getRecord())!;
     expect(rec.docs.quotation.status === "published", "not published");
     expect(rec.stage === "quoted", `stage: ${rec.stage}`);
+  });
+
+  await test("public doc page serves the published quotation, 404s a draft", async () => {
+    const pub = await callRoute("GET", `/c/${SLUG}/quotation`);
+    expect(pub.status === 200, `published: got ${pub.status}`);
+    expect(pub.headers["content-type"]?.includes("text/html"), "not HTML");
+    expect(pub.text.includes(COMPANY.split(" (")[0]), "company missing from page");
+    const draft = await callRoute("GET", `/c/${SLUG}/proposal`);
+    expect(draft.status === 404, `draft: got ${draft.status}`);
+    const missing = await callRoute("GET", `/c/${SLUG}/receipt`);
+    expect(missing.status === 404, `missing doc: got ${missing.status}`);
+  });
+
+  await test("acceptance requires a name, then stamps and advances the stage", async () => {
+    const noName = await callRoute("POST", `/c/${SLUG}/accept`, { name: "" }, undefined, {
+      "x-forwarded-for": "10.9.9.3",
+    });
+    expect(noName.status === 400, `no-name: got ${noName.status}`);
+    const honey = await callRoute(
+      "POST",
+      `/c/${SLUG}/accept`,
+      { name: "Bot", company: "spam co" },
+      undefined,
+      { "x-forwarded-for": "10.9.9.4" },
+    );
+    expect(honey.status === 200 && honey.json?.ok === true, "honeypot should pretend success");
+    expect(!(await getRecord())!.acceptance, "honeypot must not accept");
+    const ok = await callRoute("POST", `/c/${SLUG}/accept`, { name: "QA Acceptor" }, undefined, {
+      "x-forwarded-for": "10.9.9.5",
+    });
+    expect(ok.status === 200 && ok.json?.name === "QA Acceptor", `accept: ${ok.text}`);
+    const rec = (await getRecord())!;
+    expect(rec.acceptance?.name === "QA Acceptor", "acceptance not stored");
+    expect(rec.stage === "accepted", `stage: ${rec.stage}`);
+    const again = await callRoute("POST", `/c/${SLUG}/accept`, { name: "Other" }, undefined, {
+      "x-forwarded-for": "10.9.9.6",
+    });
+    expect(again.json?.already === true, "second accept not idempotent");
   });
 
   await test("retry-stage2 refuses while the quotation is published (409)", async () => {
@@ -190,13 +250,34 @@ async function main() {
     expect(b.status === 200 && b.json?.status === "draft", `unpublish: ${b.text}`);
   });
 
-  await test("contract can be deleted once unpublished", async () => {
+  await test("contract e-signing: 404 unpublished, then stamps a signature", async () => {
+    const early = await callRoute("POST", `/c/${SLUG}/sign-contract`, { name: "QA Signer" }, undefined, {
+      "x-forwarded-for": "10.9.9.7",
+    });
+    expect(early.status === 404, `unpublished sign: got ${early.status}`);
     await callRoute("POST", `/api/clients/${SLUG}/docs/contract`, { action: "publish" });
+    const ok = await callRoute("POST", `/c/${SLUG}/sign-contract`, { name: "QA Signer" }, undefined, {
+      "x-forwarded-for": "10.9.9.8",
+    });
+    expect(ok.status === 200 && ok.json?.name === "QA Signer", `sign: ${ok.text}`);
+    expect((await getRecord())!.contractSignature?.name === "QA Signer", "signature not stored");
+    const again = await callRoute("POST", `/c/${SLUG}/sign-contract`, { name: "Other" }, undefined, {
+      "x-forwarded-for": "10.9.9.9",
+    });
+    expect(again.json?.already === true, "second sign not idempotent");
+  });
+
+  await test("contract can be deleted once unpublished", async () => {
     await callRoute("POST", `/api/clients/${SLUG}/docs/contract`, { action: "unpublish" });
     const r = await callRoute("POST", `/api/clients/${SLUG}/docs/contract`, { action: "delete" });
     expect(r.status === 200, `got ${r.status}: ${r.text}`);
     const rec = (await getRecord())!;
     expect(!rec.docs.contract, "contract still present");
+  });
+
+  await test("docs route 404s a document that was never generated", async () => {
+    const r = await callRoute("POST", `/api/clients/${SLUG}/docs/invoice`, { action: "publish" });
+    expect(r.status === 404, `got ${r.status}: ${r.text}`);
   });
 
   await test("billing: 'other' invoice without instructions is a 400", async () => {
@@ -227,6 +308,42 @@ async function main() {
       doc: invoiceSlug,
     });
     expect(pub.status === 200, `publish: ${pub.text}`);
+  });
+
+  await test("send: emails the published documents to the client", async () => {
+    const bad = await callRoute("POST", `/api/clients/${SLUG}/send`, { docs: ["nonexistent"] });
+    expect(bad.status === 400, `unknown doc: got ${bad.status}`);
+    const r = await callRoute("POST", `/api/clients/${SLUG}/send`, { docs: ["quotation"] });
+    expect(r.status === 200, `got ${r.status}: ${r.text}`);
+    expect(r.json?.sentTo === "support@luminary-dev.xyz", `sentTo: ${r.json?.sentTo}`);
+    const rec = (await getRecord())!;
+    expect((rec.emailLog ?? []).length >= 1, "emailLog not recorded");
+  });
+
+  await test("change orders: free-tier default, override, and removal", async () => {
+    const noDesc = await callRoute("POST", `/api/clients/${SLUG}/change-orders`, { action: "add", desc: " " });
+    expect(noDesc.status === 400, `no desc: got ${noDesc.status}`);
+    const a = await callRoute("POST", `/api/clients/${SLUG}/change-orders`, {
+      action: "add",
+      desc: "QA change one",
+    });
+    expect(a.status === 200, a.text);
+    expect((a.json?.changeOrders as any[])[0].amount === "0", "first change order not free");
+    const b = await callRoute("POST", `/api/clients/${SLUG}/change-orders`, {
+      action: "add",
+      desc: "QA change two",
+      amount: "12,000",
+    });
+    expect((b.json?.changeOrders as any[])[1].amount === "12,000", "override amount lost");
+    const badRm = await callRoute("POST", `/api/clients/${SLUG}/change-orders`, { action: "remove", index: 99 });
+    expect(badRm.status === 404, `bad remove: got ${badRm.status}`);
+    const rm = await callRoute("POST", `/api/clients/${SLUG}/change-orders`, { action: "remove", index: 1 });
+    expect(rm.status === 200 && (rm.json?.changeOrders as any[]).length === 1, "remove failed");
+  });
+
+  await test("handover refuses before delivery (400)", async () => {
+    const r = await callRoute("POST", `/api/clients/${SLUG}/handover`);
+    expect(r.status === 400, `got ${r.status}: ${r.text}`);
   });
 
   await test("payments: invalid amount is a 400", async () => {
@@ -263,6 +380,32 @@ async function main() {
     expect((await getRecord())!.stage === "delivered", "stage not delivered");
   });
 
+  await test("payments: remove works and bad refs are rejected", async () => {
+    const badRef = await callRoute("POST", `/api/clients/${SLUG}/payments`, {
+      action: "add",
+      amount: 100,
+      invoiceSlug: "no-such-invoice",
+    });
+    expect(badRef.status === 400, `bad invoiceSlug: got ${badRef.status}`);
+    const extra = await callRoute("POST", `/api/clients/${SLUG}/payments`, {
+      action: "add",
+      amount: 1000,
+      method: "QA extra",
+    });
+    expect(extra.status === 200, extra.text);
+    const badRm = await callRoute("POST", `/api/clients/${SLUG}/payments`, { action: "remove", index: 99 });
+    expect(badRm.status === 404, `bad remove: got ${badRm.status}`);
+    const rm = await callRoute("POST", `/api/clients/${SLUG}/payments`, { action: "remove", index: 1 });
+    expect(rm.status === 200 && (rm.json?.payments as any[]).length === 1, "remove failed");
+  });
+
+  await test("handover pack generates once delivered (billing kind handover)", async () => {
+    const r = await callRoute("POST", `/api/clients/${SLUG}/handover`);
+    expect(r.status === 200, `got ${r.status}: ${r.text.slice(0, 160)}`);
+    const rec = (await getRecord())!;
+    expect((rec.billing ?? []).some((b: Rec) => b.kind === "handover"), "handover missing");
+  });
+
   await test("manual stage override works and re-stamps delivery", async () => {
     const r = await callRoute("POST", `/api/clients/${SLUG}/stage`, { stage: "development" });
     expect(r.status === 200 && r.json?.stage === "development", r.text);
@@ -281,15 +424,63 @@ async function main() {
     expect(!(await getRecord())!.notes, "note not cleared");
   });
 
-  await test("tasks add → toggle → remove", async () => {
+  await test("tasks add → toggle → remove (and bad indices are 404s)", async () => {
     const a = await callRoute("POST", `/api/clients/${SLUG}/tasks`, { action: "add", text: "QA task" });
     expect(a.status === 200, a.text);
     const t = await callRoute("POST", `/api/clients/${SLUG}/tasks`, { action: "toggle", index: 0 });
     expect(t.status === 200, t.text);
     expect((await getRecord())!.tasks?.[0]?.done === true, "task not toggled");
+    const bad = await callRoute("POST", `/api/clients/${SLUG}/tasks`, { action: "toggle", index: 42 });
+    expect(bad.status >= 400, `bad index: got ${bad.status}`);
     const d = await callRoute("POST", `/api/clients/${SLUG}/tasks`, { action: "remove", index: 0 });
     expect(d.status === 200, d.text);
     expect(((await getRecord())!.tasks ?? []).length === 0, "task not removed");
+  });
+
+  await test("search finds the client by brief content", async () => {
+    const r = await callRoute("GET", "/api/search", undefined, { q: "bakery" });
+    expect(r.status === 200, `got ${r.status}: ${r.text.slice(0, 120)}`);
+    expect(r.text.includes(SLUG), `no hit for ${SLUG}: ${r.text.slice(0, 200)}`);
+  });
+
+  await test("CSV export includes the client row", async () => {
+    const r = await callRoute("GET", "/api/clients/export");
+    expect(r.status === 200, `got ${r.status}`);
+    expect(r.text.startsWith("Company,"), "no CSV header");
+    expect(r.text.includes("QA Suite Testing"), "client row missing");
+  });
+
+  await test("inbox: opening an update marks exactly that one read", async () => {
+    const { recentActivity, isNotifiable, entryKey, getReadKeys } = await import("../../lib/activity");
+    const ev = (await recentActivity(50)).find((e) => e.target === SLUG && isNotifiable(e));
+    expect(ev, "no notifiable event for the fixture");
+    const r = await callRoute("GET", "/api/activity/open", undefined, {
+      at: ev.at,
+      target: ev.target,
+      action: ev.action,
+    });
+    expect(r.status >= 300 && r.status < 400, `expected redirect, got ${r.status}`);
+    expect(r.headers.location?.includes(`/clients/${SLUG}`), `location: ${r.headers.location}`);
+    expect((await getReadKeys()).has(entryKey(ev)), "entry not marked read");
+  });
+
+  await test("inbox: an invalid target never redirects off the dashboard", async () => {
+    const r = await callRoute("GET", "/api/activity/open", undefined, {
+      at: "2026-01-01T00:00:00.000Z",
+      target: "../evil",
+      action: "x",
+    });
+    expect(r.status >= 300 && r.status < 400, `got ${r.status}`);
+    expect(new URL(r.headers.location!).pathname === "/", `location: ${r.headers.location}`);
+  });
+
+  await test("inbox: mark-all-read stamps seenAt and clears per-item reads", async () => {
+    const r = await callRoute("POST", "/api/activity/read");
+    expect(r.status === 200, r.text);
+    const { getNotificationsSeenAt, getReadKeys } = await import("../../lib/activity");
+    const seen = await getNotificationsSeenAt();
+    expect(Date.now() - Date.parse(seen) < 30_000, `seenAt stale: ${seen}`);
+    expect((await getReadKeys()).size === 0, "read list not reset");
   });
 
   await test("activity feed recorded the lifecycle", async () => {

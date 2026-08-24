@@ -10,15 +10,17 @@ import { pathToFileURL } from "node:url";
 const ROOT = join(__dirname, "..");
 const APP_DIR = join(ROOT, "app");
 
-export type Match = { file: string; params: Record<string, string> };
+export type Match = { file: string; params: Record<string, string | string[]> };
 
 // Literal directory first, else the single [param] directory — the same
-// matching Next does for these routes. [...catchall] swallows the rest.
+// matching Next does for these routes. A [...catchall] swallows the rest and,
+// exactly like Next, its param is a string ARRAY (the asset route joins it).
 export async function resolveRoute(pathname: string): Promise<Match | null> {
   const segs = pathname.split("/").filter(Boolean);
   let dir = APP_DIR;
-  const params: Record<string, string> = {};
-  for (const seg of segs) {
+  const params: Record<string, string | string[]> = {};
+  for (let i = 0; i < segs.length; i++) {
+    const seg = segs[i];
     const literal = join(dir, seg);
     if (existsSync(literal)) {
       dir = literal;
@@ -29,7 +31,7 @@ export async function resolveRoute(pathname: string): Promise<Match | null> {
     if (!dyn) return null;
     const name = dyn.name.slice(1, -1);
     if (name.startsWith("...")) {
-      params[name.slice(3)] = segs.slice(segs.indexOf(seg)).join("/");
+      params[name.slice(3)] = segs.slice(i).map(decodeURIComponent);
       dir = join(dir, dyn.name);
       break;
     }
@@ -44,6 +46,7 @@ export type CallResult = {
   status: number;
   text: string;
   json: Record<string, unknown> | null;
+  headers: Record<string, string>;
 };
 
 /** Invoke METHOD <path> with an optional JSON body (object or raw string). */
@@ -52,6 +55,7 @@ export async function callRoute(
   pathname: string,
   body?: unknown,
   query?: Record<string, string>,
+  headers?: Record<string, string>,
 ): Promise<CallResult> {
   const match = await resolveRoute(pathname.split("?")[0]);
   if (!match) throw new Error(`No route matches ${pathname}`);
@@ -65,7 +69,7 @@ export async function callRoute(
   const payload = body === undefined ? undefined : typeof body === "string" ? body : JSON.stringify(body);
   const req = new Request(url, {
     method: method.toUpperCase(),
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...(headers ?? {}) },
     ...(payload !== undefined ? { body: payload } : {}),
   });
   const res: Response = await handler(req, { params: Promise.resolve(match.params) });
@@ -74,5 +78,10 @@ export async function callRoute(
   try {
     json = JSON.parse(text);
   } catch {}
-  return { status: res.status, text, json };
+  return {
+    status: res.status,
+    text,
+    json,
+    headers: Object.fromEntries(res.headers.entries()),
+  };
 }
