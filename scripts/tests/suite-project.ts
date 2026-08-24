@@ -103,6 +103,10 @@ async function verifyBranch(slug: string, kind: "engineering" | "web") {
 }
 
 async function main() {
+  // Publishes now ping the studio Telegram — mute it for QA runs so the team
+  // chat never sees dummy projects (sendTelegram no-ops without the token).
+  process.env.TELEGRAM_BOT_TOKEN = "";
+
   for (const slug of [ENG_SLUG, WEB_SLUG]) {
     const leftover = await openPrFor(branchOf(slug));
     if (leftover) await closePr(leftover);

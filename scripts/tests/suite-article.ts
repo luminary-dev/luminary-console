@@ -33,6 +33,10 @@ const BODY = [
 ].join("\n");
 
 async function main() {
+  // Publishes now ping the studio Telegram — mute it for QA runs so the team
+  // chat never sees dummy posts (sendTelegram no-ops without the token).
+  process.env.TELEGRAM_BOT_TOKEN = "";
+
   // Fresh ground: remove leftovers from a previous (possibly crashed) run.
   const leftover = await openPrFor(BRANCH);
   if (leftover) await closePr(leftover);
