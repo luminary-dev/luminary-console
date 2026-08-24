@@ -2,13 +2,16 @@
   "name": "luminary-console",
   "version": "1.1.0",
   "private": true,
-  "description": "Luminary studio console — AI-drafted client documents (estimate, questionnaire, quotation, proposal, contract, invoice, receipt) on per-client subdomains, end to end",
+  "description": "Luminary studio console \u2014 AI-drafted client documents (estimate, questionnaire, quotation, proposal, contract, invoice, receipt) on per-client subdomains, end to end",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "r2:init": "tsx scripts/r2-init.ts",
-    "recreate:ecomech": "tsx scripts/recreate-ecomech.ts"
+    "recreate:ecomech": "tsx scripts/recreate-ecomech.ts",
+    "test:article": "tsx --env-file=.env.local scripts/tests/suite-article.ts",
+    "test:project": "tsx --env-file=.env.local scripts/tests/suite-project.ts",
+    "test:client": "tsx --env-file=.env.local scripts/tests/suite-client.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",

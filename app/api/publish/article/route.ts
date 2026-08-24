@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { coverPrompt, generateImage } from "@/lib/publish/images";
-import { landingFileExists, openLandingPR } from "@/lib/publish/github";
+import { landingBranchExists, landingFileExists, openLandingPR } from "@/lib/publish/github";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -38,6 +38,14 @@ export async function POST(req: Request) {
   try {
     if (await landingFileExists(`content/blog/${slug}.md`)) {
       return NextResponse.json({ error: `A post with slug "${slug}" already exists.` }, { status: 409 });
+    }
+    // A branch from an earlier publish means a PR is (or was) in flight —
+    // opening a second would let one silently overwrite the other on merge.
+    if (await landingBranchExists(`content/article-${slug}`)) {
+      return NextResponse.json(
+        { error: `"${slug}" already has a publish PR in flight — merge or close it (and delete its branch) first.` },
+        { status: 409 },
+      );
     }
 
     const cover = await generateImage(coverPrompt(imageBrief || `${title} — ${excerpt || "an engineering story"}`));

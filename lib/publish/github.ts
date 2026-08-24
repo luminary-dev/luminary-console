@@ -59,6 +59,24 @@ export async function landingFileExists(path: string): Promise<boolean> {
   return (await fetchLandingFile(path)) !== null;
 }
 
+/** Does a branch (from an earlier publish, its PR likely still open) exist?
+ *  Publish routes check this so re-publishing a slug can't silently open a
+ *  second, conflicting PR — the -2/-3 branch suffixing in openLandingPR is a
+ *  crash-recovery fallback, not a workflow. */
+export async function landingBranchExists(branch: string): Promise<boolean> {
+  const res = await fetch(
+    `https://api.github.com/repos/${REPO()}/git/ref/heads/${branch}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token()}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    },
+  );
+  return res.status === 200;
+}
+
 /**
  * Commit `files` to a new branch off `dev` and open a PR back into `dev`.
  * Returns the PR url + number.

@@ -220,9 +220,20 @@ ${attachmentsHtml}<p>Full answers attached. ${
             .map((a) => `${a.n} (attached file)`);
         }
       }
-      after(async () => {
+      const draft = async () => {
         await runStage2(slug, draftAnswers, submittedAt);
-      });
+      };
+      // after() throws when there is no Next request scope (the ops runner /
+      // test harness invoke these handlers directly). By this point the
+      // submission has ALREADY succeeded — answers stored, PDFs rendered,
+      // emails sent — so a scheduling failure must never surface as a 500
+      // (the client would resubmit a submission that worked). Fall back to
+      // drafting on a floating promise instead.
+      try {
+        after(draft);
+      } catch {
+        void draft().catch((e) => console.error("Stage 2 (fallback) failed:", e));
+      }
     }
 
     return NextResponse.json({ ok: true, copySent });

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateImage, thumbPrompts } from "@/lib/publish/images";
-import { fetchLandingFile, openLandingPR } from "@/lib/publish/github";
+import { fetchLandingFile, landingBranchExists, openLandingPR } from "@/lib/publish/github";
 import type { ProjectDraft } from "@/lib/publish/draft";
 
 export const runtime = "nodejs";
@@ -53,6 +53,14 @@ export async function POST(req: Request) {
     if (!source) throw new Error(`Could not read ${PROJECTS_PATH} from the landing repo.`);
     if (source.includes(`slug: "${slug}"`)) {
       return NextResponse.json({ error: `A project with slug "${slug}" already exists.` }, { status: 409 });
+    }
+    // A branch from an earlier publish means a PR is (or was) in flight —
+    // opening a second would let one silently overwrite the other on merge.
+    if (await landingBranchExists(`content/project-${slug}`)) {
+      return NextResponse.json(
+        { error: `"${slug}" already has a publish PR in flight — merge or close it (and delete its branch) first.` },
+        { status: 409 },
+      );
     }
     const anchor = "\n];";
     const at = source.lastIndexOf(anchor);
