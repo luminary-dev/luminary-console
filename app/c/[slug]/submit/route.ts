@@ -8,7 +8,8 @@ import { buildSections, validIds } from "@/lib/questions";
 import { renderAnswers } from "@/lib/templates/answers";
 import { renderPdf } from "@/lib/pdf";
 import { emailStudio, emailAddresses } from "@/lib/email";
-import { sendTelegram, tgEsc, tgNotice } from "@/lib/telegram";
+import { tgEsc } from "@/lib/telegram";
+import { studioNotice } from "@/lib/notify";
 import { nowLabel, runStage2 } from "@/lib/pipeline";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
@@ -182,15 +183,13 @@ ${attachmentsHtml}<p>Full answers attached. ${
       contactEmail || undefined,
     );
 
-    await sendTelegram(
-      tgNotice({
-        emoji: "📝",
-        title: "Questionnaire submitted",
-        company: client.company,
-        lines: [`${tgEsc(contactName)}${submissionNo > 1 ? ` · submission #${submissionNo}` : ""}`],
-        url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
-      }),
-    );
+    await studioNotice({
+      emoji: "📝",
+      title: "Questionnaire submitted",
+      company: client.company,
+      lines: [`${tgEsc(contactName)}${submissionNo > 1 ? ` · submission #${submissionNo}` : ""}`],
+      url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
+    });
 
     let copySent = false;
     if (copyTo.length > 0) {

@@ -10,6 +10,7 @@ import { NextResponse } from "next/server";
 import { getIndex, getClient } from "@/lib/store";
 import { emailStudio } from "@/lib/email";
 import { sendTelegram, tgEsc } from "@/lib/telegram";
+import { sendPush } from "@/lib/push";
 import { overdueSummary, fmtLKR } from "@/lib/money";
 import { currentStage } from "@/lib/stage";
 import { logActivity } from "@/lib/activity";
@@ -127,6 +128,12 @@ ${flagged
       ),
     ].join("\n\n");
     await sendTelegram(tg);
+    await sendPush({
+      title: `🔔 Daily digest · ${totalItems} item${totalItems > 1 ? "s" : ""}`,
+      body: flagged.map((f) => `${f.company}: ${f.issues.length}`).join("\n"),
+      url: `https://${CONSOLE_HOST}/`,
+      tag: "daily-digest", // today's digest replaces yesterday's, never stacks
+    });
 
     await logActivity("system", "ran daily digest", "console", `${flagged.length} client(s), ${totalItems} item(s)`);
     return NextResponse.json({ ok: true, flagged: flagged.length, items: totalItems });

@@ -11,7 +11,8 @@ import { logActivity } from "@/lib/activity";
 import { currentOperator } from "@/lib/operator";
 import { displayName } from "@/lib/admins";
 import { billingLabel } from "@/lib/doclabels";
-import { sendTelegram, tgEsc, tgNotice } from "@/lib/telegram";
+import { tgEsc } from "@/lib/telegram";
+import { studioNotice } from "@/lib/notify";
 import type { Payment } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -74,20 +75,18 @@ export async function POST(
       `${fmtLKR(payment.amount)}${invoiceName ? ` · ${invoiceName}` : ""} (${method})`,
     );
 
-    // Team awareness: ping the studio Telegram so all admins see money in
-    // without opening the console. Best-effort — never blocks the response.
-    await sendTelegram(
-      tgNotice({
-        emoji: "💰",
-        title: "Payment recorded",
-        company: client.company,
-        lines: [
-          `${tgEsc(displayName(actor))} recorded ${tgEsc(fmtLKR(payment.amount))}${invoiceName ? ` for the ${tgEsc(invoiceName)}` : ""}`,
-          `Method: ${tgEsc(method)}`,
-        ],
-        url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
-      }),
-    );
+    // Team awareness: ping the studio Telegram + the admins' phones so money
+    // in is seen without opening the console. Best-effort — never blocks.
+    await studioNotice({
+      emoji: "💰",
+      title: "Payment recorded",
+      company: client.company,
+      lines: [
+        `${tgEsc(displayName(actor))} recorded ${tgEsc(fmtLKR(payment.amount))}${invoiceName ? ` for the ${tgEsc(invoiceName)}` : ""}`,
+        `Method: ${tgEsc(method)}`,
+      ],
+      url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
+    });
 
     return NextResponse.json({ ok: true, payments: client.payments, stage: client.stage });
   }

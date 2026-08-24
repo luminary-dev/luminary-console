@@ -3,6 +3,7 @@ import { coverPrompt, generateImage, inlinePrompt } from "@/lib/publish/images";
 import { landingBranchExists, landingFileExists, openLandingPR } from "@/lib/publish/github";
 import { draftInlineScenes, type InlineScene } from "@/lib/publish/draft";
 import { sendTelegram, tgEsc } from "@/lib/telegram";
+import { sendPush } from "@/lib/push";
 import { currentOperator } from "@/lib/operator";
 
 export const runtime = "nodejs";
@@ -150,6 +151,11 @@ export async function POST(req: Request) {
         `<a href="${pr.url}">Review the PR →</a>`,
       ].join("\n\n"),
     );
+    await sendPush({
+      title: `📝 Article published → PR · ${title}`,
+      body: `/blog/${slug} — tap to review the PR`,
+      url: pr.url,
+    });
 
     return NextResponse.json({
       slug,

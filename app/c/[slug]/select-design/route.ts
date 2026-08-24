@@ -6,7 +6,8 @@
 import { NextResponse } from "next/server";
 import { getClient, saveClient } from "@/lib/store";
 import { emailStudio } from "@/lib/email";
-import { sendTelegram, tgEsc, tgNotice } from "@/lib/telegram";
+import { tgEsc } from "@/lib/telegram";
+import { studioNotice } from "@/lib/notify";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
@@ -60,15 +61,13 @@ export async function POST(
     [],
     client.email || STUDIO,
   );
-  await sendTelegram(
-    tgNotice({
-      emoji: "🎨",
-      title: "Design selected",
-      company: client.company,
-      lines: [`${tgEsc(by || "Client")} chose ${tgEsc(design.title)}`],
-      url: consoleUrl,
-    }),
-  );
+  await studioNotice({
+    emoji: "🎨",
+    title: "Design selected",
+    company: client.company,
+    lines: [`${tgEsc(by || "Client")} chose ${tgEsc(design.title)}`],
+    url: consoleUrl,
+  });
 
   return NextResponse.json({ ok: true, at: client.selectedDesign.at });
 }

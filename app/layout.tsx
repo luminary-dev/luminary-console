@@ -12,7 +12,9 @@ export const metadata: Metadata = {
   description: "Luminary Studio client console.",
   robots: { index: false, follow: false },
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/icon.svg", apple: "/icon.svg" },
+  // apple must be a PNG — iOS ignores SVG touch icons and falls back to a
+  // blank page-snapshot tile on the home screen.
+  icons: { icon: "/icon.svg", apple: "/apple-touch-icon.png" },
   appleWebApp: { capable: true, title: "Luminary", statusBarStyle: "black-translucent" },
 };
 

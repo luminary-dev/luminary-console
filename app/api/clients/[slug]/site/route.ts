@@ -10,7 +10,7 @@ import { deployRepo, deploymentStatus, parseRepo } from "@/lib/deploy";
 import { ensureSubdomain, removeSubdomain } from "@/lib/domains";
 import { logOperatorActivity } from "@/lib/operator";
 import { emailStudio } from "@/lib/email";
-import { sendTelegram, tgNotice } from "@/lib/telegram";
+import { studioNotice } from "@/lib/notify";
 import type { SiteEntry } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -81,9 +81,7 @@ export async function POST(
           `<p>The finalized site for <b>${client.company}</b> is live: <a href="${url}">${url}</a></p>
 <p>Publish it in the console to show it on the client portal.</p>`,
         );
-        await sendTelegram(
-          tgNotice({ emoji: "🚀", title: "Site deployed", company: client.company, lines: [client.site.repo, url], url: `https://${CONSOLE_HOST}/clients/${slug}` }),
-        );
+        await studioNotice({ emoji: "🚀", title: "Site deployed", company: client.company, lines: [client.site.repo, url], url: `https://${CONSOLE_HOST}/clients/${slug}` });
       }
       return NextResponse.json({ ok: true, site: client.site });
     }
