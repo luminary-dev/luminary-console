@@ -182,7 +182,7 @@ async function main() {
     const pub = await callRoute("GET", `/c/${SLUG}/quotation`);
     expect(pub.status === 200, `published: got ${pub.status}`);
     expect(pub.headers["content-type"]?.includes("text/html"), "not HTML");
-    expect(pub.text.includes(COMPANY.split(" (")[0]), "company missing from page");
+    expect(pub.text.includes(COMPANY.split(" (")[0] ?? COMPANY), "company missing from page");
     const draft = await callRoute("GET", `/c/${SLUG}/proposal`);
     expect(draft.status === 404, `draft: got ${draft.status}`);
     const missing = await callRoute("GET", `/c/${SLUG}/receipt`);
