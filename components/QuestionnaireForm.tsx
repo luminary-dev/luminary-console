@@ -10,7 +10,7 @@
 // ANSWERS never change — they're keyed by field id and checkbox values stay
 // English — so switching language mid-form is lossless and the generation
 // pipeline sees identical data either way.
-import { useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { assetUrl } from "@/lib/assets";
 import type { Field, Section } from "@/lib/questions";
 import {
@@ -32,6 +32,64 @@ import {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// LC-021: the form tells the client it takes 25 to 30 minutes, and until now
+// every answer lived in React state only, so a refresh, a back-navigation or
+// a crashed tab lost the lot. Answers are autosaved per client slug and
+// restored on mount. Every localStorage call is guarded: Safari private mode
+// throws on setItem, and a form that cannot save a draft must still submit.
+const DRAFT_PREFIX = "luminary-questionnaire-draft:";
+const DRAFT_SAVE_MS = 500;
+
+type Draft = { slug: string; at: string; answers: Answers };
+
+function draftKey(slug: string): string {
+  return DRAFT_PREFIX + slug;
+}
+
+function readDraft(slug: string): Draft | null {
+  try {
+    const raw = window.localStorage.getItem(draftKey(slug));
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    const d = parsed as Partial<Draft>;
+    // The stored slug is checked as well as the key it was found under: a
+    // hand-edited or stale value must never pour one client's answers into
+    // another client's form.
+    if (d.slug !== slug) return null;
+    if (!d.answers || typeof d.answers !== "object" || Array.isArray(d.answers)) return null;
+    const answers = d.answers as Answers;
+    if (Object.keys(answers).length === 0) return null;
+    return { slug, at: typeof d.at === "string" ? d.at : "", answers };
+  } catch {
+    // Unreadable or unparseable: treat it as no draft at all.
+    return null;
+  }
+}
+
+function writeDraft(slug: string, answers: Answers): void {
+  try {
+    if (Object.keys(answers).length === 0) {
+      window.localStorage.removeItem(draftKey(slug));
+      return;
+    }
+    window.localStorage.setItem(
+      draftKey(slug),
+      JSON.stringify({ slug, at: new Date().toISOString(), answers } satisfies Draft),
+    );
+  } catch {
+    // Private mode or a full quota. The form keeps working in memory.
+  }
+}
+
+function clearDraft(slug: string): void {
+  try {
+    window.localStorage.removeItem(draftKey(slug));
+  } catch {
+    // Nothing to clear if storage is unavailable.
+  }
+}
+
 // Content types the upload route whitelists; anything else (and anything
 // markup-ish) uploads as a plain binary so nothing stored can render.
 function safeContentType(raw: string): string {
@@ -51,17 +109,19 @@ function safeContentType(raw: string): string {
 // The signed PUT pins content type AND length, so the header below must match
 // what was sent to the signing route exactly.
 function UploadControl({
-  slug,
   field,
   answers,
   setAnswer,
   lang,
+  labelId,
+  describedBy,
 }: {
-  slug: string;
   field: Field;
   answers: Answers;
   setAnswer: (id: string, value: string | string[]) => void;
   lang: Lang;
+  labelId: string;
+  describedBy?: string;
 }) {
   const t = strings(lang);
   const stored = (answers[field.id] as string[] | undefined) ?? [];
@@ -77,18 +137,18 @@ function UploadControl({
     if (inputRef.current) inputRef.current.value = "";
     const room = MAX_FILES_PER_FIELD - stored.length;
     if (room <= 0) {
-      setErr(`Up to ${MAX_FILES_PER_FIELD} files per question — remove one first, or email the rest to support@luminary-dev.xyz.`);
+      setErr(`Up to ${MAX_FILES_PER_FIELD} files per question. Remove one first, or email the rest to support@luminary-dev.xyz.`);
       return;
     }
     const queue = picked.slice(0, room);
     if (picked.length > room) {
-      setErr(`Only the first ${room} of those fit — up to ${MAX_FILES_PER_FIELD} files per question.`);
+      setErr(`Only the first ${room} of those fit: up to ${MAX_FILES_PER_FIELD} files per question.`);
     }
     setUploading(queue.length);
     const added: string[] = [];
     for (const f of queue) {
       if (f.size > MAX_FILE_BYTES) {
-        setErr(`"${f.name}" is over 15 MB — please compress it, or email it to support@luminary-dev.xyz.`);
+        setErr(`"${f.name}" is over 15 MB. Please compress it, or email it to support@luminary-dev.xyz.`);
         setUploading((n) => n - 1);
         continue;
       }
@@ -114,7 +174,7 @@ function UploadControl({
       } catch (e) {
         setErr(
           (e instanceof Error ? e.message : "Upload failed.") +
-            ` "${f.name}" wasn't attached — please try again.`,
+            ` "${f.name}" wasn't attached, please try again.`,
         );
       }
       setUploading((n) => n - 1);
@@ -123,7 +183,7 @@ function UploadControl({
   };
 
   return (
-    <div className="q-files">
+    <div className="q-files" role="group" aria-labelledby={labelId} aria-describedby={describedBy}>
       {files.length > 0 && (
         <ul className="q-file-list">
           {files.map((f, i) => (
@@ -152,28 +212,48 @@ function UploadControl({
         {uploading > 0 ? t.uploading(uploading) : files.length > 0 ? t.attachMore : t.attach}
       </button>
       <span className="q-file-note">{t.fileNote}</span>
-      {err && <div className="q-file-err">{err}</div>}
+      {/* Upload progress and failures are async: without a live region the
+          client gets no announcement either way (LC-043). */}
+      <span className="sr-only" aria-live="polite">
+        {uploading > 0 ? t.uploading(uploading) : ""}
+      </span>
+      {err && <div className="q-file-err" role="alert">{err}</div>}
     </div>
   );
 }
 
 function FieldControl({
-  slug,
   field,
   answers,
   setAnswer,
   lang,
   placeholder,
+  controlId,
+  labelId,
+  describedBy,
 }: {
-  slug: string;
   field: Field;
   answers: Answers;
   setAnswer: (id: string, value: string | string[]) => void;
   lang: Lang;
   placeholder?: string;
+  /** id of the single control, for the label's htmlFor. */
+  controlId: string;
+  /** id of the label text, for grouped controls that have no single input. */
+  labelId: string;
+  describedBy?: string;
 }) {
   if (field.type === "upload") {
-    return <UploadControl slug={slug} field={field} answers={answers} setAnswer={setAnswer} lang={lang} />;
+    return (
+      <UploadControl
+        field={field}
+        answers={answers}
+        setAnswer={setAnswer}
+        lang={lang}
+        labelId={labelId}
+        {...(describedBy !== undefined ? { describedBy } : {})}
+      />
+    );
   }
 
   if (field.type === "checks") {
@@ -185,7 +265,12 @@ function FieldControl({
         selected.includes(option) ? selected.filter((o) => o !== option) : [...selected, option],
       );
     return (
-      <div className={`q-checks${field.grid ? " grid" : ""}`}>
+      <div
+        className={`q-checks${field.grid ? " grid" : ""}`}
+        role="group"
+        aria-labelledby={labelId}
+        aria-describedby={describedBy}
+      >
         {field.options.map((option) => (
           <label className="q-check" key={option}>
             <input type="checkbox" checked={selected.includes(option)} onChange={() => toggle(option)} />
@@ -201,6 +286,7 @@ function FieldControl({
             <input
               className="q-line"
               type="text"
+              aria-label={strings(lang).other}
               value={otherValue}
               onChange={(e) => setAnswer(`${field.id}Other`, e.target.value)}
             />
@@ -214,6 +300,8 @@ function FieldControl({
   if (field.type === "textarea") {
     return (
       <textarea
+        id={controlId}
+        aria-describedby={describedBy}
         className="q-box"
         rows={field.rows ?? 3}
         placeholder={placeholder}
@@ -229,6 +317,8 @@ function FieldControl({
   }
   return (
     <input
+      id={controlId}
+      aria-describedby={describedBy}
       className="q-line"
       type="text"
       placeholder={placeholder}
@@ -251,6 +341,7 @@ export default function QuestionnaireForm({
   co?: string;
 }) {
   const t = strings(lang);
+  const uid = useId();
   const [answers, setAnswers] = useState<Answers>({});
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -258,9 +349,39 @@ export default function QuestionnaireForm({
   const [copyEmails, setCopyEmails] = useState("");
   const [copySent, setCopySent] = useState(false);
   const [company, setCompany] = useState(""); // honeypot
+  const [restored, setRestored] = useState(false);
+  /** Nothing is written back until the restore pass has run, so an empty
+   *  first render cannot wipe the draft it is about to load. */
+  const hydrated = useRef(false);
+  /** Turned off the moment the answers reach the studio, so a debounced write
+   *  already in flight cannot resurrect a submitted draft. */
+  const saving = useRef(true);
 
   const setAnswer = (id: string, value: string | string[]) =>
     setAnswers((a) => ({ ...a, [id]: value }));
+
+  useEffect(() => {
+    const draft = readDraft(slug);
+    if (draft) {
+      setAnswers(draft.answers);
+      setRestored(true);
+    }
+    hydrated.current = true;
+  }, [slug]);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    const id = setTimeout(() => { if (saving.current) writeDraft(slug, answers); }, DRAFT_SAVE_MS);
+    return () => clearTimeout(id);
+  }, [answers, slug]);
+
+  // The honeypot is deliberately absent from the draft: it must be empty on
+  // every real submission, and persisting it would defeat the trap.
+  const discardDraft = () => {
+    clearDraft(slug);
+    setAnswers({});
+    setRestored(false);
+  };
 
   const submit = async () => {
     setError(null);
@@ -303,6 +424,11 @@ export default function QuestionnaireForm({
       const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error(data?.error || `Something went wrong (${res.status}).`);
       setCopySent(data?.copySent === true);
+      // The answers are with the studio now, so the local draft has done its
+      // job. Cleared before the done screen renders so a reload cannot
+      // resurrect a submitted form.
+      saving.current = false;
+      clearDraft(slug);
       setStatus("done");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
@@ -345,6 +471,20 @@ export default function QuestionnaireForm({
         style={{ position: "absolute", left: "-9999px", height: 0, width: 0, opacity: 0 }}
       />
 
+      {restored && (
+        <div className="notice notice--row" role="status">
+          <span>{t.draftRestored}</span>
+          <span style={{ display: "flex", gap: 8 }}>
+            <button type="button" className="btn ghost small" onClick={() => setRestored(false)}>
+              {t.draftKeep}
+            </button>
+            <button type="button" className="btn ghost small" onClick={discardDraft}>
+              {t.draftDiscard}
+            </button>
+          </span>
+        </div>
+      )}
+
       {sections.map((section) => {
         const st = sectionText(section, lang, co);
         return (
@@ -356,22 +496,38 @@ export default function QuestionnaireForm({
             <div className="q-fields">
               {section.fields.map((field) => {
                 const ft = fieldText(field, lang, co);
+                const controlId = `${uid}-${field.id}`;
+                const labelId = `${controlId}-label`;
+                const hintId = ft.hint ? `${controlId}-hint` : undefined;
+                // Checkbox sets and upload controls have no single input to
+                // point a <label> at, so they are labelled groups instead of
+                // an adjacent span nobody is told about (LC-043).
+                const grouped = field.type === "checks" || field.type === "upload";
+                const labelBody = (
+                  <>
+                    {ft.label}
+                    {"required" in field && field.required && <span className="req"> *</span>}
+                  </>
+                );
                 return (
                   <div className={`q-field${"width" in field && field.width === "half" ? " half" : ""}`} key={field.id}>
                     <div>
-                      <span className="q-label">
-                        {ft.label}
-                        {"required" in field && field.required && <span className="req"> *</span>}
-                      </span>
-                      {ft.hint && <div className="q-hint">{ft.hint}</div>}
+                      {grouped ? (
+                        <span className="q-label" id={labelId}>{labelBody}</span>
+                      ) : (
+                        <label className="q-label" id={labelId} htmlFor={controlId}>{labelBody}</label>
+                      )}
+                      {ft.hint && <div className="q-hint" id={hintId}>{ft.hint}</div>}
                     </div>
                     <FieldControl
-                      slug={slug}
                       field={field}
                       answers={answers}
                       setAnswer={setAnswer}
                       lang={lang}
-                      placeholder={ft.placeholder}
+                      {...(ft.placeholder !== undefined ? { placeholder: ft.placeholder } : {})}
+                      controlId={controlId}
+                      labelId={labelId}
+                      {...(hintId !== undefined ? { describedBy: hintId } : {})}
                     />
                   </div>
                 );
@@ -398,10 +554,12 @@ export default function QuestionnaireForm({
         {sendCopy && (
           <div className="q-field" style={{ marginTop: 14 }}>
             <div>
-              <span className="q-label">{t.copyTo}</span>
-              <div className="q-hint">{t.copyHint}</div>
+              <label className="q-label" htmlFor={`${uid}-copy`}>{t.copyTo}</label>
+              <div className="q-hint" id={`${uid}-copy-hint`}>{t.copyHint}</div>
             </div>
             <input
+              id={`${uid}-copy`}
+              aria-describedby={`${uid}-copy-hint`}
               className="q-line"
               type="text"
               value={copyEmails}
@@ -412,10 +570,13 @@ export default function QuestionnaireForm({
         )}
       </div>
 
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
 
       <div className="submit-bar">
         <div className="submit-note">{t.submitNote}</div>
+        {/* The button's own label changes, but a disabled control that has
+            just taken the click announces nothing (LC-043). */}
+        <span className="sr-only" aria-live="polite">{status === "sending" ? t.sending : ""}</span>
         <button className="btn" type="submit" disabled={status === "sending"}>
           {status === "sending" ? t.sending : t.submit}
         </button>

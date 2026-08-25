@@ -21,6 +21,7 @@ import {
   parseAttachment,
   type AttachmentRef,
 } from "@/lib/attachments";
+import { clipText } from "@/lib/errors";
 import type { Answers, Attachment } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -70,9 +71,9 @@ export async function POST(
           .filter((a): a is AttachmentRef => !!a && isOwnAttachmentUrl(a.u, slug));
         answers[k] = refs.map((a) => JSON.stringify(a));
         attachments.push(...refs.map((a) => ({ name: a.n, url: a.u, size: a.s })));
-      } else if (typeof v === "string") answers[k] = v.slice(0, 8000);
+      } else if (typeof v === "string") answers[k] = clipText(v, 8000);
       else if (Array.isArray(v) && v.every((x) => typeof x === "string")) {
-        answers[k] = v.slice(0, 40).map((x) => x.slice(0, 300));
+        answers[k] = v.slice(0, 40).map((x) => clipText(x, 300));
       }
     }
   }
@@ -165,18 +166,18 @@ export async function POST(
 <ul>${attachmentLinks
           .map((a) =>
             a.href
-              ? `<li><a href="${esc(a.href)}">${esc(a.name)}</a> (${fmtSize(a.size)}) — link expires in 7 days</li>`
-              : `<li>${esc(a.name)} (${fmtSize(a.size)}) — open it from the console</li>`,
+              ? `<li><a href="${esc(a.href)}">${esc(a.name)}</a> (${fmtSize(a.size)}) · link expires in 7 days</li>`
+              : `<li>${esc(a.name)} (${fmtSize(a.size)}) · open it from the console</li>`,
           )
           .join("")}</ul>`
       : "";
 
     await emailStudio(
-      `Questionnaire submitted — ${client.company}${submissionNo > 1 ? ` (submission #${submissionNo})` : ""}`,
-      `<p><strong>${esc(contactName)}</strong> submitted the ${esc(client.company)} discovery questionnaire at ${submittedAt} (Colombo)${submissionNo > 1 ? ` — this is submission #${submissionNo} for this client` : ""}.</p>
+      `Questionnaire submitted · ${client.company}${submissionNo > 1 ? ` (submission #${submissionNo})` : ""}`,
+      `<p><strong>${esc(contactName)}</strong> submitted the ${esc(client.company)} discovery questionnaire at ${submittedAt} (Colombo)${submissionNo > 1 ? `, and this is submission #${submissionNo} for this client` : ""}.</p>
 ${attachmentsHtml}<p>Full answers attached. ${
         willDraft
-          ? "The quotation, proposal and contract are being drafted now — a second email lands when they're ready."
+          ? "The quotation, proposal and contract are being drafted now. A second email lands when they're ready."
           : "Your existing quotation/proposal/contract were left untouched. To incorporate these new answers, use Revise on a document, or delete the drafts and press Draft now in the console."
       }</p>`,
       [{ filename, content: pdf }],
@@ -184,7 +185,6 @@ ${attachmentsHtml}<p>Full answers attached. ${
     );
 
     await studioNotice({
-      emoji: "📝",
       title: "Questionnaire submitted",
       company: client.company,
       lines: [`${tgEsc(contactName)}${submissionNo > 1 ? ` · submission #${submissionNo}` : ""}`],
@@ -195,11 +195,11 @@ ${attachmentsHtml}<p>Full answers attached. ${
     if (copyTo.length > 0) {
       copySent = await emailAddresses(
         copyTo,
-        `Your questionnaire answers — Luminary × ${client.company}`,
+        `Your questionnaire answers · Luminary × ${client.company}`,
         `<p>Hi ${esc(contactName)},</p>
-<p>Thanks for completing the project questionnaire — your answers are attached as a PDF for your records.</p>
+<p>Thanks for completing the project questionnaire. Your answers are attached as a PDF for your records.</p>
 <p>Our studio has the same document and will come back within one business day with the confirmed scope and fixed quotation. If you have logos, photos or inspiration screenshots to share, just reply to this email.</p>
-<p>— Luminary Studio<br>support@luminary-dev.xyz · +94 77 16 18 093 · <a href="https://luminary-dev.xyz">luminary-dev.xyz</a></p>`,
+<p>Luminary Studio<br>support@luminary-dev.xyz · +94 77 16 18 093 · <a href="https://luminary-dev.xyz">luminary-dev.xyz</a></p>`,
         [{ filename, content: pdf }],
       );
     }

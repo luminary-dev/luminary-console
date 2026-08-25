@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { getClient, saveClient, fetchAsset, putAsset, deleteAssets } from "@/lib/store";
 import { renderPdf } from "@/lib/pdf";
+import { logger } from "@/lib/logger";
 import type { ClientRecord, DesignEntry } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -18,23 +19,66 @@ async function find(slug: string, id: string): Promise<{ client: ClientRecord; d
   return { client, design };
 }
 
+// LC-016: the console preview is the SAME untrusted operator-uploaded HTML the
+// client subdomain serves, and here it was being served on the console origin
+// itself — the origin that holds the session cookie, so strictly worse than
+// the client-subdomain exposure. It gets the identical treatment: a minimal
+// wrapper page whose sandboxed iframe (no `allow-same-origin`, so an opaque
+// origin) loads the file from `?raw=1`. See the long note in
+// app/c/[slug]/design/[id]/route.ts for why isolation beats sanitizing: these
+// are prototypes and their own CSS/fonts/inline script have to keep working.
+//
+// proxy.ts gives a GET on this path the "document" CSP surface for the same
+// reason; the strict console policy would block the wrapper's iframe outright.
+const HTML_HEADERS = {
+  "Content-Type": "text/html; charset=utf-8",
+  "X-Robots-Tag": "noindex, nofollow",
+  "Cache-Control": "no-store",
+};
+
+const SANDBOX = "allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-popups-to-escape-sandbox";
+
+const esc = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+/** `src="?raw=1"` is relative to this page's own URL, so the wrapper needs to
+ *  know nothing about the route it is serving. */
+function wrapper(title: string): Response {
+  const body = `<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
+<title>${esc(title)}</title>
+<style>html,body{margin:0;height:100%;background:#fff}iframe{display:block;border:0;width:100%;height:100%}</style>
+</head><body>
+<iframe src="?raw=1" sandbox="${SANDBOX}" title="${esc(title)}"></iframe>
+</body></html>`;
+  return new Response(body, { status: 200, headers: HTML_HEADERS });
+}
+
 /** Authed preview of the real file, whatever its status — this is how the team
  *  reviews a draft before publishing (the public path shows a holding page
  *  until then). */
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ slug: string; id: string }> },
 ) {
   const { slug, id } = await params;
   const hit = await find(slug, id);
   if (!hit) return new Response("Not found", { status: 404 });
+
+  // A top-level navigation to ?raw=1 would put the file back on the console
+  // origin, so it is answered with the wrapper; the iframe inside it
+  // re-requests the same URL as an iframe and gets the bytes.
+  const raw = new URL(req.url).searchParams.get("raw") === "1";
+  if (!raw || req.headers.get("sec-fetch-dest") === "document") return wrapper(hit.design.title);
+
   const res = await fetchAsset(hit.design.htmlUrl);
   if (!res.ok) return new Response("Not found", { status: 404 });
   return new Response(await res.arrayBuffer(), {
     headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      "X-Robots-Tag": "noindex, nofollow",
-      "Cache-Control": "no-store",
+      ...HTML_HEADERS,
+      // Applies to a direct hit as well as a framed one, so the opaque origin
+      // does not depend on the wrapper being the way in.
+      "Content-Security-Policy": `sandbox ${SANDBOX}`,
     },
   });
 }
@@ -58,21 +102,23 @@ export async function POST(
     // renders on the fly (the proven fallback). Drop any prior/stale PDF so we
     // never serve an out-of-date cache.
     const old = design.pdfUrl;
-    design.pdfUrl = undefined;
+    delete design.pdfUrl;
     try {
       const res = await fetchAsset(design.htmlUrl);
       if (!res.ok) throw new Error(`design HTML asset not readable (status ${res.status})`);
       const pdf = await renderPdf(await res.text(), { laptop: true });
       design.pdfUrl = await putAsset(`clients/${slug}/designs/design-${id}.pdf`, pdf, "application/pdf");
     } catch (e) {
-      // Logged so we can still diagnose the cache path; the client is unaffected.
-      console.error(`[designs] PDF cache failed for ${slug}/design-${id} — serving on the fly:`, e);
+      // Logged so we can still diagnose the cache path; the client is
+      // unaffected. Through lib/logger because the thrown value here is
+      // typically an S3 error carrying a presigned URL (LC-017).
+      logger.error("design PDF cache failed, serving on the fly", { slug, designId: id, err: e });
     }
     if (old && old !== design.pdfUrl) await deleteAssets([old]).catch(() => {});
   } else if (action === "unpublish") {
     // Drop the cached PDF — the public route falls back to the holding page.
     if (design.pdfUrl) await deleteAssets([design.pdfUrl]);
-    design.pdfUrl = undefined;
+    delete design.pdfUrl;
     design.status = "draft";
   } else {
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });

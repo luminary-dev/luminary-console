@@ -20,7 +20,7 @@ export default function EmailHistoryCard({ client }: { client: ClientRecord }) {
       </div>
       {log.length === 0 ? (
         <p className="empty-note">
-          Nothing sent to the client yet — every email leaves from this page, never automatically.
+          Nothing sent to the client yet: every email leaves from this page, never automatically.
         </p>
       ) : (
         <div style={{ marginTop: 8 }}>

@@ -7,6 +7,7 @@ import { reviseDoc } from "@/lib/generate";
 import { currentOperator, logOperatorActivity } from "@/lib/operator";
 import { sendPushNotice } from "@/lib/push";
 import { advanceStage } from "@/lib/stage";
+import { problemResponse } from "@/lib/errors";
 import type { DocType } from "@/lib/types";
 
 const CONSOLE_HOST =
@@ -47,7 +48,7 @@ export async function POST(
       // other admins hear about it. Push only — the Telegram feed stays
       // curated to client events and money, as designed.
       await sendPushNotice({
-        title: `${docType[0].toUpperCase()}${docType.slice(1)} ${action}ed`,
+        title: `${docType.charAt(0).toUpperCase()}${docType.slice(1)} ${action}ed`,
         company: client.company,
         lines: [`${meta.no} · by ${await currentOperator()}`],
         url: `https://${CONSOLE_HOST}/clients/${slug}`,
@@ -63,7 +64,7 @@ export async function POST(
       // separate confirmed step).
       if (meta.status === "published") {
         return NextResponse.json(
-          { error: "This document is published — unpublish it before deleting." },
+          { error: "This document is published. Unpublish it before deleting." },
           { status: 400 },
         );
       }
@@ -136,7 +137,7 @@ ${JSON.stringify(data)}`;
       );
       if (live.length) {
         return NextResponse.json(
-          { error: `Already published: ${live.join(", ")}. Unpublish or delete those first — re-drafting replaces them.` },
+          { error: `Already published: ${live.join(", ")}. Unpublish or delete those first: re-drafting replaces them.` },
           { status: 409 },
         );
       }
@@ -151,7 +152,7 @@ ${JSON.stringify(data)}`;
 
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });
   } catch (e) {
-    console.error(`Doc action ${action} failed:`, e);
-    return NextResponse.json({ error: String(e) }, { status: 500 });
+    const { body, status } = problemResponse(e, `doc action ${action} on ${slug}/${docType}`);
+    return NextResponse.json(body, { status });
   }
 }

@@ -11,6 +11,7 @@ import { ensureSubdomain, removeSubdomain } from "@/lib/domains";
 import { logOperatorActivity } from "@/lib/operator";
 import { emailStudio } from "@/lib/email";
 import { studioNotice } from "@/lib/notify";
+import { problem, problemResponse } from "@/lib/errors";
 import type { SiteEntry } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -46,12 +47,16 @@ export async function POST(
       // Attach the branded subdomain to the client's own project (best-effort).
       const domain = await ensureSubdomain(label, project);
 
+      // The branded host is only reachable once the domain is automated; until
+      // then the deploy's own URL stands in, and it can be absent entirely.
+      const url = domain.status === "automated" ? `https://${host}` : dep.url;
+
       const site: SiteEntry = {
         repo: `${parsed.org}/${parsed.name}`,
         ref,
         project,
         host,
-        url: domain.status === "automated" ? `https://${host}` : dep.url,
+        ...(url ? { url } : {}),
         deployId: dep.id,
         state: dep.state,
         status: client.site?.status ?? "draft",
@@ -77,11 +82,11 @@ export async function POST(
       if (dep.state === "READY" && prev !== "READY") {
         const url = client.site.url ?? "";
         await emailStudio(
-          `Site deployed — ${client.company}`,
+          `Site deployed · ${client.company}`,
           `<p>The finalized site for <b>${client.company}</b> is live: <a href="${url}">${url}</a></p>
 <p>Publish it in the console to show it on the client portal.</p>`,
         );
-        await studioNotice({ emoji: "🚀", title: "Site deployed", company: client.company, lines: [client.site.repo, url], url: `https://${CONSOLE_HOST}/clients/${slug}` });
+        await studioNotice({ title: "Site deployed", company: client.company, lines: [client.site.repo, url], url: `https://${CONSOLE_HOST}/clients/${slug}` });
       }
       return NextResponse.json({ ok: true, site: client.site });
     }
@@ -128,8 +133,19 @@ export async function POST(
 
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });
   } catch (e) {
-    console.error(`Site action ${action} failed:`, e);
-    const msg = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ error: msg.startsWith("manual:") ? "Vercel isn't configured — use 'Set URL' to record a site you deployed manually." : msg }, { status: 500 });
+    // lib/deploy signals "no Vercel credentials" with a `manual:` message.
+    // That one is an authored, safe sentence with an action attached, so it
+    // survives; everything else goes through the mapper and stays internal.
+    const msg = e instanceof Error ? e.message : "";
+    if (msg.startsWith("manual:")) {
+      const body = problem(
+        "conflict",
+        "Vercel isn't configured, so this can't be deployed from here. Use 'Set URL' to record a site you deployed manually.",
+      );
+      console.error(`[${body.requestId}] site action ${action} on ${slug}: Vercel not configured`);
+      return NextResponse.json(body, { status: body.status });
+    }
+    const { body, status } = problemResponse(e, `site action ${action} on ${slug}`);
+    return NextResponse.json(body, { status });
   }
 }

@@ -16,12 +16,14 @@ type Step = {
   now: string;
 };
 
-const STEPS: Step[] = [
+// A non-empty tuple: the caption falls back to the first step, and there is
+// always a first step.
+const STEPS: [Step, ...Step[]] = [
   {
     label: "Questionnaire",
     short: "Questions",
     stage: "lead",
-    now: "Tell us about your business in the questionnaire — everything else is built from it.",
+    now: "Tell us about your business in the questionnaire: everything else is built from it.",
   },
   {
     label: "Quotation",
@@ -45,13 +47,13 @@ const STEPS: Step[] = [
     label: "Delivery",
     short: "Delivery",
     stage: "delivered",
-    now: "Delivery — final invoice, handover and go-live.",
+    now: "Delivery: final invoice, handover and go-live.",
   },
   {
     label: "Warranty",
     short: "Warranty",
     stage: "warranty",
-    now: "You're in the 30-day warranty window — anything that misbehaves, just tell us.",
+    now: "You're in the 30-day warranty window: anything that misbehaves, just tell us.",
   },
 ];
 
@@ -68,7 +70,7 @@ export default function PortalProgress({ stage, deliveredAt }: { stage: ClientSt
   const currentIndex = stage === "closed" ? STEPS.length : STEPS.findIndex((s) => s.stage === stage);
   const caption =
     stage === "closed"
-      ? "This project is complete — the documents below stay available."
+      ? "This project is complete. The documents below stay available."
       : (STEPS[currentIndex] ?? STEPS[0]).now;
 
   return (
@@ -89,7 +91,7 @@ export default function PortalProgress({ stage, deliveredAt }: { stage: ClientSt
                 <span className="pstep-short">{s.short}</span>
               </span>
               <span className="pstep-sr">
-                {state === "is-done" ? " — done" : state === "is-now" ? " — in progress" : " — to come"}
+                {state === "is-done" ? ": done" : state === "is-now" ? ": in progress" : ": to come"}
               </span>
             </li>
           );
@@ -109,7 +111,7 @@ export default function PortalProgress({ stage, deliveredAt }: { stage: ClientSt
       })()}
       {rank < stageRank("delivered") && (
         <p className="pstep-note">
-          Questions at any point — reply to any of our emails or write to{" "}
+          Questions at any point: reply to any of our emails or write to{" "}
           <a href="mailto:support@luminary-dev.xyz">support@luminary-dev.xyz</a>.
         </p>
       )}

@@ -11,6 +11,7 @@ import { studioNotice } from "@/lib/notify";
 import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
+import { clipText } from "@/lib/errors";
 
 export const runtime = "nodejs";
 
@@ -45,7 +46,7 @@ export async function POST(
   if (!design || design.status !== "published") {
     return NextResponse.json({ error: "Please pick one of your design previews." }, { status: 400 });
   }
-  const by = typeof body.by === "string" ? body.by.trim().slice(0, 120) : "";
+  const by = typeof body.by === "string" ? clipText(body.by.trim(), 120) : "";
 
   client.selectedDesign = { id: design.id, title: design.title, ...(by ? { by } : {}), at: new Date().toISOString() };
   await saveClient(client);
@@ -53,7 +54,7 @@ export async function POST(
 
   const consoleUrl = `https://${CONSOLE_HOST}/clients/${client.slug}`;
   await emailStudio(
-    `Design selected — ${client.company}`,
+    `Design selected · ${client.company}`,
     `<p><strong>${esc(by || "The client")}</strong> selected a design concept from the ${esc(client.company)} client portal:</p>
 <p><b>${esc(design.title)}</b> (concept ${esc(design.id)})</p>
 <p>Proceed with this direction for development.</p>
@@ -62,7 +63,6 @@ export async function POST(
     client.email || STUDIO,
   );
   await studioNotice({
-    emoji: "🎨",
     title: "Design selected",
     company: client.company,
     lines: [`${tgEsc(by || "Client")} chose ${tgEsc(design.title)}`],

@@ -42,7 +42,7 @@ export async function GET(
   const object = await assetStream(ref).catch(() => null);
   if (!object) return new Response("Not found", { status: 404 });
 
-  const type = object.contentType.split(";")[0].trim().toLowerCase();
+  const type = (object.contentType.split(";")[0] ?? "").trim().toLowerCase();
   const inline = INLINE.has(type);
   const name = (object.key.split("/").pop() || "file").replace(/["\\\r\n]/g, "_");
 

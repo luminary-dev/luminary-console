@@ -58,6 +58,12 @@ export default function NewClientPage() {
           </Link>
         </div>
       </div>
+      {/* Skip-link target. The topbar lives inside <main> on every console
+          page, so the jump lands here, after the nav, and the next Tab
+          continues into the content. tabIndex makes it focusable, which is
+          what moves focus rather than only the scroll position. */}
+      <div id="main-content" tabIndex={-1} />
+
 
       <form className="card" onSubmit={submit}>
         <h3>Client details</h3>
@@ -91,7 +97,7 @@ export default function NewClientPage() {
               <span className="q-label">Project brief <span className="req">*</span></span>
               <div className="q-hint">
                 What are we building and for how much? Figures you give are treated as authoritative.
-                Mention the reg. no here if you have it — it&apos;s picked up automatically. e.g.
+                Mention the reg. no here if you have it. It&apos;s picked up automatically. e.g.
                 &quot;Landing page. UX 5–10k, development 30–40k LKR. Reg no PV110496. Client is an MEP
                 engineering firm bidding for hotel tenders in October.&quot;
               </div>
@@ -103,7 +109,7 @@ export default function NewClientPage() {
         {error && <div className="form-error">{error}</div>}
         {busy && (
           <div className="notice">
-            Working — the estimate is being drafted, the questionnaire tailored, the documents
+            Working: the estimate is being drafted, the questionnaire tailored, the documents
             rendered to PDF, and the subdomain provisioned. This takes about a minute; don&apos;t
             close the tab.
           </div>

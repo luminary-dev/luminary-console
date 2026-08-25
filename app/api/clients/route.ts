@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getIndex, getClient } from "@/lib/store";
 import { runStage1 } from "@/lib/pipeline";
 import { logOperatorActivity } from "@/lib/operator";
+import { problemResponse } from "@/lib/errors";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Slug must be lowercase letters, digits and dashes." }, { status: 400 });
   }
   if (RESERVED_SLUGS.has(slug) || slug.startsWith("_")) {
-    return NextResponse.json({ error: `"${slug}" is a reserved subdomain — pick another slug.` }, { status: 400 });
+    return NextResponse.json({ error: `"${slug}" is a reserved subdomain. Pick another slug.` }, { status: 400 });
   }
   if (await getClient(slug)) {
     return NextResponse.json({ error: `Client "${slug}" already exists.` }, { status: 409 });
@@ -64,25 +65,38 @@ export async function POST(req: Request) {
     // Uppercase it: the regexes are case-insensitive, so a brief that says
     // "reg no pv110496" would otherwise print lowercase on the letterhead of
     // every document this client ever gets.
-    if (m) reg = m[1].replace(/\s+/g, "").toUpperCase();
+    const found = m?.[1];
+    if (found) reg = found.replace(/\s+/g, "").toUpperCase();
   }
+
+  const address = str(body.address);
+  const email = str(body.email);
+  const phone = str(body.phone);
+  const contactName = str(body.contactName);
 
   try {
     const client = await runStage1({
       slug,
       company,
       brief,
-      reg,
-      address: str(body.address),
-      email: str(body.email),
-      phone: str(body.phone),
-      contactName: str(body.contactName),
+      ...(reg ? { reg } : {}),
+      ...(address ? { address } : {}),
+      ...(email ? { email } : {}),
+      ...(phone ? { phone } : {}),
+      ...(contactName ? { contactName } : {}),
     });
     await logOperatorActivity("created client", client.slug, company);
     return NextResponse.json({ ok: true, slug: client.slug });
   } catch (e) {
-    console.error("Client creation failed:", e);
-    return NextResponse.json({ error: `Creation failed: ${String(e)}` }, { status: 500 });
+    // The whole stage-1 pipeline (drafting, rendering, DNS, mail) runs inside
+    // this request, so `e` can be anything from a provider payload to an R2
+    // key. None of it belongs in the browser (LC-005).
+    // The record may be half-written, so the copy says "check", not "nothing
+    // happened": stage 1 writes the client before it drafts and renders.
+    const detail =
+      "Creating the client did not complete. Check the dashboard before retrying, and quote the reference below if you report it.";
+    const { body, status } = problemResponse(e, `client creation for ${slug}`);
+    return NextResponse.json({ ...body, detail, error: detail }, { status });
   }
 }
 

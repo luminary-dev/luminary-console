@@ -12,6 +12,7 @@ import { getClient, saveClient } from "@/lib/store";
 import { archiveVersion, saveBillingDoc } from "@/lib/pipeline";
 import { buildHandoverData, handoverEligible } from "@/lib/handover";
 import { logActivity } from "@/lib/activity";
+import { problemResponse } from "@/lib/errors";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -28,7 +29,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "Nothing to hand over yet — publish the final receipt, or move the client to Delivered, first.",
+          "Nothing to hand over yet: publish the final receipt, or move the client to Delivered, first.",
       },
       { status: 400 },
     );
@@ -58,7 +59,7 @@ export async function POST(
     );
     return NextResponse.json({ ok: true, slug: doc.slug, no: doc.no, regenerated: !!existing });
   } catch (e) {
-    console.error("Handover generation failed:", e);
-    return NextResponse.json({ error: String(e) }, { status: 500 });
+    const { body, status } = problemResponse(e, `handover generation for ${slug}`);
+    return NextResponse.json(body, { status });
   }
 }

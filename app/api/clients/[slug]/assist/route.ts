@@ -45,7 +45,7 @@ const clip = (s: unknown, n: number): string => {
 const SYSTEM = `You are the studio assistant inside the Luminary Studio operations console. Luminary is a full-service digital studio in Colombo, Sri Lanka (luminary-dev.xyz · support@luminary-dev.xyz · +94 77 16 18 093) building websites, brands, video, cloud infrastructure and SEO for small and mid-sized clients.
 
 WHO YOU ARE TALKING TO
-You are talking to the studio operator — the person who runs Luminary — and only to them. Nothing you write is shown to a client or sent anywhere: when you are asked to draft an email or a message, you are producing text the operator will read, edit and send themselves from their own mail client. Write drafts as finished copy they can paste, with a subject line, but never claim to have sent anything and never offer to send it.
+You are talking to the studio operator, the person who runs Luminary, and only to them. Nothing you write is shown to a client or sent anywhere: when you are asked to draft an email or a message, you are producing text the operator will read, edit and send themselves from their own mail client. Write drafts as finished copy they can paste, with a subject line, but never claim to have sent anything and never offer to send it.
 
 WHAT YOU HAVE
 Each question arrives with a snapshot of one client's record: company and contact details, the operator's original brief, the lifecycle stage, every generated document with the structured data behind it, questionnaire submissions with the client's answers, invoices and receipts, recorded payments and the outstanding balance, approved change orders, questions the client left in their portal, the operator's private notes and task list, and the log of emails already sent.
@@ -58,7 +58,7 @@ HOW LUMINARY WORKS (use this when the record is silent, and say so when you do)
 - Lifecycle stages, in order: lead, quoted, accepted, development, delivered, warranty, closed.
 
 HOW TO ANSWER
-- Ground every factual claim in the record. Quote document numbers, dates and exact amounts when they matter. If the record does not say, say that it does not say — never fill a gap with a plausible number, date or name.
+- Ground every factual claim in the record. Quote document numbers, dates and exact amounts when they matter. If the record does not say, say that it does not say. Never fill a gap with a plausible number, date or name.
 - Lead with the answer. The operator is usually mid-task and wants the conclusion first, supporting detail after.
 - Be concrete about money: state the arithmetic (invoiced minus paid), not just the conclusion, so the operator can check it.
 - Keep it short and readable. Plain sentences, no headers on a simple question, no restating the question back. Use a short list only when the content is genuinely a list.
@@ -73,7 +73,7 @@ function buildContext(client: ClientRecord): string {
   const money = summarizeMoney(client.billing, client.payments);
   const out: string[] = [];
 
-  out.push(`# CLIENT RECORD — ${client.company} (slug: ${client.slug})
+  out.push(`# CLIENT RECORD · ${client.company} (slug: ${client.slug})
 Today: ${dayLabel(new Date().toISOString())}
 Company: ${client.company}${client.reg ? ` · Reg. No: ${client.reg}` : ""}
 Address: ${client.address || "—"}
@@ -90,7 +90,7 @@ ${client.acceptance ? `Quotation accepted by ${client.acceptance.name} on ${dayL
     .filter((t) => client.docs[t])
     .map((t) => {
       const m = client.docs[t]!;
-      return `### ${DOC_LABELS[t]} — ${m.no} · ${m.status} · last rendered ${dayLabel(m.updatedAt)}\n${clip(m.data, MAX_TEXT)}`;
+      return `### ${DOC_LABELS[t]} · ${m.no} · ${m.status} · last rendered ${dayLabel(m.updatedAt)}\n${clip(m.data, MAX_TEXT)}`;
     });
   out.push(`## DOCUMENTS\n${docs.length ? docs.join("\n\n") : "None generated yet."}`);
 
@@ -101,13 +101,13 @@ ${client.acceptance ? `Quotation accepted by ${client.acceptance.name} on ${dayL
       b.kind === "invoice"
         ? ` · ${total === null ? "total unreadable" : fmtLKR(total)} invoiced, ${fmtLKR(paid)} recorded as paid`
         : "";
-    return `### ${billingLabel(b)} — ${b.no} · ${b.status} · ${dayLabel(b.updatedAt)}${settle}\n${clip(b.data, MAX_TEXT)}`;
+    return `### ${billingLabel(b)} · ${b.no} · ${b.status} · ${dayLabel(b.updatedAt)}${settle}\n${clip(b.data, MAX_TEXT)}`;
   });
   out.push(`## BILLING DOCUMENTS\n${billing.length ? billing.join("\n\n") : "None generated yet."}`);
 
   const payments = (client.payments ?? []).map(
     (p, i) =>
-      `${i + 1}. ${fmtLKR(p.amount)} on ${dayLabel(p.at)} by ${p.method}${p.invoiceSlug ? ` against ${p.invoiceSlug}` : ""}${p.note ? ` — ${p.note}` : ""}`,
+      `${i + 1}. ${fmtLKR(p.amount)} on ${dayLabel(p.at)} by ${p.method}${p.invoiceSlug ? ` against ${p.invoiceSlug}` : ""}${p.note ? ` · ${p.note}` : ""}`,
   );
   out.push(`## MONEY
 Invoiced (published invoices only): ${fmtLKR(money.invoiced)}
@@ -127,7 +127,7 @@ ${payments.length ? payments.join("\n") : "None."}`);
         ? "The client has not submitted the questionnaire."
         : (client.submissions ?? []).map(
             (s, i) =>
-              `### Submission ${i + 1} — ${s.at} by ${s.by}${s.attachments?.length ? ` · ${s.attachments.length} file(s): ${s.attachments.map((a) => a.name).join(", ")}` : ""}`,
+              `### Submission ${i + 1} · ${s.at} by ${s.by}${s.attachments?.length ? ` · ${s.attachments.length} file(s): ${s.attachments.map((a) => a.name).join(", ")}` : ""}`,
           ).join("\n") || `Submitted ${client.answersAt} by ${client.answersBy ?? "—"}.`
     }`,
   );
@@ -212,7 +212,7 @@ export async function POST(
   }
   if (prompt.length > MAX_PROMPT) {
     return NextResponse.json(
-      { error: `That question is too long — keep it under ${MAX_PROMPT.toLocaleString("en-US")} characters.` },
+      { error: `That question is too long. Keep it under ${MAX_PROMPT.toLocaleString("en-US")} characters.` },
       { status: 400 },
     );
   }
@@ -257,13 +257,13 @@ export async function POST(
       .join("\n")
       .trim();
     if (!text) {
-      return NextResponse.json({ error: "The assistant returned an empty answer — try again." }, { status: 502 });
+      return NextResponse.json({ error: "The assistant returned an empty answer. Try again." }, { status: 502 });
     }
 
     await logOperatorActivity("asked the studio assistant", slug, clip(prompt, 120));
     return NextResponse.json({ text });
   } catch (e) {
     console.error("Assist failed:", e);
-    return NextResponse.json({ error: "The assistant is unavailable right now — try again." }, { status: 502 });
+    return NextResponse.json({ error: "The assistant is unavailable right now. Try again." }, { status: 502 });
   }
 }

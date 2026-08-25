@@ -78,7 +78,7 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
       </div>
       <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 6, lineHeight: 1.6 }}>
         Deploy the finished build from a GitHub repo in the org. Clients reach it at{" "}
-        <span className="mono">{clientPath}</span> — which shows an under-maintenance page until you publish.
+        <span className="mono">{clientPath}</span>, which shows an under-maintenance page until you publish.
       </p>
 
       {!site ? (

@@ -1,9 +1,11 @@
 // Global content search across client records — company, brief, notes,
 // comments, questionnaire-derived doc data, document numbers, design titles.
-// Authed by the proxy like every console API route. Small client counts, so a
-// linear scan of the already-cached records is fine (no external index).
+// Authed by the proxy like every console API route. There is no external
+// index, so this is a scan; what it must not be is a scan that reads one
+// record per round trip in series, or one that reads the whole store when the
+// first page of hits is already full (LC-030).
 import { NextResponse } from "next/server";
-import { getIndex, getClient } from "@/lib/store";
+import { getIndex, getClients, READ_CONCURRENCY } from "@/lib/store";
 import { DOC_LABELS, type DocType, type ClientRecord } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -45,14 +47,21 @@ export async function GET(req: Request) {
 
   const index = await getIndex();
   const results: { slug: string; company: string; where: string; snippet: string }[] = [];
-  for (const e of index) {
-    if (results.length >= MAX_RESULTS) break;
-    // A name/doc-no hit is handled instantly client-side; here we surface the
-    // CONTENT match so the palette can show "why" this client came up.
-    const c = await getClient(e.slug);
-    if (!c) continue;
-    const m = firstMatch(c, q);
-    if (m) results.push({ slug: e.slug, company: e.company, where: m.where, snippet: m.snippet });
+  // One bounded batch at a time, in index order, stopping the moment the page
+  // of results is full: a common term still costs a handful of reads, and a
+  // rare one no longer serialises a round trip per client.
+  for (let i = 0; i < index.length && results.length < MAX_RESULTS; i += READ_CONCURRENCY) {
+    const batch = index.slice(i, i + READ_CONCURRENCY);
+    const records = await getClients(batch.map((e) => e.slug));
+    for (const [n, c] of records.entries()) {
+      if (results.length >= MAX_RESULTS) break;
+      if (!c) continue;
+      // A name/doc-no hit is handled instantly client-side; here we surface
+      // the CONTENT match so the palette can show "why" this client came up.
+      const m = firstMatch(c, q);
+      const e = batch[n];
+      if (m && e) results.push({ slug: e.slug, company: e.company, where: m.where, snippet: m.snippet });
+    }
   }
   return NextResponse.json({ results });
 }

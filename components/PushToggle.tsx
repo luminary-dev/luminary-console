@@ -34,10 +34,16 @@ function deviceLabel(): string {
   return standalone ? `${device} app` : device;
 }
 
-type Mode = "hidden" | "toggle" | "install-hint";
+// "pending" is the state before the effect below has established whether this
+// device supports push. It is separate from "hidden" (established: this device
+// does not) because the two need different renders: "hidden" collapses, while
+// "pending" holds the button's space so the topbar does not grow a row the
+// moment the effect resolves. That growth was worth 0.234 CLS on the
+// dashboard, the whole page below the topbar jumping down 43px.
+type Mode = "pending" | "hidden" | "toggle" | "install-hint";
 
 export default function PushToggle() {
-  const [mode, setMode] = useState<Mode>("hidden");
+  const [mode, setMode] = useState<Mode>("pending");
   const [enabled, setEnabled] = useState(false);
   const [busy, setBusy] = useState(false);
   const [hintOpen, setHintOpen] = useState(false);
@@ -51,8 +57,10 @@ export default function PushToggle() {
 
     (async () => {
       if (!supported) {
-        // iOS exposes PushManager only to home-screen apps — nudge the install.
-        if (isIOS && !standalone) setMode("install-hint");
+        // iOS exposes PushManager only to home-screen apps, so nudge the
+        // install. Anywhere else, resolve to "hidden" so the reserved space
+        // is released rather than left holding a gap forever.
+        setMode(isIOS && !standalone ? "install-hint" : "hidden");
         return;
       }
       try {
@@ -126,6 +134,18 @@ export default function PushToggle() {
     }
   }
 
+  if (mode === "pending") {
+    // Same element, same classes, same widest label, so it occupies exactly
+    // the box the real toggle will. Inert and invisible to both sighted users
+    // and assistive tech: it is a spacer, not a control. Server and client
+    // render this identically, so there is no hydration mismatch either.
+    return (
+      <button className="btn ghost small" disabled aria-hidden tabIndex={-1} style={{ visibility: "hidden" }}>
+        Alerts: off
+      </button>
+    );
+  }
+
   if (mode === "hidden") return null;
 
   if (mode === "install-hint") {
@@ -168,7 +188,7 @@ export default function PushToggle() {
       onClick={enabled ? turnOff : turnOn}
       title={
         enabled
-          ? "This device gets studio notifications — tap to turn off"
+          ? "This device gets studio notifications: tap to turn off"
           : "Get studio notifications on this device"
       }
     >

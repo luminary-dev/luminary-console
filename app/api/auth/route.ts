@@ -8,7 +8,7 @@ import { issueOtp, verifyOtp } from "@/lib/otp";
 import { emailAddresses, NO_REPLY } from "@/lib/email";
 import { logActivity } from "@/lib/activity";
 import { registerSession } from "@/lib/sessions";
-import { rateLimit } from "@/lib/ratelimit";
+import { rateLimitShared } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -38,7 +38,7 @@ async function readPending(secret: string, token: string | undefined): Promise<s
 }
 
 export async function POST(req: Request) {
-  const limited = rateLimit(req, "auth");
+  const limited = await rateLimitShared(req, "auth");
   if (limited) return limited;
   const secret = process.env.SESSION_SECRET;
   if (!secret) return NextResponse.json({ error: "Auth not configured." }, { status: 503 });
@@ -50,16 +50,16 @@ export async function POST(req: Request) {
     const token = cookie.match(new RegExp(`${PENDING_COOKIE}=([^;]+)`))?.[1];
     const email = await readPending(secret, token);
     if (!email) {
-      return NextResponse.json({ error: "Login expired — start again." }, { status: 401 });
+      return NextResponse.json({ error: "Login expired. Start again." }, { status: 401 });
     }
     const result = await verifyOtp(email, body.code);
     if (result !== "ok") {
       await new Promise((r) => setTimeout(r, 800));
       const msg = result === "locked"
-        ? "Too many wrong codes — start the login again for a fresh code."
+        ? "Too many wrong codes. Start the login again for a fresh code."
         : result === "expired"
-          ? "That code has expired — start the login again."
-          : "Wrong code — check the email and try again.";
+          ? "That code has expired. Start the login again."
+          : "Wrong code. Check the email and try again.";
       return NextResponse.json({ error: msg }, { status: 401 });
     }
     await logActivity(email, "signed in", "console");
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
     const res = NextResponse.json({
       ok: true,
       step: "otp",
-      note: `A code was already sent — wait ${Math.ceil(issued.retryInMs / 1000)}s to resend.`,
+      note: `A code was already sent. Wait ${Math.ceil(issued.retryInMs / 1000)}s to resend.`,
     });
     res.cookies.set(PENDING_COOKIE, await makePending(secret, verified), {
       httpOnly: true, secure: true, sameSite: "lax", maxAge: PENDING_MAX_AGE, path: "/",
@@ -107,11 +107,11 @@ export async function POST(req: Request) {
     `<p>Your one-time sign-in code:</p>
 <p style="font-size:28px;font-weight:700;letter-spacing:.2em">${issued.code}</p>
 <p>It expires in 10 minutes and works once. If you didn't try to sign in to the Luminary Console, change your password.</p>
-<p style="color:#888;font-size:12px">This is an automated message — replies aren't monitored.</p>`,
+<p style="color:#888;font-size:12px">This is an automated message. Replies aren't monitored.</p>`,
     [],
     { from: NO_REPLY, noReply: true },
   );
-  if (!sent) return NextResponse.json({ error: "Couldn't send the code — try again." }, { status: 502 });
+  if (!sent) return NextResponse.json({ error: "Couldn't send the code. Try again." }, { status: 502 });
   const res = NextResponse.json({ ok: true, step: "otp" });
   res.cookies.set(PENDING_COOKIE, await makePending(secret, verified), {
     httpOnly: true, secure: true, sameSite: "lax", maxAge: PENDING_MAX_AGE, path: "/",

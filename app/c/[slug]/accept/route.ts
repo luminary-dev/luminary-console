@@ -14,6 +14,7 @@ import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { advanceStage } from "@/lib/stage";
 import { esc } from "@/lib/templates/shell";
+import { clipText } from "@/lib/errors";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -60,7 +61,7 @@ export async function POST(
     });
   }
 
-  const name = typeof body.name === "string" ? body.name.trim().slice(0, 120) : "";
+  const name = typeof body.name === "string" ? clipText(body.name.trim(), 120) : "";
   if (!name) {
     return NextResponse.json(
       { error: "Please type your full name to accept." },
@@ -68,7 +69,7 @@ export async function POST(
     );
   }
 
-  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim();
+  const ip = ((req.headers.get("x-forwarded-for") || "").split(",")[0] ?? "").trim();
   client.acceptance = { name, at: new Date().toISOString(), ...(ip ? { ip } : {}) };
   advanceStage(client, "accepted");
 
@@ -90,7 +91,7 @@ export async function POST(
   await logActivity(name, "accepted quotation", slug, quotation.no);
 
   await emailStudio(
-    `Quotation accepted — ${client.company} (${quotation.no})`,
+    `Quotation accepted · ${client.company} (${quotation.no})`,
     `<p><strong>${esc(name)}</strong> accepted the ${esc(client.company)} quotation <b>${esc(quotation.no)}</b> from the client portal.</p>
 <p>The acceptance is stamped on the quotation and the client is now at stage <b>accepted</b>.</p>
 <p>Next step: move into the design stage; the <b>30% design-approval invoice</b> follows once the client approves the design:</p>
@@ -98,7 +99,6 @@ export async function POST(
   );
 
   await studioNotice({
-    emoji: "✅",
     title: "Quotation accepted",
     company: client.company,
     lines: [`${tgEsc(name)} accepted ${tgEsc(quotation.no)}`],

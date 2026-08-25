@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { getClient, getIndex } from "@/lib/store";
+import { getClients, getIndex } from "@/lib/store";
 import { STAGES, STAGE_LABELS, currentStage } from "@/lib/stage";
 import { clientMoney, fmtLKR, overdueSummary } from "@/lib/money";
 import { recentActivity, isNotifiable, getNotificationsSeenAt, getReadKeys, entryKey } from "@/lib/activity";
 import MarkAllRead from "@/components/MarkAllRead";
+import RelativeTime from "@/components/RelativeTime";
 import { displayName } from "@/lib/admins";
 import { relTime } from "@/lib/time";
 import type { ClientStage } from "@/lib/types";
@@ -20,15 +21,22 @@ export const dynamic = "force-dynamic";
 
 const STATUS_LABEL: Record<string, string> = {
   created: "Estimate sent",
-  answers_in: "Answers in — drafting",
+  answers_in: "Answers in: drafting",
   drafts_ready: "Drafts ready",
 };
 
 export default async function Dashboard() {
   const index = (await getIndex()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  // Stage + money live on the full records, not the index — fetch them all
-  // (a handful of clients; each is one small object read, cached 5s).
-  const records = await Promise.all(index.map((e) => getClient(e.slug)));
+  // The index carries only slug, company, status, createdAt and the doc
+  // number. Stage, money, overdue and open tasks all live inside the full
+  // record, so the pipeline counts and the outstanding total genuinely need
+  // every record read, and the rows the table shows need exactly the same
+  // ones: there is no smaller correct set to fetch here. What is not
+  // acceptable is opening one R2 connection per client at once, which is what
+  // Promise.all over the index did, so the fan-out is bounded instead
+  // (LC-030). The table virtualizes above 100 rows, so a large index costs
+  // reads, not render time.
+  const records = await getClients(index.map((e) => e.slug));
 
   // Client-portal notifications: uploads, questions, acceptances, submissions.
   // Only for clients that still exist (so deleted/test clients never show), and
@@ -64,7 +72,15 @@ export default async function Dashboard() {
     const stage = currentStage(rec);
     counts[stage]++;
     for (const t of rec.tasks ?? []) {
-      if (!t.done) openTasks.push({ slug: e.slug, company: e.company, text: t.text, due: t.due, assignee: t.assignee });
+      if (!t.done) {
+        openTasks.push({
+          slug: e.slug,
+          company: e.company,
+          text: t.text,
+          ...(t.due !== undefined ? { due: t.due } : {}),
+          ...(t.assignee !== undefined ? { assignee: t.assignee } : {}),
+        });
+      }
     }
     const money = clientMoney(rec);
     if (money.outstanding > 0) {
@@ -104,6 +120,9 @@ export default async function Dashboard() {
           <SignOut />
           {/* .app-hide: in the installed app the tab bar owns navigation and
               CSV export is a desktop affair — hidden there, unchanged on web. */}
+          <Link className="btn ghost small app-hide" href="/github">
+            Engineering
+          </Link>
           <Link className="btn ghost small app-hide" href="/activity">
             Activity{unread > 0 ? ` · ${unread}` : ""}
           </Link>
@@ -120,6 +139,12 @@ export default async function Dashboard() {
           </Link>
         </div>
       </div>
+      {/* Skip-link target. The topbar lives inside <main> on every console
+          page, so the jump lands here, after the nav, and the next Tab
+          continues into the content. tabIndex makes it focusable, which is
+          what moves focus rather than only the scroll position. */}
+      <div id="main-content" tabIndex={-1} />
+
 
       {feedEvents.length > 0 && (
         <div className="card">
@@ -135,7 +160,7 @@ export default async function Dashboard() {
             </span>
           </div>
           <p className="app-hide" style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            Unseen actions across your clients — document publishes, invoices, payments, stage
+            Unseen actions across your clients: document publishes, invoices, payments, stage
             changes and emails, plus uploads, questions and acceptances from the portals.
             Opening an update clears it; the full history lives in{" "}
             <Link href="/activity">Activity</Link>.
@@ -159,9 +184,11 @@ export default async function Dashboard() {
                     </span>
                   )}
                   <span style={{ marginLeft: "auto", display: "flex", gap: 12, alignItems: "baseline", whiteSpace: "nowrap" }}>
-                    <span style={{ fontSize: 12, color: "var(--muted)" }} title={e.at}>
-                      {relTime(e.at, now)}
-                    </span>
+                    <RelativeTime
+                      at={e.at}
+                      initial={relTime(e.at, now)}
+                      className="rel-time"
+                    />
                     {company ? (
                       /* bare <a>: routes through /api/activity/open, which marks
                          this one update read and redirects to the client page —
@@ -242,7 +269,7 @@ export default async function Dashboard() {
               </>
             ) : (
               <span style={{ color: "var(--muted)" }}>
-                Nothing outstanding — every published invoice is settled.
+                Nothing outstanding: every published invoice is settled.
               </span>
             )}
           </p>
@@ -253,7 +280,7 @@ export default async function Dashboard() {
         <div className="card">
           <h3>Clients</h3>
           <p style={{ color: "var(--muted)", marginTop: 10, fontSize: 14 }}>
-            No clients yet — create the first one and the estimate, questionnaire and subdomain are
+            No clients yet. Create the first one and the estimate, questionnaire and subdomain are
             generated automatically.
           </p>
         </div>

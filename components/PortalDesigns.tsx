@@ -80,7 +80,7 @@ export default function PortalDesigns({
       <p className="ask-intro">
         {selectedTitle ? (
           <>
-            You chose <b>{selectedTitle}</b> — we&apos;ll build this direction. You can change your
+            You chose <b>{selectedTitle}</b>. We&apos;ll build this direction. You can change your
             choice below any time before development.
           </>
         ) : (
@@ -118,7 +118,7 @@ export default function PortalDesigns({
                   {chosen && <span className="new-pill" style={{ background: "var(--accent)", color: "#0d0d0f" }}>Selected</span>}
                   {!chosen && d.isNew && <span className="new-pill">New</span>}
                 </span>
-                <span className="no" style={{ display: "inline-flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+                <span className="no no--actions" style={{ display: "inline-flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
                   <a href={`${base}/design/${d.id}`} target="_blank" rel="noopener noreferrer">Preview →</a>
                   <a href={`${base}/design/${d.id}/pdf`}>Download PDF ↓</a>
                   <button
@@ -139,7 +139,7 @@ export default function PortalDesigns({
               </div>
               {feedbackSent === d.id && (
                 <p className="ask-sent" style={{ margin: "0 0 10px" }}>
-                  <span aria-hidden="true">✓</span> Thanks — your change request is with the studio.
+                  <span aria-hidden="true">✓</span> Thanks. Your change request is with the studio.
                 </p>
               )}
               {feedbackFor === d.id && (

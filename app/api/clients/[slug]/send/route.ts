@@ -6,7 +6,7 @@
 // published. PDFs are attached for every generated doc; page links are
 // included only for published ones (drafts have no public URL).
 import { NextResponse } from "next/server";
-import { fetchAsset, getClient, saveClient } from "@/lib/store";
+import { fetchAsset, getClient, mapLimit, saveClient } from "@/lib/store";
 import { emailAddresses } from "@/lib/email";
 import { currentOperator, logOperatorActivity } from "@/lib/operator";
 import { sendPushNotice } from "@/lib/push";
@@ -64,44 +64,47 @@ export async function POST(
       ];
 
   if (docs.length === 0) {
-    return NextResponse.json({ error: "Nothing to send — the requested documents don't exist." }, { status: 400 });
+    return NextResponse.json({ error: "Nothing to send: the requested documents don't exist." }, { status: 400 });
   }
 
   const base = `https://${client.domain}`;
   const rows = docs
     .map((d) => {
       if (d.key === "questionnaire") {
-        return `<li><a href="${base}/questionnaire">Project questionnaire</a> — tell us about your business, goals and design taste (~25 min)</li>`;
+        return `<li><a href="${base}/questionnaire">Project questionnaire</a>: tell us about your business, goals and design taste (~25 min)</li>`;
       }
       const name = `${d.label}${d.no ? ` (${d.no})` : ""}`;
       return d.published
-        ? `<li><a href="${base}/${d.key}">${name}</a> — attached as PDF, with a live copy at the link</li>`
-        : `<li>${name} — attached as PDF</li>`;
+        ? `<li><a href="${base}/${d.key}">${name}</a>: attached as PDF, with a live copy at the link</li>`
+        : `<li>${name}: attached as PDF</li>`;
     })
     .join("");
 
+  // Bounded rather than all at once (LC-033): "send everything published" can
+  // be ten PDFs, and buffering them concurrently is needless peak memory.
   const attachments = (
-    await Promise.all(
-      docs
-        .filter((d) => d.pdfUrl)
-        .map(async (d) => {
-          const res = await fetchAsset(d.pdfUrl!).catch(() => null);
-          if (!res || !res.ok) return null;
-          return {
-            filename: `${d.label} - ${client.company} - ${d.no}.pdf`,
-            content: Buffer.from(await res.arrayBuffer()),
-          };
-        }),
+    await mapLimit(
+      docs.filter((d) => d.pdfUrl),
+      4,
+      async (d) => {
+        const res = await fetchAsset(d.pdfUrl!).catch(() => null);
+        if (!res || !res.ok) return null;
+        return {
+          filename: `${d.label} - ${client.company} - ${d.no}.pdf`,
+          content: Buffer.from(await res.arrayBuffer()),
+        };
+      },
     )
   ).filter(Boolean) as { filename: string; content: Buffer }[];
 
-  const single = docs.length === 1 && docs[0].key !== "questionnaire" ? docs[0] : null;
+  const only = docs.length === 1 ? docs[0] : undefined;
+  const single = only && only.key !== "questionnaire" ? only : null;
   const greeting = client.contactName ? `Hi ${client.contactName.split(" ")[0]},` : "Hello,";
   const subject = single
-    ? `Your ${single.label.toLowerCase()} — Luminary × ${client.company}`
-    : `Your project documents — Luminary × ${client.company}`;
+    ? `Your ${single.label.toLowerCase()} · Luminary × ${client.company}`
+    : `Your project documents · Luminary × ${client.company}`;
   const intro = single
-    ? `<p>Please find your <b>${single.label.toLowerCase()}</b>${single.no ? ` (${single.no})` : ""} attached${single.published ? ` — it also lives at <a href="${base}/${single.key}">${client.domain}/${single.key}</a> with a PDF download` : ""}.</p>`
+    ? `<p>Please find your <b>${single.label.toLowerCase()}</b>${single.no ? ` (${single.no})` : ""} attached${single.published ? `, and it also lives at <a href="${base}/${single.key}">${client.domain}/${single.key}</a> with a PDF download` : ""}.</p>`
     : `<p>Thanks for working with us on <b>${client.projectLabel.toLowerCase()}</b>. Here's everything for your project:</p><ul>${rows}</ul><p>The PDFs are attached for your records.</p>`;
 
   const ok = await emailAddresses(
@@ -109,8 +112,8 @@ export async function POST(
     subject,
     `<p>${greeting}</p>
 ${intro}
-<p>Questions any time — just reply to this email.</p>
-<p>— Luminary Studio<br>support@luminary-dev.xyz · +94 77 16 18 093 · <a href="https://luminary-dev.xyz">luminary-dev.xyz</a></p>`,
+<p>Questions any time: just reply to this email.</p>
+<p>Luminary Studio<br>support@luminary-dev.xyz · +94 77 16 18 093 · <a href="https://luminary-dev.xyz">luminary-dev.xyz</a></p>`,
     attachments,
   );
 

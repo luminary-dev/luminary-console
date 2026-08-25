@@ -35,6 +35,24 @@ const TABS: {
     isActive: (p) => p === "/" || (p.startsWith("/clients/") && p !== "/clients/new"),
   },
   {
+    href: "/github",
+    label: "Eng",
+    icon: (
+      // A branch with a merge, which reads as "pull requests" at 22px far
+      // better than a repository or an octocat silhouette would.
+      <svg viewBox="0 0 24 24" {...stroke}>
+        <circle cx="6" cy="5" r="2.5" />
+        <circle cx="6" cy="19" r="2.5" />
+        <circle cx="18" cy="9" r="2.5" />
+        <path d="M6 7.5v9" />
+        <path d="M18 11.5c0 3.5-3 4.5-6 5" />
+      </svg>
+    ),
+    // The whole engineering section keeps this tab lit, including the sub
+    // views and a pull request drill-down.
+    isActive: (p) => p === "/github" || p.startsWith("/github/"),
+  },
+  {
     href: "/activity",
     label: "Activity",
     icon: (

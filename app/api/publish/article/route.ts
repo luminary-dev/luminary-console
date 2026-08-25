@@ -49,12 +49,12 @@ export async function POST(req: Request) {
     // opening a second would let one silently overwrite the other on merge.
     if (await landingBranchExists(`content/article-${slug}`)) {
       return NextResponse.json(
-        { error: `"${slug}" already has a publish PR in flight — merge or close it (and delete its branch) first.` },
+        { error: `"${slug}" already has a publish PR in flight: merge or close it (and delete its branch) first.` },
         { status: 409 },
       );
     }
 
-    const cover = await generateImage(coverPrompt(imageBrief || `${title} — ${excerpt || "an engineering story"}`));
+    const cover = await generateImage(coverPrompt(imageBrief || `${title} · ${excerpt || "an engineering story"}`));
 
     // Inline illustrations: Claude picks the sections and scenes, gpt-image-2
     // renders them, and each is inserted right under its "## " heading (or at
@@ -71,8 +71,12 @@ export async function POST(req: Request) {
       const images = await Promise.all(scenes.map((s) => generateImage(inlinePrompt(s.scene))));
       const lines = markdown.split("\n");
       scenes.forEach((s, i) => {
+        const image = images[i];
+        // No rendered image means no file to commit, so inserting the markdown
+        // reference would publish a broken image into the post.
+        if (!image) return;
         const src = `/blog/${slug}/inline-${i + 1}.jpg`;
-        const block = ["", `![${s.alt.replace(/[\[\]]/g, "")}](${src})`, ""];
+        const block = ["", `![${s.alt.replace(/[[\]]/g, "")}](${src})`, ""];
         const at = lines.findIndex(
           (l) => l.startsWith("## ") && l.slice(3).trim().toLowerCase() === s.afterHeading.trim().toLowerCase(),
         );
@@ -83,15 +87,15 @@ export async function POST(req: Request) {
           const mid = Math.floor(lines.length * ((i + 1) / (scenes.length + 1)));
           let insert = lines.length;
           for (let j = mid; j < lines.length; j++) {
-            if (lines[j].trim() === "") {
+            if (lines[j]?.trim() === "") {
               insert = j;
               break;
             }
           }
           lines.splice(insert, 0, ...block);
         }
-        inlineFiles.push({ path: `public/blog/${slug}/inline-${i + 1}.jpg`, base64: images[i].toString("base64") });
-        inlinePreviews.push(`data:image/jpeg;base64,${images[i].toString("base64")}`);
+        inlineFiles.push({ path: `public/blog/${slug}/inline-${i + 1}.jpg`, base64: image.toString("base64") });
+        inlinePreviews.push(`data:image/jpeg;base64,${image.toString("base64")}`);
       });
       markdown = lines.join("\n");
     }
@@ -117,14 +121,14 @@ export async function POST(req: Request) {
       prBody: [
         `New blog post **${title}** (\`/blog/${slug}\`), published from the console portal.`,
         "",
-        `- \`content/blog/${slug}.md\` — ${markdown.split(/\s+/).length} words, tags: ${tags.join(", ") || "—"}${draftFlag ? ", **draft: true**" : ""}`,
-        `- \`public/blog/${slug}/cover.jpg\` — generated cover (house 3D-animation style)`,
-        ...inlineFiles.map((f, i) => `- \`${f.path}\` — inline illustration ${i + 1}, placed in the body`),
+        `- \`content/blog/${slug}.md\`: ${markdown.split(/\s+/).length} words, tags: ${tags.join(", ") || "—"}${draftFlag ? ", **draft: true**" : ""}`,
+        `- \`public/blog/${slug}/cover.jpg\`: generated cover (house 3D-animation style)`,
+        ...inlineFiles.map((f, i) => `- \`${f.path}\`: inline illustration ${i + 1}, placed in the body`),
         "",
         "Review the copy and the cover on the Vercel preview, then merge to publish on dev.",
         "Remember the version bump if this PR rides to prod on its own.",
         "",
-        "🤖 Published via luminary-console",
+        "Published via luminary-console.",
       ].join("\n"),
       files: [
         { path: `content/blog/${slug}.md`, text: fm + markdown + "\n" },
@@ -137,7 +141,7 @@ export async function POST(req: Request) {
     // never blocks the publish.
     await sendTelegram(
       [
-        `📝 <b>Article published → PR</b> · ${tgEsc(title)}`,
+        `<b>Article published, PR opened</b> · ${tgEsc(title)}`,
         [
           `/blog/${slug}${draftFlag ? " (draft: true)" : ""}`,
           tags.length ? `Tags: ${tgEsc(tags.join(", "))}` : "",
@@ -153,7 +157,7 @@ export async function POST(req: Request) {
     );
     await sendPush({
       title: `Article published → PR · ${title}`,
-      body: `/blog/${slug} — tap to review the PR`,
+      body: `/blog/${slug} · tap to review the PR`,
       url: pr.url,
     });
 

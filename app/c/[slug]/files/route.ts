@@ -14,6 +14,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
 import { isOwnAttachmentUrl, MAX_FILE_BYTES, fmtSize } from "@/lib/attachments";
 import type { PortalUpload } from "@/lib/types";
+import { clipText } from "@/lib/errors";
 
 export const runtime = "nodejs";
 
@@ -52,14 +53,14 @@ export async function POST(
   if (!isOwnAttachmentUrl(url, slug)) {
     return NextResponse.json({ error: "That file reference isn't valid." }, { status: 400 });
   }
-  const name = typeof body.name === "string" ? body.name.trim().slice(0, MAX_NAME) : "";
+  const name = typeof body.name === "string" ? clipText(body.name.trim(), MAX_NAME) : "";
   if (!name) return NextResponse.json({ error: "Missing file name." }, { status: 400 });
   const size = typeof body.size === "number" && Number.isFinite(body.size) ? Math.max(0, Math.floor(body.size)) : 0;
   if (size <= 0 || size > MAX_FILE_BYTES) {
     return NextResponse.json({ error: "That file is over 15 MB." }, { status: 400 });
   }
-  const by = typeof body.by === "string" ? body.by.trim().slice(0, 120) : "";
-  const note = typeof body.note === "string" ? body.note.trim().slice(0, MAX_NOTE) : "";
+  const by = typeof body.by === "string" ? clipText(body.by.trim(), 120) : "";
+  const note = typeof body.note === "string" ? clipText(body.note.trim(), MAX_NOTE) : "";
 
   const upload: PortalUpload = {
     at: new Date().toISOString(),
@@ -79,13 +80,13 @@ export async function POST(
   // stays reachable from the console after that.
   const href = await signedAssetUrl(url).catch(() => null);
   const linkLine = href
-    ? `<p><a href="${esc(href)}">Download ${esc(name)}</a> — link expires in 7 days.</p>`
+    ? `<p><a href="${esc(href)}">Download ${esc(name)}</a>. Link expires in 7 days.</p>`
     : `<p>Open it from the console (the portal stores files in the private bucket).</p>`;
 
   await emailStudio(
-    `File uploaded — ${client.company}`,
+    `File uploaded · ${client.company}`,
     `<p><strong>${esc(by || "The client")}</strong> uploaded a file from the ${esc(client.company)} client portal:</p>
-<p><b>${esc(name)}</b> (${esc(fmtSize(size))})${note ? ` — ${esc(note)}` : ""}</p>
+<p><b>${esc(name)}</b> (${esc(fmtSize(size))})${note ? ` · ${esc(note)}` : ""}</p>
 ${linkLine}
 <p><a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open ${esc(client.company)} in the console →</a></p>`,
     [],
@@ -93,7 +94,6 @@ ${linkLine}
   );
 
   await studioNotice({
-    emoji: "📎",
     title: "File uploaded",
     company: client.company,
     lines: [

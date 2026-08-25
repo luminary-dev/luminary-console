@@ -7,7 +7,7 @@
 // /api/cron/* past the session gate, so this CRON_SECRET check is the guard.
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
-import { getIndex, getClient } from "@/lib/store";
+import { getIndex, getClients } from "@/lib/store";
 import { emailStudio } from "@/lib/email";
 import { sendTelegram, tgEsc } from "@/lib/telegram";
 import { sendPush } from "@/lib/push";
@@ -91,12 +91,16 @@ export async function GET(req: Request) {
     const now = Date.now();
     const index = await getIndex();
     const flagged: { slug: string; company: string; issues: string[] }[] = [];
-    for (const e of index) {
-      const c = await getClient(e.slug);
-      if (!c) continue;
+    // The digest asks a question of every client, so every record is read; the
+    // fan-out is bounded rather than one round trip per client in series
+    // (LC-030).
+    const records = await getClients(index.map((e) => e.slug));
+    index.forEach((e, i) => {
+      const c = records[i];
+      if (!c) return;
       const issues = clientIssues(c, now);
       if (issues.length) flagged.push({ slug: e.slug, company: e.company, issues });
-    }
+    });
 
     if (flagged.length === 0) {
       await logActivity("system", "ran daily digest", "console", "nothing stalled");
@@ -107,7 +111,7 @@ export async function GET(req: Request) {
 
     // Studio email
     await emailStudio(
-      `Daily digest — ${totalItems} item${totalItems > 1 ? "s" : ""} need attention`,
+      `Daily digest · ${totalItems} item${totalItems > 1 ? "s" : ""} need attention`,
       `<p>Things that have stalled or need a nudge across your clients:</p>
 ${flagged
         .map(
@@ -116,12 +120,13 @@ ${flagged
 <ul style="margin:4px 0">${f.issues.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>`,
         )
         .join("")}
-<p style="color:#888;font-size:12px">Sent by the daily digest cron — replies aren't monitored.</p>`,
+<p style="color:#888;font-size:12px">Sent by the daily digest cron. Replies aren't monitored.</p>`,
     );
 
-    // Telegram digest (emojis fine here)
+    // Telegram digest. No decoration: authored emojis are barred project-wide
+    // (LC-050), so the bold header and the bulleted lines carry the structure.
     const tg = [
-      `🔔 <b>Daily digest</b> · ${totalItems} item${totalItems > 1 ? "s" : ""}`,
+      `<b>Daily digest</b> · ${totalItems} item${totalItems > 1 ? "s" : ""}`,
       ...flagged.map(
         (f) =>
           `<b>${tgEsc(f.company)}</b>\n${f.issues.map((i) => `• ${tgEsc(i)}`).join("\n")}\n<a href="https://${CONSOLE_HOST}/clients/${f.slug}">Open →</a>`,

@@ -23,7 +23,7 @@ export async function GET(
   }
   // Read-receipt: only the CLIENT'S own view counts, not the operator preview
   // on the console host. Best-effort, throttled — never blocks the response.
-  const host = (req.headers.get("host") || "").split(":")[0].toLowerCase();
+  const host = ((req.headers.get("host") || "").split(":")[0] ?? "").toLowerCase();
   if (host !== CONSOLE_HOST) await markDocView(slug, doc);
   const res = await fetchAsset(meta.htmlUrl);
   // A published document whose stored render has gone missing must 404, not

@@ -28,7 +28,7 @@ export default function SendToClient({
           <ul style={{ margin: "10px 0 10px 18px", padding: 0, display: "grid", gap: 4 }}>
             <li>the questionnaire link</li>
             <li>
-              all {publishedCount} published document{publishedCount === 1 ? "" : "s"} — links + PDF
+              all {publishedCount} published document{publishedCount === 1 ? "" : "s"}: links + PDF
               attachments
             </li>
           </ul>

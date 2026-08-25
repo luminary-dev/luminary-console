@@ -28,7 +28,7 @@ export async function POST(
     if (!text) return NextResponse.json({ error: "Task text required." }, { status: 400 });
     if (tasks.length >= MAX_TASKS) {
       return NextResponse.json(
-        { error: `That's ${MAX_TASKS} tasks — clear some done ones first.` },
+        { error: `That's ${MAX_TASKS} tasks. Clear some done ones first.` },
         { status: 400 },
       );
     }

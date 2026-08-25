@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { parseUsers, hashPassword } from "@/lib/users";
-import { rateLimit } from "@/lib/ratelimit";
-import { getClient, deleteClient, fetchAsset } from "@/lib/store";
+import { rateLimitShared } from "@/lib/ratelimit";
+import { getClient, deleteClient, fetchAsset, mapLimit } from "@/lib/store";
 import { removeClientDomain } from "@/lib/domains";
 import { emailStudio } from "@/lib/email";
 import { logOperatorActivity } from "@/lib/operator";
@@ -30,7 +30,7 @@ export async function DELETE(
 ) {
   // Rate-limited like the login it re-verifies against: this is the one
   // irreversible endpoint and an 800ms sleep is not a guessing defence.
-  const limited = rateLimit(req, "auth");
+  const limited = await rateLimitShared(req, "auth");
   if (limited) return limited;
 
   const { slug } = await params;
@@ -39,7 +39,7 @@ export async function DELETE(
   const confirmed = typeof body?.password === "string" && (await anyUserPassword(body.password));
   if (!confirmed) {
     await new Promise((r) => setTimeout(r, 800));
-    return NextResponse.json({ error: "Wrong password — deletion cancelled." }, { status: 403 });
+    return NextResponse.json({ error: "Wrong password. Deletion cancelled." }, { status: 403 });
   }
   const client = await getClient(slug);
   if (!client) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -59,14 +59,16 @@ export async function DELETE(
   if (!client.submissions?.length && client.answersPdfUrl) {
     files.push({ filename: `Questionnaire answers (${client.answersBy ?? "client"}).pdf`, pdfUrl: client.answersPdfUrl });
   }
+  // Bounded rather than all at once (LC-033): a long-running client can have
+  // a dozen documents, and holding every PDF in memory simultaneously is what
+  // turns an archive into an out-of-memory failure on the one path that must
+  // not fail.
   const attachments = (
-    await Promise.all(
-      files.map(async (f) => {
-        const res = await fetchAsset(f.pdfUrl).catch(() => null);
-        if (!res || !res.ok) return null;
-        return { filename: `${client.company} - ${f.filename}`, content: Buffer.from(await res.arrayBuffer()) };
-      }),
-    )
+    await mapLimit(files, 4, async (f) => {
+      const res = await fetchAsset(f.pdfUrl).catch(() => null);
+      if (!res || !res.ok) return null;
+      return { filename: `${client.company} - ${f.filename}`, content: Buffer.from(await res.arrayBuffer()) };
+    })
   ).filter(Boolean) as { filename: string; content: Buffer }[];
 
   // If any PDF couldn't be pulled, or the archive mail didn't go out, STOP.
@@ -75,12 +77,12 @@ export async function DELETE(
   // teardown is irreversible.
   if (attachments.length !== files.length) {
     return NextResponse.json(
-      { error: `Couldn't read ${files.length - attachments.length} of ${files.length} document(s) for the archive — nothing was deleted.` },
+      { error: `Couldn't read ${files.length - attachments.length} of ${files.length} document(s) for the archive. Nothing was deleted.` },
       { status: 502 },
     );
   }
   const archived = await emailStudio(
-    `Archive before deletion — ${client.company}`,
+    `Archive before deletion · ${client.company}`,
     `<p><strong>${client.company}</strong> (${client.slug}) is being deleted from the console. Every document the project produced is attached for your records:</p>
 <ul>${attachments.map((a) => `<li>${a.filename}</li>`).join("")}</ul>
 <p>Brief, for the record:</p><p style="color:#6b7280;">${client.brief}</p>`,
@@ -89,7 +91,7 @@ export async function DELETE(
 
   if (!archived) {
     return NextResponse.json(
-      { error: "The archive email didn't go out — nothing was deleted. Check the mail provider and try again." },
+      { error: "The archive email didn't go out. Nothing was deleted. Check the mail provider and try again." },
       { status: 502 },
     );
   }

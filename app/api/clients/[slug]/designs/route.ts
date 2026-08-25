@@ -56,7 +56,7 @@ export async function POST(
     // PDF is now stale — drop it; re-publishing renders a fresh one.
     await deleteAssets([existing.htmlUrl, ...(existing.pdfUrl ? [existing.pdfUrl] : [])]);
     existing.htmlUrl = htmlUrl;
-    existing.pdfUrl = undefined;
+    delete existing.pdfUrl;
     existing.status = "draft";
     existing.updatedAt = now;
     if (title) existing.title = title;

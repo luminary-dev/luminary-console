@@ -1,6 +1,13 @@
 /* Luminary tokens — console UI + client questionnaire form. */
+/* --subtle is a BORDER/DOT token, never a text colour: #c4c4c8 on #ffffff is
+   1.74:1 and #3f3f46 on #0b0b0d is 1.88:1, both far under the 4.5:1 AA floor
+   for small text (LC-040). Small mono labels (table headers, .k, save state)
+   use --label, which clears AAA on the card surface in both themes:
+   #545965 on #ffffff is 7.01:1, #9a9aa3 on #0b0b0d is 7.05:1, and neither
+   drops below 5.9:1 on --off or --desk. */
 :root {
   --bg: #ffffff; --off: #f7f7f5; --text: #0d0d0f; --muted: #6b7280;
+  --label: #545965;
   --subtle: #c4c4c8; --border: rgba(0,0,0,.09); --border-hi: rgba(0,0,0,.14);
   --accent: #84cc16; --a-text: #5a9e08; --a-dim: rgba(132,204,22,.09);
   --a-border: rgba(132,204,22,.28); --desk: #f0f0ee; --r: 18px;
@@ -8,6 +15,7 @@
 }
 html[data-theme="dark"] {
   --bg: #0b0b0d; --off: #141416; --text: #f4f4f5; --muted: #8a8a92;
+  --label: #9a9aa3;
   --subtle: #3f3f46; --border: rgba(255,255,255,.09); --border-hi: rgba(255,255,255,.16);
   --accent: #a3e635; --a-text: #a3e635; --a-dim: rgba(163,230,53,.09);
   --a-border: rgba(163,230,53,.22); --desk: #050506;
@@ -24,6 +32,42 @@ body {
 a { color: var(--a-text); text-decoration: none; }
 a:hover { color: var(--accent); }
 .mono { font-family: var(--font-mono), ui-monospace, monospace; }
+
+/* Visible keyboard focus everywhere (LC-042), ported from the landing page:
+   accent ring, 2px, 3px offset, per design-language rule 6.8. Only
+   :focus-visible, so a mouse click never draws it. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  /* No border-radius here on purpose: the outline already follows each
+     control's own radius, and forcing 6px would square off the pills. */
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+/* The bordered inputs already draw their own accent edge on focus; the ring
+   sits outside it rather than replacing it, so keep the offset tight. */
+.q-line:focus-visible, .q-box:focus-visible { outline-offset: 2px; }
+
+/* Skip to content (LC-042). Off-canvas until it takes focus. */
+.skip-link {
+  position: fixed; top: 12px; left: 12px; z-index: 10000;
+  background: var(--text); color: var(--bg);
+  padding: 10px 16px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 700; text-decoration: none;
+  transform: translateY(-200%); transition: transform .16s ease;
+}
+.skip-link:focus, .skip-link:focus-visible { transform: translateY(0); color: var(--bg); }
+@media (prefers-reduced-motion: reduce) { .skip-link { transition: none; } }
+
+/* Visually hidden but announced: live regions, extra context for controls. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
 
 .wrap { width: 1080px; max-width: calc(100% - 32px); margin: 0 auto; }
 /* Inline maxWidth on .wrap overrides the responsive cap above — use this
@@ -44,6 +88,13 @@ a:hover { color: var(--accent); }
 }
 .portal-link:first-child { border-top: none; }
 .portal-link .no { font-family: var(--font-mono), monospace; font-size: 11px; color: var(--muted); font-weight: 500; flex-shrink: 0; }
+/* The design rows reuse .no for a cluster of actions rather than a short
+   document number. That cluster has to be allowed to shrink and wrap, which
+   the inherited flex-shrink: 0 above prevents: it held the row at its full
+   387px inside a 360px viewport and scrolled the whole portal sideways.
+   min-width: 0 is required as well, because a flex item defaults to
+   min-width: auto and will not shrink below its content without it. */
+.portal-link .no--actions { flex-shrink: 1; min-width: 0; }
 
 .topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0 4px; }
 .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; }
@@ -65,7 +116,7 @@ a:hover { color: var(--accent); }
 .wrap > .card > h3 { font-size: 16px; }
 @media (max-width: 720px) { .wrap > .card { margin-top: 16px; padding: 18px 18px; } }
 .card h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
-.k { font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--subtle); }
+.k { font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--label); }
 
 .btn { border: none; cursor: pointer; background: var(--accent); color: #0d0d0f; font-family: inherit; font-size: 13.5px; font-weight: 700; border-radius: 100px; padding: 10px 22px; transition: transform .15s ease, opacity .15s ease; display: inline-block; }
 .btn:hover { transform: translateY(-1px); color: #0d0d0f; }
@@ -103,12 +154,33 @@ html[data-reveal] *, html[data-reveal] body { transition: none !important; }
 
 .form-error { margin-top: 14px; padding: 12px 16px; border-radius: 10px; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.35); font-size: 13.5px; }
 .notice { margin-top: 14px; padding: 12px 16px; border-radius: 10px; background: var(--a-dim); border: 1px solid var(--a-border); font-size: 13.5px; }
+/* Notice with its own actions, e.g. the restored-draft banner (LC-021). */
+.notice--row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.notice--row .btn { flex-shrink: 0; }
 
-.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 8px -22px 0; padding: 0 22px; }
+/* `position: relative` is load-bearing, not decoration. Overflow only clips a
+   descendant whose containing block is inside the scroller. The .sr-only
+   table captions and cell labels are `position: absolute`, so on a static
+   scroller they resolve against the initial containing block, escape the
+   clip, and stretch the document to the full width of the table: 630px of
+   document in a 360px viewport, with the header scrolled off screen. Making
+   the scroller the containing block clips them with everything else. */
+.table-scroll { position: relative; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 8px -22px 0; padding: 0 22px; }
 table.list { width: 100%; border-collapse: collapse; margin-top: 8px; min-width: 560px; }
 .table-scroll table.list { margin-top: 0; }
-table.list th { text-align: left; font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--subtle); font-weight: 600; padding: 8px 10px; border-bottom: 1.5px solid var(--border-hi); }
+table.list th { text-align: left; font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--label); font-weight: 600; padding: 8px 10px; border-bottom: 1.5px solid var(--border-hi); }
 table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+/* Sortable header: a real button inside the th so sorting is focusable and
+   operable by keyboard (LC-041). It inherits the header's mono type, so the
+   column reads identically whether or not it sorts. */
+.th-sort {
+  font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit;
+  background: none; border: none; padding: 0; margin: 0; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.th-sort:hover { color: var(--text); }
+th[aria-sort="ascending"] .th-sort, th[aria-sort="descending"] .th-sort { color: var(--text); }
+.th-arrow { display: inline-block; min-width: .6em; }
 
 @media (max-width: 720px) {
   .topbar { flex-wrap: wrap; gap: 12px; }
@@ -131,7 +203,7 @@ table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font
 .q-line { border: none; border-bottom: 1px solid var(--border-hi); padding: 8px 2px; border-radius: 0; }
 .q-box { border: 1px solid var(--border-hi); border-radius: 10px; padding: 10px 12px; line-height: 1.6; min-height: 64px; resize: vertical; }
 .q-line:focus, .q-box:focus { outline: none; border-color: var(--accent); }
-.q-line::placeholder, .q-box::placeholder { color: var(--subtle); }
+.q-line::placeholder, .q-box::placeholder { color: var(--muted); }
 @media (max-width: 820px) { .q-line, .q-box { font-size: 16px; } }
 
 .q-section { padding-top: 22px; border-top: 1px solid var(--border); margin-top: 24px; }
@@ -162,7 +234,7 @@ table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font
 }
 .q-file-btn:hover:not(:disabled) { border-color: var(--a-text); }
 .q-file-btn:disabled { opacity: .6; cursor: wait; }
-.q-file-note { font-size: 11.5px; color: var(--subtle); font-family: var(--mono); }
+.q-file-note { font-size: 11.5px; color: var(--label); font-family: var(--mono); }
 .q-file-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; width: 100%; }
 .q-file-list li {
   display: flex; align-items: center; gap: 10px; min-width: 0;
@@ -185,7 +257,15 @@ table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   animation: veil-in .16s ease both;
 }
+/* Click-outside-to-dismiss as a real button, so the veil is not a div with a
+   mouse handler on it. Escape does the same job from the keyboard, so it
+   stays out of the tab order and the dialog's focus trap. */
+.modal-veil-btn {
+  position: absolute; inset: 0; border: none; background: none;
+  padding: 0; margin: 0; cursor: default;
+}
 .modal {
+  position: relative;
   width: 100%; max-width: 420px; background: var(--off);
   border: 1px solid var(--border-hi); border-radius: 16px; padding: 22px 22px 18px;
   box-shadow: 0 24px 70px rgba(0, 0, 0, .35);
@@ -314,13 +394,18 @@ select.q-line { appearance: none; background: transparent; padding-right: 18px; 
 .hist-row { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
 
 /* Console: notes / tasks / comments / email history cards. */
-.save-state { font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--subtle); }
+/* Relative timestamps (components/RelativeTime.tsx). A <time> element, so it
+   needs the surrounding row's type size and colour rather than the browser
+   default. */
+.rel-time { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+.save-state { font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--label); }
 .save-state.on { color: var(--a-text); }
 .task-row { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13.5px; }
 .task-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-top: 3px; }
 .task-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
 .task-row.done .task-text { text-decoration: line-through; color: var(--muted); }
-.task-x { background: none; border: none; cursor: pointer; color: var(--subtle); font-size: 16px; line-height: 1; padding: 0 4px; }
+.task-x { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 16px; line-height: 1; padding: 0 4px; }
 .task-x:hover { color: var(--danger); }
 .task-add { display: flex; gap: 10px; align-items: flex-end; margin-top: 12px; flex-wrap: wrap; }
 .task-add .q-line { flex: 1 1 180px; min-width: 0; }
@@ -390,7 +475,9 @@ body {
   .topbar { padding-bottom: 10px; row-gap: 10px; }
   .btn { padding: 12px 24px; font-size: 14px; }
   .btn.small { padding: 8px 16px; font-size: 12.5px; }
-  .portal-link { min-height: 52px; }
+  /* Wrapping lets the action cluster drop onto its own full-width line
+     instead of being squeezed into the space left beside the title. */
+  .portal-link { min-height: 52px; flex-wrap: wrap; }
   table.list td { padding: 14px 10px; font-size: 14px; }
   .task-row, .log-row { padding-top: 12px; padding-bottom: 12px; }
   body { -webkit-tap-highlight-color: transparent; }

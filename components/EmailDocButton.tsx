@@ -49,7 +49,7 @@ export default function EmailDocButton({
   return (
     <>
       <button className="btn ghost small" disabled={busy} onClick={run}>
-        {busy ? "…" : state === "sent" ? "Sent ✓" : state === "error" ? "Failed — retry" : "Email"}
+        {busy ? "…" : state === "sent" ? "Sent ✓" : state === "error" ? "Failed: retry" : "Email"}
       </button>
       {dialog}
     </>
