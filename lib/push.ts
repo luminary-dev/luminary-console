@@ -107,17 +107,14 @@ export async function sendPush(
   }
 }
 
-/** Reverse of tgEsc — call sites pass tgNotice-ready (HTML-escaped) detail
- *  lines; a push body is plain text, so the entities go back. */
+/** Reverse of tgEsc: call sites pass tgNotice-ready (HTML-escaped) detail
+ *  lines, and a push body is plain text, so the entities go back. */
 const unesc = (s: string) =>
   String(s ?? "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 
-/** Push twin of tgNotice — same inputs, plain-text rendering:
- *  title "{Title} · {Company}", body = detail lines, click opens url.
- *  The emoji is Telegram styling only — lock-screen titles stay plain. */
+/** Push twin of tgNotice, same inputs, plain-text rendering:
+ *  title "{Title} · {Company}", body = detail lines, click opens url. */
 export async function sendPushNotice(opts: {
-  /** Accepted for studioNotice compatibility; Telegram-only styling. */
-  emoji?: string;
   title: string;
   company: string;
   lines?: string[];

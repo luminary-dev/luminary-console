@@ -86,8 +86,9 @@ export type PaymentStage = {
 
 /** The 30/70 schedule for a fixed total. The delivery amount is the exact
  *  remainder, so the two milestones always sum back to the total even after
- *  rounding. */
-export function paymentSchedule(total: number): PaymentStage[] {
+ *  rounding. Typed as a fixed pair because the schedule is always exactly the
+ *  design-approval and delivery milestones, in that order. */
+export function paymentSchedule(total: number): [PaymentStage, PaymentStage] {
   const designApproval = Math.round(total * PAYMENT_SPLIT.designApproval);
   const delivery = total - designApproval;
   return [

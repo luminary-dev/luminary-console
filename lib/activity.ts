@@ -156,7 +156,9 @@ export async function markClientSeen(slug: string): Promise<void> {
 export async function recentActivity(limit = 100): Promise<ActivityEntry[]> {
   try {
     const entries = (await readState<ActivityEntry[]>(PATH)) ?? [];
-    return entries.slice(-limit).reverse();
+    // -0 is not negative, so slice(-0) is slice(0) and would return the whole
+    // log for a limit of zero, which reads as "show me nothing".
+    return limit <= 0 ? [] : entries.slice(-limit).reverse();
   } catch (e) {
     console.error("Activity log read failed:", e);
     return [];
@@ -168,6 +170,7 @@ export async function recentActivity(limit = 100): Promise<ActivityEntry[]> {
 export async function activityFor(slug: string, limit = 100): Promise<ActivityEntry[]> {
   try {
     const entries = (await readState<ActivityEntry[]>(PATH)) ?? [];
+    if (limit <= 0) return [];
     return entries.filter((e) => e.target === slug).slice(-limit).reverse();
   } catch (e) {
     console.error("Activity log read failed:", e);

@@ -143,7 +143,7 @@ export function renderEstimate(d: EstimateData, ctx: Ctx): string {
     </div>`;
   return shell({
     mode: ctx.mode,
-    title: `Estimate ${ctx.docNo} — ${ctx.client.company}`,
+    title: `Estimate ${ctx.docNo} · ${ctx.client.company}`,
     docTitle: "Estimate",
     pill: "For planning",
     metaLeft: clientBlock(ctx.client),
@@ -154,7 +154,7 @@ export function renderEstimate(d: EstimateData, ctx: Ctx): string {
       metaRow("Prepared by", "Luminary Studio"),
     ],
     body,
-    pdfHref: ctx.pdfHref,
+    ...(ctx.pdfHref !== undefined ? { pdfHref: ctx.pdfHref } : {}),
   });
 }
 
@@ -176,10 +176,10 @@ function quotationAcceptBlock(ctx: Ctx): string {
     return `<div class="box" style="background:var(--a-dim);border-color:var(--a-border);break-inside:avoid;">
       <div class="sec-k">Acceptance</div>
       <div style="font-size:13.5px;"><b>Accepted by ${esc(acc.name)} on ${esc(acceptedDate(acc.at))}</b></div>
-      <div class="small" style="margin-top:4px;">Recorded via the client portal — the scope, price and payment terms above are confirmed. Next step: the 30% design-approval invoice once the design is approved.</div>
+      <div class="small" style="margin-top:4px;">Recorded via the client portal: the scope, price and payment terms above are confirmed. Next step: the 30% design-approval invoice once the design is approved.</div>
     </div>`;
   }
-  const note = `<div class="section"><div class="sec-k">Accepting this quotation</div><div class="small">Reply by email confirming acceptance${ctx.mode === "web" ? ", or accept right here with your full name below" : ""}, or sign the accompanying Services Agreement — we'll then move into the design stage, and the 30% design-approval invoice follows once you approve the design. The payment terms above form part of this quotation.</div></div>`;
+  const note = `<div class="section"><div class="sec-k">Accepting this quotation</div><div class="small">Reply by email confirming acceptance${ctx.mode === "web" ? ", or accept right here with your full name below" : ""}, or sign the accompanying Services Agreement. We'll then move into the design stage, and the 30% design-approval invoice follows once you approve the design. The payment terms above form part of this quotation.</div></div>`;
   if (ctx.mode !== "web") return note;
   const inputStyle =
     "flex:1 1 220px;min-width:0;border:1px solid var(--border-hi);background:var(--bg);color:var(--text);border-radius:10px;padding:10px 14px;font-family:var(--sans);font-size:14px;";
@@ -188,7 +188,7 @@ function quotationAcceptBlock(ctx: Ctx): string {
   return `${note}
   <div class="box" id="acceptBox" style="break-inside:avoid;">
     <div class="sec-k">Accept online</div>
-    <div class="small">Type your full name and press accept — this records your acceptance of this quotation, including the payment terms above.</div>
+    <div class="small">Type your full name and press accept: this records your acceptance of this quotation, including the payment terms above.</div>
     <form id="acceptForm" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;">
       <input type="text" name="company" value="" style="position:absolute;left:-9999px;top:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true">
       <input id="acceptName" type="text" placeholder="Your full name" maxlength="120" autocomplete="name" style="${inputStyle}">
@@ -244,7 +244,7 @@ export function renderQuotation(d: QuotationData, ctx: Ctx): string {
     ${quotationAcceptBlock(ctx)}`;
   return shell({
     mode: ctx.mode,
-    title: `Quotation ${ctx.docNo} — ${ctx.client.company}`,
+    title: `Quotation ${ctx.docNo} · ${ctx.client.company}`,
     docTitle: "Quotation",
     pill: ctx.client.acceptance ? "Accepted" : "Fixed price",
     metaLeft: clientBlock(ctx.client),
@@ -257,7 +257,7 @@ export function renderQuotation(d: QuotationData, ctx: Ctx): string {
         : [metaRow("Prepared by", "Luminary Studio")]),
     ],
     body,
-    pdfHref: ctx.pdfHref,
+    ...(ctx.pdfHref !== undefined ? { pdfHref: ctx.pdfHref } : {}),
   });
 }
 
@@ -302,7 +302,7 @@ export function renderInvoice(d: InvoiceData, ctx: Ctx): string {
     <div class="section"><div class="small">Any remaining balance falls due on delivery, payable before final handover. Work beyond the agreed scope is quoted separately as a written change order.</div></div>`;
   return shell({
     mode: ctx.mode,
-    title: `Invoice ${ctx.docNo} — ${ctx.client.company}`,
+    title: `Invoice ${ctx.docNo} · ${ctx.client.company}`,
     docTitle: "Invoice",
     pill: "Payment due",
     metaLeft: clientBlock(ctx.client, "Billed to"),
@@ -313,7 +313,7 @@ export function renderInvoice(d: InvoiceData, ctx: Ctx): string {
       metaRow("Ref / quote", d.ref, true),
     ],
     body,
-    pdfHref: ctx.pdfHref,
+    ...(ctx.pdfHref !== undefined ? { pdfHref: ctx.pdfHref } : {}),
   });
 }
 
@@ -332,10 +332,10 @@ export function renderReceipt(d: ReceiptData, ctx: Ctx): string {
       <div class="t-main"><b>Total received</b><span class="val">${esc(d.totalReceived)}</span></div>
       <div class="t-note">${esc(d.balanceNote)}</div>
     </div></div>
-    <div class="box"><div class="small">Thank you — this receipt confirms payment received by Luminary Studio. Keep it for your records. Any remaining balance falls due on delivery, payable before final handover; the 30-day post-launch defect warranty runs from the launch date.</div></div>`;
+    <div class="box"><div class="small">Thank you. This receipt confirms payment received by Luminary Studio. Keep it for your records. Any remaining balance falls due on delivery, payable before final handover; the 30-day post-launch defect warranty runs from the launch date.</div></div>`;
   return shell({
     mode: ctx.mode,
-    title: `Receipt ${ctx.docNo} — ${ctx.client.company}`,
+    title: `Receipt ${ctx.docNo} · ${ctx.client.company}`,
     docTitle: "Receipt",
     pill: "Paid",
     metaLeft: clientBlock(ctx.client, "Received from"),
@@ -346,7 +346,7 @@ export function renderReceipt(d: ReceiptData, ctx: Ctx): string {
       metaRow("Ref / invoice", d.ref, true),
     ],
     body,
-    pdfHref: ctx.pdfHref,
+    ...(ctx.pdfHref !== undefined ? { pdfHref: ctx.pdfHref } : {}),
   });
 }
 
@@ -369,7 +369,7 @@ function contractSignBlock(ctx: Ctx): string {
     "border:none;cursor:pointer;background:var(--text);color:var(--bg);border-radius:100px;padding:11px 22px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;";
   return `<div class="box" id="signBox" style="break-inside:avoid;">
     <div class="sec-k">Sign online</div>
-    <div class="small">Type your full name and press sign — this records your acceptance of this Services Agreement and Statement of Work. Legally valid under the Electronic Transactions Act No. 19 of 2006.</div>
+    <div class="small">Type your full name and press sign: this records your acceptance of this Services Agreement and Statement of Work. Legally valid under the Electronic Transactions Act No. 19 of 2006.</div>
     <form id="signForm" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;">
       <input type="text" name="company" value="" style="position:absolute;left:-9999px;top:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true">
       <input id="signName" type="text" placeholder="Your full name" maxlength="120" autocomplete="name" style="${inputStyle}">
@@ -443,7 +443,7 @@ export function renderContract(d: ContractData, ctx: Ctx): string {
     </div>`;
   return shell({
     mode: ctx.mode,
-    title: `Services Agreement ${ctx.docNo} — ${ctx.client.company}`,
+    title: `Services Agreement ${ctx.docNo} · ${ctx.client.company}`,
     docTitle: "Services Agreement & SOW",
     pill: "For signature",
     metaLeft: clientBlock(ctx.client),
@@ -453,7 +453,7 @@ export function renderContract(d: ContractData, ctx: Ctx): string {
       metaRow("Prepared by", "Luminary Studio"),
     ],
     body,
-    pdfHref: ctx.pdfHref,
+    ...(ctx.pdfHref !== undefined ? { pdfHref: ctx.pdfHref } : {}),
   });
 }
 
@@ -496,7 +496,7 @@ export function renderProposal(d: ProposalData, ctx: Ctx): string {
     </div>`;
   return shell({
     mode: ctx.mode,
-    title: `Proposal ${ctx.docNo} — ${ctx.client.company}`,
+    title: `Proposal ${ctx.docNo} · ${ctx.client.company}`,
     docTitle: "Project Proposal",
     pill: "Proposal",
     metaLeft: clientBlock(ctx.client),
@@ -507,7 +507,7 @@ export function renderProposal(d: ProposalData, ctx: Ctx): string {
       metaRow("Prepared by", "Luminary Studio"),
     ],
     body,
-    pdfHref: ctx.pdfHref,
+    ...(ctx.pdfHref !== undefined ? { pdfHref: ctx.pdfHref } : {}),
   });
 }
 

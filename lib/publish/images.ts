@@ -16,18 +16,18 @@ export const IMAGE_SIZE = "1536x1024";
 const STYLE = `Rendered as a still frame from a modern 3D animated feature film in the style of "The Adventures of Tintin" (2011) motion-capture animation: stylised-realistic characters with expressive faces, cinematic depth of field, warm practical lighting, richly detailed textured environments, painterly volumetric atmosphere. Sri Lankan setting and characters where people appear. No text, no logos, no watermarks, no UI. Composition works as a wide 3:2 editorial image with clear focal subject.`;
 
 export function coverPrompt(brief: string): string {
-  return `Editorial cover illustration for a Luminary engineering blog post. Scene: ${brief}. Favour a clever visual metaphor over literal screenshots — whimsical machinery, workshops, skies, harbours and streets are all in the house vocabulary. ${STYLE}`;
+  return `Editorial cover illustration for a Luminary engineering blog post. Scene: ${brief}. Favour a clever visual metaphor over literal screenshots: whimsical machinery, workshops, skies, harbours and streets are all in the house vocabulary. ${STYLE}`;
 }
 
 export function inlinePrompt(scene: string): string {
-  return `In-article editorial illustration for a Luminary engineering blog post, sitting mid-read between paragraphs. Scene: ${scene}. Quieter and more focused than a cover — one clear subject, calm composition. ${STYLE}`;
+  return `In-article editorial illustration for a Luminary engineering blog post, sitting mid-read between paragraphs. Scene: ${scene}. Quieter and more focused than a cover: one clear subject, calm composition. ${STYLE}`;
 }
 
 export function thumbPrompts(scene: string): { light: string; dark: string } {
   const base = `Portfolio thumbnail artwork for a Luminary project. Scene: ${scene}. ${STYLE}`;
   return {
     light: `${base} Lighting: bright tropical daylight, blue sky, sunlit colour palette.`,
-    dark: `${base} Lighting: the exact same scene at dusk turning to night — lantern and lamp light, deep blue-violet sky, warm golden highlights.`,
+    dark: `${base} Lighting: the exact same scene at dusk turning to night. Lantern and lamp light, deep blue-violet sky, warm golden highlights.`,
   };
 }
 

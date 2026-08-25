@@ -41,6 +41,15 @@ function inferStage(c: ClientRecord): ClientStage {
   return "lead";
 }
 
+/** The one fact outside `deliveredAt` that establishes delivery: a published
+ *  final receipt. Kept as a named predicate because both the warranty clock
+ *  and the un-delivery path below ask the same question. */
+function hasDeliveryEvidence(c: ClientRecord): boolean {
+  return (c.billing ?? []).some(
+    (b) => b.kind === "receipt" && b.stage === "final" && b.status === "published",
+  );
+}
+
 /** When delivery happened, for the warranty clock: explicit deliveredAt,
  *  falling back to the published final receipt's timestamp (legacy records). */
 function deliveredMs(c: ClientRecord): number {
@@ -76,5 +85,33 @@ export function advanceStage(c: ClientRecord, to: ClientStage): boolean {
   const changed = c.stage !== to;
   c.stage = to;
   if (to === "delivered" && !c.deliveredAt) c.deliveredAt = new Date().toISOString();
+  return changed;
+}
+
+/** The reverse of the one auto-advance that can be undone: unpublishing the
+ *  final receipt. Publishing it stamps `deliveredAt`; leaving that stamp
+ *  behind on unpublish kept a 30-day warranty commitment alive and let
+ *  currentStage() keep drifting delivered, warranty, closed off a delivery
+ *  that no longer exists (LC-025).
+ *
+ *  Call it AFTER the receipt's status has been set back to "draft", so the
+ *  evidence check sees the new state. Does nothing while another published
+ *  final receipt still establishes delivery. "closed" is left alone: it is
+ *  also how a lead is closed out unwon, so it is never inferred away.
+ *  Returns whether the record changed. */
+export function revertDelivery(c: ClientRecord): boolean {
+  if (hasDeliveryEvidence(c)) return false;
+  let changed = false;
+  if (c.deliveredAt) {
+    delete c.deliveredAt;
+    changed = true;
+  }
+  if (c.stage === "delivered" || c.stage === "warranty") {
+    const back = inferStage(c);
+    if (c.stage !== back) {
+      c.stage = back;
+      changed = true;
+    }
+  }
   return changed;
 }

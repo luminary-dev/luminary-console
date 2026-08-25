@@ -18,7 +18,9 @@ const CRC_TABLE = (() => {
 
 function crc32(buf: Buffer): number {
   let c = 0xffffffff;
-  for (let i = 0; i < buf.length; i++) c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
+  // `& 0xff` keeps the table index inside CRC_TABLE's 256 entries and `i` is
+  // bounded by the loop, so neither fallback is reachable.
+  for (let i = 0; i < buf.length; i++) c = (CRC_TABLE[(c ^ (buf[i] ?? 0)) & 0xff] ?? 0) ^ (c >>> 8);
   return (c ^ 0xffffffff) >>> 0;
 }
 

@@ -1,7 +1,7 @@
 // The discovery questionnaire, parameterized per client. Base schema is the
 // battle-tested Ecomech questionnaire, generalized; Claude may append a few
 // client-specific questions per section (ExtraQuestion in the client record).
-import type { ClientRecord, ExtraQuestion } from "./types";
+import type { ClientRecord } from "./types";
 
 export type Field =
   | {
@@ -39,7 +39,7 @@ export type Section = {
 };
 
 export function buildSections(client: ClientRecord): Section[] {
-  const co = client.company.split("(")[0].trim();
+  const co = (client.company.split("(")[0] ?? client.company).trim();
   const short = co.split(" ").slice(0, 2).join(" ");
 
   const sections: Section[] = [
@@ -175,9 +175,9 @@ export function buildSections(client: ClientRecord): Section[] {
     section.fields.push({
       id: `extra_${i}`,
       type: q.kind,
-      rows: q.kind === "textarea" ? 3 : undefined,
+      ...(q.kind === "textarea" ? { rows: 3 } : {}),
       label: q.label,
-      hint: q.hint,
+      ...(q.hint !== undefined ? { hint: q.hint } : {}),
     });
   }
 

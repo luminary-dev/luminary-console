@@ -7,13 +7,13 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const MODEL = "claude-opus-5";
 
-const BLOG_SYSTEM = `You draft long-form posts for the Luminary engineering blog (luminary-dev.xyz/blog). Luminary is a full-service digital studio in Colombo, Sri Lanka — web design & development (Next.js/React), brand & motion, cloud & DevOps.
+const BLOG_SYSTEM = `You draft long-form posts for the Luminary engineering blog (luminary-dev.xyz/blog). Luminary is a full-service digital studio in Colombo, Sri Lanka: web design & development (Next.js/React), brand & motion, cloud & DevOps.
 
-Voice: a senior practitioner writing to peers — practical, specific, first-person plural ("we"), opinionated but honest about trade-offs. British-adjacent spelling. No hype, no filler, no listicle fluff. Concrete numbers, commands and code where they earn their place. GitHub-flavored markdown: ## section headings, tables and fenced code blocks where useful. Do NOT include an H1 (the page renders the title) and do NOT include frontmatter. Never mention AI or that this was drafted.`;
+Voice: a senior practitioner writing to peers. Practical, specific, first-person plural ("we"), opinionated but honest about trade-offs. British-adjacent spelling. No hype, no filler, no listicle fluff. Concrete numbers, commands and code where they earn their place. GitHub-flavored markdown: ## section headings, tables and fenced code blocks where useful. Do NOT include an H1 (the page renders the title) and do NOT include frontmatter. Never mention AI or that this was drafted.`;
 
-const PROJECT_SYSTEM = `You draft portfolio case-study entries for Luminary (a digital studio in Colombo, Sri Lanka — luminary-dev.xyz/work). Each entry is a TypeScript object rendered into a designed case-study page.
+const PROJECT_SYSTEM = `You draft portfolio case-study entries for Luminary (a digital studio in Colombo, Sri Lanka · luminary-dev.xyz/work). Each entry is a TypeScript object rendered into a designed case-study page.
 
-Voice: confident, warm, concrete — the studio telling the story of a real build (problem → approach → what we built → outcome). Keep every field tight and skimmable. Outcomes are 4 punchy metric cards: short value (a number or one word), short label, one-line detail. Never invent client names or figures the brief doesn't support — for engineering/open-source projects realistic representative figures are fine.`;
+Voice: confident, warm, concrete. The studio telling the story of a real build (problem → approach → what we built → outcome). Keep every field tight and skimmable. Outcomes are 4 punchy metric cards: short value (a number or one word), short label, one-line detail. Never invent client names or figures the brief doesn't support. For engineering/open-source projects realistic representative figures are fine.`;
 
 function extractJson<T>(msg: Anthropic.Message): T {
   if (msg.stop_reason === "refusal") throw new Error("Model declined the request.");
@@ -58,7 +58,7 @@ export type ArticleDraft = {
 };
 
 const ARTICLE_SCHEMA = S.obj(["title", "slug", "excerpt", "tags", "body", "imageBrief"], {
-  title: { type: "string", description: "Post title — specific and earnest, not clickbait." },
+  title: { type: "string", description: "Post title: specific and earnest, not clickbait." },
   slug: { type: "string", description: "kebab-case URL slug, lowercase letters/digits/hyphens." },
   excerpt: { type: "string", description: "1–2 sentence standfirst for the card and OG description." },
   tags: { ...S.arr(S.str), description: "3–5 short lowercase topic tags." },
@@ -70,7 +70,7 @@ const ARTICLE_SCHEMA = S.obj(["title", "slug", "excerpt", "tags", "body", "image
   imageBrief: {
     type: "string",
     description:
-      "One-sentence scene for the cover illustration: a whimsical visual metaphor for the post (physical scenes — machinery, workshops, harbours, skies — not screenshots).",
+      "One-sentence scene for the cover illustration: a whimsical visual metaphor for the post (physical scenes, not screenshots: machinery, workshops, harbours, skies).",
   },
 });
 
@@ -101,7 +101,7 @@ const INLINE_SCENES_SCHEMA = S.obj(["scenes"], {
       scene: {
         type: "string",
         description:
-          "One-sentence physical scene for the illustration — a whimsical metaphor for that section (machinery, workshops, harbours, skies — never screenshots or UI).",
+          "One-sentence physical scene for the illustration: a whimsical metaphor for that section (machinery, workshops, harbours, skies, never screenshots or UI).",
       },
       alt: { type: "string", description: "Short, concrete alt text, e.g. 'Illustration: …'." },
     }),
@@ -117,7 +117,7 @@ export function draftInlineScenes(
 ): Promise<{ scenes: InlineScene[] }> {
   return draft<{ scenes: InlineScene[] }>(
     BLOG_SYSTEM,
-    `This post is being illustrated. Pick exactly ${count} of its "## " sections — well spaced through the article, never the first or the last section when there are enough to choose from — and give each an illustration scene in the house style (3D-animated-film metaphors).\n\nTitle: ${title}\n\nBody:\n${body.slice(0, 12_000)}`,
+    `This post is being illustrated. Pick exactly ${count} of its "## " sections, well spaced through the article, never the first or the last section when there are enough to choose from, and give each an illustration scene in the house style (3D-animated-film metaphors).\n\nTitle: ${title}\n\nBody:\n${body.slice(0, 12_000)}`,
     INLINE_SCENES_SCHEMA,
   );
 }
@@ -167,7 +167,7 @@ const PROJECT_SCHEMA = S.obj(
     name: S.str,
     category: { type: "string", description: "e.g. 'Hospitality · Website' or 'Cloud · FinOps Tool'." },
     tagline: { type: "string", description: "One evocative line." },
-    liveUrl: { type: "string", description: "Live site URL (web) or GitHub repo URL (engineering). Use the brief's URL; never invent domains — if none given, use an empty string." },
+    liveUrl: { type: "string", description: "Live site URL (web) or GitHub repo URL (engineering). Use the brief's URL; never invent domains. If none given, use an empty string." },
     accent: { type: "string", description: "A hex brand colour for the project, e.g. '#c9a227'." },
     motif: { type: "string", description: "One lowercase word for the project's icon motif, e.g. 'paw', 'rings', 'book', 'cloud', 'loop', 'shield'." },
     kind: { type: "string", enum: ["web", "engineering"] },
@@ -183,7 +183,7 @@ const PROJECT_SCHEMA = S.obj(
     outcomes: { ...S.arr(OUTCOME), description: "Exactly 4 outcome metric cards." },
     result: { type: "string", description: "One closing line." },
     deploy: S.obj(["lighthouse", "lcp", "bundle"], {
-      lighthouse: { type: "string", description: "e.g. '98' — web projects only; use '0' for engineering." },
+      lighthouse: { type: "string", description: "e.g. '98'. Web projects only; use '0' for engineering." },
       lcp: { type: "string", description: "e.g. '0.8s'." },
       bundle: { type: "string", description: "e.g. '112 kB'." },
     }),

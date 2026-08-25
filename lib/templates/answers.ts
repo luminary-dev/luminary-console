@@ -55,7 +55,7 @@ export function renderAnswers(
 
   return shell({
     mode,
-    title: `Questionnaire answers — ${client.company}`,
+    title: `Questionnaire answers · ${client.company}`,
     docTitle: "Questionnaire",
     pill: "Submitted response",
     metaLeft: clientBlock(client),

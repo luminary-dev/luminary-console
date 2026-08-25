@@ -57,6 +57,11 @@ export type UIStrings = {
   doneCopy1: string;
   doneCopy2: string;
 
+  /** Shown when answers typed earlier on this device are brought back. */
+  draftRestored: string;
+  draftKeep: string;
+  draftDiscard: string;
+
   errName: string;
   /** Prefix for the list of unanswered starred questions. */
   errRequired: string;
@@ -412,6 +417,11 @@ export const SI_UI: UIStrings = {
   doneBodyEnd: " වෙත email කරන්න.",
   doneCopy1: "ඔබේ පිළිතුරුවල පිටපතක් ",
   doneCopy2: " වෙත යමින් පවතී — inbox එක (සහ පළමු වතාවේ spam එකත්) බලන්න.",
+
+  draftRestored:
+    "ඔබ කලින් මෙම උපාංගයේ ලියූ පිළිතුරු නැවත ගෙන එන ලදී. තවම කිසිවක් යවා නැත.",
+  draftKeep: "ඒවා තබාගන්න",
+  draftDiscard: "අලුතින් පටන් ගන්න",
 
   errName: "කරුණාකර ඔබේ නම (පළමු ප්‍රශ්නය) සඳහන් කරන්න — පිළිතුරු දිය යුත්තේ කාටදැයි අපි දැනගන්නට.",
   errRequired: "තරුවකින් (*) සලකුණු කළ මේ ප්‍රශ්නවලට තවම පිළිතුරු නැත: ",
