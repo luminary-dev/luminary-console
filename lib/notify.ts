@@ -6,7 +6,6 @@ import { sendTelegram, tgNotice } from "./telegram";
 import { sendPushNotice } from "./push";
 
 export type StudioNotice = {
-  emoji: string;
   title: string;
   company: string;
   /** Detail lines, already tgEsc-escaped (push un-escapes for plain text). */
