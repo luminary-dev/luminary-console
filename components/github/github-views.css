@@ -1,0 +1,140 @@
+/* The GitHub console beyond pull requests: repositories, CI, deployments,
+   releases, security, insights and activity.
+
+   Its own stylesheet so components/github/github.css (the pull request
+   workspace) is never edited to make one of these screens work. Every colour
+   here is an existing token from app/globals.css. --subtle is deliberately
+   absent as a text colour: it is a border and dot token and it fails the AA
+   contrast floor on both themes. Small label text uses --label. */
+
+/* === section sub-navigation === */
+.gh-nav { margin-top: 14px; }
+.gh-nav-list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; gap: 4px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.gh-nav-link {
+  display: inline-block;
+  font-family: var(--font-mono), monospace; font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--label); padding: 8px 12px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s ease, border-color .15s ease;
+}
+.gh-nav-link:hover { color: var(--text); }
+/* The current section is marked by weight, colour AND an underline rule, so
+   it does not depend on hue alone. aria-current carries it to a screen
+   reader. */
+.gh-nav-link[aria-current="page"] {
+  color: var(--a-text); border-bottom-color: var(--accent); font-weight: 700;
+}
+
+/* === metric tiles === */
+.gh-metrics {
+  list-style: none; margin: 14px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px 22px;
+}
+.gh-metric-k {
+  font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--label);
+}
+.gh-metric-v {
+  font-size: 19px; font-weight: 700; letter-spacing: -.02em; margin-top: 4px;
+  font-variant-numeric: tabular-nums; overflow-wrap: anywhere;
+}
+/* "not enough data" is a sentence, not a number, so it must not be typeset
+   like one or it reads as a broken value. */
+.gh-metric-v.is-absent { font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.gh-metric-note { color: var(--muted); font-size: 12.5px; line-height: 1.6; margin-top: 4px; max-width: 40ch; }
+
+/* === tables === */
+.gh-table--tight { min-width: 620px; }
+.gh-num { font-family: var(--font-mono), monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gh-table td.gh-num, .gh-table th.gh-num { text-align: right; }
+.gh-sub { display: block; font-family: var(--font-mono), monospace; font-size: 11px; color: var(--muted); margin-top: 2px; }
+.gh-sub-text { display: block; font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 2px; max-width: 44ch; }
+
+/* === bars: a visual reading of a number that is already in the same cell,
+   which is why the bar itself is hidden from assistive technology === */
+.gh-bar {
+  display: block; height: 6px; margin-top: 5px; width: 100%; min-width: 60px;
+  background: var(--off); border: 1px solid var(--border); border-radius: 100px; overflow: hidden;
+}
+.gh-bar-fill { display: block; height: 100%; background: var(--accent); }
+.gh-bar-fill.is-bad { background: var(--danger); }
+.gh-bar-fill.is-warn { background: var(--label); }
+
+/* === urgent callout: secret scanning, failed deployments === */
+.gh-urgent {
+  display: flex; align-items: flex-start; gap: 10px;
+  border: 1.5px solid var(--danger); border-radius: 12px;
+  padding: 14px 16px; margin-top: 14px;
+}
+.gh-urgent svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: var(--danger); }
+.gh-urgent-title { font-size: 14.5px; font-weight: 700; letter-spacing: -.01em; color: var(--danger); }
+.gh-urgent-body { color: var(--text); font-size: 13px; line-height: 1.65; margin-top: 4px; max-width: 70ch; }
+
+/* === severity and kind tags === */
+.gh-sev {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 700;
+  letter-spacing: .07em; text-transform: uppercase;
+  border: 1px solid var(--border-hi); border-radius: 100px; padding: 3px 10px; color: var(--label);
+  white-space: nowrap;
+}
+.gh-sev.is-bad { color: var(--danger); border-color: var(--danger); }
+.gh-sev.is-warn { color: var(--text); border-color: var(--border-hi); }
+.gh-sev svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+/* === environment blocks on the deployments screen === */
+.gh-env { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px; }
+.gh-env:first-of-type { border-top: none; padding-top: 0; margin-top: 12px; }
+.gh-env-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.gh-env-name { font-family: var(--font-mono), monospace; font-size: 14px; font-weight: 700; color: var(--text); }
+.gh-env-now { color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+.gh-env-now b { color: var(--text); font-family: var(--font-mono), monospace; font-weight: 600; }
+
+/* === releases === */
+.gh-release { border-top: 1px solid var(--border); padding: 16px 0; }
+.gh-release:first-of-type { border-top: none; }
+.gh-release-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.gh-release-tag { font-family: var(--font-mono), monospace; font-size: 14px; font-weight: 700; color: var(--text); }
+.gh-release-name { font-size: 13.5px; color: var(--text); }
+.gh-release-meta { font-family: var(--font-mono), monospace; font-size: 11px; color: var(--muted); }
+/* Release bodies are third-party text. They are rendered as plain text in a
+   pre-wrap block: never as markup, never as an auto-linked URL. */
+.gh-release-body {
+  white-space: pre-wrap; overflow-wrap: anywhere;
+  font-family: var(--font-mono), monospace; font-size: 12px; line-height: 1.65; color: var(--text);
+  background: var(--off); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 14px; margin-top: 10px; max-height: 320px; overflow-y: auto;
+}
+
+/* === activity stream === */
+.gh-filters { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
+.gh-filter-group { min-width: 0; }
+.gh-filter-legend {
+  font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--label); display: block; margin-bottom: 6px;
+}
+.gh-chip[aria-current="true"] { color: var(--a-text); background: var(--a-dim); border-color: var(--a-border); }
+.gh-stream { list-style: none; margin: 12px 0 0; padding: 0; }
+.gh-stream-item {
+  display: grid; grid-template-columns: 72px 118px 1fr; gap: 12px;
+  padding: 9px 0; border-top: 1px solid var(--border); align-items: baseline;
+}
+.gh-stream-item:first-child { border-top: none; }
+.gh-stream-when { font-family: var(--font-mono), monospace; font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.gh-stream-kind {
+  font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--label);
+}
+.gh-stream-body { min-width: 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.gh-stream-body b { font-weight: 600; }
+
+@media (max-width: 720px) {
+  .gh-stream-item { grid-template-columns: 1fr; gap: 3px; }
+  .gh-nav-list { gap: 0; }
+  .gh-nav-link { padding: 8px 10px; }
+}
