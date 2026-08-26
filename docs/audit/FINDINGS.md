@@ -24,9 +24,9 @@ says plainly that no automated test covers it.
 Since that pass, LC-051 moved from Not fixed to Fixed, making the tally **24
 Fixed, 13 Partially fixed, 8 Not fixed** across the original 45.
 
-A further **17 findings, LC-068 to LC-084, were discovered during the
+A further **18 findings, LC-068 to LC-085, were discovered during the
 remediation itself** and are recorded in their own section at the end of this
-document. Sixteen are fixed; one (LC-082) is a deliberate Won't fix with the
+document. Seventeen are fixed; one (LC-082) is a deliberate Won't fix with the
 trade written down. They are kept separate because the distinction is the
 point: they were not visible on a first read of the code. They surfaced from
 unit-testing modules that had none, from measuring rendered pages instead of
@@ -43,7 +43,7 @@ scanning the wrong tree. Both had passed lint, typecheck, tests and a local
 build. They are the argument for watching a change land rather than declaring
 it done when the local gates go green.
 
-Whole-document totals: **62 findings, 40 Fixed, 13 Partially fixed, 8 Not
+Whole-document totals: **63 findings, 41 Fixed, 13 Partially fixed, 8 Not
 fixed, 1 Won't fix.**
 
 ---
@@ -1158,11 +1158,55 @@ build time, producing 25 findings for material that is not in the repository
 and cannot be. It now runs `gitleaks git .`, with `fetch-depth: 0` on the
 checkout so the history is actually there to scan rather than a single shallow
 commit.
-Scanning the real history surfaced exactly one hit, in `tests/redact.test.ts`:
+Scanning the real history surfaced one hit in `tests/redact.test.ts`, and
+GitGuardian independently flagged four in the same and one neighbouring file:
 synthetic fixtures (a 64-character hex string, AWS's published
 `AKIAIOSFODNN7EXAMPLE`, a fake fine-grained PAT) that exist precisely because
 that test proves secret-shaped strings are scrubbed before they reach a log.
-`.gitleaks.toml` allowlists that one path, extending the default rules rather
-than replacing them, so upstream's future rules still apply.
-Guarded by: the job itself, verified end to end locally. The allowlist was checked for over-reach by planting `AKIAIOSFODNN7EXAMPLE` in a different test file and confirming the scan still failed.
+
+The first fix was a path allowlist in `.gitleaks.toml`, and it was the wrong
+one twice over. It exempts the file permanently, so a credential genuinely
+pasted into it later would pass unnoticed, and it fixes nothing for the second
+scanner, because GitGuardian reads its policy from its own dashboard rather
+than from this repository. One allowlist per tool, forever, is a treadmill.
+
+The root cause was the literals themselves, so those are gone: the fixtures are
+now assembled at runtime from harmless fragments, with the runtime values
+byte-identical, so the redactor is tested against exactly the same input and
+all 37 assertions are unchanged. `tests/` now scans clean with no allowlist at
+all. What remains is a single `.gitleaksignore` fingerprint,
+`commit:path:rule:line`, dismissing the one finding in the commit that
+introduced the literal, since history still holds it. A fingerprint dismisses
+one finding rather than switching off a file.
+Guarded by: the job itself, verified end to end locally. The ignore was checked for over-reach by planting a fake classic PAT in that same file and confirming the scan still failed, so the dismissal covers one historical finding and nothing else.
+Effort: S   Risk of fix: Low   Blocks: —
+
+### LC-085 — Six pipeline tests were a time bomb that turned CI red on a clock change
+Severity: High
+Category: Testing
+Location: `tests/github-pipeline.test.ts`
+Evidence: The fixtures carried absolute timestamps, `2026-08-26T10:00:00Z` and
+neighbours. The webhook receiver rejects a delivery whose payload timestamp is
+older than `WEBHOOK_MAX_AGE_MS` (5 minutes), and `payloadTimestamp()` reads
+`pull_request.updated_at`, which is one of those literals. Written in the
+morning of 2026-08-26 the timestamps sat in the future, so the freshness check
+saw a negative age and passed. By that afternoon they were hours in the past
+and six tests failed with `stale_delivery`, the receive path returning 400
+instead of 200.
+Impact: The suite passed CI on the pull request and would have failed the next
+run on `main` with no intervening code change. That is the worst shape a test
+failure can take: it points at whatever merged most recently rather than at the
+real cause, and it erodes trust in the suite exactly when the suite is new and
+that trust is still being built. It was found by running the tests again hours
+later while configuring the GitHub App, not by any gate.
+Reproduction: Run the suite before 10:05Z on 2026-08-26 and again after.
+Proposed fix: Derive fixture timestamps from the clock rather than hard-coding
+them.
+Resolution: Fixed — a single `BASE = Date.now()` captured at module load, with
+an `at(minutesFromNow)` helper. Every offset sits inside the freshness window
+and the relative ordering the out-of-order and newer-wins cases depend on is
+preserved. No absolute date remains in the file. The other test files that
+contain 2026 dates were checked and are not exposed: they pass an explicit
+`now` into the function under test rather than relying on the wall clock.
+Guarded by: the tests themselves, which now cannot drift out of the window. There is no meta-test asserting determinism; the durable guard would be running CI on a clock-skewed runner, which is not set up.
 Effort: S   Risk of fix: Low   Blocks: —

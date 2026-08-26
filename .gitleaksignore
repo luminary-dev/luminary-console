@@ -1,0 +1,17 @@
+# Reviewed and dismissed secret-scanner findings, one fingerprint per line.
+#
+# A fingerprint is commit:path:rule:line, so an entry here dismisses exactly
+# one finding in one historical commit. It does NOT exempt the file: a real
+# credential added to tests/redact.test.ts tomorrow is still caught. That is
+# why this is a fingerprint list rather than a path allowlist in
+# .gitleaks.toml, which would have switched the file off permanently.
+#
+# The entry below is a synthetic fixture, a 64-character hex string of the form
+# 0123456789abcdef repeated four times, which tests/redact.test.ts used to
+# carry as a literal. It was never a valid credential. The file now assembles
+# such fixtures at runtime from harmless fragments, so nothing secret-shaped
+# remains in the source and no new entry should ever be needed here; this one
+# stays only because the literal is still present in the commit that
+# introduced it.
+
+a56bd548fa9460ac6c0229c2e42f684abf3fa16d:tests/redact.test.ts:generic-api-key:51
