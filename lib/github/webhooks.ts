@@ -116,9 +116,14 @@ export function payloadTimestamp(rawBody: string): number | null {
 
   // `repository.pushed_at` is a number on push events and a string elsewhere;
   // workflow/check events stamp their own objects.
+  const checkRun = body.check_run as Record<string, unknown> | undefined;
   const candidates: unknown[] = [
     (body.workflow_run as Record<string, unknown> | undefined)?.updated_at,
-    (body.check_run as Record<string, unknown> | undefined)?.started_at,
+    // completed_at BEFORE started_at. A completed check reports when it began,
+    // which for a slow build is far in the past and says nothing about when
+    // this delivery was sent. Reading started_at first is what made every
+    // check longer than the window look like a replay.
+    checkRun?.completed_at ?? checkRun?.started_at,
     (body.check_suite as Record<string, unknown> | undefined)?.updated_at,
     (body.pull_request as Record<string, unknown> | undefined)?.updated_at,
     (body.comment as Record<string, unknown> | undefined)?.updated_at,
