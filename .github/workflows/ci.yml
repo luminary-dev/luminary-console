@@ -77,6 +77,11 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v7
+        with:
+          # Full history: the secret scan below reads commits, and the default
+          # shallow clone would hand it one, so a secret added in any earlier
+          # commit would pass unnoticed.
+          fetch-depth: 0
       - name: Set up Node 24
         uses: actions/setup-node@v7
         with:
@@ -86,7 +91,30 @@ jobs:
         run: npm ci
       - name: Audit dependencies
         run: npm audit --audit-level=high
+      # The gitleaks TOOL is open source and free. The gitleaks ACTION refuses
+      # to run for a GitHub organization without a paid GITLEAKS_LICENSE, which
+      # failed this job on every push. Running the binary directly keeps the
+      # secret scan and drops the licence requirement. The version is pinned
+      # and the checksum is verified, because a scanner that silently becomes
+      # a different program is worse than no scanner.
       - name: Scan for committed secrets
-        uses: gitleaks/gitleaks-action@v2
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITLEAKS_VERSION: 8.30.1
+        run: |
+          set -euo pipefail
+          ASSET="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          BASE="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          # Kept under its published name so the checksum line matches the file
+          # on disk; renaming it makes `sha256sum -c` look for a file that is
+          # not there and the verification silently has nothing to check.
+          curl -sSfL -O "${BASE}/${ASSET}"
+          curl -sSfL -O "${BASE}/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          grep " ${ASSET}\$" "gitleaks_${GITLEAKS_VERSION}_checksums.txt" | sha256sum -c -
+          tar -xzf "${ASSET}" gitleaks
+          # `git`, not `dir`: scan what is committed. `dir` walks the working
+          # tree including gitignored build output, and .next/cache holds real
+          # token values baked in at build time, so it reports 25 findings that
+          # are not in the repository and cannot be.
+          # --redact so a finding never prints the secret into a public log.
+          ./gitleaks git . --redact --verbose --exit-code 1
+          rm -f "${ASSET}" "gitleaks_${GITLEAKS_VERSION}_checksums.txt" gitleaks

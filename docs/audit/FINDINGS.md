@@ -24,9 +24,9 @@ says plainly that no automated test covers it.
 Since that pass, LC-051 moved from Not fixed to Fixed, making the tally **24
 Fixed, 13 Partially fixed, 8 Not fixed** across the original 45.
 
-A further **15 findings, LC-068 to LC-082, were discovered during the
+A further **17 findings, LC-068 to LC-084, were discovered during the
 remediation itself** and are recorded in their own section at the end of this
-document. Fourteen are fixed; one (LC-082) is a deliberate Won't fix with the
+document. Sixteen are fixed; one (LC-082) is a deliberate Won't fix with the
 trade written down. They are kept separate because the distinction is the
 point: they were not visible on a first read of the code. They surfaced from
 unit-testing modules that had none, from measuring rendered pages instead of
@@ -36,7 +36,14 @@ LC-070, where the pull request inbox silently hid real open work, and LC-071,
 where a pull request with more than 100 checks could report as ready to merge
 while a check was failing.
 
-Whole-document totals: **60 findings, 38 Fixed, 13 Partially fixed, 8 Not
+The last two, LC-083 and LC-084, were found only because the pull request was
+opened and its checks watched: a cron schedule the Hobby plan rejects, which
+took every deployment down, and a secret scan that could never pass and was
+scanning the wrong tree. Both had passed lint, typecheck, tests and a local
+build. They are the argument for watching a change land rather than declaring
+it done when the local gates go green.
+
+Whole-document totals: **62 findings, 40 Fixed, 13 Partially fixed, 8 Not
 fixed, 1 Won't fix.**
 
 ---
@@ -1094,3 +1101,68 @@ forgotten. If the derivation is ever revisited, `docs/MIGRATION-PLAN.md`
 describes the expand-and-contract this would need.
 Guarded by: tests/github-projection.test.ts pins the current derivation, so a change cannot happen silently.
 Effort: M   Risk of fix: Medium   Blocks: —
+
+### LC-083 — The GitHub cron took the whole deployment down on the Hobby plan
+Severity: High
+Category: Deployment
+Location: `vercel.json`
+Evidence: The pipeline added `/api/github/process` on `*/5 * * * *`. The Vercel
+account is on the Hobby plan, which permits a cron to run at most once per day,
+and Vercel rejects the schedule when the deployment is CREATED rather than when
+the cron fires: `Hobby accounts are limited to daily cron jobs. This cron
+expression (*/5 * * * *) would run more than once per day.`
+Impact: Every deployment failed, with duration 0 and no deployment record, so
+there were no build logs to read and the failure looked like an infrastructure
+problem rather than a configuration one. This is the mandate's "never break the
+running console" rule broken by the remediation itself: a change that passed
+lint, typecheck, tests and `next build` locally and in CI still could not ship,
+because CI builds the app and Vercel validates the platform config, and nothing
+in the local gates covers the latter.
+Reproduction: `vercel deploy` with a sub-daily cron on a Hobby account.
+Proposed fix: Use a daily schedule, or upgrade the plan.
+Resolution: Fixed — the schedule is `0 5 * * *` and a preview deployment was
+verified READY afterwards. The cost is written down rather than absorbed:
+normal webhook handling is unaffected, because deliveries are processed via
+`after()` within a second of arrival, but the RETRY window for a delivery whose
+inline processing threw grows from 5 minutes to 24 hours, and reconciliation
+runs daily rather than hourly. `docs/DEPLOYMENT.md` records that, and says the
+one-line change to make on Pro. Nothing in the code assumes a frequency:
+`/api/github/process` decides internally whether a reconcile is due.
+Guarded by: no automated test. Platform configuration is not exercised by any local gate, which is the gap this finding is really about.
+Effort: S   Risk of fix: Low   Blocks: —
+
+### LC-084 — The secret scan could never pass, and was scanning the wrong thing
+Severity: Medium
+Category: CI / Security
+Location: `.github/workflows/ci.yml`
+Evidence: The security job used `gitleaks/gitleaks-action@v2`, which refuses to
+run for a GitHub organization without a paid licence:
+`missing gitleaks license. Go grab one at gitleaks.io and store it as a GitHub
+Secret named GITLEAKS_LICENSE.` The job failed on every push from the moment it
+was added.
+Impact: A red merge gate that cannot be made green is worse than no gate. It
+trains everyone to ignore the check, and it hid the fact that no secret
+scanning was actually happening. The audit added this job and never watched it
+run against the org, which is the same class of mistake as the coverage
+threshold set above the real figure.
+Reproduction: Push any commit to a repository owned by an organization.
+Proposed fix: Run the gitleaks binary, which is open source and free. Only the
+Action wrapper is licensed.
+Resolution: Fixed, and two further defects were found while verifying it rather
+than assuming it worked. First, the download was renamed with `curl -o`, so the
+checksum line referred to a filename that did not exist on disk and
+`sha256sum -c` had nothing to verify: the asset now keeps its published name.
+Second, the scan used `gitleaks dir .`, which walks the working tree including
+gitignored build output, and `.next/cache` holds real token values baked in at
+build time, producing 25 findings for material that is not in the repository
+and cannot be. It now runs `gitleaks git .`, with `fetch-depth: 0` on the
+checkout so the history is actually there to scan rather than a single shallow
+commit.
+Scanning the real history surfaced exactly one hit, in `tests/redact.test.ts`:
+synthetic fixtures (a 64-character hex string, AWS's published
+`AKIAIOSFODNN7EXAMPLE`, a fake fine-grained PAT) that exist precisely because
+that test proves secret-shaped strings are scrubbed before they reach a log.
+`.gitleaks.toml` allowlists that one path, extending the default rules rather
+than replacing them, so upstream's future rules still apply.
+Guarded by: the job itself, verified end to end locally. The allowlist was checked for over-reach by planting `AKIAIOSFODNN7EXAMPLE` in a different test file and confirming the scan still failed.
+Effort: S   Risk of fix: Low   Blocks: —
