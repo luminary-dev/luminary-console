@@ -89,7 +89,30 @@ export function githubLoginFor(operatorEmail: string): string | null {
 /** Every mapped GitHub login, for fanning a notification out to the team. */
 export const knownGithubLogins = (): string[] => [...operatorGithubLogins().values()];
 
-/** How long a webhook delivery may have been in flight before we treat it as
- *  a replay. GitHub retries legitimately for a while, so this is generous;
- *  the point is to bound an attacker replaying a captured body forever. */
-export const WEBHOOK_MAX_AGE_MS = 5 * 60 * 1000;
+/**
+ * How old a delivery's payload timestamp may be before we treat it as a
+ * replay.
+ *
+ * This was 5 minutes, and 5 minutes was wrong, because GitHub does not tell us
+ * when it sent a delivery. There is no signed timestamp and no send-time
+ * header, so the age is inferred from timestamps inside the payload, and those
+ * describe the ENTITY, not the delivery. A check run that takes ten minutes
+ * reports a `started_at` from ten minutes ago at the moment it completes, so
+ * every CI check slower than the window was rejected on its FIRST delivery and
+ * silently lost. Slow checks are precisely the ones worth seeing.
+ *
+ * It also made the documented recovery procedure impossible: redelivering from
+ * the App's Recent Deliveries page resends the original body with its original
+ * timestamps, so anything older than the window could never be replayed by an
+ * operator putting the projection back together.
+ *
+ * 48 hours is deliberately generous, because the check earns very little. A
+ * forged body is already impossible without the webhook secret; a replay of
+ * the same delivery id is already caught by the inbox's dedup; and handlers
+ * reconcile against the API rather than applying payload deltas, so even a
+ * successful replay of a genuine old event just re-reads current truth. The
+ * window is a backstop against a captured body being replayed indefinitely,
+ * not a primary control, and it must never be the reason real work goes
+ * missing.
+ */
+export const WEBHOOK_MAX_AGE_MS = 48 * 60 * 60 * 1000;

@@ -170,10 +170,53 @@ describe("constant-time comparison", () => {
 
 describe("replay protection", () => {
   it("rejects a delivery whose payload timestamp is far in the past", () => {
-    const old = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const old = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
     const body = JSON.stringify({ action: "opened", created_at: old });
     const result = verifyDelivery(body, headersFor(body));
     expect(result).toMatchObject({ ok: false, reason: "stale_delivery" });
+  });
+
+  it("accepts a check run that took longer than the old five minute window", () => {
+    // The bug this exists to prevent lost real CI results in production.
+    // GitHub sends no delivery timestamp, so freshness is inferred from the
+    // payload, and check_run.started_at describes when the check BEGAN. A
+    // ten minute build therefore looked ten minutes stale the instant it
+    // finished, and was refused on its FIRST delivery. Slow checks are
+    // exactly the ones an operator needs to see.
+    const startedAt = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const body = JSON.stringify({
+      action: "completed",
+      check_run: { id: 1, status: "completed", started_at: startedAt, completed_at: new Date().toISOString() },
+    });
+    expect(verifyDelivery(body, headersFor(body)).ok).toBe(true);
+  });
+
+  it("prefers a check run's completed_at over its started_at", () => {
+    // completed_at is the closest thing to a send time that the payload has.
+    const started = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+    const completed = new Date(Date.now() - 1000).toISOString();
+    const ts = payloadTimestamp(
+      JSON.stringify({ check_run: { started_at: started, completed_at: completed } }),
+    );
+    expect(ts).toBe(Date.parse(completed));
+  });
+
+  it("still uses started_at for a check run that has not finished", () => {
+    // An in-progress run has no completed_at, and its start IS recent.
+    const started = new Date(Date.now() - 1000).toISOString();
+    const ts = payloadTimestamp(JSON.stringify({ check_run: { started_at: started } }));
+    expect(ts).toBe(Date.parse(started));
+  });
+
+  it("accepts an operator redelivery from the App's Recent Deliveries page", () => {
+    // Redelivery resends the ORIGINAL body with its original timestamps, so a
+    // tight window made the documented recovery procedure impossible: the
+    // deliveries most worth replaying are the old ones.
+    const body = JSON.stringify({
+      action: "completed",
+      workflow_run: { id: 9, updated_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString() },
+    });
+    expect(verifyDelivery(body, headersFor(body)).ok).toBe(true);
   });
 
   it("accepts a delivery with no timestamp rather than failing closed", () => {

@@ -24,9 +24,9 @@ says plainly that no automated test covers it.
 Since that pass, LC-051 moved from Not fixed to Fixed, making the tally **24
 Fixed, 13 Partially fixed, 8 Not fixed** across the original 45.
 
-A further **18 findings, LC-068 to LC-085, were discovered during the
+A further **19 findings, LC-068 to LC-086, were discovered during the
 remediation itself** and are recorded in their own section at the end of this
-document. Seventeen are fixed; one (LC-082) is a deliberate Won't fix with the
+document. Eighteen are fixed; one (LC-082) is a deliberate Won't fix with the
 trade written down. They are kept separate because the distinction is the
 point: they were not visible on a first read of the code. They surfaced from
 unit-testing modules that had none, from measuring rendered pages instead of
@@ -43,7 +43,7 @@ scanning the wrong tree. Both had passed lint, typecheck, tests and a local
 build. They are the argument for watching a change land rather than declaring
 it done when the local gates go green.
 
-Whole-document totals: **63 findings, 41 Fixed, 13 Partially fixed, 8 Not
+Whole-document totals: **64 findings, 42 Fixed, 13 Partially fixed, 8 Not
 fixed, 1 Won't fix.**
 
 ---
@@ -1209,4 +1209,52 @@ preserved. No absolute date remains in the file. The other test files that
 contain 2026 dates were checked and are not exposed: they pass an explicit
 `now` into the function under test rather than relying on the wall clock.
 Guarded by: the tests themselves, which now cannot drift out of the window. There is no meta-test asserting determinism; the durable guard would be running CI on a clock-skewed runner, which is not set up.
+Effort: S   Risk of fix: Low   Blocks: —
+
+### LC-086 — Every CI check slower than five minutes was silently dropped
+Severity: Critical
+Category: Data integrity
+Location: `lib/github/webhooks.ts` (`payloadTimestamp`), `lib/github/config.ts` (`WEBHOOK_MAX_AGE_MS`)
+Evidence: The receiver rejects a delivery whose payload timestamp is older than
+`WEBHOOK_MAX_AGE_MS`, which was 5 minutes. GitHub sends no delivery timestamp:
+there is no signed timestamp and no send-time header, so the age was inferred
+from fields inside the payload. Those describe the ENTITY, not the delivery,
+and the field consulted for check runs was `check_run.started_at`, which is
+when the check BEGAN.
+A check run taking ten minutes therefore reports a `started_at` ten minutes old
+at the moment it completes, and was refused with `stale_delivery` on its FIRST
+delivery. Verified directly against the real code and the production webhook
+secret: a `check_run.completed` with `started_at` ten minutes ago and
+`completed_at` now was REJECTED, while the same event with a two minute build
+was accepted.
+Impact: The console silently lost the completion of every CI check slower than
+five minutes, which is most real builds. `mergeReadiness` reads those checks to
+decide whether a pull request is safe to merge, so this is the same class of
+harm as LC-071 arriving by a different route: the console would show a pull
+request as ready while a slow check that had actually failed never landed. It
+fails closed in the sense that the delivery is refused rather than mangled, but
+GitHub records a 400 and moves on, so the loss is invisible from inside the
+console. It was live in production from the moment the App was installed.
+It also made the documented recovery procedure impossible. Redelivering from
+the App's Recent Deliveries page resends the ORIGINAL body with its ORIGINAL
+timestamps, so any delivery older than five minutes could never be replayed by
+an operator rebuilding the projection. This was found exactly that way: 18
+deliveries rejected while production still lacked the webhook secret were
+redelivered afterwards, and every `check_run` and `check_suite` among them came
+back 400 while `workflow_job` (which has no scanned timestamp field) returned
+200.
+Reproduction: Sign a `check_run.completed` payload whose `started_at` is ten
+minutes ago and post it. Before the fix: 400, `stale_delivery`.
+Proposed fix: Stop reading a start time as a send time, and stop letting a
+backstop control drop real traffic.
+Resolution: Fixed, in two parts. `payloadTimestamp` now prefers
+`check_run.completed_at` and falls back to `started_at` only for a run that has
+not finished, where the start genuinely is recent. And `WEBHOOK_MAX_AGE_MS` is
+now 48 hours rather than 5 minutes, because the check earns very little: a
+forged body is impossible without the webhook secret, a replayed delivery id is
+already caught by the inbox dedup, and handlers reconcile against the API
+rather than applying payload deltas, so replaying a genuine old event just
+re-reads current truth. The window is a backstop against indefinite replay, not
+a primary control, and it must never be the reason real work goes missing.
+Guarded by: tests/github-webhooks.test.ts::"accepts a check run that took longer than the old five minute window", ::"prefers a check run's completed_at over its started_at", ::"still uses started_at for a check run that has not finished", and ::"accepts an operator redelivery from the App's Recent Deliveries page".
 Effort: S   Risk of fix: Low   Blocks: —
