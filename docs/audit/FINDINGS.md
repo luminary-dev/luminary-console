@@ -1158,11 +1158,25 @@ build time, producing 25 findings for material that is not in the repository
 and cannot be. It now runs `gitleaks git .`, with `fetch-depth: 0` on the
 checkout so the history is actually there to scan rather than a single shallow
 commit.
-Scanning the real history surfaced exactly one hit, in `tests/redact.test.ts`:
+Scanning the real history surfaced one hit in `tests/redact.test.ts`, and
+GitGuardian independently flagged four in the same and one neighbouring file:
 synthetic fixtures (a 64-character hex string, AWS's published
 `AKIAIOSFODNN7EXAMPLE`, a fake fine-grained PAT) that exist precisely because
 that test proves secret-shaped strings are scrubbed before they reach a log.
-`.gitleaks.toml` allowlists that one path, extending the default rules rather
-than replacing them, so upstream's future rules still apply.
-Guarded by: the job itself, verified end to end locally. The allowlist was checked for over-reach by planting `AKIAIOSFODNN7EXAMPLE` in a different test file and confirming the scan still failed.
+
+The first fix was a path allowlist in `.gitleaks.toml`, and it was the wrong
+one twice over. It exempts the file permanently, so a credential genuinely
+pasted into it later would pass unnoticed, and it fixes nothing for the second
+scanner, because GitGuardian reads its policy from its own dashboard rather
+than from this repository. One allowlist per tool, forever, is a treadmill.
+
+The root cause was the literals themselves, so those are gone: the fixtures are
+now assembled at runtime from harmless fragments, with the runtime values
+byte-identical, so the redactor is tested against exactly the same input and
+all 37 assertions are unchanged. `tests/` now scans clean with no allowlist at
+all. What remains is a single `.gitleaksignore` fingerprint,
+`commit:path:rule:line`, dismissing the one finding in the commit that
+introduced the literal, since history still holds it. A fingerprint dismisses
+one finding rather than switching off a file.
+Guarded by: the job itself, verified end to end locally. The ignore was checked for over-reach by planting a fake classic PAT in that same file and confirming the scan still failed, so the dismissal covers one historical finding and nothing else.
 Effort: S   Risk of fix: Low   Blocks: —
