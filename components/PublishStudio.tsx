@@ -153,7 +153,7 @@ function ArticleForm() {
               rows={3}
               value={brief}
               onChange={(e) => setBrief(e.target.value)}
-              placeholder="e.g. A practical post on shipping WebSockets on Vercel Fluid Compute — what changed, patterns, pitfalls."
+              placeholder="e.g. A practical post on shipping WebSockets on Vercel Fluid Compute: what changed, patterns, pitfalls."
             />
           </div>
         </div>
@@ -188,7 +188,7 @@ function ArticleForm() {
               className="q-line"
               value={f.imageBrief}
               onChange={set("imageBrief")}
-              placeholder="One sentence — a whimsical physical metaphor for the post (no screenshots)."
+              placeholder="One sentence: a whimsical physical metaphor for the post (no screenshots)."
             />
           </div>
           <div className="q-field">
@@ -202,9 +202,9 @@ function ArticleForm() {
               value={inlineImages}
               onChange={(e) => setInlineImages(Number(e.target.value))}
             >
-              <option value={0}>None — cover only</option>
-              <option value={1}>1 — under a middle section</option>
-              <option value={2}>2 — spaced through the body</option>
+              <option value={0}>None: cover only</option>
+              <option value={1}>1: under a middle section</option>
+              <option value={2}>2: spaced through the body</option>
             </select>
           </div>
           <div className="q-field half">
@@ -217,7 +217,7 @@ function ArticleForm() {
         {error && <div className="form-error">{error}</div>}
         {busy && (
           <div className="notice">
-            Publishing — generating the cover with gpt-image-2 and opening the PR against dev. About a minute; don&apos;t close the tab.
+            Publishing: generating the cover with gpt-image-2 and opening the PR against dev. About a minute; don&apos;t close the tab.
           </div>
         )}
         <button className="btn" style={{ marginTop: 18 }} disabled={busy}>
@@ -256,7 +256,7 @@ function ProjectForm() {
     try {
       project = JSON.parse(json);
     } catch {
-      setError("The project JSON doesn't parse — fix it and try again.");
+      setError("The project JSON doesn't parse. Fix it and try again.");
       return;
     }
     setBusy(true);
@@ -307,12 +307,12 @@ function ProjectForm() {
               className="q-line"
               value={imageBrief}
               onChange={(e) => setImageBrief(e.target.value)}
-              placeholder="One sentence — the physical scene for the day/dusk thumbnail pair."
+              placeholder="One sentence: the physical scene for the day/dusk thumbnail pair."
               required
             />
           </div>
           <div className="q-field">
-            <span className="q-label">Entry (JSON — review before publishing) <span className="req">*</span></span>
+            <span className="q-label">Entry (JSON, review before publishing) <span className="req">*</span></span>
             <textarea
               className="q-box"
               rows={22}
@@ -326,7 +326,7 @@ function ProjectForm() {
         {error && <div className="form-error">{error}</div>}
         {busy && (
           <div className="notice">
-            Publishing — generating the day & dusk thumbnails with gpt-image-2, updating lib/projects.ts and opening the PR against dev. One to two minutes; don&apos;t close the tab.
+            Publishing: generating the day & dusk thumbnails with gpt-image-2, updating lib/projects.ts and opening the PR against dev. One to two minutes; don&apos;t close the tab.
           </div>
         )}
         <button className="btn" style={{ marginTop: 18 }} disabled={busy}>

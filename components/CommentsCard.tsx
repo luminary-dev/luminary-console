@@ -20,8 +20,8 @@ export default function CommentsCard({ client }: { client: ClientRecord }) {
       </div>
       {comments.length === 0 ? (
         <p className="empty-note">
-          Nothing asked yet. The portal shows a question box against every published document —
-          anything sent lands here and in the studio inbox.
+          Nothing asked yet. The portal shows a question box against every published document.
+          Anything sent lands here and in the studio inbox.
         </p>
       ) : (
         <div style={{ marginTop: 8 }}>

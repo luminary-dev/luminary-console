@@ -1,7 +1,7 @@
 // CSV export of the client list for the operator (spreadsheets / accounting).
 // Authed by the proxy like every console API route. One row per client with
 // the money + stage summary already computed elsewhere.
-import { getIndex, getClient } from "@/lib/store";
+import { getIndex, getClients } from "@/lib/store";
 import { clientMoney, overdueSummary } from "@/lib/money";
 import { currentStage, STAGE_LABELS } from "@/lib/stage";
 
@@ -18,8 +18,13 @@ export async function GET() {
   const header = ["Company", "Doc no.", "Stage", "Status", "Email", "Outstanding (LKR)", "Overdue (LKR)", "Created"];
   const lines = [header.map(cell).join(",")];
 
-  for (const e of index) {
-    const c = await getClient(e.slug);
+  // Every row of the CSV needs its record, so this read is the export; only
+  // the shape of it changes, from one round trip per client in series to a
+  // bounded fan-out (LC-030).
+  const records = await getClients(index.map((e) => e.slug));
+
+  for (const [i, e] of index.entries()) {
+    const c = records[i];
     if (!c) continue;
     const money = clientMoney(c);
     const od = overdueSummary(c);

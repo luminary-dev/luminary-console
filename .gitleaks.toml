@@ -1,0 +1,21 @@
+# Secret scanning configuration.
+#
+# Extends the stock gitleaks rules rather than replacing them: the default set
+# is the valuable part, and a hand-rolled rule list silently stops catching
+# whatever upstream adds next.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = """
+Fixtures for the redaction layer. tests/redact.test.ts exists to prove that
+secret-shaped strings are scrubbed before they reach a log, so it necessarily
+contains secret-shaped strings: a synthetic 64-character hex R2 key, AWS's own
+published example access key id (AKIAIOSFODNN7EXAMPLE), and a fake fine-grained
+PAT. None is real, and none has ever been valid.
+
+Scoped to this one path rather than to tests/ generally, so a credential
+accidentally pasted into any other test still fails the build.
+"""
+paths = ['''tests/redact\.test\.ts''']

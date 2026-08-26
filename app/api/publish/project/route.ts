@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     // opening a second would let one silently overwrite the other on merge.
     if (await landingBranchExists(`content/project-${slug}`)) {
       return NextResponse.json(
-        { error: `"${slug}" already has a publish PR in flight — merge or close it (and delete its branch) first.` },
+        { error: `"${slug}" already has a publish PR in flight: merge or close it (and delete its branch) first.` },
         { status: 409 },
       );
     }
@@ -113,18 +113,18 @@ export async function POST(req: Request) {
       prBody: [
         `New ${isEng ? "Cloud & DevOps" : "web"} project **${p.name}** (\`/work/${slug}\`), added from the console portal.`,
         "",
-        `- \`lib/projects.ts\` — new entry appended to PROJECTS`,
-        `- \`public/work/thumbs/${slug}-light.jpg\` / \`-dark.jpg\` — generated day/dusk thumbnails (house 3D-animation style)`,
+        `- \`lib/projects.ts\`: new entry appended to PROJECTS`,
+        `- \`public/work/thumbs/${slug}-light.jpg\` / \`-dark.jpg\`: generated day/dusk thumbnails (house 3D-animation style)`,
         "",
         ...(isEng
-          ? ["The case page renders the architecture diagram + terminal run from the entry — no other assets needed."]
+          ? ["The case page renders the architecture diagram + terminal run from the entry. No other assets needed."]
           : [
               "### Before merging",
               `- [ ] Add device screenshots: \`public/work/${slug}-desktop.png\`, \`-tablet.png\`, \`-mobile.png\`, then add \`shots: shots("${slug}")\` to the entry (the case page's device showcase needs them).`,
             ]),
         "Remember the version bump if this PR rides to prod on its own.",
         "",
-        "🤖 Published via luminary-console",
+        "Published via luminary-console.",
       ].join("\n"),
       files: [
         { path: PROJECTS_PATH, text: updated },
@@ -137,7 +137,7 @@ export async function POST(req: Request) {
     // never blocks the publish.
     await sendTelegram(
       [
-        `🏗️ <b>Project published → PR</b> · ${tgEsc(p.name)}`,
+        `<b>Project published, PR opened</b> · ${tgEsc(p.name)}`,
         [
           `/work/${slug} · ${isEng ? "Cloud & DevOps (repo)" : "Web (complete website)"}`,
           `Day + dusk thumbnails generated`,
@@ -151,7 +151,7 @@ export async function POST(req: Request) {
     );
     await sendPush({
       title: `Project published → PR · ${p.name}`,
-      body: `/work/${slug} — tap to review the PR`,
+      body: `/work/${slug} · tap to review the PR`,
       url: pr.url,
     });
 

@@ -11,6 +11,7 @@ import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
 import type { Comment } from "@/lib/types";
+import { clipText } from "@/lib/errors";
 
 export const runtime = "nodejs";
 
@@ -39,7 +40,7 @@ export async function POST(
   if (!design || design.status !== "published") {
     return NextResponse.json({ error: "Please pick one of your design previews." }, { status: 400 });
   }
-  const by = typeof body.by === "string" ? body.by.trim().slice(0, 120) : "";
+  const by = typeof body.by === "string" ? clipText(body.by.trim(), 120) : "";
   const text = typeof body.text === "string" ? body.text.trim() : "";
   if (!text) return NextResponse.json({ error: "Please describe the changes you'd like." }, { status: 400 });
   if (text.length > MAX_TEXT) return NextResponse.json({ error: `Please keep it under ${MAX_TEXT} characters.` }, { status: 400 });
@@ -51,7 +52,7 @@ export async function POST(
 
   const consoleUrl = `https://${CONSOLE_HOST}/clients/${client.slug}`;
   await emailStudio(
-    `Design changes requested — ${client.company}`,
+    `Design changes requested · ${client.company}`,
     `<p><strong>${esc(by || "The client")}</strong> requested changes on <b>${esc(design.title)}</b> from the ${esc(client.company)} client portal:</p>
 <blockquote style="margin:14px 0;padding:10px 16px;border-left:3px solid #84cc16;white-space:pre-wrap">${esc(text)}</blockquote>
 <p><a href="${consoleUrl}">Open ${esc(client.company)} in the console →</a></p>`,
@@ -59,10 +60,9 @@ export async function POST(
     client.email || undefined,
   );
   await studioNotice({
-    emoji: "✏️",
     title: "Design changes requested",
     company: client.company,
-    lines: [`${tgEsc(by || "Client")} on ${tgEsc(design.title)}`, `“${tgEsc(text.slice(0, 400))}”`],
+    lines: [`${tgEsc(by || "Client")} on ${tgEsc(design.title)}`, `“${tgEsc(clipText(text, 400))}”`],
     url: consoleUrl,
   });
 

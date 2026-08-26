@@ -53,7 +53,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
         setAnswer(data.text);
       }
     } catch {
-      setError("Network problem — check your connection and try again.");
+      setError("Network problem. Check your connection and try again.");
     } finally {
       setBusy(false);
     }
@@ -66,7 +66,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
-      setError("Couldn't copy automatically — select the text and copy it manually.");
+      setError("Couldn't copy automatically. Select the text and copy it manually.");
     }
   };
 
@@ -95,7 +95,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
     const data = res ? await res.json().catch(() => null) : null;
     setBusy(false);
     if (!res?.ok) {
-      setError(data?.error || "Couldn't send — try again.");
+      setError(data?.error || "Couldn't send. Try again.");
       return;
     }
     setComposing(false);
@@ -114,7 +114,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
     }).catch(() => null);
     setBusy(false);
     if (!res?.ok) {
-      setError("Couldn't add the task — try again.");
+      setError("Couldn't add the task. Try again.");
       return;
     }
     setHandoff(`Added a task: "${text}". Refresh to see it in the Tasks card.`);
@@ -129,7 +129,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
         {busy && <span className="save-state on">Thinking…</span>}
       </div>
       <p className="empty-note" style={{ marginTop: 4 }}>
-        Ask anything about this client — their answers, documents, money or what to do next. Answers
+        Ask anything about this client: their answers, documents, money or what to do next. Answers
         are for you only: nothing here is sent to the client, and drafted emails come back as text to
         copy and send yourself.
       </p>
@@ -162,7 +162,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
         </button>
         <span className="save-state">
           {tooLong
-            ? `${prompt.length.toLocaleString("en-US")} / ${MAX_PROMPT.toLocaleString("en-US")} — too long`
+            ? `${prompt.length.toLocaleString("en-US")} / ${MAX_PROMPT.toLocaleString("en-US")} · too long`
             : "⌘ + Enter"}
         </span>
       </div>

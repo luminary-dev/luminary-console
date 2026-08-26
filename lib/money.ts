@@ -32,32 +32,92 @@ export function paidAgainst(payments: Payment[] | undefined, invoiceSlug: string
     .reduce((s, p) => s + (Number.isFinite(p.amount) ? p.amount : 0), 0);
 }
 
+/** One published invoice and the payments actually attributed to it. */
+export type InvoiceBalance = {
+  /** Doc number, e.g. "LUM-INV-0044-01". */
+  no: string;
+  /** Billing slug the payments point at, e.g. "invoice-1". */
+  slug: string;
+  /** Grand total, or null when the stored string was not a single amount. */
+  total: number | null;
+  /** Payments carrying this invoice's slug. */
+  paid: number;
+  /** Still owed on this invoice. 0 when settled or when the total is unreadable. */
+  outstanding: number;
+  /** Paid beyond the total. 0 when the total is unreadable. */
+  overpaid: number;
+};
+
 export type MoneySummary = {
   /** Sum of parsable published-invoice totals. */
   invoiced: number;
-  /** Sum of all recorded payments. */
+  /** Sum of ALL recorded payments, attributed or not. */
   paid: number;
-  /** max(0, invoiced − paid). */
+  /** Sum of what each published invoice still owes, from its OWN payments.
+   *  Payments that name no invoice, or name a draft or deleted one, do not
+   *  reduce it: see `unattributed`. */
   outstanding: number;
   /** Doc numbers of published invoices whose total didn't parse (not summed). */
   unparsable: string[];
+  /** Payments carrying the slug of a published invoice. */
+  attributed: number;
+  /** paid − attributed: money received that settles no published invoice.
+   *  Shown, never quietly netted off the balance. */
+  unattributed: number;
+  /** Sum of per-invoice overpayment. Shown, never clamped to zero. */
+  overpaid: number;
+  /** Per-invoice attribution, published invoices only, in record order. */
+  invoices: InvoiceBalance[];
 };
 
-/** Outstanding = published invoices − payments. */
+/** Outstanding is computed per invoice from the payments attributed to it,
+ *  then summed. The old version compared two aggregates (every published
+ *  invoice against every recorded payment) and clamped the result at zero,
+ *  so an untagged payment, or one tagged to an invoice still in draft, drove
+ *  the balance to "settled" while money was genuinely owed, and overpayment
+ *  vanished entirely (LC-003). See docs/adr/0001-outstanding-balance-semantics.md. */
 export function summarizeMoney(
   billing: BillingDoc[] | undefined,
   payments: Payment[] | undefined,
 ): MoneySummary {
   let invoiced = 0;
+  let outstanding = 0;
+  let overpaid = 0;
+  let attributed = 0;
   const unparsable: string[] = [];
+  const invoices: InvoiceBalance[] = [];
+
   for (const b of billing ?? []) {
     if (b.kind !== "invoice" || b.status !== "published") continue;
-    const t = invoiceTotal(b);
-    if (t === null) unparsable.push(b.no);
-    else invoiced += t;
+    const total = invoiceTotal(b);
+    const paidHere = paidAgainst(payments, b.slug);
+    // Counted as attributed even when the total is unreadable: the money is
+    // still pointed at a real published invoice, so it is not "unassigned".
+    attributed += paidHere;
+    if (total === null) {
+      unparsable.push(b.no);
+      invoices.push({ no: b.no, slug: b.slug, total: null, paid: paidHere, outstanding: 0, overpaid: 0 });
+      continue;
+    }
+    invoiced += total;
+    const owed = Math.max(0, total - paidHere);
+    const over = Math.max(0, paidHere - total);
+    outstanding += owed;
+    overpaid += over;
+    invoices.push({ no: b.no, slug: b.slug, total, paid: paidHere, outstanding: owed, overpaid: over });
   }
+
   const paid = (payments ?? []).reduce((s, p) => s + (Number.isFinite(p.amount) ? p.amount : 0), 0);
-  return { invoiced, paid, outstanding: Math.max(0, invoiced - paid), unparsable };
+  return {
+    invoiced,
+    paid,
+    outstanding,
+    unparsable,
+    attributed,
+    unattributed: Math.max(0, paid - attributed),
+    overpaid,
+    invoices,
+  };
 }
 
 export const clientMoney = (c: ClientRecord): MoneySummary => summarizeMoney(c.billing, c.payments);
@@ -89,7 +149,7 @@ export function invoiceStatus(b: BillingDoc, payments: Payment[] | undefined, no
   const overdue = unpaid && hasDue && dueMs < now;
   const overdueDays = overdue ? Math.floor((now - dueMs) / DAY_MS) : 0;
   const dueSoon = unpaid && hasDue && !overdue && dueMs - now <= 3 * DAY_MS;
-  return { outstanding, dueOn: b.dueOn, overdueDays, dueSoon, overdue };
+  return { outstanding, ...(b.dueOn !== undefined ? { dueOn: b.dueOn } : {}), overdueDays, dueSoon, overdue };
 }
 
 /** Overdue published invoices for a client: count + total outstanding. */

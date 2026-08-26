@@ -4,41 +4,95 @@
 //   (public: questionnaire, published docs, PDFs)
 // - Console:       console host (or the *.vercel.app project URL) — every
 //   path except /login and /api/auth requires the signed session cookie.
+//
+// It is also the single place every HTML response gets its security headers,
+// including the per-request CSP nonce. See lib/csp.ts.
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { SESSION_COOKIE, SESSION_MAX_AGE, makeSessionToken, verifySessionToken } from "@/lib/auth";
+import { SESSION_ABS_MAX_AGE, SESSION_COOKIE, SESSION_MAX_AGE, makeSessionToken, verifySessionToken } from "@/lib/auth";
+import { cspFor, newNonce, securityHeaders, type Surface } from "@/lib/csp";
+import { csrfViolation } from "@/lib/csrf";
+import { logger } from "@/lib/logger";
 
-// Revoked-sid cache: one store read per instance per minute instead of per
-// request. Revocation therefore takes up to ~60s to propagate — acceptable
-// staleness for "sign that device out". Fails open (treats the list as
-// empty) so a store hiccup can't lock the operator out of the console.
+// Session allowlist cache: one store read per instance per minute instead of
+// per request. lib/sessions.liveSids() returns every sid that is registered,
+// unrevoked, inside the absolute cap and still owned by an allowlisted
+// operator, so a sid missing from it is a sid that must not authenticate
+// anything (LC-010, GAP-3.5a).
+//
+// FAILURE MODE (deliberate, unchanged in spirit from the revoked-list cache
+// this replaces): when the store read throws, `sids` is null and the gate
+// FAILS OPEN, accepting any signature-valid unexpired token. An allowlist
+// that fails closed would turn an R2 hiccup into "every operator is locked
+// out of the console until storage comes back", which is a worse outcome
+// than a stolen cookie surviving the outage: the token is still HMAC-signed
+// with SESSION_SECRET, still expires, and the window is the length of the
+// outage. Signature verification is never skipped.
+//
+// STALENESS, and why a miss is not simply a rejection: with a denylist a
+// stale cache only delayed a revocation, but with an allowlist it would also
+// reject a session created after the snapshot was taken, i.e. every operator
+// would bounce back to /login for up to 60s after signing in. So a miss is
+// re-checked against the store when, and only when, the token was ISSUED
+// after the snapshot was loaded. That timestamp comes out of the signed
+// token, so a replayed old cookie cannot use this path to hammer the store.
 //
 // lib/sessions is imported lazily because it reaches the S3 SDK through the
 // store: the proxy runs on EVERY request, and there is no reason to load a
 // storage client on the ~59 seconds in 60 that this answers from cache, or
 // on client-host requests, which never consult it at all.
-let revokedCache: { at: number; sids: Set<string> } | null = null;
-async function sidRevoked(sid: string): Promise<boolean> {
-  if (!revokedCache || Date.now() - revokedCache.at > 60_000) {
+const GATE_TTL_MS = 60_000;
+let gate: { at: number; sids: Set<string> | null } = { at: 0, sids: null };
+let gateLoad: Promise<void> | null = null;
+
+function loadGate(): Promise<void> {
+  // Concurrent misses share one store read rather than each firing their own.
+  gateLoad ??= (async () => {
     try {
-      const { revokedSids } = await import("@/lib/sessions");
-      revokedCache = { at: Date.now(), sids: new Set(await revokedSids()) };
+      const { liveSids } = await import("@/lib/sessions");
+      gate = { at: Date.now(), sids: new Set(await liveSids()) };
     } catch {
-      revokedCache = { at: Date.now(), sids: new Set() };
+      gate = { at: Date.now(), sids: null }; // fail open, see above
+    } finally {
+      gateLoad = null;
     }
-  }
-  return revokedCache.sids.has(sid);
+  })();
+  return gateLoad;
 }
 
-// Standard hardening for a private operations console.
-function harden(res: NextResponse, console_: boolean) {
-  res.headers.set("X-Content-Type-Options", "nosniff");
-  res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  res.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains");
-  res.headers.set("X-Frame-Options", console_ ? "DENY" : "SAMEORIGIN");
-  res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-  if (console_) res.headers.set("Cache-Control", "no-store"); // back/hard-reload never shows stale authed pages
+async function sidAllowed(sid: string, absExp: number): Promise<boolean> {
+  if (Date.now() - gate.at > GATE_TTL_MS) await loadGate();
+  if (gate.sids === null) return true;
+  if (gate.sids.has(sid)) return true;
+  // absExp never moves, so this is the login's own creation time.
+  const issuedAt = absExp - SESSION_ABS_MAX_AGE * 1000;
+  if (issuedAt <= gate.at) return false;
+  await loadGate();
+  return gate.sids === null || gate.sids.has(sid);
+}
+
+// Standard hardening. `surface` picks the CSP: see lib/csp.ts for why the
+// generated client documents cannot take the strict one.
+export function harden(
+  res: NextResponse,
+  surface: Surface,
+  nonce: string | null = null,
+  noStore = false,
+): NextResponse {
+  for (const [k, v] of Object.entries(securityHeaders(surface, nonce))) res.headers.set(k, v);
+  if (noStore) res.headers.set("Cache-Control", "no-store"); // back/hard-reload never shows stale authed pages
   return res;
+}
+
+// Next reads the nonce back out of the REQUEST's CSP header to stamp it on
+// the framework's own script tags; app/layout.tsx reads x-nonce for the
+// pre-paint theme script. Both have to be set on the request, not just the
+// response.
+function nonceRequest(request: NextRequest, nonce: string): Headers {
+  const headers = new Headers(request.headers);
+  headers.set("x-nonce", nonce);
+  headers.set("Content-Security-Policy", cspFor("console", nonce));
+  return headers;
 }
 
 const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
@@ -78,8 +132,18 @@ function stampVisit(res: NextResponse, slug: string): NextResponse {
   return res;
 }
 
+// LC-016: the console's own preview of an operator-uploaded design serves the
+// same untrusted HTML the client subdomain serves. The route answers it as a
+// wrapper page around a sandboxed iframe, and the strict console policy would
+// break both halves of that (frame-src 'none' kills the wrapper, no
+// 'unsafe-inline' kills the design's own demo script), so the preview takes
+// the document policy like every other stored HTML file this app serves.
+const DESIGN_PREVIEW = /^\/api\/clients\/[a-z0-9-]+\/designs\/[^/]+\/?$/;
+
 export async function proxy(request: NextRequest) {
-  const host = (request.headers.get("host") || "").split(":")[0].toLowerCase();
+  // Port included: the CSRF same-origin comparison needs it on localhost.
+  const rawHost = (request.headers.get("host") || "").toLowerCase();
+  const host = rawHost.split(":")[0] ?? "";
   const { pathname } = request.nextUrl;
 
   const isClientHost =
@@ -94,12 +158,29 @@ export async function proxy(request: NextRequest) {
     // Client hosts may only reach client-site routes.
     const url = request.nextUrl.clone();
     url.pathname = `/c/${slug}${pathname === "/" ? "" : pathname}`;
-    if (pathname !== "/") return harden(NextResponse.rewrite(url), false);
+    if (pathname !== "/") return harden(NextResponse.rewrite(url), "document");
     return stampVisit(
-      harden(NextResponse.rewrite(url, { request: { headers: visitHeaders(request, slug) } }), false),
+      harden(NextResponse.rewrite(url, { request: { headers: visitHeaders(request, slug) } }), "document"),
       slug,
     );
   }
+
+  // A stored document previewed on the console host is the same immutable
+  // HTML the client subdomain serves, inline scripts and all, so it needs the
+  // document policy here too. The portal page under the same prefix is a Next
+  // page, and it renders and hydrates cleanly under the document policy: its
+  // bundles load from 'self'. It needs the dev-only 'unsafe-eval' in
+  // lib/csp.ts to hot-reload, which is why that concession exists.
+  // The design preview is GET-only here: publish/unpublish and delete use the
+  // same path and answer JSON, which wants the console policy.
+  const surface: Surface =
+    pathname.startsWith("/c/") || (request.method === "GET" && DESIGN_PREVIEW.test(pathname))
+      ? "document"
+      : "console";
+  const nonce = newNonce();
+  // The document policy has no nonce source, so handing one out there would
+  // be theatre: a browser ignores nonce attributes a policy never named.
+  const cspNonce = surface === "console" ? nonce : null;
 
   // Console host: public paths first.
   if (
@@ -109,6 +190,13 @@ export async function proxy(request: NextRequest) {
     // Cron endpoints skip the session gate — each route guards itself with
     // the CRON_SECRET bearer check (Vercel Cron can't hold a session cookie).
     pathname.startsWith("/api/cron/") ||
+    // The GitHub webhook receiver is necessarily public: GitHub cannot hold a
+    // session cookie. Its guard is the HMAC signature over the raw body,
+    // verified before the payload is parsed, stored or logged
+    // (lib/github/webhooks.ts). It is listed as an exact path, not a prefix,
+    // so nothing else under /api/github/ inherits the exemption: the delivery
+    // inbox and the processing sweep stay behind the session gate.
+    pathname === "/api/github/webhook" ||
     pathname.startsWith("/_next") ||
     pathname === "/icon.svg" ||
     pathname === "/favicon.ico" ||
@@ -123,40 +211,88 @@ export async function proxy(request: NextRequest) {
     pathname === "/icon-512.png" ||
     pathname === "/badge.png"
   ) {
-    return harden(NextResponse.next(), pathname === "/login");
+    // /login is a rendered page and needs the nonce; the rest are static
+    // assets that must stay cacheable, so only /login gets no-store.
+    const isLogin = pathname === "/login";
+    return harden(
+      isLogin
+        ? NextResponse.next({ request: { headers: nonceRequest(request, nonce) } })
+        : NextResponse.next(),
+      surface,
+      cspNonce,
+      isLogin,
+    );
   }
 
   // Direct /c/* access on the console host is allowed for previewing —
   // but still behind auth like everything else.
   const secret = process.env.SESSION_SECRET || "";
   const session = await verifySessionToken(secret, request.cookies.get(SESSION_COOKIE)?.value);
-  if (!session || (await sidRevoked(session.sid))) {
+  if (!session || !(await sidAllowed(session.sid, session.absExp))) {
     // These are console responses too. Skipping harden() here left the most
     // requested path on the host — an unauthenticated GET / — with no
     // nosniff, no X-Frame-Options, no HSTS of ours and a cacheable
     // Cache-Control, which is exactly the response a shared cache or a
     // framing attack would want.
     if (pathname.startsWith("/api/")) {
-      return harden(NextResponse.json({ error: "Unauthorized" }, { status: 401 }), true);
+      return harden(NextResponse.json({ error: "Unauthorized" }, { status: 401 }), "console", cspNonce, true);
     }
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.search = "";
-    return harden(NextResponse.redirect(url), true);
+    return harden(NextResponse.redirect(url), "console", cspNonce, true);
+  }
+
+  // LC-014: Origin/Referer check on cookie-authenticated mutations.
+  //
+  // It sits HERE, after the session gate, and that placement is the whole
+  // design: reaching this line proves the request carried a valid session
+  // cookie, which is exactly the ambient credential a CSRF attack borrows. So
+  // the check applies to every cookie-authed mutation and to nothing else.
+  // The callers that must never be blocked are all already past:
+  //   - /api/github/webhook and /api/cron/* returned from the public-path
+  //     list above,
+  //   - /api/github/process authenticates cron with a bearer and no cookie,
+  //     so a cron call is refused by the session gate exactly as it was
+  //     before this check existed (its own behaviour, unchanged here),
+  //   - the public portal routes under /c/<slug>/… on a client host returned
+  //     from the isClientHost branch long before this point.
+  const violation = csrfViolation(request, rawHost);
+  if (violation) {
+    // Through lib/logger, because the reason string quotes an attacker-chosen
+    // Origin/Referer and the request carries a session cookie (LC-017).
+    logger.warn("csrf refusal", { path: pathname, method: request.method, reason: violation });
+    const body = { error: "Request blocked: cross-origin state change." };
+    return harden(
+      pathname.startsWith("/api/")
+        ? NextResponse.json(body, { status: 403 })
+        : new NextResponse(body.error, { status: 403, headers: { "Content-Type": "text/plain; charset=utf-8" } }),
+      "console",
+      cspNonce,
+      true,
+    );
   }
 
   // Slide the idle window (capped at the absolute expiry).
   const { absExp, sid } = session;
   // Previewing a portal from the console stamps the same visit cookie, so the
   // "New" badges behave identically to what the client sees.
-  const preview = /^\/c\/([a-z0-9-]+)\/?$/.exec(pathname);
+  const previewSlug = /^\/c\/([a-z0-9-]+)\/?$/.exec(pathname)?.[1] ?? null;
+  // A preview path always lives under /c/, so it is always the document
+  // surface and never carries a nonce; the two branches cannot overlap.
+  const requestHeaders =
+    surface === "console"
+      ? nonceRequest(request, nonce)
+      : previewSlug
+        ? visitHeaders(request, previewSlug)
+        : null;
   let res = harden(
-    preview
-      ? NextResponse.next({ request: { headers: visitHeaders(request, preview[1]) } })
-      : NextResponse.next(),
+    requestHeaders ? NextResponse.next({ request: { headers: requestHeaders } }) : NextResponse.next(),
+    surface,
+    cspNonce,
     true,
   );
-  if (preview) res = stampVisit(res, preview[1]);
+  if (previewSlug) res = stampVisit(res, previewSlug);
   res.cookies.set(SESSION_COOKIE, await makeSessionToken(secret, sid, absExp), {
     httpOnly: true,
     secure: true,

@@ -3,14 +3,18 @@
 // - "console/sessions.json": every OTP redemption appends {sid, email, ua, at}
 //   (cap 50, entries older than the 24h absolute session cap are pruned on
 //   write — their tokens can't be valid anymore).
-// - "console/revoked.json": sids whose tokens must stop working. proxy.ts
-//   checks it with a 60s module-scope cache, so revocation takes effect
-//   within a minute without a store read per request.
+// - "console/revoked.json": sids whose tokens must stop working. It is folded
+//   into liveSids() below, which proxy.ts caches for 60s, so revocation takes
+//   effect within a minute without a store read per request.
+//
+// Since LC-010 the registry is an ALLOWLIST, not just a denylist: a token is
+// only accepted while its sid is still listed here. See liveSids().
 //
 // Writes are sequential per the store's contract (no concurrency control);
 // registry updates are best-effort — a store hiccup must never block a login.
 import { readState, writeState } from "./store";
 import { SESSION_ABS_MAX_AGE } from "./auth";
+import { operatorEmails } from "./users";
 
 export type SessionEntry = { sid: string; email: string; ua: string; at: string };
 export type RevokedEntry = { sid: string; at: string };
@@ -56,10 +60,32 @@ export async function registerSession(sid: string, email: string, ua: string): P
   }
 }
 
-/** Currently revoked sids (raw — proxy caches this for 60s). */
-export async function revokedSids(): Promise<string[]> {
-  const all = (await readState<RevokedEntry[]>(REVOKED_PATH)) ?? [];
-  return all.filter((r) => Date.parse(r.at) > liveSince()).map((r) => r.sid);
+/** Sids that may still authenticate a request, i.e. the proxy's allowlist.
+ *
+ *  A sid qualifies only if it is (a) registered here by a real OTP redemption,
+ *  (b) not revoked, (c) inside the 24h absolute session cap, and (d) owned by
+ *  an email that is STILL in CONSOLE_USERS. (d) is GAP-3.5a: taking an
+ *  operator out of the allowlist has to end their live sessions, not just
+ *  stop future logins.
+ *
+ *  This THROWS when the store is unreachable rather than returning [], so the
+ *  caller can tell "nobody is signed in" from "I cannot tell" and choose its
+ *  own failure mode. proxy.ts fails open on the second. */
+export async function liveSids(): Promise<string[]> {
+  const [sessions, revoked] = await Promise.all([
+    readState<SessionEntry[]>(SESSIONS_PATH),
+    readState<RevokedEntry[]>(REVOKED_PATH),
+  ]);
+  const dead = new Set((revoked ?? []).map((r) => r.sid));
+  const operators = operatorEmails();
+  return (sessions ?? [])
+    .filter(
+      (s) =>
+        Date.parse(s.at) > liveSince() &&
+        !dead.has(s.sid) &&
+        operators.has((s.email || "").toLowerCase()),
+    )
+    .map((s) => s.sid);
 }
 
 /** Revoke sids: add to the revocation list and drop them from the registry.

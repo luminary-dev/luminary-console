@@ -183,15 +183,29 @@ export function shell(opts: {
   body: string;
   pdfHref?: string;
 }): string {
+  // No inline event-handler attributes anywhere in here (LC-012): an
+  // `onclick="…"` is unreachable under any CSP that does not carry
+  // 'unsafe-hashes', and these documents are stored HTML that can never
+  // receive a nonce. The buttons are labelled with data-lum instead and wired
+  // up by the script at the end of the body.
   const toolbar =
     opts.mode === "web"
-      ? `<div class="toolbar"><button class="theme-toggle" aria-label="Toggle light and dark theme" onclick="__flipTheme(this)"><span class="theme-toggle__knob"><span class="theme-toggle__ico theme-toggle__sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span><span class="theme-toggle__ico theme-toggle__moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span></span></button>${opts.pdfHref ? `<a href="${opts.pdfHref}">PDF</a>` : ""}<button onclick="window.print()">PRINT</button></div>`
+      ? `<div class="toolbar"><button class="theme-toggle" data-lum="theme" aria-label="Toggle light and dark theme"><span class="theme-toggle__knob"><span class="theme-toggle__ico theme-toggle__sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span><span class="theme-toggle__ico theme-toggle__moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span></span></button>${opts.pdfHref ? `<a href="${opts.pdfHref}">PDF</a>` : ""}<button data-lum="print">PRINT</button></div>`
       : "";
   // Pre-paint theme pick (web only): saved choice, else system preference.
+  // Stays in <head> because it has to run before the first paint.
   const themeScript =
     opts.mode === "web"
-      ? `<script>(function(){var d=document.documentElement;var t=null;try{t=localStorage.getItem('luminary-theme')}catch(e){}if(t!=='light'&&t!=='dark'){try{t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}catch(e){t='light'}}d.dataset.theme=t;})();
-function __flipTheme(btn){var d=document.documentElement;var next=d.dataset.theme==='dark'?'light':'dark';var apply=function(){d.dataset.theme=next;try{localStorage.setItem('luminary-theme',next);document.cookie='luminary-theme='+next+';path=/;max-age=31536000;samesite=lax'}catch(e){}};var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(!document.startViewTransition||reduce){apply();return}var r=btn.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;var rad=Math.hypot(Math.max(x,window.innerWidth-x),Math.max(y,window.innerHeight-y));var t=document.startViewTransition(function(){d.setAttribute('data-reveal','');apply()});t.ready.then(function(){d.animate({clipPath:['circle(0px at '+x+'px '+y+'px)','circle('+rad.toFixed(1)+'px at '+x+'px '+y+'px)']},{duration:600,easing:'linear',pseudoElement:'::view-transition-new(root)'})}).catch(function(){});t.finished.finally(function(){d.removeAttribute('data-reveal')})}</script>`
+      ? `<script>(function(){var d=document.documentElement;var t=null;try{t=localStorage.getItem('luminary-theme')}catch(e){}if(t!=='light'&&t!=='dark'){try{t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}catch(e){t='light'}}d.dataset.theme=t;})();</script>`
+      : "";
+  // Toolbar wiring, at the end of the body so the buttons already exist.
+  const toolbarScript =
+    opts.mode === "web"
+      ? `<script>(function(){
+function flip(btn){var d=document.documentElement;var next=d.dataset.theme==='dark'?'light':'dark';var apply=function(){d.dataset.theme=next;try{localStorage.setItem('luminary-theme',next);document.cookie='luminary-theme='+next+';path=/;max-age=31536000;samesite=lax'}catch(e){}};var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(!document.startViewTransition||reduce){apply();return}var r=btn.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;var rad=Math.hypot(Math.max(x,window.innerWidth-x),Math.max(y,window.innerHeight-y));var t=document.startViewTransition(function(){d.setAttribute('data-reveal','');apply()});t.ready.then(function(){d.animate({clipPath:['circle(0px at '+x+'px '+y+'px)','circle('+rad.toFixed(1)+'px at '+x+'px '+y+'px)']},{duration:600,easing:'linear',pseudoElement:'::view-transition-new(root)'})}).catch(function(){});t.finished.finally(function(){d.removeAttribute('data-reveal')})}
+var themeBtn=document.querySelector('[data-lum="theme"]');if(themeBtn)themeBtn.addEventListener('click',function(){flip(themeBtn)});
+var printBtn=document.querySelector('[data-lum="print"]');if(printBtn)printBtn.addEventListener('click',function(){window.print()});
+})();</script>`
       : "";
   return `<!DOCTYPE html>
 <html lang="en">
@@ -226,6 +240,7 @@ ${toolbar}
   ${opts.body}
   <div class="foot">support@luminary-dev.xyz · +94 77 16 18 093 · luminary-dev.xyz</div>
 </div>
+${toolbarScript}
 </body>
 </html>`;
 }

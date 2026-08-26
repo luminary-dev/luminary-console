@@ -15,6 +15,7 @@ import { logActivity } from "@/lib/activity";
 import { rateLimit } from "@/lib/ratelimit";
 import { advanceStage } from "@/lib/stage";
 import { esc } from "@/lib/templates/shell";
+import { clipText } from "@/lib/errors";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -50,10 +51,10 @@ export async function POST(
     return NextResponse.json({ ok: true, already: true, name: client.contractSignature.name, at: client.contractSignature.at });
   }
 
-  const name = typeof body.name === "string" ? body.name.trim().slice(0, 120) : "";
+  const name = typeof body.name === "string" ? clipText(body.name.trim(), 120) : "";
   if (!name) return NextResponse.json({ error: "Please type your full name to sign." }, { status: 400 });
 
-  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim();
+  const ip = ((req.headers.get("x-forwarded-for") || "").split(",")[0] ?? "").trim();
   client.contractSignature = { name, at: new Date().toISOString(), ...(ip ? { ip } : {}) };
   advanceStage(client, "accepted");
 
@@ -72,13 +73,12 @@ export async function POST(
   await logActivity(name, "signed the contract", slug, contract.no);
 
   await emailStudio(
-    `Agreement signed — ${client.company} (${contract.no})`,
+    `Agreement signed · ${client.company} (${contract.no})`,
     `<p><strong>${esc(name)}</strong> e-signed the ${esc(client.company)} Services Agreement <b>${esc(contract.no)}</b> from the client portal.</p>
 <p>The signature is stamped on the agreement and the client is at stage <b>accepted</b>.</p>
 <p><a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open ${esc(client.company)} in the console →</a></p>`,
   );
   await studioNotice({
-    emoji: "🖊️",
     title: "Agreement signed",
     company: client.company,
     lines: [`${tgEsc(name)} signed ${tgEsc(contract.no)}`],

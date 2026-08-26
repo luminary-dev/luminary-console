@@ -100,7 +100,7 @@ export default function SessionsCard() {
       title: "Sign out everywhere?",
       message: (
         <>
-          Every signed-in device — <b>including this one</b> — is revoked. Everyone signs in again
+          Every signed-in device, <b>including this one</b>, is revoked. Everyone signs in again
           with email, password and a fresh code.
         </>
       ),
@@ -125,7 +125,7 @@ export default function SessionsCard() {
         <p style={{ color: "var(--muted)", marginTop: 10, fontSize: 13.5 }}>Loading…</p>
       ) : sessions.length === 0 ? (
         <p style={{ color: "var(--muted)", marginTop: 10, fontSize: 13.5 }}>
-          No registered sessions yet — they appear here from the next sign-in.
+          No registered sessions yet: they appear here from the next sign-in.
         </p>
       ) : (
         <div style={{ marginTop: 6 }}>

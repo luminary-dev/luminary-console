@@ -22,7 +22,7 @@ export default async function QuestionnairePage({
   const sections = buildSections(client);
   // Same derivation buildSections uses for its templated labels, so the
   // Sinhala "{co}" slot reads identically to the English one.
-  const co = client.company.split("(")[0].trim().split(" ").slice(0, 2).join(" ");
+  const co = (client.company.split("(")[0] ?? "").trim().split(" ").slice(0, 2).join(" ");
 
   return (
     <QuestionnaireSheet
@@ -30,10 +30,10 @@ export default async function QuestionnairePage({
       client={{
         slug: client.slug,
         company: client.company,
-        reg: client.reg,
-        address: client.address,
-        email: client.email,
-        phone: client.phone,
+        ...(client.reg !== undefined ? { reg: client.reg } : {}),
+        ...(client.address !== undefined ? { address: client.address } : {}),
+        ...(client.email !== undefined ? { email: client.email } : {}),
+        ...(client.phone !== undefined ? { phone: client.phone } : {}),
         docNoBase: client.docNoBase,
         projectLabel: client.projectLabel,
         co,

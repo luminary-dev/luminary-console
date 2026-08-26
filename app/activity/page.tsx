@@ -47,11 +47,17 @@ export default async function ActivityPage() {
           </Link>
         </div>
       </div>
+      {/* Skip-link target. The topbar lives inside <main> on every console
+          page, so the jump lands here, after the nav, and the next Tab
+          continues into the content. tabIndex makes it focusable, which is
+          what moves focus rather than only the scroll position. */}
+      <div id="main-content" tabIndex={-1} />
+
 
       <div className="card">
         <h3>Recent activity</h3>
         <p className="app-hide" style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-          What&apos;s new since your last visit — document actions, payments, portal acceptances,
+          What&apos;s new since your last visit: document actions, payments, portal acceptances,
           questions and uploads. Use <b>See more</b> for everything already seen; the log keeps the
           most recent 500.
         </p>

@@ -35,7 +35,9 @@ export default function ThemeToggle() {
     const onChange = (e: MediaQueryListEvent) => {
       try {
         if (localStorage.getItem("luminary-theme")) return;
-      } catch {}
+      } catch {
+        // Blocked storage (private mode): fall through and follow the OS.
+      }
       document.documentElement.setAttribute("data-theme", e.matches ? "dark" : "light");
     };
     mq.addEventListener("change", onChange);
@@ -49,7 +51,9 @@ export default function ThemeToggle() {
       try {
         localStorage.setItem("luminary-theme", next);
         document.cookie = `luminary-theme=${next};path=/;max-age=31536000;samesite=lax`;
-      } catch {}
+      } catch {
+        // Blocked storage: the choice just will not survive the visit.
+      }
     });
   };
 

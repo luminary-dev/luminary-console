@@ -38,3 +38,22 @@ export function relTime(at: string, now = Date.now()): string {
     year: "numeric",
   });
 }
+
+/** How long to wait before `relTime` could produce a different label, in ms,
+ *  or null once it never will again. Cheap when the label is minutes old and
+ *  quiet once it is counting days, so a tab left open all afternoon stays
+ *  honest without waking up every second (components/RelativeTime.tsx). */
+export function relTickMs(at: string, now = Date.now()): number | null {
+  const ms = Date.parse(at);
+  if (!Number.isFinite(ms)) return null;
+  const diff = now - ms;
+  // A clock-skewed future timestamp reads "just now" and will cross into the
+  // past soon, so keep checking.
+  if (diff < 0) return 30_000;
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 60) return 15_000;
+  if (mins < 60 * 24) return 5 * 60_000;
+  if (mins <= 60 * 24 * 14) return 60 * 60_000;
+  // Past a fortnight the label is an absolute date: it is done changing.
+  return null;
+}

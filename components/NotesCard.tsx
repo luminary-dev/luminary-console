@@ -54,7 +54,7 @@ export default function NotesCard({ slug, notes }: { slug: string; notes?: strin
   }, []);
 
   const label =
-    state === "saving" ? "Saving…" : state === "saved" ? "Saved" : state === "error" ? "Not saved — retry" : "";
+    state === "saving" ? "Saving…" : state === "saved" ? "Saved" : state === "error" ? "Not saved: retry" : "";
 
   return (
     <div className="card">
@@ -63,7 +63,7 @@ export default function NotesCard({ slug, notes }: { slug: string; notes?: strin
         <span className={`save-state${state === "saved" ? " on" : ""}`}>{label}</span>
       </div>
       <p className="empty-note" style={{ marginTop: 4 }}>
-        Private to the console — never shown to the client, never sent anywhere.
+        Private to the console: never shown to the client, never sent anywhere.
       </p>
       <textarea
         className="q-box"

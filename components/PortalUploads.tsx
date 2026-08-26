@@ -48,13 +48,13 @@ export default function PortalUploads({
     setError(null);
     const queue = picked.slice(0, MAX_FILES_PER_FIELD);
     if (picked.length > queue.length) {
-      setError(`Only the first ${queue.length} files were taken — up to ${MAX_FILES_PER_FIELD} at a time.`);
+      setError(`Only the first ${queue.length} files were taken: up to ${MAX_FILES_PER_FIELD} at a time.`);
     }
     setBusy(queue.length);
     let sent = 0;
     for (const f of queue) {
       if (f.size > MAX_FILE_BYTES) {
-        setError(`"${f.name}" is over 15 MB — please compress it, or email it to support@luminary-dev.xyz.`);
+        setError(`"${f.name}" is over 15 MB. Please compress it, or email it to support@luminary-dev.xyz.`);
         setBusy((n) => n - 1);
         continue;
       }
@@ -89,7 +89,7 @@ export default function PortalUploads({
       } catch (err) {
         setError(
           (err instanceof Error ? err.message : "Upload failed.") +
-            ` "${f.name}" wasn't sent — please try again.`,
+            ` "${f.name}" wasn't sent. Please try again.`,
         );
       }
       setBusy((n) => n - 1);
@@ -111,7 +111,7 @@ export default function PortalUploads({
 
       {!open ? (
         <p className="ask-intro">
-          Anything we need from you — brand assets, a signed contract, photos, reference material.
+          Anything we need from you: brand assets, a signed contract, photos, reference material.
           Upload it here any time and it goes straight to the studio. Up to 15 MB per file.
         </p>
       ) : (

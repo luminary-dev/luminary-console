@@ -23,10 +23,10 @@ export async function emailStudio(
   const { error } = await resend.emails.send({
     from: FROM,
     to: [TO],
-    replyTo: replyTo || undefined,
+    ...(replyTo ? { replyTo } : {}),
     subject,
     html,
-    attachments: attachments.length ? attachments : undefined,
+    ...(attachments.length ? { attachments } : {}),
   });
   if (error) console.error("Studio email failed:", error);
   return !error;
@@ -45,10 +45,10 @@ export async function emailAddresses(
   const { error } = await resend.emails.send({
     from: opts.from || FROM,
     to,
-    replyTo: opts.noReply ? undefined : TO,
+    ...(opts.noReply ? {} : { replyTo: TO }),
     subject,
     html,
-    attachments: attachments.length ? attachments : undefined,
+    ...(attachments.length ? { attachments } : {}),
   });
   if (error) console.error("Copy email failed:", error);
   return !error;

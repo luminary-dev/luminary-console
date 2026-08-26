@@ -6,7 +6,8 @@ import { deleteAssets, getClient, saveClient } from "@/lib/store";
 import { archiveVersion, saveBillingDoc, todayLabel } from "@/lib/pipeline";
 import { generateBilling, reviseDoc } from "@/lib/generate";
 import { logOperatorActivity } from "@/lib/operator";
-import { advanceStage } from "@/lib/stage";
+import { advanceStage, revertDelivery } from "@/lib/stage";
+import { problemResponse } from "@/lib/errors";
 import type { QuotationData } from "@/lib/templates/docs";
 
 export const runtime = "nodejs";
@@ -42,7 +43,7 @@ export async function POST(
         return NextResponse.json(
           {
             error:
-              "There's no quotation to bill against — draft the quotation first, or use an additional invoice with explicit instructions.",
+              "There's no quotation to bill against: draft the quotation first, or use an additional invoice with explicit instructions.",
           },
           { status: 400 },
         );
@@ -78,9 +79,14 @@ export async function POST(
       doc.status = action === "publish" ? "published" : "draft";
       doc.updatedAt = new Date().toISOString();
       // Lifecycle: the published final receipt marks delivery (starts the
-      // 30-day warranty clock — delivered → warranty → closed).
-      if (action === "publish" && doc.kind === "receipt" && doc.stage === "final") {
-        advanceStage(client, "delivered");
+      // 30-day warranty clock: delivered, warranty, closed). Unpublishing it
+      // takes the delivery stamp back off, otherwise an accidental
+      // publish/unpublish left a spurious delivery date and a live warranty
+      // commitment running off it (LC-025). doc.status is already "draft"
+      // here, so revertDelivery sees the state it needs to judge.
+      if (doc.kind === "receipt" && doc.stage === "final") {
+        if (action === "publish") advanceStage(client, "delivered");
+        else revertDelivery(client);
       }
       await saveClient(client);
       await logOperatorActivity(`${action}ed ${doc.stage} ${doc.kind}`, slug, doc.no);
@@ -92,7 +98,7 @@ export async function POST(
       // hold — the console unpublishes first, but enforce it here too.
       if (doc.status === "published") {
         return NextResponse.json(
-          { error: "This document is published — unpublish it before deleting." },
+          { error: "This document is published. Unpublish it before deleting." },
           { status: 400 },
         );
       }
@@ -112,7 +118,7 @@ export async function POST(
       // from the record by its own endpoint.
       if (doc.kind === "handover") {
         return NextResponse.json(
-          { error: "Handover packs are rebuilt from the record — use Regenerate on the Handover pack card." },
+          { error: "Handover packs are rebuilt from the record: use Regenerate on the Handover pack card." },
           { status: 400 },
         );
       }
@@ -128,7 +134,9 @@ export async function POST(
 
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });
   } catch (e) {
-    console.error(`Billing action ${action} failed:`, e);
-    return NextResponse.json({ error: String(e) }, { status: 500 });
+    // One taxonomy, one shape, no internals on the wire (LC-005). The mapper
+    // logs the real cause against the requestId it returns.
+    const { body, status } = problemResponse(e, `billing action ${action} on ${slug}`);
+    return NextResponse.json(body, { status });
   }
 }

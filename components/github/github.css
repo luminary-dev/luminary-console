@@ -1,0 +1,167 @@
+/* Pull request workspace: the inbox and the PR detail.
+   Its own stylesheet so the console's shared vocabulary in app/globals.css is
+   never edited to make one screen work. Every colour here is an existing
+   token. --subtle is deliberately absent: it is a border/dot token and fails
+   the AA floor as text on both themes. */
+
+.gh-page { padding-bottom: 80px; }
+
+/* === page heading === */
+.gh-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
+.gh-h1 { font-size: 20px; font-weight: 800; letter-spacing: -.03em; line-height: 1.25; }
+.gh-lede { color: var(--muted); font-size: 13px; line-height: 1.6; margin-top: 5px; max-width: 74ch; }
+.gh-card-title { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+.gh-crumb { font-family: var(--font-mono), monospace; font-size: 11px; letter-spacing: .08em; color: var(--label); }
+
+/* === saved view chips === */
+.gh-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.gh-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); background: transparent;
+  border: 1px solid var(--border-hi); border-radius: 100px;
+  padding: 5px 12px; cursor: pointer; line-height: 1.6;
+  transition: color .15s ease, background .15s ease, border-color .15s ease;
+}
+.gh-chip:hover:not(:disabled) { color: var(--text); }
+.gh-chip[aria-pressed="true"] { color: var(--a-text); background: var(--a-dim); border-color: var(--a-border); }
+.gh-chip:disabled { cursor: default; opacity: .65; }
+.gh-chip-n { font-variant-numeric: tabular-nums; color: inherit; }
+/* The count needs a shape of its own or "needs my review 4" reads as one
+   word at 10px. */
+.gh-chip-n::before { content: "\00b7"; margin-right: 6px; opacity: .6; }
+.gh-view-note { color: var(--muted); font-size: 12.5px; line-height: 1.6; margin-top: 10px; }
+
+/* === toolbar (viewer identity + rate limit) === */
+.gh-toolbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+.gh-login { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gh-login .q-line { width: 200px; max-width: 100%; font-size: 13px; padding: 5px 2px; }
+
+/* === rate limit badge === */
+.gh-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600;
+  letter-spacing: .07em; text-transform: uppercase;
+  border: 1px solid var(--border-hi); border-radius: 100px; padding: 5px 12px;
+  color: var(--label);
+}
+.gh-badge svg { width: 12px; height: 12px; flex-shrink: 0; }
+.gh-badge.is-low { color: var(--danger); border-color: var(--danger); }
+.gh-badge-n { font-variant-numeric: tabular-nums; color: var(--text); }
+
+/* === the list === */
+/* `position: relative` is load-bearing: see the note on .table-scroll in
+   app/globals.css. The absolutely positioned .sr-only captions and cell
+   labels escape a static scroller's clip and widen the whole document. */
+.gh-scroll { position: relative; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 12px; }
+.gh-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+.gh-table th, .gh-table td { text-align: left; vertical-align: top; }
+.gh-table thead th {
+  font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--label); font-weight: 600;
+  padding: 7px 10px; border-bottom: 1.5px solid var(--border-hi); white-space: nowrap;
+}
+/* Density 8: rows are tight enough that a full inbox fits one screen, with
+   the second meta line carrying branch and age instead of extra columns. */
+.gh-table tbody th, .gh-table tbody td {
+  padding: 7px 10px; border-bottom: 1px solid var(--border);
+  font-size: 13px; font-weight: 400; line-height: 1.45;
+}
+.gh-row.is-selected { background: var(--a-dim); }
+.gh-row.is-selected > th:first-child { box-shadow: inset 2px 0 0 var(--accent); }
+.gh-row:hover { background: var(--off); }
+.gh-row-link { display: inline-block; font-weight: 600; color: var(--text); max-width: 52ch; }
+.gh-row-link:hover { color: var(--a-text); }
+.gh-row-no { font-family: var(--font-mono), monospace; font-size: 12px; color: var(--label); margin-right: 8px; }
+.gh-row-meta {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2px;
+  font-family: var(--font-mono), monospace; font-size: 11px; color: var(--muted);
+}
+.gh-row-meta b { font-weight: 600; color: var(--label); }
+.gh-cell-mono { font-family: var(--font-mono), monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* === status vocabulary: icon plus words, never hue alone === */
+.gh-status { display: inline-flex; align-items: flex-start; gap: 6px; line-height: 1.4; }
+.gh-status svg { width: 13px; height: 13px; flex-shrink: 0; margin-top: 2px; }
+.gh-status.is-ok { color: var(--a-text); }
+.gh-status.is-bad { color: var(--danger); }
+.gh-status.is-warn, .gh-status.is-idle { color: var(--muted); }
+.gh-status-strong { font-weight: 600; }
+
+/* === verdict block on the detail page === */
+.gh-verdict-head { display: flex; align-items: flex-start; gap: 8px; font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+.gh-verdict-head svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 2px; }
+.gh-blockers { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.gh-blockers li { display: flex; align-items: flex-start; gap: 8px; font-size: 13.5px; line-height: 1.55; color: var(--text); }
+/* The sentence stays full-contrast body text; only the marker carries the
+   tone, so a wall of red never buries the wording that says what to do. */
+.gh-blockers svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 3px; }
+.gh-blockers li.is-bad svg { color: var(--danger); }
+.gh-blockers li.is-warn svg, .gh-blockers li.is-idle svg { color: var(--muted); }
+.gh-blockers li.is-ok svg { color: var(--a-text); }
+
+/* === checks and reviews lists === */
+.gh-lines { list-style: none; margin: 10px 0 0; padding: 0; }
+.gh-line {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  padding: 7px 0; border-top: 1px solid var(--border); font-size: 13px;
+}
+.gh-line:first-child { border-top: none; }
+.gh-line-name { font-family: var(--font-mono), monospace; font-size: 12.5px; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
+.gh-line-meta { font-family: var(--font-mono), monospace; font-size: 11px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+/* === grouped CI failures === */
+.gh-group { padding: 10px 0; border-top: 1px solid var(--border); }
+.gh-group:first-child { border-top: none; }
+.gh-group-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.gh-group-name { font-family: var(--font-mono), monospace; font-size: 13px; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+.gh-group-count { font-size: 12.5px; color: var(--danger); font-weight: 600; }
+.gh-group-prs { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.gh-group-prs li { font-size: 12.5px; line-height: 1.5; }
+.gh-group-prs .gh-row-no { margin-right: 6px; }
+
+/* === detail page meta === */
+.gh-facts { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 22px; }
+.gh-fact dt, .gh-fact-k { font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--label); }
+.gh-fact-v { font-size: 13.5px; margin-top: 3px; overflow-wrap: anywhere; }
+.gh-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.gh-tag {
+  display: inline-flex; align-items: center; font-family: var(--font-mono), monospace;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .06em;
+  border: 1px solid var(--border-hi); border-radius: 100px; padding: 3px 10px; color: var(--label);
+}
+.gh-links { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; font-size: 13.5px; }
+
+/* A control that reads as a link because it changes what is on screen rather
+   than where you are. */
+.gh-linkbtn { background: none; border: none; padding: 0; font: inherit; color: var(--a-text); cursor: pointer; text-decoration: underline; }
+.gh-linkbtn:hover { color: var(--accent); }
+
+/* === keyboard hint === */
+.gh-keys { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.9; }
+.gh-keys kbd {
+  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600;
+  border: 1px solid var(--border-hi); border-radius: 5px; padding: 2px 6px;
+  color: var(--text); background: var(--off); margin: 0 2px;
+}
+
+/* === loading skeleton: same grid as a real row, so nothing jumps === */
+.gh-skel { display: block; height: 11px; border-radius: 4px; background: var(--off); border: 1px solid var(--border); }
+.gh-skel + .gh-skel { margin-top: 5px; }
+.gh-skel--wide { width: 100%; }
+.gh-skel--half { width: 52%; }
+@media (prefers-reduced-motion: no-preference) {
+  .gh-skel { animation: gh-pulse 1.4s ease-in-out infinite; }
+}
+@keyframes gh-pulse { 50% { opacity: .55; } }
+
+/* === empty and error notes === */
+.gh-note { color: var(--muted); font-size: 13.5px; line-height: 1.7; margin-top: 10px; max-width: 74ch; }
+.gh-note b { color: var(--text); }
+.gh-note code { font-family: var(--font-mono), monospace; font-size: 12.5px; color: var(--text); }
+
+@media (max-width: 720px) {
+  .gh-head { margin-top: 14px; }
+  .gh-scroll { margin-left: -18px; margin-right: -18px; padding: 0 18px; }
+}

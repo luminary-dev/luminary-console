@@ -1,6 +1,59 @@
 # luminary-console
 
-Luminary Studio's client-document platform, end to end:
+Luminary Studio's internal console. Two halves, one application:
+
+- **Client work**: the client-document platform, described below.
+- **Engineering**: the GitHub operations console at `/github`, where the three
+  of us run pull requests, CI, deployments, releases and security across the
+  `luminary-dev` organisation.
+
+Documentation index: [`ARCHITECTURE.md`](ARCHITECTURE.md),
+[`SECURITY.md`](SECURITY.md), [`docs/GITHUB-APP.md`](docs/GITHUB-APP.md),
+[`docs/WEBHOOKS.md`](docs/WEBHOOKS.md),
+[`docs/ACCESS-CONTROL.md`](docs/ACCESS-CONTROL.md),
+[`docs/TESTING.md`](docs/TESTING.md),
+[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md),
+[`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md),
+[`docs/DISASTER-RECOVERY.md`](docs/DISASTER-RECOVERY.md),
+[`docs/KEYBOARD-SHORTCUTS.md`](docs/KEYBOARD-SHORTCUTS.md),
+[`docs/DESIGN-LANGUAGE.md`](docs/DESIGN-LANGUAGE.md),
+[`docs/MIGRATION-PLAN.md`](docs/MIGRATION-PLAN.md),
+[`docs/DEPENDENCY-MANIFEST.md`](docs/DEPENDENCY-MANIFEST.md),
+[`docs/adr/`](docs/adr), [`docs/runbooks/`](docs/runbooks), and the audit in
+[`docs/audit/`](docs/audit).
+
+## Engineering console
+
+`/github` reads a local projection of the organisation rather than calling
+GitHub on every page load, so the screens cost no API budget, keep working
+when GitHub is degraded, and derive merge readiness once so no two views can
+disagree. Every screen shows how fresh it is.
+
+| Screen | What it answers |
+| --- | --- |
+| `/github` | Every open pull request, with one merge verdict each and the specific thing blocking it. Saved views, grouped CI failures, keyboard driven |
+| `/github/repos` | Health per repository: open PRs, CI pass rate, alerts, last push |
+| `/github/ci` | Flaky versus broken checks, duration trends, the same failure across pull requests |
+| `/github/deployments` | What version is where, and what failed to land |
+| `/github/releases` | Releases and their notes |
+| `/github/security` | Dependabot, code scanning and secret scanning, most urgent first |
+| `/github/insights` | Team health signals. Deliberately not a per-person scoreboard, see [ADR 0002](docs/adr/0002-team-health-not-individual-scoreboards.md) |
+| `/github/activity` | One chronological stream, filterable, shareable by URL |
+
+Ingestion is a webhook pipeline: verify the HMAC over the raw body, store the
+delivery, answer 200, then process asynchronously and idempotently by
+**reconciling against the API rather than applying payload deltas**. That one
+decision is what makes duplicate, out-of-order and lost deliveries all safe.
+A backfill rebuilds everything from the API alone, and reconciliation reports
+drift rather than hiding it. See [`docs/WEBHOOKS.md`](docs/WEBHOOKS.md).
+
+Set it up with [`docs/GITHUB-APP.md`](docs/GITHUB-APP.md). Without an App the
+console falls back to `GH_TOKEN` for reads, with no webhooks, so the
+projection is only as fresh as the last backfill.
+
+## Client work
+
+The client-document platform, end to end:
 
 1. **New client** (auth-protected console) — enter company details + a short
    brief. Claude Opus drafts the **estimate** and tailors the discovery
@@ -42,6 +95,12 @@ Luminary Studio's client-document platform, end to end:
 | `VERCEL_TOKEN` / `VERCEL_PROJECT_ID` / `VERCEL_TEAM_ID` | domain attach |
 | `ROOT_DOMAIN` / `CONSOLE_HOST` | defaults: `luminary-dev.xyz` / `console.…` |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` (+ optional `VAPID_SUBJECT`) | Web Push to the installed console app |
+| `GITHUB_APP_ID` / `GITHUB_APP_PRIVATE_KEY` (+ optional `GITHUB_APP_INSTALLATION_ID`) | The GitHub App. Preferred path, see `docs/GITHUB-APP.md` |
+| `GITHUB_WEBHOOK_SECRET` | Webhook signature verification. Without it the endpoint refuses every delivery rather than trusting it |
+| `GITHUB_ORG` | Defaults to `luminary-dev` |
+| `GITHUB_OPERATORS` | `email:login` pairs, so "needs my review" and per-person notification rules mean something |
+| `GITHUB_QUIET_HOURS` / `GITHUB_QUIET_TZ` | Optional per-operator quiet hours, e.g. `dhanikaa:22-8` |
+| `GH_TOKEN` | Read-only fallback when the App is not configured. REST only, no webhooks |
 
 Missing DNS tokens degrade gracefully: everything still generates, and the
 client record shows the manual CNAME to add.
@@ -76,6 +135,22 @@ subscriptions, so devices must re-toggle after a rotation.
 ```bash
 npm install && vercel env pull && npm run dev
 ```
+
+Quality gates, all of which run in CI on every pull request:
+
+```bash
+npm run lint        # ESLint with security and accessibility rules
+npm run typecheck   # TypeScript strict, plus noUncheckedIndexedAccess,
+                    # exactOptionalPropertyTypes and verbatimModuleSyntax
+npm test            # Vitest: unit, component and integration
+npm run test:coverage
+```
+
+The `test:live:*` scripts are different: they drive the real product against
+real backends, spend real money, open real pull requests and send real push
+notifications to phones. Only `test:live:ops` is zero-cost. They are named
+that way so they cannot be run by reflex, and they must never run in CI.
+See [`docs/TESTING.md`](docs/TESTING.md).
 
 ## GitHub Actions — CI & ops
 

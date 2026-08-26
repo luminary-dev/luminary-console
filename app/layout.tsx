@@ -1,6 +1,7 @@
 import SessionGuard from "@/components/SessionGuard";
+import SkipLink from "@/components/SkipLink";
 import type { Metadata, Viewport } from "next";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -8,7 +9,7 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", display: 
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "Luminary Console", template: "%s — Luminary" },
+  title: { default: "Luminary Console", template: "%s · Luminary" },
   description: "Luminary Studio client console.",
   robots: { index: false, follow: false },
   manifest: "/manifest.webmanifest",
@@ -34,13 +35,22 @@ const themeInitScript = `(function(){var d=document.documentElement;if(d.dataset
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const saved = (await cookies()).get("luminary-theme")?.value;
   const theme = saved === "dark" || saved === "light" ? saved : undefined;
+  // Per-request nonce from proxy.ts (LC-012). It is absent on the client
+  // subdomains, which run the relaxed document policy instead: see lib/csp.ts.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html lang="en" suppressHydrationWarning data-theme={theme} className={`${outfit.variable} ${mono.variable}`}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <style>{`html{background:#f0f0ee;color-scheme:light}html[data-theme="dark"]{background:#050506;color-scheme:dark}`}</style>
       </head>
-      <body>{children}<SessionGuard /></body>
+      <body>
+        {/* First tab stop on every page, so a keyboard user is not walked
+            through the topbar on every navigation. */}
+        <SkipLink />
+        {children}
+        <SessionGuard />
+      </body>
     </html>
   );
 }

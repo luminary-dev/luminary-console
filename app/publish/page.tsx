@@ -27,6 +27,12 @@ export default function PublishPage() {
           </Link>
         </div>
       </div>
+      {/* Skip-link target. The topbar lives inside <main> on every console
+          page, so the jump lands here, after the nav, and the next Tab
+          continues into the content. tabIndex makes it focusable, which is
+          what moves focus rather than only the scroll position. */}
+      <div id="main-content" tabIndex={-1} />
+
       <PublishStudio />
       <AppTabBar />
     </main>

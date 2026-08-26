@@ -13,6 +13,7 @@ import { displayName } from "@/lib/admins";
 import { billingLabel } from "@/lib/doclabels";
 import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
+import { clipText } from "@/lib/errors";
 import type { Payment } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -40,8 +41,8 @@ export async function POST(
       );
     }
     const method =
-      (typeof body.method === "string" && body.method.trim().slice(0, 60)) || "bank transfer";
-    const note = typeof body.note === "string" ? body.note.trim().slice(0, 300) : "";
+      (typeof body.method === "string" && clipText(body.method.trim(), 60)) || "bank transfer";
+    const note = typeof body.note === "string" ? clipText(body.note.trim(), 300) : "";
     const invoiceSlug = typeof body.invoiceSlug === "string" ? body.invoiceSlug.trim() : "";
     if (invoiceSlug && !(client.billing ?? []).some((b) => b.kind === "invoice" && b.slug === invoiceSlug)) {
       return NextResponse.json({ error: "No such invoice." }, { status: 400 });
@@ -78,7 +79,6 @@ export async function POST(
     // Team awareness: ping the studio Telegram + the admins' phones so money
     // in is seen without opening the console. Best-effort — never blocks.
     await studioNotice({
-      emoji: "💰",
       title: "Payment recorded",
       company: client.company,
       lines: [
@@ -93,10 +93,12 @@ export async function POST(
 
   if (action === "remove") {
     const index = Number(body.index);
-    if (!Number.isInteger(index) || !client.payments?.[index]) {
+    const payments = client.payments ?? [];
+    const gone = Number.isInteger(index) ? payments[index] : undefined;
+    if (!gone) {
       return NextResponse.json({ error: "No such payment." }, { status: 404 });
     }
-    const [gone] = client.payments.splice(index, 1);
+    payments.splice(index, 1);
     await saveClient(client);
     await logActivity(
       "operator",

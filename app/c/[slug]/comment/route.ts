@@ -12,6 +12,7 @@ import { rateLimit } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
 import { resolveDoc } from "@/lib/doclabels";
 import type { Comment } from "@/lib/types";
+import { clipText } from "@/lib/errors";
 
 export const runtime = "nodejs";
 
@@ -60,7 +61,7 @@ export async function POST(
   }
   const { label: docLabel, no: docNo } = doc;
 
-  const by = typeof body.by === "string" ? body.by.trim().slice(0, MAX_NAME) : "";
+  const by = typeof body.by === "string" ? clipText(body.by.trim(), MAX_NAME) : "";
   if (!by) {
     return NextResponse.json({ error: "Please add your name." }, { status: 400 });
   }
@@ -70,7 +71,7 @@ export async function POST(
   }
   if (rawText.length > MAX_TEXT) {
     return NextResponse.json(
-      { error: `That's a bit long — please keep it under ${MAX_TEXT} characters, or email us instead.` },
+      { error: `That's a bit long. Please keep it under ${MAX_TEXT} characters, or email us instead.` },
       { status: 400 },
     );
   }
@@ -81,10 +82,10 @@ export async function POST(
   await logActivity(by, "asked about a document", slug, docNo);
 
   await emailStudio(
-    `Question on ${docNo} — ${client.company}`,
+    `Question on ${docNo} · ${client.company}`,
     `<p><strong>${esc(by)}</strong> asked a question about the ${esc(docLabel.toLowerCase())} <b>${esc(docNo)}</b> from the ${esc(client.company)} client portal:</p>
 <blockquote style="margin:14px 0;padding:10px 16px;border-left:3px solid #84cc16;white-space:pre-wrap">${esc(rawText)}</blockquote>
-<p>Reply to them directly${client.email ? ` at <a href="mailto:${esc(client.email)}">${esc(client.email)}</a>` : ""} — the portal doesn't send replies.</p>
+<p>Reply to them directly${client.email ? ` at <a href="mailto:${esc(client.email)}">${esc(client.email)}</a>` : ""}. The portal doesn't send replies.</p>
 <p><a href="https://${CONSOLE_HOST}/clients/${client.slug}">Open ${esc(client.company)} in the console →</a></p>`,
     [],
     // Reply-To the client, not ourselves: the body tells the operator to
@@ -94,12 +95,11 @@ export async function POST(
   );
 
   await studioNotice({
-    emoji: "💬",
     title: "Question asked",
     company: client.company,
     lines: [
       `${tgEsc(by)} asked about ${tgEsc(docLabel)} ${tgEsc(docNo)}`,
-      `“${tgEsc(rawText.slice(0, 500))}”`,
+      `“${tgEsc(clipText(rawText, 500))}”`,
     ],
     url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
   });

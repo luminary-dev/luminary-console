@@ -19,8 +19,7 @@ export async function resolveRoute(pathname: string): Promise<Match | null> {
   const segs = pathname.split("/").filter(Boolean);
   let dir = APP_DIR;
   const params: Record<string, string | string[]> = {};
-  for (let i = 0; i < segs.length; i++) {
-    const seg = segs[i];
+  for (const [i, seg] of segs.entries()) {
     const literal = join(dir, seg);
     if (existsSync(literal)) {
       dir = literal;
@@ -57,8 +56,11 @@ export async function callRoute(
   query?: Record<string, string>,
   headers?: Record<string, string>,
 ): Promise<CallResult> {
-  const match = await resolveRoute(pathname.split("?")[0]);
+  const match = await resolveRoute(pathname.split("?")[0] ?? pathname);
   if (!match) throw new Error(`No route matches ${pathname}`);
+  // The path is resolved by resolveRoute against our own app/ directory and
+  // is never attacker-controlled, so this dynamic import is safe.
+  // eslint-disable-next-line no-unsanitized/method
   const mod = await import(pathToFileURL(match.file).href);
   const handler = mod[method.toUpperCase()];
   if (typeof handler !== "function") {
@@ -77,7 +79,9 @@ export async function callRoute(
   let json: Record<string, unknown> | null = null;
   try {
     json = JSON.parse(text);
-  } catch {}
+  } catch {
+    // A non-JSON response body is normal here (HTML, PDF); callers use .text.
+  }
   return {
     status: res.status,
     text,

@@ -55,6 +55,11 @@ export const EN_UI: UIStrings = {
   doneCopy1: "A copy of your answers is on its way to ",
   doneCopy2: " — check the inbox (and spam, the first time).",
 
+  draftRestored:
+    "Your earlier answers were brought back from this device. Nothing has been sent yet.",
+  draftKeep: "Keep them",
+  draftDiscard: "Start fresh",
+
   errName: "Please tell us your name (first question) so we know who to reply to.",
   errRequired: "These starred questions still need an answer: ",
   errCopy: "You asked for a copy — please enter at least one valid email address for it.",
@@ -71,13 +76,19 @@ export const strings = (lang: Lang): UIStrings => (lang === "si" ? SI_UI : EN_UI
 export type SectionText = { eyebrow: string; title: string; sub?: string };
 
 export function sectionText(section: Section, lang: Lang, co: string): SectionText {
-  if (lang !== "si") return { eyebrow: section.eyebrow, title: section.title, sub: section.sub };
+  const en: SectionText = {
+    eyebrow: section.eyebrow,
+    title: section.title,
+    ...(section.sub !== undefined ? { sub: section.sub } : {}),
+  };
+  if (lang !== "si") return en;
   const t = SI_SECTIONS[section.id];
-  if (!t) return { eyebrow: section.eyebrow, title: section.title, sub: section.sub };
+  if (!t) return en;
+  const sub = t.sub ? si(t.sub, co) : section.sub;
   return {
     eyebrow: si(t.eyebrow, co),
     title: si(t.title, co),
-    sub: t.sub ? si(t.sub, co) : section.sub,
+    ...(sub !== undefined ? { sub } : {}),
   };
 }
 
@@ -86,18 +97,21 @@ export type FieldText = { label: string; hint?: string; placeholder?: string };
 /** Sinhala for a base-schema field; Claude's "extra_N" questions have no
  *  entry and fall through to their generated English. */
 export function fieldText(field: Field, lang: Lang, co: string): FieldText {
+  const enPlaceholder = "placeholder" in field ? field.placeholder : undefined;
   const en: FieldText = {
     label: field.label,
-    hint: field.hint,
-    placeholder: "placeholder" in field ? field.placeholder : undefined,
+    ...(field.hint !== undefined ? { hint: field.hint } : {}),
+    ...(enPlaceholder !== undefined ? { placeholder: enPlaceholder } : {}),
   };
   if (lang !== "si") return en;
   const t = SI_FIELDS[field.id];
   if (!t) return en;
+  const hint = t.hint ? si(t.hint, co) : en.hint;
+  const placeholder = t.placeholder ? si(t.placeholder, co) : en.placeholder;
   return {
     label: t.label ? si(t.label, co) : en.label,
-    hint: t.hint ? si(t.hint, co) : en.hint,
-    placeholder: t.placeholder ? si(t.placeholder, co) : en.placeholder,
+    ...(hint !== undefined ? { hint } : {}),
+    ...(placeholder !== undefined ? { placeholder } : {}),
   };
 }
 

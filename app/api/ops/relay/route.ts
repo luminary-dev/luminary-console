@@ -38,7 +38,7 @@ async function relay(req: Request): Promise<Response> {
   // back to direct execution instead of failing the operation.
   if (process.env.OPS_VIA_ACTIONS !== "1" || !opsDispatchConfigured()) {
     return NextResponse.json(
-      { error: "Ops-via-Actions is not configured — execute directly.", fallback: true },
+      { error: "Ops-via-Actions is not configured. Execute directly.", fallback: true },
       { status: 503 },
     );
   }
@@ -80,7 +80,7 @@ async function relay(req: Request): Promise<Response> {
   return NextResponse.json(
     {
       error:
-        "The operation is still running on GitHub Actions — check the Actions tab; the change will land when the run finishes.",
+        "The operation is still running on GitHub Actions: check the Actions tab; the change will land when the run finishes.",
       requestId,
     },
     { status: 504 },

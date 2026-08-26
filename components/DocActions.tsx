@@ -72,7 +72,7 @@ export default function DocActions({
         confirmLabel: "Unpublish",
         message: (
           <>
-            {no ? <b>{no}</b> : <>This document</>} is <b>published</b> — it must be unpublished
+            {no ? <b>{no}</b> : <>This document</>} is <b>published</b>. It must be unpublished
             before it can be deleted. Unpublish it now?
           </>
         ),
@@ -90,7 +90,7 @@ export default function DocActions({
           {type === "estimate" && (
             <>
               {" "}
-              The estimate is generated when the client is created — there is no way to regenerate
+              The estimate is generated when the client is created. There is no way to regenerate
               it afterwards.
             </>
           )}
@@ -128,7 +128,7 @@ export default function DocActions({
                 body: JSON.stringify({ docs: [type] }),
               });
               setBusy(null);
-              if (!s.ok) setError("Published, but the email failed — use Email to retry.");
+              if (!s.ok) setError("Published, but the email failed. Use Email to retry.");
               router.refresh();
             }}
           >
@@ -168,8 +168,8 @@ export default function DocActions({
             rows={2}
             placeholder={
               exists
-                ? "Revision instructions — e.g. 'drop the total to 40,000 and add a maintenance line'"
-                : "What to bill — e.g. '30% design-approval against the quotation' or 'receipt for 22,500 received today by bank transfer'"
+                ? "Revision instructions: e.g. 'drop the total to 40,000 and add a maintenance line'"
+                : "What to bill: e.g. '30% design-approval against the quotation' or 'receipt for 22,500 received today by bank transfer'"
             }
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
@@ -185,7 +185,7 @@ export default function DocActions({
                 style={{ marginTop: 2 }}
               />
               <span>
-                Also apply this change to <b>{relatedDocs.join(", ")}</b> — each is revised the same
+                Also apply this change to <b>{relatedDocs.join(", ")}</b>: each is revised the same
                 way and kept consistent with this one (prior version archived so you can roll back).
                 Your other edits on them stay.
               </span>

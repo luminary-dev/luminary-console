@@ -33,7 +33,7 @@ export async function POST(
 <p style="color:#888;font-size:12px;margin-top:18px">Luminary Studio · support@luminary-dev.xyz · <a href="https://luminary-dev.xyz">luminary-dev.xyz</a></p>`;
 
   const sent = await emailAddresses([client.email], subject, html);
-  if (!sent) return NextResponse.json({ error: "The email did not go out — try again." }, { status: 502 });
+  if (!sent) return NextResponse.json({ error: "The email did not go out. Try again." }, { status: 502 });
 
   const entry: EmailLogEntry = { at: new Date().toISOString(), to: client.email, subject };
   client.emailLog = [...(client.emailLog ?? []), entry];

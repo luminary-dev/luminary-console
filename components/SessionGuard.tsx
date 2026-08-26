@@ -8,9 +8,20 @@ import { useEffect, useRef } from "react";
 const IDLE_MS = 30 * 60 * 1000;
 const PING_MS = 5 * 60 * 1000;
 
+/** Pages that have no session to guard. Pinging from here is guaranteed to
+ *  401, which self-disables correctly but costs two console errors on the
+ *  most-visited unauthenticated page in the product, on every single load
+ *  (UX-21). Skipping the ping outright is both quieter and one fewer request. */
+const NO_SESSION_PATHS = new Set(["/login"]);
+
 export default function SessionGuard() {
   const last = useRef(Date.now());
   useEffect(() => {
+    // The client subdomains are handled by the ping's own 401 (there is no
+    // session concept there at all), but the console's own login page is
+    // known statically, so do not even ask.
+    if (NO_SESSION_PATHS.has(window.location.pathname)) return;
+
     let enabled = true;
     const mark = () => { last.current = Date.now(); };
     const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"] as const;

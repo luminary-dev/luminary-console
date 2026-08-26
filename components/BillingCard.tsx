@@ -11,10 +11,10 @@ import { fmtLKR, invoiceStatus, invoiceTotal, paidAgainst, parseAmount, summariz
 // One naming rule for billing documents, shared with the portal, the email
 // route and the comment box — "Final invoice", "Handover pack".
 import { billingLabel } from "@/lib/doclabels";
-import { relTime } from "@/lib/time";
 
 import EmailDocButton from "./EmailDocButton";
 import DocHistory from "./DocHistory";
+import RelativeTime from "./RelativeTime";
 import { useConfirm } from "./ConfirmDialog";
 import { opsFetch } from "@/lib/ops-fetch";
 
@@ -77,7 +77,7 @@ export default function BillingCard({
         confirmLabel: "Unpublish",
         message: (
           <>
-            <b>{b.no}</b> is <b>published</b> — it must be unpublished before it can be deleted.
+            <b>{b.no}</b> is <b>published</b>. It must be unpublished before it can be deleted.
             Unpublish it now?
           </>
         ),
@@ -146,7 +146,7 @@ export default function BillingCard({
               {paid > 0 ? <>, {fmtLKR(paid)} already recorded</> : null})
             </>
           ) : (
-            <> — the invoice total couldn&apos;t be read automatically, so enter the amount received</>
+            <>: the invoice total couldn&apos;t be read automatically, so enter the amount received</>
           )}
           . Amount in LKR:
         </>
@@ -159,7 +159,7 @@ export default function BillingCard({
     if (typed === null) return;
     const amount = parseAmount(typed);
     if (amount === null || amount <= 0) {
-      setError("That amount didn't parse — digits only, e.g. 22,500.");
+      setError("That amount didn't parse: digits only, e.g. 22,500.");
       return;
     }
     await callPayments(
@@ -248,7 +248,7 @@ export default function BillingCard({
             rows={2}
             placeholder={
               otherFor === "invoice"
-                ? "What extra work is being billed, and for how much? e.g. “New careers page requested after launch — LKR 25,000”"
+                ? "What extra work is being billed, and for how much? e.g. “New careers page requested after launch, LKR 25,000”"
                 : "Which payment was received? e.g. “Payment received in full for additional invoice LUM-INV-0044-03”"
             }
             value={otherText}
@@ -285,6 +285,7 @@ export default function BillingCard({
                 const fullyPaid = isInvoice && total !== null && total > 0 && paid >= total;
                 const dueDate = isInvoice ? (b.data as { dueDate?: string })?.dueDate : undefined;
                 const st = isInvoice && b.status === "published" ? invoiceStatus(b, payments) : null;
+                const viewedAt = views[b.slug];
                 return (
                 <tr key={b.slug}>
                   <td style={{ fontWeight: 600 }}>{billingLabel(b)}</td>
@@ -294,9 +295,9 @@ export default function BillingCard({
                       <i />
                       {b.status}
                     </span>
-                    {b.status === "published" && views[b.slug] && (
-                      <div style={{ marginTop: 5, fontSize: 11, color: "var(--a-text)" }} title={views[b.slug]}>
-                        opened {relTime(views[b.slug], Date.now())}
+                    {b.status === "published" && viewedAt && (
+                      <div style={{ marginTop: 5, fontSize: 11, color: "var(--a-text)" }}>
+                        opened <RelativeTime at={viewedAt} />
                       </div>
                     )}
                     {isInvoice && (dueDate || paid > 0) && (
@@ -366,7 +367,7 @@ export default function BillingCard({
                                   body: JSON.stringify({ docs: [b.slug] }),
                                 });
                                 setBusy(null);
-                                if (!s.ok) setError("Published, but the email failed — use Email to retry.");
+                                if (!s.ok) setError("Published, but the email failed. Use Email to retry.");
                                 router.refresh();
                               }}
                             >
@@ -391,7 +392,12 @@ export default function BillingCard({
                           Revise
                         </button>
                       )}
-                      <EmailDocButton slug={slug} docKey={b.slug} label={billingLabel(b).toLowerCase()} email={email} />
+                      <EmailDocButton
+                        slug={slug}
+                        docKey={b.slug}
+                        label={billingLabel(b).toLowerCase()}
+                        {...(email !== undefined ? { email } : {})}
+                      />
                       <button
                         className="btn ghost small"
                         style={{ color: "#ef4444", borderColor: "rgba(239,68,68,.35)" }}
@@ -401,7 +407,7 @@ export default function BillingCard({
                         {busy === `del-${b.slug}` ? "…" : "Delete"}
                       </button>
                     </div>
-                    <DocHistory history={b.history} />
+                    <DocHistory {...(b.history ? { history: b.history } : {})} />
                     {reviseFor === b.slug && (
                       <div style={{ marginTop: 10 }}>
                         <textarea
@@ -435,7 +441,7 @@ export default function BillingCard({
           <div className="k">Payments</div>
           {payments.length === 0 ? (
             <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 8 }}>
-              No payments recorded yet — use <b>Mark paid</b> on a published invoice when the money
+              No payments recorded yet: use <b>Mark paid</b> on a published invoice when the money
               arrives.
             </p>
           ) : (
@@ -466,16 +472,38 @@ export default function BillingCard({
               ))}
             </div>
           )}
+          {/* The balance is the sum of what each published invoice still owes
+              from ITS OWN payments. Money that settles no published invoice is
+              listed separately rather than netted off, because netting it off
+              is what used to show "settled" while an invoice was unpaid
+              (LC-003). Overpayment is shown for the same reason. */}
           <div style={{ marginTop: 10, fontSize: 13 }}>
             Outstanding: <b className="mono">{fmtLKR(money.outstanding)}</b>
             <span style={{ color: "var(--muted)" }}>
               {" "}
-              ({fmtLKR(money.invoiced)} invoiced &amp; published − {fmtLKR(money.paid)} paid)
+              across {money.invoices.length} published invoice{money.invoices.length === 1 ? "" : "s"}
             </span>
+            <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+              {fmtLKR(money.invoiced)} invoiced and published. {fmtLKR(money.paid)} received, of
+              which {fmtLKR(money.attributed)} is assigned to a published invoice.
+            </div>
+            {money.unattributed > 0 && (
+              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+                {fmtLKR(money.unattributed)} received is not assigned to a published invoice, so it
+                does not reduce the balance above. Remove the payment and record it again with{" "}
+                <b>Mark paid</b> on the invoice it settles, or publish that invoice.
+              </div>
+            )}
+            {money.overpaid > 0 && (
+              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+                {fmtLKR(money.overpaid)} received beyond what those invoices asked for. Check the
+                amounts before issuing the next receipt.
+              </div>
+            )}
             {money.unparsable.length > 0 && (
               <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
-                Not counted (total unreadable): {money.unparsable.join(", ")} — record their
-                payments with Mark paid and the balance stays honest.
+                Not counted (total unreadable): {money.unparsable.join(", ")}. Their payments still
+                show against them, but they add nothing to the balance.
               </div>
             )}
           </div>

@@ -105,7 +105,7 @@ export function renderHandover(d: HandoverData, ctx: Ctx): string {
     <div class="section">
       <div class="sec-k">Access &amp; credentials</div>
       <div class="small">Completed by Luminary at handover. Once these are transferred, change every password
-      and enable two-factor authentication where the service offers it — we keep no copy.</div>
+      and enable two-factor authentication where the service offers it. We keep no copy.</div>
       <div class="tbl-head tbl-head--keep" style="grid-template-columns:190px 1fr 150px;margin-top:10px;">
         <div>System</div><div>Location / username</div><div>Handed over</div>
       </div>
@@ -159,7 +159,7 @@ export function renderHandover(d: HandoverData, ctx: Ctx): string {
 
   return shell({
     mode: ctx.mode,
-    title: `Handover pack ${ctx.docNo} — ${ctx.client.company}`,
+    title: `Handover pack ${ctx.docNo} · ${ctx.client.company}`,
     docTitle: "Handover Pack",
     pill: "Project complete",
     metaLeft: clientBlock(ctx.client, "Handed over to"),
@@ -170,6 +170,6 @@ export function renderHandover(d: HandoverData, ctx: Ctx): string {
       metaRow("Prepared by", "Luminary Studio"),
     ],
     body,
-    pdfHref: ctx.pdfHref,
+    ...(ctx.pdfHref !== undefined ? { pdfHref: ctx.pdfHref } : {}),
   });
 }

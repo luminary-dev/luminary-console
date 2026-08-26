@@ -44,7 +44,7 @@ export default function ChangeOrders({
       <h3>Change orders</h3>
       <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
         Changes the client requests after the quotation is accepted. Log them here as they're
-        approved — each one is billed as its own line on the <b>final invoice</b>.
+        approved: each one is billed as its own line on the <b>final invoice</b>.
       </p>
 
       {changeOrders.length > 0 && (

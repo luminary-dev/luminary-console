@@ -44,7 +44,7 @@ export default async function ClientHome({
   // console host — the documented operator preview — where every link landed
   // on the console root and 404'd or bounced to /login. Derive the prefix the
   // same way the proxy decides the host is a client host.
-  const host = (h.get("host") || "").split(":")[0].toLowerCase();
+  const host = ((h.get("host") || "").split(":")[0] ?? "").toLowerCase();
   const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
   const CONSOLE_HOST = process.env.CONSOLE_HOST || `console.${ROOT}`;
   const onClientHost = host.endsWith(`.${ROOT}`) && host !== CONSOLE_HOST && host !== ROOT;
@@ -89,7 +89,7 @@ export default async function ClientHome({
           <div className="k portal-hero__eyebrow">Client portal</div>
           <h1>{client.company}</h1>
           <p className="portal-hero__sub">
-            Your project with Luminary, all in one place — documents, design previews and
+            Your project with Luminary, all in one place: documents, design previews and
             everything we need from you, kept here for the whole build.
           </p>
           <div className="portal-stats">
@@ -110,7 +110,10 @@ export default async function ClientHome({
       </header>
 
       <div className="portal-body">
-        <PortalProgress stage={stage} deliveredAt={client.deliveredAt} />
+        <PortalProgress
+          stage={stage}
+          {...(client.deliveredAt !== undefined ? { deliveredAt: client.deliveredAt } : {})}
+        />
 
         {client.site && (() => {
           const live = client.site.status === "published" && client.site.state === "READY";
@@ -121,7 +124,7 @@ export default async function ClientHome({
                 <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 4 }}>
                   {live
                     ? "Your finished website is deployed and ready to visit."
-                    : "Your new website is being prepared — check its progress here."}
+                    : "Your new website is being prepared. Check its progress here."}
                 </p>
               </div>
               <a className="btn" href={`${base}/site`} target="_blank" rel="noopener noreferrer">
@@ -163,11 +166,11 @@ export default async function ClientHome({
         <PortalDesigns
           base={base}
           designs={publishedDesigns.map((d) => ({ id: d.id, title: d.title, isNew: isNew(d.updatedAt) }))}
-          initialSelectedId={client.selectedDesign?.id}
+          {...(client.selectedDesign ? { initialSelectedId: client.selectedDesign.id } : {})}
         />
       )}
 
-      <PortalComments docs={askable} initialDoc={newest} base={base} />
+      <PortalComments docs={askable} {...(newest !== undefined ? { initialDoc: newest } : {})} base={base} />
 
       <PortalUploads
         base={base}

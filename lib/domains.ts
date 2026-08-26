@@ -9,6 +9,33 @@ const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
 
 type DnsResult = { status: "automated" | "manual_required" | "error"; detail: string };
 
+/**
+ * The zone id, from the environment or looked up by name.
+ *
+ * Shared so creation and removal resolve it the same way. Removal used to
+ * require CLOUDFLARE_ZONE_ID while creation fell back to this lookup, so a
+ * deployment holding only CLOUDFLARE_API_TOKEN could create DNS records it
+ * could never delete, and reported the wrong missing variable when asked to.
+ *
+ * The HTTP status is checked before the body is read. Without that, a 401 from
+ * an expired token surfaced as "Cloudflare zone for <root> not found", which
+ * sends the operator hunting a DNS problem that does not exist, and an HTML
+ * error page or WAF challenge threw a JSON parse error instead of the status.
+ */
+async function resolveZoneId(headers: Record<string, string>): Promise<string> {
+  const fromEnv = process.env.CLOUDFLARE_ZONE_ID;
+  if (fromEnv) return fromEnv;
+
+  const res = await fetch(`https://api.cloudflare.com/client/v4/zones?name=${ROOT}`, { headers });
+  if (!res.ok) {
+    throw new Error(`Cloudflare zone lookup failed: HTTP ${res.status} ${res.statusText}`.trim());
+  }
+  const data = await res.json().catch(() => null);
+  const zoneId = data?.result?.[0]?.id;
+  if (!zoneId) throw new Error(`Cloudflare zone for ${ROOT} not found`);
+  return zoneId;
+}
+
 async function cloudflareCname(label: string): Promise<string> {
   const token = process.env.CLOUDFLARE_API_TOKEN;
   if (!token) throw new Error("manual:CLOUDFLARE_API_TOKEN not set");
@@ -18,13 +45,7 @@ async function cloudflareCname(label: string): Promise<string> {
     "Content-Type": "application/json",
   };
 
-  let zoneId = process.env.CLOUDFLARE_ZONE_ID;
-  if (!zoneId) {
-    const res = await fetch(`https://api.cloudflare.com/client/v4/zones?name=${ROOT}`, { headers });
-    const data = await res.json();
-    zoneId = data?.result?.[0]?.id;
-    if (!zoneId) throw new Error(`Cloudflare zone for ${ROOT} not found`);
-  }
+  const zoneId = await resolveZoneId(headers);
 
   const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records`, {
     method: "POST",
@@ -97,22 +118,30 @@ export async function removeSubdomain(
   const notes: string[] = [];
 
   const cfToken = process.env.CLOUDFLARE_API_TOKEN;
-  const zoneId = process.env.CLOUDFLARE_ZONE_ID;
-  if (cfToken && zoneId) {
+  // Only the token is required, matching creation. Requiring the zone id here
+  // meant a deployment with just the token created records it could never
+  // remove, and blamed a variable that was not the one missing.
+  if (cfToken) {
     try {
       const headers = { Authorization: `Bearer ${cfToken}` };
+      const zoneId = await resolveZoneId(headers);
       const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records?name=${host}`, { headers });
-      const data = await res.json();
+      if (!res.ok) throw new Error(`record lookup failed: HTTP ${res.status}`);
+      const data = await res.json().catch(() => null);
       for (const rec of data?.result ?? []) {
-        await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${rec.id}`, { method: "DELETE", headers });
-        notes.push("cloudflare record deleted");
+        // The response is checked rather than discarded. A token without
+        // DNS:Edit returns 403 here, and reporting "deleted" regardless left
+        // the operator believing a subdomain was torn down while the CNAME
+        // still resolved at the old target.
+        const del = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${rec.id}`, { method: "DELETE", headers });
+        notes.push(del.ok ? "cloudflare record deleted" : `cloudflare delete failed: HTTP ${del.status}`);
       }
       if (!(data?.result ?? []).length) notes.push("no cloudflare record");
     } catch (e) {
       notes.push(`cloudflare: ${String(e)}`);
     }
   } else {
-    notes.push("cloudflare token missing — remove CNAME manually");
+    notes.push("CLOUDFLARE_API_TOKEN not set: remove the CNAME manually");
   }
 
   const vToken = process.env.VERCEL_TOKEN;

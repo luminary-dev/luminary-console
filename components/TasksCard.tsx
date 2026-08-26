@@ -34,7 +34,7 @@ export default function TasksCard({ slug, tasks }: { slug: string; tasks: Task[]
     setBusy(false);
     if (!res?.ok) {
       setList(before);
-      setError(data?.error || "That didn't save — please try again.");
+      setError(data?.error || "That didn't save. Please try again.");
       return;
     }
     if (Array.isArray(data?.tasks)) setList(data.tasks);
@@ -64,13 +64,17 @@ export default function TasksCard({ slug, tasks }: { slug: string; tasks: Task[]
     );
 
   const remove = async (i: number) => {
+    // The row could have gone if the server's authoritative list came back
+    // shorter while the click was in flight.
+    const task = list[i];
+    if (!task) return;
     const sure = await confirm({
       title: "Remove task",
       danger: true,
       confirmLabel: "Remove",
       message: (
         <>
-          Remove <b>{list[i].text}</b> from the checklist?
+          Remove <b>{task.text}</b> from the checklist?
         </>
       ),
     });
@@ -93,7 +97,7 @@ export default function TasksCard({ slug, tasks }: { slug: string; tasks: Task[]
       </div>
       {list.length === 0 ? (
         <p className="empty-note">
-          Nothing on the list. Add what this client is waiting on — assets, a callback, a domain
+          Nothing on the list. Add what this client is waiting on: assets, a callback, a domain
           transfer.
         </p>
       ) : (

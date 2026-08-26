@@ -35,8 +35,8 @@ export default function HandoverCard({
         confirmLabel: "Rebuild",
         message: (
           <>
-            <b>{existing.no}</b> already exists. Rebuilding it re-reads the record — documents,
-            dates and payment totals — and replaces the current render.
+            <b>{existing.no}</b> already exists. Rebuilding it re-reads the record (documents,
+            dates and payment totals) and replaces the current render.
             {existing.status === "published" && " It stays published, so the client sees the new version immediately."}{" "}
             The previous render is kept in its version history.
           </>
@@ -63,7 +63,7 @@ export default function HandoverCard({
         The document that closes the project out: what was built, every document issued with its
         number and date, a credentials table for you to fill in at handover, the 30-day warranty
         window{deliveredOn ? ` (running from ${deliveredOn.slice(0, 10)})` : ""}, the care-plan
-        pitch and a payment summary. Built from the record — no drafting step — so rebuilding it
+        pitch and a payment summary. Built from the record, with no drafting step, so rebuilding it
         after a late payment or a new document costs nothing. It appears in <b>Billing</b> below,
         where you publish, email or delete it like any other document.
       </p>
@@ -75,7 +75,7 @@ export default function HandoverCard({
           title={
             eligible
               ? undefined
-              : "Available once the project is delivered — publish the final receipt, or set the stage to Delivered."
+              : "Available once the project is delivered: publish the final receipt, or set the stage to Delivered."
           }
         >
           <button className="btn small" disabled={!eligible || busy} onClick={run}>
@@ -101,7 +101,7 @@ export default function HandoverCard({
         ) : (
           !eligible && (
             <span style={{ fontSize: 12.5, color: "var(--muted)" }}>
-              Available once the project is delivered — publish the final receipt, or set the stage
+              Available once the project is delivered: publish the final receipt, or set the stage
               to <b>Delivered</b>.
             </span>
           )

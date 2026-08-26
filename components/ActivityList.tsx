@@ -7,7 +7,8 @@
 // hydration mismatch). Entries must arrive newest-first.
 import Link from "next/link";
 import { useState } from "react";
-import { relTime, whenLabel } from "@/lib/time";
+import { relTime } from "@/lib/time";
+import RelativeTime from "./RelativeTime";
 import { displayName } from "@/lib/admins";
 
 export type ActivityRow = { at: string; actor: string; action: string; target: string; detail?: string };
@@ -48,7 +49,7 @@ export default function ActivityList({
         <p className="empty-note">Nothing logged yet.</p>
       ) : visible.length === 0 ? (
         <p className="empty-note">
-          {unreadMode ? "You're all caught up — nothing new since your last visit." : "Nothing in the last 24 hours."}
+          {unreadMode ? "You're all caught up. Nothing new since your last visit." : "Nothing in the last 24 hours."}
         </p>
       ) : (
         <div className="table-scroll">
@@ -65,8 +66,9 @@ export default function ActivityList({
             <tbody>
               {visible.map((e, i) => (
                 <tr key={`${e.at}-${i}`}>
-                  <td style={{ whiteSpace: "nowrap", color: "var(--muted)" }} title={whenLabel(e.at)}>
-                    {relTime(e.at, now)}
+                  <td style={{ whiteSpace: "nowrap", color: "var(--muted)" }}>
+                    {/* RelativeTime sets its own title from the absolute time. */}
+                    <RelativeTime at={e.at} initial={relTime(e.at, now)} />
                   </td>
                   <td style={{ overflowWrap: "anywhere" }} title={e.actor}>{displayName(e.actor)}</td>
                   <td style={{ fontWeight: 600 }}>{e.action}</td>

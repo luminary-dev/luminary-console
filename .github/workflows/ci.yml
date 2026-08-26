@@ -1,6 +1,6 @@
-# Merge gate + visibility: build (includes the TypeScript pass) on every PR
-# and every push to main. Vercel still does the deploying — this only tells
-# you, on GitHub, whether the commit is sound. Failures on main ping Telegram.
+# Merge gate: lint, typecheck, unit tests with coverage, then build. Vercel
+# still does the deploying — this tells you, on GitHub, whether the commit is
+# sound. Failures on main ping Telegram.
 #
 # Naming convention (all workflows): see README "GitHub Actions" —
 #   workflow "Area · Action" · run-name adds runtime context · jobs are
@@ -16,9 +16,37 @@ on:
   pull_request:
 
 jobs:
+  quality:
+    name: 1 · Lint, typecheck & test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+      - name: Set up Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit & component tests with coverage
+        run: npm run test:coverage
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+
   build:
     name: Build
     runs-on: ubuntu-latest
+    needs: quality
     steps:
       - name: Check out
         uses: actions/checkout@v7
@@ -40,5 +68,53 @@ jobs:
           [ -z "$TG_TOKEN" ] && exit 0
           curl -s "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
             -d chat_id="$TG_CHAT" \
-            -d text="🔴 console CI failed on main: ${{ github.event.head_commit.message }} — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            -d text="Console CI failed on main: ${{ github.event.head_commit.message }} — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             > /dev/null
+
+  security:
+    name: 2 · Security scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+        with:
+          # Full history: the secret scan below reads commits, and the default
+          # shallow clone would hand it one, so a secret added in any earlier
+          # commit would pass unnoticed.
+          fetch-depth: 0
+      - name: Set up Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+      # The gitleaks TOOL is open source and free. The gitleaks ACTION refuses
+      # to run for a GitHub organization without a paid GITLEAKS_LICENSE, which
+      # failed this job on every push. Running the binary directly keeps the
+      # secret scan and drops the licence requirement. The version is pinned
+      # and the checksum is verified, because a scanner that silently becomes
+      # a different program is worse than no scanner.
+      - name: Scan for committed secrets
+        env:
+          GITLEAKS_VERSION: 8.30.1
+        run: |
+          set -euo pipefail
+          ASSET="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          BASE="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          # Kept under its published name so the checksum line matches the file
+          # on disk; renaming it makes `sha256sum -c` look for a file that is
+          # not there and the verification silently has nothing to check.
+          curl -sSfL -O "${BASE}/${ASSET}"
+          curl -sSfL -O "${BASE}/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          grep " ${ASSET}\$" "gitleaks_${GITLEAKS_VERSION}_checksums.txt" | sha256sum -c -
+          tar -xzf "${ASSET}" gitleaks
+          # `git`, not `dir`: scan what is committed. `dir` walks the working
+          # tree including gitignored build output, and .next/cache holds real
+          # token values baked in at build time, so it reports 25 findings that
+          # are not in the repository and cannot be.
+          # --redact so a finding never prints the secret into a public log.
+          ./gitleaks git . --redact --verbose --exit-code 1
+          rm -f "${ASSET}" "gitleaks_${GITLEAKS_VERSION}_checksums.txt" gitleaks

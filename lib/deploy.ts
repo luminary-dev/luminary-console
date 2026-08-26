@@ -18,7 +18,9 @@ export function parseRepo(input: string): ParsedRepo | null {
   let m = s.match(/github\.com[/:]([^/\s]+)\/([^/\s]+)/i);
   if (!m) m = s.match(/^([\w.-]+)\/([\w.-]+)$/);
   if (!m) return null;
-  return { org: m[1], name: m[2] };
+  const [, org, name] = m;
+  if (!org || !name) return null;
+  return { org, name };
 }
 
 export type DeployState = "QUEUED" | "INITIALIZING" | "BUILDING" | "READY" | "ERROR" | "CANCELED";
@@ -116,12 +118,13 @@ async function uploadFile(token: string, data: Buffer): Promise<{ sha: string; s
 
 async function mapLimit<T, R>(items: T[], limit: number, fn: (t: T) => Promise<R>): Promise<R[]> {
   const out: R[] = new Array(items.length);
-  let i = 0;
+  // One shared iterator hands each worker the next index/element pair, so the
+  // element is carried with its index instead of being re-looked-up by number.
+  const queue = items.entries();
   await Promise.all(
     Array.from({ length: Math.min(limit, items.length) }, async () => {
-      while (i < items.length) {
-        const idx = i++;
-        out[idx] = await fn(items[idx]);
+      for (const [idx, item] of queue) {
+        out[idx] = await fn(item);
       }
     }),
   );
@@ -134,8 +137,12 @@ export async function deployRepo(opts: { org: string; name: string; ref: string;
   const token = vercelToken();
   const repoFiles = await fetchRepoFiles(opts.org, opts.name, opts.ref);
 
-  const uploaded = await mapLimit(repoFiles, 8, (f) => uploadFile(token, f.data));
-  const files = repoFiles.map((f, i) => ({ file: f.path, sha: uploaded[i].sha, size: uploaded[i].size }));
+  // Pair each upload result with its own path inside the worker, rather than
+  // re-joining two arrays by index afterwards.
+  const files = await mapLimit(repoFiles, 8, async (f) => {
+    const { sha, size } = await uploadFile(token, f.data);
+    return { file: f.path, sha, size };
+  });
 
   const res = await fetch(`${API}/v13/deployments${teamQs()}`, {
     method: "POST",
@@ -152,8 +159,8 @@ export async function deployRepo(opts: { org: string; name: string; ref: string;
   return {
     id: data.id ?? data.uid,
     state: asState(data.readyState ?? data.status),
-    url: data.url ? `https://${data.url}` : undefined,
-    inspectorUrl: data.inspectorUrl,
+    ...(data.url ? { url: `https://${data.url}` } : {}),
+    ...(data.inspectorUrl ? { inspectorUrl: String(data.inspectorUrl) } : {}),
   };
 }
 
@@ -166,7 +173,7 @@ export async function deploymentStatus(id: string): Promise<DeployResult> {
   return {
     id,
     state: asState(data.readyState ?? data.status),
-    url: data.url ? `https://${data.url}` : undefined,
-    inspectorUrl: data.inspectorUrl,
+    ...(data.url ? { url: `https://${data.url}` } : {}),
+    ...(data.inspectorUrl ? { inspectorUrl: String(data.inspectorUrl) } : {}),
   };
 }

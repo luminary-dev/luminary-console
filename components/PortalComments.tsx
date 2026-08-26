@@ -65,7 +65,7 @@ export default function PortalComments({
       </div>
       {status === "sent" ? (
         <p className="ask-sent">
-          <span aria-hidden="true">✓</span> Thanks — your question is with the studio. We reply
+          <span aria-hidden="true">✓</span> Thanks. Your question is with the studio. We reply
           within one business day.{" "}
           <button
             type="button"
@@ -80,7 +80,7 @@ export default function PortalComments({
         </p>
       ) : !open ? (
         <p className="ask-intro">
-          Pick a document, type your question and it lands straight in the studio inbox — no
+          Pick a document, type your question and it lands straight in the studio inbox: no
           account, no login.
         </p>
       ) : (

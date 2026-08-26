@@ -31,6 +31,7 @@ import { clientMoney, fmtLKR, overdueSummary } from "@/lib/money";
 import { getDocViews } from "@/lib/receipts";
 import { relTime } from "@/lib/time";
 import ActivityList from "@/components/ActivityList";
+import RelativeTime from "@/components/RelativeTime";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +62,10 @@ export default async function ClientPage({
   ]);
   await markClientSeen(slug);
   const now = Date.now();
+  // The cards below declare `email?: string`, which under
+  // exactOptionalPropertyTypes means "absent", not "present and undefined".
+  // Spread the prop in only when the record actually carries an address.
+  const emailProp = client.email !== undefined ? { email: client.email } : {};
 
   return (
     <main className="wrap" style={{ paddingBottom: 80 }}>
@@ -77,6 +82,12 @@ export default async function ClientPage({
           </Link>
         </div>
       </div>
+      {/* Skip-link target. The topbar lives inside <main> on every console
+          page, so the jump lands here, after the nav, and the next Tab
+          continues into the content. tabIndex makes it focusable, which is
+          what moves focus rather than only the scroll position. */}
+      <div id="main-content" tabIndex={-1} />
+
 
       <div className="card">
         <h3>{client.company}</h3>
@@ -129,12 +140,12 @@ export default async function ClientPage({
         </div>
         <SendToClient
           slug={slug}
-          email={client.email}
+          {...emailProp}
           publishedCount={ORDER.filter((t) => client.docs[t]?.status === "published").length}
         />
         {client.dnsStatus !== "automated" && (
           <div className="form-error" style={{ marginTop: 14 }}>
-            DNS is <b>{client.dnsStatus}</b> — the links above won&apos;t resolve until the CNAME
+            DNS is <b>{client.dnsStatus}</b>: the links above won&apos;t resolve until the CNAME
             &quot;{client.slug}&quot; → cname.vercel-dns.com exists in Cloudflare and the domain is
             attached to the Vercel project. Set CLOUDFLARE_API_TOKEN / VERCEL_TOKEN to automate this.
           </div>
@@ -175,7 +186,7 @@ export default async function ClientPage({
             ))}
             <div style={{ marginTop: 8, fontSize: 12, color: "var(--muted)" }}>
               Documents are drafted from the first submission automatically; later submissions
-              never overwrite your documents — use Revise to fold them in.
+              never overwrite your documents: use Revise to fold them in.
             </div>
           </div>
         )}
@@ -212,7 +223,10 @@ export default async function ClientPage({
                   </>
                 )}
               </td>
-              <td style={{ color: "var(--subtle)" }}>—</td>
+              <td>
+                <span aria-hidden="true" style={{ color: "var(--label)" }}>-</span>
+                <span className="sr-only">No actions</span>
+              </td>
             </tr>
             {ORDER.filter((t) => CORE.includes(t) || client.docs[t]).map((t) => {
               const meta = client.docs[t];
@@ -228,13 +242,13 @@ export default async function ClientPage({
                         {meta.status}
                       </span>
                     ) : (
-                      <span style={{ color: "var(--subtle)" }}>
+                      <span style={{ color: "var(--label)" }}>
                         {billing ? "not generated" : t === "estimate" ? "—" : "awaiting answers"}
                       </span>
                     )}
                     {meta?.status === "published" && docViews[t] && (
-                      <div style={{ marginTop: 5, fontSize: 11, color: "var(--a-text)" }} title={docViews[t]}>
-                        opened {relTime(docViews[t], now)}
+                      <div style={{ marginTop: 5, fontSize: 11, color: "var(--a-text)" }}>
+                        opened <RelativeTime at={docViews[t]} initial={relTime(docViews[t], now)} />
                       </div>
                     )}
                   </td>
@@ -253,11 +267,10 @@ export default async function ClientPage({
                         slug={slug}
                         type={t}
                         label={DOC_LABELS[t]}
-                        no={meta?.no}
+                        {...(meta ? { no: meta.no, status: meta.status } : {})}
                         exists={!!meta}
-                        status={meta?.status}
                         billing={false}
-                        email={client.email}
+                        {...emailProp}
                         relatedDocs={
                           // The project-doc family that a revision can cascade to:
                           // the other existing docs among estimate/quotation/proposal/contract.
@@ -268,9 +281,9 @@ export default async function ClientPage({
                             : []
                         }
                       />
-                      {meta && <EmailDocButton slug={slug} docKey={t} label={DOC_LABELS[t]} email={client.email} />}
+                      {meta && <EmailDocButton slug={slug} docKey={t} label={DOC_LABELS[t]} {...emailProp} />}
                     </div>
-                    <DocHistory history={meta?.history} />
+                    <DocHistory {...(meta?.history ? { history: meta.history } : {})} />
                   </td>
                 </tr>
               );
@@ -279,38 +292,46 @@ export default async function ClientPage({
         </table></div>
         {client.status === "answers_in" && !client.docs.quotation && (
           <div className="notice" style={{ marginTop: 14 }}>
-            Answers are in — drafting runs automatically in the background. If the drafts don&apos;t
+            Answers are in, and drafting runs automatically in the background. If the drafts don&apos;t
             appear after a few minutes, run it manually: <RetryStage2 slug={slug} />
           </div>
         )}
       </div>
 
-      <DesignsCard slug={slug} domain={client.domain} initial={client.designs ?? []} selectedId={client.selectedDesign?.id} />
+      <DesignsCard
+        slug={slug}
+        domain={client.domain}
+        initial={client.designs ?? []}
+        {...(client.selectedDesign ? { selectedId: client.selectedDesign.id } : {})}
+      />
 
-      <SiteCard slug={slug} initial={client.site} />
+      <SiteCard slug={slug} {...(client.site ? { initial: client.site } : {})} />
 
       <BillingCard
         slug={slug}
         billing={client.billing ?? []}
         payments={client.payments ?? []}
         hasQuotation={!!client.docs.quotation}
-        email={client.email}
+        {...emailProp}
         views={docViews}
       />
 
-      <HandoverCard
-        slug={slug}
-        eligible={handoverEligible(client)}
-        existing={(() => {
-          const h = (client.billing ?? []).find((b) => b.kind === "handover");
-          return h ? { no: h.no, slug: h.slug, status: h.status } : undefined;
-        })()}
-        deliveredOn={deliveredAtIso(client)}
-      />
+      {(() => {
+        const h = (client.billing ?? []).find((b) => b.kind === "handover");
+        const deliveredOn = deliveredAtIso(client);
+        return (
+          <HandoverCard
+            slug={slug}
+            eligible={handoverEligible(client)}
+            {...(h ? { existing: { no: h.no, slug: h.slug, status: h.status } } : {})}
+            {...(deliveredOn !== undefined ? { deliveredOn } : {})}
+          />
+        );
+      })()}
 
       <ChangeOrders slug={slug} changeOrders={client.changeOrders ?? []} />
 
-      <AssistantCard slug={slug} email={client.email} />
+      <AssistantCard slug={slug} {...emailProp} />
 
       <CommentsCard client={client} />
 
@@ -318,7 +339,7 @@ export default async function ClientPage({
         <div className="card">
           <h3>Client uploads</h3>
           <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            Files the client sent from their portal. Stored in the private bucket — links open on the console.
+            Files the client sent from their portal. Stored in the private bucket: links open on the console.
           </p>
           <div style={{ marginTop: 8 }}>
             {[...client.uploads!].reverse().map((u, i) => (
@@ -344,7 +365,7 @@ export default async function ClientPage({
         </div>
       )}
 
-      <NotesCard slug={slug} notes={client.notes} />
+      <NotesCard slug={slug} {...(client.notes !== undefined ? { notes: client.notes } : {})} />
 
       <TasksCard slug={slug} tasks={client.tasks ?? []} />
 
@@ -354,7 +375,7 @@ export default async function ClientPage({
         <div className="card">
           <h3>Activity</h3>
           <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            This project&apos;s history — client actions and operator work. New since your last visit
+            This project&apos;s history: client actions and operator work. New since your last visit
             by default; use <b>See more</b> for the rest.
           </p>
           <ActivityList entries={activity} now={now} seenAt={activitySeenAt} />

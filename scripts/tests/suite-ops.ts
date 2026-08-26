@@ -54,7 +54,9 @@ async function main() {
         try {
           status = (await callRoute(m, p)).status;
           break;
-        } catch {} // no handler for this method — try the next
+        } catch {
+          // No handler for this method on this route, so try the next one.
+        }
       }
       expect(status === 401 || status === 403, `${p}: got ${status}`);
     }
@@ -103,10 +105,10 @@ async function main() {
     } finally {
       globalThis.fetch = realFetch;
     }
-    expect(calls[0].includes("/api/ops/relay?path=%2Fapi%2Fclients%2Feco-mech%2Fnotes"), `1: ${calls[0]}`);
+    expect(calls[0]?.includes("/api/ops/relay?path=%2Fapi%2Fclients%2Feco-mech%2Fnotes"), `1: ${calls[0]}`);
     expect(calls[1] === "GET /api/clients/eco-mech", `2: ${calls[1]}`);
     expect(calls[2] === "POST /api/activity/read", `3: ${calls[2]}`);
-    expect(calls[3].includes("/api/ops/relay?path=%2Fapi%2Fpublish%2Farticle"), `4: ${calls[3]}`);
+    expect(calls[3]?.includes("/api/ops/relay?path=%2Fapi%2Fpublish%2Farticle"), `4: ${calls[3]}`);
   });
 
   await test("opsFetch: falls back to direct execution on the 503 marker", async () => {

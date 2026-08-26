@@ -21,7 +21,7 @@ p{margin:0;color:#8a8a92;font-size:1rem;line-height:1.65}
 text-transform:uppercase;color:#8a8a92;border:1px solid rgba(255,255,255,.16);border-radius:100px;padding:6px 14px}</style></head>
 <body><div class="b"><div class="mark">Luminary<span>.</span></div>
 <h1>Your website is being prepared</h1>
-<p>${esc(company)}'s new site is almost ready. We're putting the finishing touches in place — please check back shortly.</p>
+<p>${esc(company)}'s new site is almost ready. We're putting the finishing touches in place. Please check back shortly.</p>
 <div class="tag">Under maintenance</div></div></body></html>`;
   return new Response(body, {
     status: 200,

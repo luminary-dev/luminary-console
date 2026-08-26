@@ -8,7 +8,6 @@ import { BILLING_NO_PREFIX, DOC_NO_PREFIX } from "./types";
 import { fetchAsset, getClient, nextDocNoBase, putAsset, saveClient } from "./store";
 import { renderDoc, type Ctx, type EstimateData, type QuotationData } from "./templates/docs";
 import { renderHandover, type HandoverData } from "./templates/handover";
-import { renderAnswers } from "./templates/answers";
 import { renderPdf } from "./pdf";
 import { emailStudio } from "./email";
 import { ensureClientDomain } from "./domains";
@@ -190,9 +189,9 @@ export async function runStage1(input: {
   // 1. Claude drafts the estimate + tailored questions.
   const result = await stage1(client, todayLabel());
   client.projectLabel = result.projectLabel;
-  client.extraQuestions = result.extraQuestions.map((q) => ({
+  client.extraQuestions = result.extraQuestions.map(({ hint, ...q }) => ({
     ...q,
-    hint: q.hint ?? undefined,
+    ...(hint !== null ? { hint } : {}),
   }));
 
   // 2. Render + publish the estimate (client-visible immediately).
@@ -281,7 +280,7 @@ export async function runStage2(slug: string, answers: Answers, submittedAt: str
         const meta = client.docs[t]!;
         const res = await fetchAsset(meta.pdfUrl);
         return {
-          filename: `${t[0].toUpperCase()}${t.slice(1)} DRAFT - ${client.company} - ${meta.no}.pdf`,
+          filename: `${t.charAt(0).toUpperCase()}${t.slice(1)} DRAFT - ${client.company} - ${meta.no}.pdf`,
           content: Buffer.from(await res.arrayBuffer()),
         };
       }),

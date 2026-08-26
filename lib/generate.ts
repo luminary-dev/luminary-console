@@ -7,10 +7,8 @@ import type { Answers, ClientRecord, DocType, ExtraQuestion } from "./types";
 import type {
   ContractData,
   EstimateData,
-  InvoiceData,
   ProposalData,
   QuotationData,
-  ReceiptData,
 } from "./templates/docs";
 import { parseAmount } from "./money";
 import { PRICING_REFERENCE, fmtLKR, paymentSchedule } from "./pricing";
@@ -326,8 +324,8 @@ export async function generateBilling(
   const quoteTotal = parseAmount(context.quotation?.total ?? null);
   const sched = quoteTotal !== null ? paymentSchedule(quoteTotal) : null;
   // schedule is [designApproval (30%), delivery (70%)]: progress -> 0, final -> 1.
-  const idx = stage === "progress" ? 0 : stage === "final" ? 1 : -1;
-  const milestone = sched && idx >= 0 ? sched[idx] : null;
+  // Any other stage (an additional invoice) has no milestone at all.
+  const milestone = !sched ? null : stage === "progress" ? sched[0] : stage === "final" ? sched[1] : null;
   const exact = milestone ? ` exactly ${fmtLKR(milestone.amount)} (${Math.round(milestone.pct * 100)}% of the fixed quotation total of ${fmtLKR(quoteTotal as number)})` : "";
   const defaults: Record<string, string> = {
     "invoice-progress": `Invoice the 30% design-approval milestone:${exact || " 30% of the fixed quotation total"}. It falls due once the client approves the design and development begins, and it covers the discovery and 3 prototype concepts delivered in the design stage.`,
