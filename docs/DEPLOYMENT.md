@@ -75,7 +75,37 @@ are absent, rather than failing.
 | --- | --- | --- |
 | `/api/cron/backup` | Mondays 03:00 UTC | Zips the index and every client record, emails it, then checks DNS health. Fails the run if the email does not go out |
 | `/api/cron/digest` | Daily 04:00 UTC | Stalled-deal digest to the studio |
-| `/api/github/process` | Every 5 minutes | Processes pending webhook deliveries, and reconciles when the last reconcile is over an hour old |
+| `/api/github/process` | Daily 05:00 UTC | Processes pending webhook deliveries, and reconciles when the last reconcile is over an hour old |
+
+### Why that one is daily, and what it costs
+
+**The Vercel account is on the Hobby plan, which allows a cron to run at most
+once per day.** A `*/5 * * * *` schedule is rejected at deployment creation, not
+at runtime, so it takes the whole deployment down with it:
+
+```
+Hobby accounts are limited to daily cron jobs. This cron expression
+(*/5 * * * *) would run more than once per day.
+```
+
+This does **not** delay normal webhook handling. `app/api/github/webhook`
+stores the delivery, answers 200, and processes it via `after()`, so an event
+is projected within a second of GitHub sending it. The cron is a safety net,
+and only the safety net is slower:
+
+- A delivery whose inline processing threw waits up to 24 hours for a retry,
+  rather than 5 minutes. GitHub redelivers failed deliveries on its own
+  schedule, so most recover sooner than that anyway.
+- Drift reconciliation runs daily rather than hourly, so a lost delivery that
+  GitHub never retries can leave the projection stale for up to a day.
+
+Neither is silent: pending deliveries and dead letters are visible in the
+console, and the drift report says when it last ran.
+
+On Pro, change the schedule back to `*/5 * * * *` and both windows return to
+five minutes. That is the only change needed; nothing in the code assumes a
+particular frequency, because `/api/github/process` decides internally whether
+a reconcile is due rather than trusting the schedule to be right.
 
 ## Deploying a change
 

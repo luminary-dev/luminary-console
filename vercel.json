@@ -10,7 +10,7 @@
     },
     {
       "path": "/api/github/process",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 5 * * *"
     }
   ]
 }
