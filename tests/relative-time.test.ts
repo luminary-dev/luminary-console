@@ -8,7 +8,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import RelativeTime from "@/components/RelativeTime";
-import { relTickMs, relTime } from "@/lib/time";
+import { relTickMs, relTime, shortWhenLabel, whenLabel } from "@/lib/time";
 
 const BASE = Date.parse("2026-08-26T10:00:00.000Z");
 const ago = (ms: number) => new Date(BASE - ms).toISOString();
@@ -56,5 +56,29 @@ describe("RelativeTime", () => {
 
     act(() => { vi.advanceTimersByTime(60 * 60_000); });
     expect(screen.getByText("1h ago")).toBeTruthy();
+  });
+});
+
+describe("LC-087 timestamps are pinned to one timezone", () => {
+  it("formats in Colombo time regardless of the runtime's zone", () => {
+    // The bug: two components carried their own copy of this formatter with
+    // no timeZone, so the SERVER rendered UTC and the BROWSER rendered the
+    // viewer's local zone. Same instant, 18:23 against 23:53, which is a
+    // React hydration mismatch and a timestamp readable five and a half hours
+    // wrong. Asserted against an explicit instant so the expectation cannot
+    // drift with the machine running the suite.
+    const instant = "2026-08-15T18:23:00Z"; // 23:53 in Asia/Colombo
+    expect(shortWhenLabel(instant)).toContain("23:53");
+    expect(shortWhenLabel(instant)).toContain("15 Aug");
+  });
+
+  it("agrees with whenLabel on the hour, so the two clocks cannot diverge", () => {
+    const instant = "2026-08-15T18:23:00Z";
+    expect(whenLabel(instant)).toContain("23:53");
+    expect(shortWhenLabel(instant)).toContain("23:53");
+  });
+
+  it("returns the input unchanged when it is not a date", () => {
+    expect(shortWhenLabel("not a date")).toBe("not a date");
   });
 });

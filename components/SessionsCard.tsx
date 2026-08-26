@@ -7,6 +7,7 @@
 // you to /login immediately.
 import { useCallback, useEffect, useState } from "react";
 import { useConfirm } from "./ConfirmDialog";
+import { shortWhenLabel } from "@/lib/time";
 
 type Session = { sid: string; email: string; ua: string; at: string; current: boolean };
 
@@ -35,13 +36,6 @@ function device(ua: string): string {
             ? "Linux"
             : "Unknown OS";
   return `${browser} · ${os}`;
-}
-
-function when(at: string): string {
-  const d = new Date(at);
-  return Number.isNaN(+d)
-    ? at
-    : d.toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
 export default function SessionsCard() {
@@ -85,7 +79,7 @@ export default function SessionsCard() {
         <>You&apos;ll be signed out here and returned to the login page.</>
       ) : (
         <>
-          <b>{device(s.ua)}</b> ({s.email}, signed in {when(s.at)}) will be signed out within a
+          <b>{device(s.ua)}</b> ({s.email}, signed in {shortWhenLabel(s.at)}) will be signed out within a
           minute.
         </>
       ),
@@ -152,7 +146,7 @@ export default function SessionsCard() {
                   )}
                 </div>
                 <div style={{ fontSize: 12, color: "var(--muted)", overflowWrap: "anywhere" }}>
-                  {s.email} · <span className="mono">{when(s.at)}</span>
+                  {s.email} · <span className="mono">{shortWhenLabel(s.at)}</span>
                 </div>
               </div>
               <button className="btn ghost small" onClick={() => revoke(s)} disabled={busy}>

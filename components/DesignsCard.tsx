@@ -10,13 +10,7 @@ import { useConfirm } from "./ConfirmDialog";
 import { MAX_DESIGNS, designUrl } from "@/lib/designs";
 import type { DesignEntry } from "@/lib/types";
 import { opsFetch } from "@/lib/ops-fetch";
-
-function when(at: string): string {
-  const d = new Date(at);
-  return Number.isNaN(+d)
-    ? at
-    : d.toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
-}
+import { shortWhenLabel } from "@/lib/time";
 
 export default function DesignsCard({
   slug,
@@ -174,7 +168,7 @@ export default function DesignsCard({
                     ) : (
                       <span className="mono">{domain}/design/{d.id}</span>
                     )}{" "}
-                    · <span className="mono">{when(d.updatedAt)}</span>
+                    · <span className="mono">{shortWhenLabel(d.updatedAt)}</span>
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>

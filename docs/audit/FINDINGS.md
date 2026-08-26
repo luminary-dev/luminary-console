@@ -24,9 +24,9 @@ says plainly that no automated test covers it.
 Since that pass, LC-051 moved from Not fixed to Fixed, making the tally **24
 Fixed, 13 Partially fixed, 8 Not fixed** across the original 45.
 
-A further **19 findings, LC-068 to LC-086, were discovered during the
+A further **20 findings, LC-068 to LC-087, were discovered during the
 remediation itself** and are recorded in their own section at the end of this
-document. Eighteen are fixed; one (LC-082) is a deliberate Won't fix with the
+document. Nineteen are fixed; one (LC-082) is a deliberate Won't fix with the
 trade written down. They are kept separate because the distinction is the
 point: they were not visible on a first read of the code. They surfaced from
 unit-testing modules that had none, from measuring rendered pages instead of
@@ -43,7 +43,7 @@ scanning the wrong tree. Both had passed lint, typecheck, tests and a local
 build. They are the argument for watching a change land rather than declaring
 it done when the local gates go green.
 
-Whole-document totals: **64 findings, 42 Fixed, 13 Partially fixed, 8 Not
+Whole-document totals: **65 findings, 43 Fixed, 13 Partially fixed, 8 Not
 fixed, 1 Won't fix.**
 
 ---
@@ -1257,4 +1257,34 @@ rather than applying payload deltas, so replaying a genuine old event just
 re-reads current truth. The window is a backstop against indefinite replay, not
 a primary control, and it must never be the reason real work goes missing.
 Guarded by: tests/github-webhooks.test.ts::"accepts a check run that took longer than the old five minute window", ::"prefers a check run's completed_at over its started_at", ::"still uses started_at for a check run that has not finished", and ::"accepts an operator redelivery from the App's Recent Deliveries page".
+Effort: S   Risk of fix: Low   Blocks: —
+
+### LC-087 — Timestamps rendered five and a half hours wrong, and broke hydration
+Severity: Medium
+Category: Correctness / UX
+Location: `components/DesignsCard.tsx`, `components/SessionsCard.tsx`
+Evidence: Both carried their own private copy of a `when()` helper calling
+`toLocaleString("en-GB", { day, month, hour, minute })` with **no `timeZone`**.
+Without one, the runtime's zone is used, and the runtime differs by side: the
+Vercel server renders in UTC, the browser renders in the viewer's zone. On the
+production client page the same instant appeared as `15 Aug, 18:23` from the
+server and `15 Aug, 23:53` after hydration, a clean +5:30 for Asia/Colombo.
+Impact: Two problems from one cause. React reported a hydration mismatch
+(minified error #418) on `/clients/eco-mech`, the only console error left in
+production. And the timestamp itself is wrong for five and a half hours' worth
+of reading: an operator glancing at the page before hydration completes sees a
+different time than a moment later, with nothing indicating which is right.
+`lib/time.ts` already documents the rule this broke, that the studio's clock is
+Colombo rather than the server's UTC, so an entry's time matches what the
+operator remembers.
+Reproduction: Load `/clients/eco-mech` in production from a non-UTC timezone
+and compare the design timestamps before and after hydration.
+Proposed fix: Pin the zone, and stop duplicating the formatter.
+Resolution: Fixed — `shortWhenLabel` now lives in `lib/time.ts` alongside
+`whenLabel` and `relTime`, pinned to Asia/Colombo like every other clock in the
+console, and both components use it. The duplication was the real defect: the
+shared helpers were already correct, and the bug existed only in the two copies
+that had drifted from them. `RateLimitBadge` was checked and was already
+correct.
+Guarded by: tests/relative-time.test.ts::"formats in Colombo time regardless of the runtime's zone", ::"agrees with whenLabel on the hour, so the two clocks cannot diverge", and ::"returns the input unchanged when it is not a date". The second is the one that matters: it pins the two formatters together so they cannot drift apart again.
 Effort: S   Risk of fix: Low   Blocks: —
