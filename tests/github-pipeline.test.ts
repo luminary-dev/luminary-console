@@ -9,6 +9,24 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const SECRET = "pipeline-test-secret";
 
+// Fixture timestamps are RELATIVE to a base captured when the module loads,
+// never absolute dates.
+//
+// They used to be absolute (at(-1)), which was a time bomb.
+// The webhook receiver rejects a delivery whose payload timestamp is more than
+// WEBHOOK_MAX_AGE_MS (5 minutes) old, so those literals passed only while the
+// wall clock happened to sit near them: written in the morning they were in
+// the future, and by the same afternoon they were hours stale and six tests
+// went red without a line of code changing. A test that depends on the date it
+// is run is worse than no test, because it fails in CI long after the change
+// that appears to have broken it.
+//
+// Offsets stay inside the freshness window and preserve the ordering the
+// out-of-order and newer-wins cases depend on.
+const BASE = Date.now();
+const at = (minutesFromNow: number): string =>
+  new Date(BASE + minutesFromNow * 60_000).toISOString();
+
 // ——— in-memory store ———
 // Mocking at the store boundary keeps the test honest about everything above
 // it (route, verification, inbox, processor, handlers) while never touching
@@ -46,7 +64,7 @@ vi.mock("@/lib/operator", () => ({
 const apiState = {
   prState: "open" as "open" | "closed" | "merged",
   prTitle: "Add a thing",
-  prUpdatedAt: "2026-08-26T10:00:00Z",
+  prUpdatedAt: at(-1),
   fetchCount: 0,
   missing: false,
 };
@@ -73,7 +91,7 @@ vi.mock("@/lib/github/api", async () => {
         headSha: "abc1234",
         baseRef: "main",
         fromFork: false,
-        createdAt: "2026-08-26T09:00:00Z",
+        createdAt: at(-3),
         updatedAt: apiState.prUpdatedAt,
         mergeable: true,
         url: `https://github.com/${repo}/pull/${number}`,
@@ -121,8 +139,8 @@ function prPayload(overrides: Record<string, unknown> = {}): string {
       number: 7,
       state: "open",
       title: "Add a thing",
-      created_at: "2026-08-26T09:00:00Z",
-      updated_at: "2026-08-26T10:00:00Z",
+      created_at: at(-3),
+      updated_at: at(-1),
       head: { ref: "feat/thing", sha: "abc1234" },
       base: { ref: "main", sha: "def5678" },
       ...(prOverrides as object | undefined),
@@ -134,7 +152,7 @@ beforeEach(() => {
   objects.clear();
   apiState.prState = "open";
   apiState.prTitle = "Add a thing";
-  apiState.prUpdatedAt = "2026-08-26T10:00:00Z";
+  apiState.prUpdatedAt = at(-1);
   apiState.fetchCount = 0;
   apiState.missing = false;
   process.env.GITHUB_WEBHOOK_SECRET = SECRET;
@@ -242,7 +260,7 @@ describe("out-of-order delivery", () => {
 
     const staleClosed = prPayload({
       action: "closed",
-      pull_request: { state: "closed", updated_at: "2026-08-26T09:30:00Z" },
+      pull_request: { state: "closed", updated_at: at(-2) },
     });
     await POST(deliveryRequest(staleClosed, { id: "ooo-1" }));
     await processDelivery("ooo-1");
@@ -268,8 +286,8 @@ describe("out-of-order delivery", () => {
       headSha: "b",
       baseRef: "main",
       fromFork: false,
-      createdAt: "2026-08-26T09:00:00Z",
-      updatedAt: "2026-08-26T12:00:00Z",
+      createdAt: at(-3),
+      updatedAt: at(1),
       mergeable: true,
       url: "https://example.test",
       reviews: [],
@@ -278,7 +296,7 @@ describe("out-of-order delivery", () => {
     };
     await putPullRequest(base);
 
-    const older = { ...base, title: "Older", updatedAt: "2026-08-26T08:00:00Z" };
+    const older = { ...base, title: "Older", updatedAt: at(-4) };
     const result = await putPullRequest(older);
 
     expect(result.written).toBe(false);
@@ -361,7 +379,7 @@ describe("replay", () => {
   it("refuses a range whose end precedes its start", async () => {
     const { replayRange } = await import("@/lib/github/processor");
     await expect(
-      replayRange("2026-08-26T12:00:00Z", "2026-08-26T10:00:00Z"),
+      replayRange(at(1), at(-1)),
     ).rejects.toThrow();
   });
 });
