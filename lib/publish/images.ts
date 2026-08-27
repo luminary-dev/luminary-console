@@ -13,14 +13,34 @@
 const API = "https://api.openai.com/v1/images/generations";
 export const IMAGE_SIZE = "1536x1024";
 
-const STYLE = `Rendered as a still frame from a modern 3D animated feature film in the style of "The Adventures of Tintin" (2011) motion-capture animation: stylised-realistic characters with expressive faces, cinematic depth of field, warm practical lighting, richly detailed textured environments, painterly volumetric atmosphere. Sri Lankan setting and characters where people appear. No text, no logos, no watermarks, no UI. Composition works as a wide 3:2 editorial image with clear focal subject.`;
+const STYLE = `RENDERING STYLE, follow exactly: a still frame from a 3D animated feature film in the style of Steven Spielberg's "The Adventures of Tintin" (2011), Weta Digital motion-capture. Characters have REALISTIC HUMAN PROPORTIONS and naturalistic anatomy: normal-sized eyes, real skin texture with pores and subtle imperfection, individually rendered hair, understated facial expression. Cinematic camera work: shallow depth of field with real bokeh, motivated practical lighting, volumetric haze.
+
+It is an ANIMATED film frame, not a photograph. Forms are subtly sculpted and slightly heightened, colour is art-directed rather than accidental, and everything is a shade cleaner and more deliberate than a camera would catch. Aim for the exact midpoint between photorealism and caricature: if it could pass for a stock photograph it has gone too far one way, and if the faces look cute it has gone too far the other.
+
+NOT Pixar, NOT Disney, NOT DreamWorks. No oversized glossy eyes, no rounded caricature faces, no smooth plastic skin, no bright saturated toy colours, no wide cartoon smiles. If the faces look cute or the surfaces look like moulded plastic, the style is wrong.
+
+HOUSE PALETTE AND SUBJECT VOCABULARY: warm golden-hour or lantern-lit key light against cooler shadow; aged brass, copper, oiled steel and worn timber; one restrained accent of luminous green from a dial, gauge, filament or screen; intricate practical machinery with visible gears, pipes, rivets and linkages; richly detailed environments with real wear. Sri Lankan setting and South Asian characters where people appear, dressed as working engineers and craftspeople.
+
+No text, no lettering, no numerals, no logos, no watermarks, no user interfaces, no screenshots. Wide 3:2 editorial composition with one unmistakable focal subject.`;
 
 export function coverPrompt(brief: string): string {
-  return `Editorial cover illustration for a Luminary engineering blog post. Scene: ${brief}. Favour a clever visual metaphor over literal screenshots: whimsical machinery, workshops, skies, harbours and streets are all in the house vocabulary. ${STYLE}`;
+  return `Editorial cover illustration for a Luminary engineering blog post.
+
+SCENE: ${brief}
+
+The scene must be a PHYSICAL METAPHOR for the article's argument, built from real objects a person could touch, so a reader who has not read the piece can still guess what it is about. Workshops, harbours, foundries, signal boxes, printing presses, clockwork, cargo and weather are all in the house vocabulary. Never draw the technology literally: no computers, no code, no dashboards, no server racks, no abstract glowing networks.
+
+${STYLE}`;
 }
 
 export function inlinePrompt(scene: string): string {
-  return `In-article editorial illustration for a Luminary engineering blog post, sitting mid-read between paragraphs. Scene: ${scene}. Quieter and more focused than a cover: one clear subject, calm composition. ${STYLE}`;
+  return `In-article editorial illustration for a Luminary engineering blog post, sitting mid-read between paragraphs.
+
+SCENE: ${scene}
+
+Quieter and more focused than a cover: one clear subject, calm composition, fewer characters, shallower stage. It sits beside body text, so it must read at a glance and never compete with the cover.
+
+${STYLE}`;
 }
 
 export function thumbPrompts(scene: string): { light: string; dark: string } {

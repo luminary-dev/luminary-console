@@ -70,7 +70,7 @@ const ARTICLE_SCHEMA = S.obj(["title", "slug", "excerpt", "tags", "body", "image
   imageBrief: {
     type: "string",
     description:
-      "One-sentence scene for the cover illustration: a whimsical visual metaphor for the post (physical scenes, not screenshots: machinery, workshops, harbours, skies).",
+      "One-sentence scene for the cover illustration. It must be a PHYSICAL metaphor for the article's central argument, not its topic: a reader who has not read the piece should be able to guess what it claims. Real objects a person could touch, in a Sri Lankan setting: workshops, harbours, foundries, signal boxes, printing presses, clockwork, cargo, weather. Name what is in shot and what the people are doing. Never computers, code, dashboards, server racks or glowing networks.",
   },
 });
 
@@ -101,7 +101,7 @@ const INLINE_SCENES_SCHEMA = S.obj(["scenes"], {
       scene: {
         type: "string",
         description:
-          "One-sentence physical scene for the illustration: a whimsical metaphor for that section (machinery, workshops, harbours, skies, never screenshots or UI).",
+          "One-sentence physical scene for the illustration: a metaphor for THAT SECTION's specific point, quieter and simpler than the cover, one clear subject. Real objects only: machinery, workshops, harbours, weather. Never screenshots, UI, code or server racks.",
       },
       alt: { type: "string", description: "Short, concrete alt text, e.g. 'Illustration: …'." },
     }),

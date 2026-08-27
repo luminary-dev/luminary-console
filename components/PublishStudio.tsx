@@ -98,7 +98,7 @@ function ArticleForm() {
   const [brief, setBrief] = useState("");
   const [f, setF] = useState({ title: "", slug: "", tags: "", excerpt: "", imageBrief: "", body: "" });
   const [isDraftPost, setIsDraftPost] = useState(false);
-  const [inlineImages, setInlineImages] = useState(0);
+  const [inlineImages, setInlineImages] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PublishResult | null>(null);
@@ -196,16 +196,20 @@ function ArticleForm() {
             <textarea className="q-box" rows={16} value={f.body} onChange={set("body")} required />
           </div>
           <div className="q-field half">
-            <span className="q-label">Inline illustrations (placed mid-article)</span>
-            <select
-              className="q-line"
-              value={inlineImages}
-              onChange={(e) => setInlineImages(Number(e.target.value))}
-            >
-              <option value={0}>None: cover only</option>
-              <option value={1}>1: under a middle section</option>
-              <option value={2}>2: spaced through the body</option>
-            </select>
+            <label style={{ display: "flex", gap: 8, alignItems: "center", cursor: "pointer", marginTop: 22 }}>
+              <input
+                type="checkbox"
+                checked={inlineImages}
+                onChange={(e) => setInlineImages(e.target.checked)}
+              />
+              <span className="q-label" style={{ margin: 0 }}>
+                Add illustrations inside the article
+              </span>
+            </label>
+            <span className="gh-view-note" style={{ marginTop: 4 }}>
+              One or two, placed under well-spaced sections. The count follows the length of the
+              piece, so a short post gets one.
+            </span>
           </div>
           <div className="q-field half">
             <label style={{ display: "flex", gap: 8, alignItems: "center", cursor: "pointer", marginTop: 22 }}>
