@@ -113,10 +113,29 @@ jobs:
           else
             RESP=$(npx tsx scripts/ops.ts "$METHOD" "$ROUTE")
           fi
-          echo "$RESP" | jq "${FILTER:-.}" || echo "$RESP"
+          # Pretty-print once, in the shell, and truncate with substring
+          # expansion rather than `| head -c`.
+          #
+          # `head` closes the pipe the moment it has its bytes, which sends
+          # SIGPIPE upstream. With `set -o pipefail` above, that makes the
+          # whole pipeline exit 141, and the `|| ...` fallback was itself a
+          # pipeline with exactly the same problem, so nothing caught it. The
+          # result: a route that had ALREADY SUCCEEDED failed the job, because
+          # its response was larger than 4000 bytes. /api/publish/article
+          # returns the cover image as a base64 data URL, so its response is
+          # roughly 200KB every time, and every publish went red after opening
+          # a real pull request.
+          PRETTY=$(printf '%s' "$RESP" | jq "${FILTER:-.}" 2>/dev/null) || PRETTY="$RESP"
+          printf '%s\n' "${PRETTY:0:2000}"
+          if [ "${#PRETTY}" -gt 2000 ]; then
+            printf '... truncated, %s bytes total\n' "${#PRETTY}"
+          fi
           {
             echo "### $METHOD \`$ROUTE\`"
             echo '```json'
-            echo "$RESP" | jq "${FILTER:-.}" 2>/dev/null | head -c 4000 || echo "$RESP" | head -c 4000
+            printf '%s\n' "${PRETTY:0:4000}"
+            if [ "${#PRETTY}" -gt 4000 ]; then
+              printf '... truncated, %s bytes total\n' "${#PRETTY}"
+            fi
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
