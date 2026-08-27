@@ -154,7 +154,19 @@ export function targetProbe(): TargetHit[] {
     return true;
   });
 
-  const boxes = els.map((el) => el.getBoundingClientRect());
+  // The TARGET is what a finger can hit, which for a control wrapped in a
+  // label is the whole label. Measuring the bare <input> reported 20x20
+  // checkboxes as failures when their label row is 44px and fully clickable,
+  // which is a false positive: WCAG 2.5.8 measures the target, not the widget
+  // drawn inside it.
+  const targetBox = (el: HTMLElement): DOMRect => {
+    const own = el.getBoundingClientRect();
+    const label = el.closest("label");
+    if (!label || label === el) return own;
+    const lb = label.getBoundingClientRect();
+    return lb.width >= own.width && lb.height >= own.height ? lb : own;
+  };
+  const boxes = els.map((el) => targetBox(el));
 
   const accessibleName = (el: HTMLElement): string => {
     const aria = el.getAttribute("aria-label");

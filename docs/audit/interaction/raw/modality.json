@@ -10,49 +10,21 @@
     "path": "/login",
     "name": "Sign in",
     "total": 4,
-    "under44": 2,
+    "under44": 0,
     "underAA24": 0,
     "crowdedUnder8px": 0,
-    "worst": [
-      {
-        "name": "Email",
-        "w": 303,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      },
-      {
-        "name": "Password",
-        "w": 303,
-        "h": 37,
-        "gap": 22,
-        "cls": "q-line"
-      }
-    ]
+    "worst": [],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
     "path": "/",
     "name": "Dashboard",
     "total": 25,
-    "under44": 3,
-    "underAA24": 2,
+    "under44": 1,
+    "underAA24": 0,
     "crowdedUnder8px": 8,
     "worst": [
-      {
-        "name": "All · 1",
-        "w": 75,
-        "h": 23,
-        "gap": 6,
-        "cls": "pill"
-      },
-      {
-        "name": "Development · 1",
-        "w": 131,
-        "h": 23,
-        "gap": 6,
-        "cls": "pill"
-      },
       {
         "name": "Search clients by name, document number,",
         "w": 280,
@@ -60,69 +32,28 @@
         "gap": 12,
         "cls": "q-line"
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
     "path": "/clients/new",
     "name": "New client",
     "total": 11,
-    "under44": 6,
+    "under44": 0,
     "underAA24": 0,
     "crowdedUnder8px": 0,
-    "worst": [
-      {
-        "name": "Company name *",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      },
-      {
-        "name": "Subdomain slug",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      },
-      {
-        "name": "Contact person",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      },
-      {
-        "name": "Address",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      },
-      {
-        "name": "Email",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      },
-      {
-        "name": "Phone",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      }
-    ]
+    "worst": [],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
     "path": "/clients/eco-mech",
     "name": "Client detail",
     "total": 117,
-    "under44": 41,
-    "underAA24": 12,
-    "crowdedUnder8px": 41,
+    "under44": 29,
+    "underAA24": 0,
+    "crowdedUnder8px": 40,
     "worst": [
       {
         "name": "PDF",
@@ -194,7 +125,8 @@
         "gap": 0,
         "cls": ""
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
@@ -204,67 +136,19 @@
     "under44": 0,
     "underAA24": 0,
     "crowdedUnder8px": 0,
-    "worst": []
+    "worst": [],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
     "path": "/publish",
     "name": "Publish studio",
     "total": 16,
-    "under44": 7,
-    "underAA24": 1,
+    "under44": 0,
+    "underAA24": 0,
     "crowdedUnder8px": 0,
-    "worst": [
-      {
-        "name": "Add illustrations inside the article",
-        "w": 12,
-        "h": 12,
-        "gap": 45,
-        "cls": ""
-      },
-      {
-        "name": "Mark as draft (hidden until the flag is ",
-        "w": 12,
-        "h": 12,
-        "gap": 23,
-        "cls": ""
-      },
-      {
-        "name": "Title *",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      },
-      {
-        "name": "Slug",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      },
-      {
-        "name": "Tags (comma-separated)",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      },
-      {
-        "name": "Excerpt",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      },
-      {
-        "name": "Cover image scene",
-        "w": 323,
-        "h": 37,
-        "gap": 48,
-        "cls": "q-line"
-      }
-    ]
+    "worst": [],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
@@ -345,7 +229,8 @@
         "gap": 0,
         "cls": ""
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
@@ -363,14 +248,15 @@
         "gap": 0,
         "cls": "gh-nav-link"
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
     "path": "/github/ci",
     "name": "CI",
     "total": 78,
-    "under44": 31,
+    "under44": 28,
     "underAA24": 0,
     "crowdedUnder8px": 78,
     "worst": [
@@ -444,15 +330,16 @@
         "gap": 0,
         "cls": "gh-row-link"
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
     "path": "/github/deployments",
     "name": "Deployments",
     "total": 14,
-    "under44": 3,
-    "underAA24": 2,
+    "under44": 1,
+    "underAA24": 0,
     "crowdedUnder8px": 14,
     "worst": [
       {
@@ -461,22 +348,9 @@
         "h": 44,
         "gap": 0,
         "cls": "gh-nav-link"
-      },
-      {
-        "name": "Open Preview",
-        "w": 84,
-        "h": 22,
-        "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "Open Production",
-        "w": 101,
-        "h": 22,
-        "gap": 0,
-        "cls": ""
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
@@ -494,7 +368,8 @@
         "gap": 0,
         "cls": "gh-nav-link"
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
@@ -512,7 +387,8 @@
         "gap": 0,
         "cls": "gh-nav-link"
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
@@ -530,14 +406,15 @@
         "gap": 0,
         "cls": "gh-nav-link"
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
     "path": "/github/activity",
     "name": "Engineering activity",
     "total": 131,
-    "under44": 35,
+    "under44": 28,
     "underAA24": 0,
     "crowdedUnder8px": 131,
     "worst": [
@@ -611,95 +488,34 @@
         "gap": 0,
         "cls": ""
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
     "path": "/github/luminary-dev/luminary-console/21",
     "name": "Pull request detail",
     "total": 14,
-    "under44": 10,
-    "underAA24": 10,
+    "under44": 1,
+    "underAA24": 0,
     "crowdedUnder8px": 14,
     "worst": [
       {
         "name": "Build",
         "w": 38,
-        "h": 17,
-        "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "Files changed",
-        "w": 82,
-        "h": 22,
-        "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "Open on GitHub",
-        "w": 97,
-        "h": 22,
-        "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "2 · Security scan",
-        "w": 128,
-        "h": 17,
-        "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "3 · Workflow lint",
-        "w": 128,
-        "h": 17,
-        "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "Back to the inbox",
-        "w": 102,
-        "h": 22,
-        "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "Checks on GitHub",
-        "w": 106,
-        "h": 22,
-        "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "Vercel Preview Comments",
-        "w": 173,
-        "h": 17,
-        "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "1 · Lint, typecheck & test",
-        "w": 195,
-        "h": 17,
-        "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "GitGuardian Security Checks",
-        "w": 203,
-        "h": 17,
+        "h": 44,
         "gap": 0,
         "cls": ""
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
     "path": "/c/eco-mech",
     "name": "Client portal",
     "total": 26,
-    "under44": 4,
+    "under44": 3,
     "underAA24": 0,
     "crowdedUnder8px": 7,
     "worst": [
@@ -723,93 +539,113 @@
         "h": 19,
         "gap": 28,
         "cls": ""
-      },
-      {
-        "name": "Your name (optional)",
-        "w": 327,
-        "h": 37,
-        "gap": 20,
-        "cls": "q-line"
       }
-    ]
+    ],
+    "aaFailures": []
   },
   {
     "check": "touch targets",
     "path": "/c/eco-mech/questionnaire",
     "name": "Questionnaire",
     "total": 129,
-    "under44": 99,
-    "underAA24": 64,
+    "under44": 28,
+    "underAA24": 3,
     "crowdedUnder8px": 2,
     "worst": [
       {
-        "name": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 15,
+        "name": "+94 77 16 18 093",
+        "w": 115,
+        "h": 19,
+        "gap": 12,
         "cls": ""
       },
       {
-        "name": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 15,
+        "name": "luminary-dev.xyz",
+        "w": 115,
+        "h": 19,
+        "gap": 12,
         "cls": ""
       },
       {
-        "name": "Showcase our work",
-        "w": 15,
-        "h": 15,
-        "gap": 15,
+        "name": "support@luminary-dev.xyz",
+        "w": 173,
+        "h": 19,
+        "gap": 12,
         "cls": ""
       },
       {
         "name": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18,
+        "w": 220,
+        "h": 27,
+        "gap": 8,
+        "cls": "q-line"
+      },
+      {
+        "name": "Your name *",
+        "w": 303,
+        "h": 37,
+        "gap": 52,
+        "cls": "q-line"
+      },
+      {
+        "name": "Your role at Ecomech Engineering",
+        "w": 303,
+        "h": 37,
+        "gap": 52,
+        "cls": "q-line"
+      },
+      {
+        "name": "Best email to reach you",
+        "w": 303,
+        "h": 37,
+        "gap": 52,
+        "cls": "q-line"
+      },
+      {
+        "name": "Best phone / WhatsApp",
+        "w": 303,
+        "h": 37,
+        "gap": 52,
+        "cls": "q-line"
+      },
+      {
+        "name": "Core values.",
+        "w": 303,
+        "h": 37,
+        "gap": 72,
+        "cls": "q-line"
+      },
+      {
+        "name": "Slogan or tagline",
+        "w": 303,
+        "h": 37,
+        "gap": 72,
+        "cls": "q-line"
+      }
+    ],
+    "aaFailures": [
+      {
+        "name": "support@luminary-dev.xyz",
+        "tag": "A",
+        "w": 173,
+        "h": 19,
+        "gap": 12,
         "cls": ""
       },
       {
-        "name": "Call",
-        "w": 15,
-        "h": 15,
-        "gap": 15,
+        "name": "+94 77 16 18 093",
+        "tag": "A",
+        "w": 115,
+        "h": 19,
+        "gap": 12,
         "cls": ""
       },
       {
-        "name": "WhatsApp",
-        "w": 15,
-        "h": 15,
-        "gap": 50,
-        "cls": ""
-      },
-      {
-        "name": "Email",
-        "w": 15,
-        "h": 15,
-        "gap": 80,
-        "cls": ""
-      },
-      {
-        "name": "Fill an enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15,
-        "cls": ""
-      },
-      {
-        "name": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15,
-        "cls": ""
-      },
-      {
-        "name": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15,
+        "name": "luminary-dev.xyz",
+        "tag": "A",
+        "w": 115,
+        "h": 19,
+        "gap": 12,
         "cls": ""
       }
     ]

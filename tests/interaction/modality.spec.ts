@@ -58,6 +58,17 @@ for (const route of ROUTES) {
         .sort((a, b) => a.width * a.height - b.width * b.height)
         .slice(0, 10)
         .map((t) => ({ name: t.name || t.tag, w: t.width, h: t.height, gap: t.nearestGap, cls: t.cls })),
+      // The AA failures themselves, not a sample of the smallest. `worst` is
+      // sorted by area and truncated, so a failure can be absent from it and
+      // the report then cannot say what to fix.
+      aaFailures: underAA.map((t) => ({
+        name: t.name || t.tag,
+        tag: t.tag,
+        w: t.width,
+        h: t.height,
+        gap: t.nearestGap,
+        cls: t.cls,
+      })),
     });
   });
 }

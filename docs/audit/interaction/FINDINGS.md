@@ -23,13 +23,13 @@ Every number below was measured, before and after. None is an estimate.
 | Overlay focus-trap leaks, worst | 15 of 15 tabs | **0** |
 | Overlays applying scroll lock | 0 of 6 | **6 of 6** |
 | Overlays returning focus to `document.body` | 6 of 6 | **0 of 6** |
-| Targets failing WCAG 2.5.8 | 242 | **91** |
-| Targets under Apple's 44px | 665 | **261** |
+| Targets failing WCAG 2.5.8 | 242 | **3** |
+| Targets under Apple's 44px | 665 | **139** |
 | Worst CLS on load | 0.0000 | 0.0091 |
 | Routes answering 200 with no error boundary | 234 of 234 | 234 of 234 |
 
-Severity counts: Critical 0, High 4, Medium 6, Low 2. Twelve findings, eleven
-fixed and one partially fixed.
+Severity counts: Critical 0, High 4, Medium 6, Low 2. Twelve findings, all
+twelve fixed.
 
 ---
 
@@ -185,12 +185,25 @@ dense, and the growth happens only where a finger is the input device.
 `min-width` matters as much as height and is the half usually forgotten: a
 workflow named "ci" renders a 10px-wide link, tall enough after the height
 rule and still an impossible target.
-Resolution: **Partially fixed.** 242 to 91.
-Of the 91 remaining, **64 are the client questionnaire's checkboxes, already
-fixed in the open pull request for LC-091** and absent from this branch. The
-rest are dense table controls where growing the box further would change the
-console's information density, and they are recorded here rather than forced:
-they need a design decision, not a CSS rule.
+Resolution: **Fixed.** 242 to 3, and the 3 are a deliberate exemption rather
+than remaining work.
+The sweep ran in stages, and the stages are worth recording because each one
+found a different shape of the same problem. Height first, 242 to 91. Then
+LC-091 merged from main, carrying the questionnaire's 64 checkboxes, 91 to 29.
+Then min-width, because a workflow named "ci" renders a 10px-wide link that is
+tall enough and still unhittable, 29 to 21. Then the remaining named controls,
+copy-url affordances, `<details>` summaries, check links and design links,
+21 to 3.
+The last 3 are the WCAG 2.5.8 **inline exception**, applied deliberately: an
+email address, a phone number and a domain inside the sentence "write to us
+at ...". The criterion exempts a target whose size is set by the line-height
+of the text around it, and padding these to 44px would break the sentence they
+live in, which is worse than the exemption exists to prevent. `app/globals.css`
+carries a rule whose only job is to hold that comment next to the selectors.
+One measurement in this set was a probe fault rather than a console fault: a
+checkbox wrapped in a 44px label reported as a 20x20 target, because the probe
+measured the widget rather than the thing a finger hits. 2.5.8 measures the
+target. The probe now takes the label's box when it encloses the control.
 
 ### IX-009 — A git ref pushed the deployments page sideways at 320px
 Severity: Low

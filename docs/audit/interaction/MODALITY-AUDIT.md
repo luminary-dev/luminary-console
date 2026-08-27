@@ -20,25 +20,25 @@ only targets that fail the criterion including its spacing exception.
 
 | Route | Targets | <44px | <24px AA | Neighbours under 8px |
 | --- | ---: | ---: | ---: | ---: |
-| `/c/eco-mech/questionnaire` | 129 | 99 | 64 | 2 |
-| `/clients/eco-mech` | 117 | 41 | 12 | 41 |
-| `/github/activity` | 131 | 35 | 0 | 131 |
-| `/github/ci` | 78 | 31 | 0 | 78 |
+| `/clients/eco-mech` | 117 | 29 | 0 | 40 |
+| `/github/ci` | 78 | 28 | 0 | 78 |
+| `/github/activity` | 131 | 28 | 0 | 131 |
+| `/c/eco-mech/questionnaire` | 129 | 28 | 3 | 2 |
 | `/github` | 86 | 16 | 0 | 84 |
-| `/github/luminary-dev/luminary-console/21` | 14 | 10 | 10 | 14 |
-| `/publish` | 16 | 7 | 1 | 0 |
-| `/clients/new` | 11 | 6 | 0 | 0 |
-| `/c/eco-mech` | 26 | 4 | 0 | 7 |
-| `/` | 25 | 3 | 2 | 8 |
-| `/github/deployments` | 14 | 3 | 2 | 14 |
-| `/login` | 4 | 2 | 0 | 0 |
+| `/c/eco-mech` | 26 | 3 | 0 | 7 |
+| `/` | 25 | 1 | 0 | 8 |
 | `/github/repos` | 46 | 1 | 0 | 43 |
+| `/github/deployments` | 14 | 1 | 0 | 14 |
 | `/github/releases` | 12 | 1 | 0 | 12 |
 | `/github/security` | 12 | 1 | 0 | 12 |
 | `/github/insights` | 12 | 1 | 0 | 12 |
+| `/github/luminary-dev/luminary-console/21` | 14 | 1 | 0 | 14 |
+| `/login` | 4 | 0 | 0 | 0 |
+| `/clients/new` | 11 | 0 | 0 | 0 |
 | `/activity` | 4 | 0 | 0 | 0 |
+| `/publish` | 16 | 0 | 0 | 0 |
 
-**Total: 261 targets under 44px, 91 failing WCAG 2.5.8 outright.**
+**Total: 139 targets under 44px, 3 failing WCAG 2.5.8 outright.**
 
 ## Keyboard (section 3.5)
 

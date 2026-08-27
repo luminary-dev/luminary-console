@@ -11,7 +11,7 @@ Screenshots are under `screens/<project>/<route>.png`.
 | `/login` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/` | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err |
 | `/clients/new` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
-| `/clients/eco-mech` | OK | OK | OK | OK | OK | OK | OK | 1 err | OK | OK | OK | OK | OK |
+| `/clients/eco-mech` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/activity` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/publish` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/github` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |

@@ -609,7 +609,15 @@ body {
   .gh-stream a,
   .gh-stream button,
   .gh-metrics a,
-  .gh-note a {
+  .gh-note a,
+  .gh-links a,
+  .gh-checks a,
+  .gh-line a,
+  .gh-line-name a,
+  .copy-url,
+  .hist > summary,
+  .portal-links a,
+  .pill {
     min-height: 44px;
     /* min-width matters as much as height and is the half usually forgotten.
        A workflow named "ci" renders a 10px-wide link: tall enough after the
@@ -655,3 +663,17 @@ body {
   accent-color: var(--accent);
 }
 .check-row .q-label { margin: 0; }
+
+/* The WCAG 2.5.8 "inline" exception, applied deliberately and once.
+   A target inside a sentence, whose size is set by the line-height of the
+   text around it, is exempt from the 24x24 minimum. The client portal's
+   footer contact links (an email address and a phone number inside "write to
+   us at ...") are that case: padding them to 44px would break the sentence
+   they sit in, which is a worse outcome than the exemption exists to prevent.
+   Named here so the three remaining measurements in MODALITY-AUDIT.md are a
+   recorded decision rather than an oversight. */
+.pstep-note a,
+.q-foot a {
+  /* No sizing. This rule exists to carry the comment. */
+  overflow-wrap: anywhere;
+}

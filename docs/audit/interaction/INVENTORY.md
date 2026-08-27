@@ -36,22 +36,22 @@ so a control that renders conditionally is counted only when it actually renders
 
 | Path | Interactive elements | Tab stops | Under 44px on touch |
 | --- | ---: | ---: | ---: |
-| `/login` | 4 | 2 | 2 of 4 |
-| `/` | 24 | 19 | 3 of 25 |
-| `/clients/new` | 11 | 12 | 6 of 11 |
-| `/clients/eco-mech` | 117 | 60 | 41 of 117 |
+| `/login` | 4 | 2 | 0 of 4 |
+| `/` | 24 | 19 | 1 of 25 |
+| `/clients/new` | 11 | 12 | 0 of 11 |
+| `/clients/eco-mech` | 117 | 60 | 29 of 117 |
 | `/activity` | 4 | 5 | 0 of 4 |
-| `/publish` | 16 | 16 | 7 of 16 |
+| `/publish` | 16 | 16 | 0 of 16 |
 | `/github` | 86 | 33 | 16 of 86 |
 | `/github/repos` | 46 | 46 | 1 of 46 |
-| `/github/ci` | 78 | 60 | 31 of 78 |
-| `/github/deployments` | 14 | 14 | 3 of 14 |
+| `/github/ci` | 78 | 60 | 28 of 78 |
+| `/github/deployments` | 14 | 14 | 1 of 14 |
 | `/github/releases` | 12 | 12 | 1 of 12 |
 | `/github/security` | 12 | 12 | 1 of 12 |
 | `/github/insights` | 12 | 12 | 1 of 12 |
-| `/github/activity` | 131 | 60 | 35 of 131 |
-| `/github/luminary-dev/luminary-console/21` | 14 | 14 | 10 of 14 |
-| `/c/eco-mech` | 26 | 27 | 4 of 26 |
-| `/c/eco-mech/questionnaire` | 129 | 60 | 99 of 129 |
+| `/github/activity` | 131 | 60 | 28 of 131 |
+| `/github/luminary-dev/luminary-console/21` | 14 | 14 | 1 of 14 |
+| `/c/eco-mech` | 26 | 27 | 3 of 26 |
+| `/c/eco-mech/questionnaire` | 129 | 60 | 28 of 129 |
 
 **736 interactive elements** across the console at 1440px.

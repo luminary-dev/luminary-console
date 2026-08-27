@@ -14,7 +14,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/login.png"
   },
@@ -79,7 +79,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 9,
+    "underTouch44": 3,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/clients-new.png"
   },
@@ -341,7 +341,7 @@
     "shifts": [],
     "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 13,
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/publish.png"
   },
@@ -729,27 +729,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 43,
+    "underTouch44": 42,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-ci.png"
   },
@@ -769,14 +751,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -1072,51 +1054,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 93,
+    "underTouch44": 89,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-activity.png"
   },
@@ -1294,7 +1234,7 @@
         "gap": 12
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/c-eco-mech.png"
   },
@@ -1313,354 +1253,6 @@
     "shifts": [],
     "targetCount": 129,
     "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Showcase our work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 10
-      },
-      {
-        "n": "Call",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Fill an enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Modern & bold",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Warm & approachable",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical & detailed",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Light & clean",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark & premium",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Follow our logo colours",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice — surprise us",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clean modern sans-serif",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Classic serif touches",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical / engineered feel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Rich & eye-catching",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Minimal — almost none",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'll send our own text",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Luminary writes it from this form (recom",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "WhatsApp",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Calls",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
       {
         "n": "support@luminary-dev.xyz",
         "w": 173,
@@ -1699,7 +1291,7 @@
     "shifts": [
       {
         "value": 0.00011920928955078125,
-        "at": 1500,
+        "at": 1402,
         "sources": [
           "SPAN."
         ]
@@ -1726,7 +1318,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/login.png"
   },
@@ -1791,7 +1383,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/clients-new.png"
   },
@@ -2077,7 +1669,7 @@
     "shifts": [],
     "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 13,
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/publish.png"
   },
@@ -2465,27 +2057,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 51,
+    "underTouch44": 50,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-ci.png"
   },
@@ -2505,14 +2079,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -2826,51 +2400,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 98,
+    "underTouch44": 94,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-activity.png"
   },
@@ -3036,7 +2568,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/c-eco-mech.png"
   },
@@ -3055,366 +2587,6 @@
     "shifts": [],
     "targetCount": 129,
     "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Showcase our work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 10
-      },
-      {
-        "n": "Call",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Fill an enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Modern & bold",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Warm & approachable",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical & detailed",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Light & clean",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Follow our logo colours",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice — surprise us",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clean modern sans-serif",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Classic serif touches",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical / engineered feel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Subtle & professional (recommended)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Rich & eye-catching",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Minimal — almost none",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'll send our own text",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Luminary writes it from this form (recom",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
       {
         "n": "support@luminary-dev.xyz",
         "w": 173,
@@ -3453,7 +2625,7 @@
     "shifts": [
       {
         "value": 0.00006781684027777778,
-        "at": 1456,
+        "at": 1174,
         "sources": [
           "SPAN."
         ]
@@ -3480,7 +2652,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/login.png"
   },
@@ -3545,7 +2717,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/clients-new.png"
   },
@@ -3776,20 +2948,20 @@
       },
       {
         "n": "eco-mech.luminary-dev.xyz/design/1",
-        "w": 196,
-        "h": 15,
+        "w": 204,
+        "h": 16,
         "gap": 13
       },
       {
         "n": "eco-mech.luminary-dev.xyz/design/2",
-        "w": 198,
-        "h": 15,
+        "w": 207,
+        "h": 16,
         "gap": 13
       },
       {
         "n": "eco-mech.luminary-dev.xyz/design/3",
-        "w": 198,
-        "h": 15,
+        "w": 207,
+        "h": 16,
         "gap": 13
       },
       {
@@ -3854,15 +3026,8 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 16,
-    "undersizedAA": [
-      {
-        "n": "Mark as draft (hidden until the flag is ",
-        "w": 13,
-        "h": 13,
-        "gap": 23
-      }
-    ],
-    "underTouch44": 13,
+    "undersizedAA": [],
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/publish.png"
   },
@@ -4256,27 +3421,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 58,
+    "underTouch44": 57,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github-ci.png"
   },
@@ -4296,14 +3443,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -4387,6 +3534,12 @@
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
         "h": 16,
         "gap": 0
       },
@@ -4629,51 +3782,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 120,
+    "underTouch44": 119,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github-activity.png"
   },
@@ -4839,7 +3950,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/c-eco-mech.png"
   },
@@ -4858,372 +3969,6 @@
     "shifts": [],
     "targetCount": 129,
     "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Showcase our work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "Call",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Fill an enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Warm & approachable",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical & detailed",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Light & clean",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Follow our logo colours",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice — surprise us",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clean modern sans-serif",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Classic serif touches",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical / engineered feel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Subtle & professional (recommended)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Rich & eye-catching",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Minimal — almost none",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'll send our own text",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Luminary writes it from this form (recom",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
       {
         "n": "support@luminary-dev.xyz",
         "w": 173,
@@ -5262,7 +4007,7 @@
     "shifts": [
       {
         "value": 0.001670904619197279,
-        "at": 2145,
+        "at": 1193,
         "sources": [
           "DIV.section",
           "SPAN."
@@ -5290,7 +4035,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/login.png"
   },
@@ -5355,7 +4100,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/clients-new.png"
   },
@@ -5586,20 +4331,20 @@
       },
       {
         "n": "eco-mech.luminary-dev.xyz/design/1",
-        "w": 196,
-        "h": 15,
+        "w": 204,
+        "h": 16,
         "gap": 13
       },
       {
         "n": "eco-mech.luminary-dev.xyz/design/2",
-        "w": 198,
-        "h": 15,
+        "w": 207,
+        "h": 16,
         "gap": 13
       },
       {
         "n": "eco-mech.luminary-dev.xyz/design/3",
-        "w": 198,
-        "h": 15,
+        "w": 207,
+        "h": 16,
         "gap": 13
       },
       {
@@ -5688,15 +4433,8 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 16,
-    "undersizedAA": [
-      {
-        "n": "Mark as draft (hidden until the flag is ",
-        "w": 13,
-        "h": 13,
-        "gap": 23
-      }
-    ],
-    "underTouch44": 13,
+    "undersizedAA": [],
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/publish.png"
   },
@@ -6090,27 +4828,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github-ci.png"
   },
@@ -6130,14 +4850,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -6219,14 +4939,32 @@
     "targetCount": 131,
     "undersizedAA": [
       {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
+        "n": "#21 fix(a11y): give every checkbox a rea",
+        "w": 292,
         "h": 16,
         "gap": 0
       },
       {
-        "n": "#21 fix(a11y): give every checkbox a rea",
-        "w": 292,
+        "n": "Preview: bfe9f089b08acb0c7098c71a0277cf6",
+        "w": 332,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
+        "w": 334,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
         "h": 16,
         "gap": 0
       },
@@ -6559,51 +5297,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 121,
+    "underTouch44": 120,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github-activity.png"
   },
@@ -6769,7 +5465,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/c-eco-mech.png"
   },
@@ -6788,378 +5484,6 @@
     "shifts": [],
     "targetCount": 129,
     "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Showcase our work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "Call",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Fill an enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Modern & bold",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Warm & approachable",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical & detailed",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Light & clean",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Follow our logo colours",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice — surprise us",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clean modern sans-serif",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Classic serif touches",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical / engineered feel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Subtle & professional (recommended)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Rich & eye-catching",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'll send our own text",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Luminary writes it from this form (recom",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Mix — we'll send notes, you polish",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
       {
         "n": "support@luminary-dev.xyz",
         "w": 173,
@@ -7198,7 +5522,7 @@
     "shifts": [
       {
         "value": 0.0012452734653942915,
-        "at": 1395,
+        "at": 1314,
         "sources": [
           "DIV.tbl-row",
           "SPAN.",
@@ -7227,7 +5551,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/login.png"
   },
@@ -7292,7 +5616,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/clients-new.png"
   },
@@ -7590,7 +5914,7 @@
     "shifts": [],
     "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 13,
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/publish.png"
   },
@@ -8182,27 +6506,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-ci.png"
   },
@@ -8222,14 +6528,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -8311,14 +6617,50 @@
     "targetCount": 131,
     "undersizedAA": [
       {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
+        "n": "Production: 2b5e31ed77156d35f8cafa198984",
+        "w": 351,
         "h": 16,
         "gap": 0
       },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: bfe9f089b08acb0c7098c71a0277cf6",
+        "w": 332,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "#22 Interaction audit: harness, 12 findi",
+        "w": 398,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
+        "w": 334,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Interaction audit: harness, 12 find",
+        "w": 392,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
         "h": 16,
         "gap": 0
       },
@@ -8783,48 +7125,6 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
     "underTouch44": 125,
@@ -8993,7 +7293,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/c-eco-mech.png"
   },
@@ -9011,266 +7311,7 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 129,
-    "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 12
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clean modern sans-serif",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'll send our own text",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Mix — we'll send notes, you polish",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      }
-    ],
+    "undersizedAA": [],
     "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/c-eco-mech-questionnaire.png"
@@ -9290,7 +7331,7 @@
     "shifts": [
       {
         "value": 0.009123242382581036,
-        "at": 1623,
+        "at": 1515,
         "sources": [
           "DIV.section",
           "DIV.totals",
@@ -9319,7 +7360,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/login.png"
   },
@@ -9384,7 +7425,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/clients-new.png"
   },
@@ -9676,7 +7717,7 @@
     "shifts": [],
     "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 13,
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/publish.png"
   },
@@ -10268,27 +8309,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/github-ci.png"
   },
@@ -10308,14 +8331,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -10397,14 +8420,50 @@
     "targetCount": 131,
     "undersizedAA": [
       {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
+        "n": "Production: 2b5e31ed77156d35f8cafa198984",
+        "w": 351,
         "h": 16,
         "gap": 0
       },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: bfe9f089b08acb0c7098c71a0277cf6",
+        "w": 332,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "#22 Interaction audit: harness, 12 findi",
+        "w": 398,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
+        "w": 334,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Interaction audit: harness, 12 find",
+        "w": 392,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
         "h": 16,
         "gap": 0
       },
@@ -10881,48 +8940,6 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
     "underTouch44": 130,
@@ -11091,7 +9108,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/c-eco-mech.png"
   },
@@ -11109,290 +9126,7 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 129,
-    "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 12
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Real photos of our work & team (preferre",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'll send our own text",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Mix — we'll send notes, you polish",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      }
-    ],
+    "undersizedAA": [],
     "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/c-eco-mech-questionnaire.png"
@@ -11412,7 +9146,7 @@
     "shifts": [
       {
         "value": 0.000015151108242333207,
-        "at": 1842,
+        "at": 1401,
         "sources": [
           "SPAN."
         ]
@@ -11439,7 +9173,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/login.png"
   },
@@ -11510,7 +9244,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/clients-new.png"
   },
@@ -11521,9 +9255,7 @@
     "name": "Client detail",
     "status": 200,
     "errorBoundary": false,
-    "consoleErrors": [
-      "pageerror: Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors a"
-    ],
+    "consoleErrors": [],
     "scrollableBy": 0,
     "documentScrollWidth": 1024,
     "overflowHits": [],
@@ -11810,7 +9542,7 @@
     "shifts": [],
     "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 13,
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/publish.png"
   },
@@ -12414,27 +10146,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/github-ci.png"
   },
@@ -12454,14 +10168,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -12543,14 +10257,56 @@
     "targetCount": 131,
     "undersizedAA": [
       {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
+        "n": "Production: 2b5e31ed77156d35f8cafa198984",
+        "w": 351,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Merge pull request #21 from luminar",
+        "w": 690,
         "h": 16,
         "gap": 0
       },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: bfe9f089b08acb0c7098c71a0277cf6",
+        "w": 332,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "#22 Interaction audit: harness, 12 findi",
+        "w": 398,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
+        "w": 334,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Interaction audit: harness, 12 find",
+        "w": 392,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
         "h": 16,
         "gap": 0
       },
@@ -13027,48 +10783,6 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
     "underTouch44": 130,
@@ -13237,7 +10951,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/c-eco-mech.png"
   },
@@ -13255,278 +10969,7 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 129,
-    "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 12
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Real photos of our work & team (preferre",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      }
-    ],
+    "undersizedAA": [],
     "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/c-eco-mech-questionnaire.png"
@@ -13546,7 +10989,7 @@
     "shifts": [
       {
         "value": 0.000019402553637822468,
-        "at": 1825,
+        "at": 1261,
         "sources": [
           "SPAN."
         ]
@@ -13573,7 +11016,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/login.png"
   },
@@ -13644,7 +11087,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/clients-new.png"
   },
@@ -13942,7 +11385,7 @@
     "shifts": [],
     "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 13,
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/publish.png"
   },
@@ -14576,27 +12019,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/github-ci.png"
   },
@@ -14616,14 +12041,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -14705,14 +12130,56 @@
     "targetCount": 131,
     "undersizedAA": [
       {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
+        "n": "Production: 2b5e31ed77156d35f8cafa198984",
+        "w": 351,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Merge pull request #21 from luminar",
+        "w": 690,
         "h": 16,
         "gap": 0
       },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: bfe9f089b08acb0c7098c71a0277cf6",
+        "w": 332,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "#22 Interaction audit: harness, 12 findi",
+        "w": 398,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
+        "w": 334,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Interaction audit: harness, 12 find",
+        "w": 392,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
         "h": 16,
         "gap": 0
       },
@@ -15201,48 +12668,6 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
     "underTouch44": 130,
@@ -15411,7 +12836,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/c-eco-mech.png"
   },
@@ -15429,278 +12854,7 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 129,
-    "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 12
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Real photos of our work & team (preferre",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      }
-    ],
+    "undersizedAA": [],
     "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/c-eco-mech-questionnaire.png"
@@ -15720,7 +12874,7 @@
     "shifts": [
       {
         "value": 0.000011920928955078125,
-        "at": 1196,
+        "at": 1375,
         "sources": [
           "SPAN."
         ]
@@ -15747,7 +12901,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/login.png"
   },
@@ -15818,7 +12972,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/clients-new.png"
   },
@@ -16116,7 +13270,7 @@
     "shifts": [],
     "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 13,
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/publish.png"
   },
@@ -16750,27 +13904,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-ci.png"
   },
@@ -16790,14 +13926,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -16879,14 +14015,56 @@
     "targetCount": 131,
     "undersizedAA": [
       {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
+        "n": "Production: 2b5e31ed77156d35f8cafa198984",
+        "w": 351,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Merge pull request #21 from luminar",
+        "w": 690,
         "h": 16,
         "gap": 0
       },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: bfe9f089b08acb0c7098c71a0277cf6",
+        "w": 332,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "#22 Interaction audit: harness, 12 findi",
+        "w": 398,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
+        "w": 334,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Interaction audit: harness, 12 find",
+        "w": 392,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
         "h": 16,
         "gap": 0
       },
@@ -17375,48 +14553,6 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
     "underTouch44": 130,
@@ -17585,7 +14721,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/c-eco-mech.png"
   },
@@ -17603,278 +14739,7 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 129,
-    "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 12
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Real photos of our work & team (preferre",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      }
-    ],
+    "undersizedAA": [],
     "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/c-eco-mech-questionnaire.png"
@@ -17894,7 +14759,7 @@
     "shifts": [
       {
         "value": 0.0000083724494170096,
-        "at": 1327,
+        "at": 1110,
         "sources": [
           "SPAN."
         ]
@@ -17921,7 +14786,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/login.png"
   },
@@ -17992,7 +14857,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/clients-new.png"
   },
@@ -18290,7 +15155,7 @@
     "shifts": [],
     "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 13,
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/publish.png"
   },
@@ -18924,27 +15789,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/github-ci.png"
   },
@@ -18964,14 +15811,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -19053,14 +15900,56 @@
     "targetCount": 131,
     "undersizedAA": [
       {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
+        "n": "Production: 2b5e31ed77156d35f8cafa198984",
+        "w": 351,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Merge pull request #21 from luminar",
+        "w": 690,
         "h": 16,
         "gap": 0
       },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: bfe9f089b08acb0c7098c71a0277cf6",
+        "w": 332,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "#22 Interaction audit: harness, 12 findi",
+        "w": 398,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
+        "w": 334,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Interaction audit: harness, 12 find",
+        "w": 392,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
         "h": 16,
         "gap": 0
       },
@@ -19549,48 +16438,6 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
     "underTouch44": 130,
@@ -19759,7 +16606,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/c-eco-mech.png"
   },
@@ -19777,278 +16624,7 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 129,
-    "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 12
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Real photos of our work & team (preferre",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      }
-    ],
+    "undersizedAA": [],
     "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/c-eco-mech-questionnaire.png"
@@ -20068,7 +16644,7 @@
     "shifts": [
       {
         "value": 0.000003924585664223251,
-        "at": 1365,
+        "at": 1066,
         "sources": [
           "SPAN."
         ]
@@ -20095,7 +16671,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/login.png"
   },
@@ -20166,7 +16742,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/clients-new.png"
   },
@@ -20464,7 +17040,7 @@
     "shifts": [],
     "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 13,
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/publish.png"
   },
@@ -21098,27 +17674,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/github-ci.png"
   },
@@ -21138,14 +17696,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -21227,14 +17785,56 @@
     "targetCount": 131,
     "undersizedAA": [
       {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
+        "n": "Production: 2b5e31ed77156d35f8cafa198984",
+        "w": 351,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Merge pull request #21 from luminar",
+        "w": 690,
         "h": 16,
         "gap": 0
       },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: bfe9f089b08acb0c7098c71a0277cf6",
+        "w": 332,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "#22 Interaction audit: harness, 12 findi",
+        "w": 398,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
+        "w": 334,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Interaction audit: harness, 12 find",
+        "w": 392,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
         "h": 16,
         "gap": 0
       },
@@ -21723,48 +18323,6 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
     "underTouch44": 130,
@@ -21933,7 +18491,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/c-eco-mech.png"
   },
@@ -21951,278 +18509,7 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 129,
-    "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 12
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Real photos of our work & team (preferre",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      }
-    ],
+    "undersizedAA": [],
     "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/c-eco-mech-questionnaire.png"
@@ -22242,7 +18529,7 @@
     "shifts": [
       {
         "value": 0.000001655684577094184,
-        "at": 1985,
+        "at": 1110,
         "sources": [
           "SPAN."
         ]
@@ -22269,7 +18556,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/login.png"
   },
@@ -22340,7 +18627,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/clients-new.png"
   },
@@ -22638,7 +18925,7 @@
     "shifts": [],
     "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 13,
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/publish.png"
   },
@@ -23272,27 +19559,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/github-ci.png"
   },
@@ -23312,14 +19581,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -23401,14 +19670,56 @@
     "targetCount": 131,
     "undersizedAA": [
       {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
+        "n": "Production: 2b5e31ed77156d35f8cafa198984",
+        "w": 351,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Merge pull request #21 from luminar",
+        "w": 690,
         "h": 16,
         "gap": 0
       },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: bfe9f089b08acb0c7098c71a0277cf6",
+        "w": 332,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "#22 Interaction audit: harness, 12 findi",
+        "w": 398,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
+        "w": 334,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Interaction audit: harness, 12 find",
+        "w": 392,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
         "h": 16,
         "gap": 0
       },
@@ -23897,48 +20208,6 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
     "underTouch44": 130,
@@ -24107,7 +20376,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/c-eco-mech.png"
   },
@@ -24125,278 +20394,7 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 129,
-    "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 12
-      },
-      {
-        "n": "Other:",
-        "w": 15,
-        "h": 15,
-        "gap": 18
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Real photos of our work & team (preferre",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      }
-    ],
+    "undersizedAA": [],
     "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/c-eco-mech-questionnaire.png"
@@ -24416,7 +20414,7 @@
     "shifts": [
       {
         "value": 9.169394304729283e-7,
-        "at": 1850,
+        "at": 1091,
         "sources": [
           "SPAN."
         ]
@@ -24443,7 +20441,7 @@
     "shifts": [],
     "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 4,
+    "underTouch44": 2,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/login.png"
   },
@@ -24508,7 +20506,7 @@
     "shifts": [],
     "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/clients-new.png"
   },
@@ -24823,15 +20821,8 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 16,
-    "undersizedAA": [
-      {
-        "n": "Mark as draft (hidden until the flag is ",
-        "w": 13,
-        "h": 13,
-        "gap": 23
-      }
-    ],
-    "underTouch44": 13,
+    "undersizedAA": [],
+    "underTouch44": 6,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/publish.png"
   },
@@ -25303,27 +21294,9 @@
         "w": 10,
         "h": 19,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 19,
-        "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/github-ci.png"
   },
@@ -25343,14 +21316,14 @@
     "targetCount": 14,
     "undersizedAA": [
       {
-        "n": "Open Preview",
-        "w": 84,
+        "n": "Open Production",
+        "w": 101,
         "h": 22,
         "gap": 0
       },
       {
-        "n": "Open Production",
-        "w": 101,
+        "n": "Open Preview",
+        "w": 84,
         "h": 22,
         "gap": 0
       }
@@ -25432,14 +21405,50 @@
     "targetCount": 131,
     "undersizedAA": [
       {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
+        "n": "Production: 2b5e31ed77156d35f8cafa198984",
+        "w": 351,
         "h": 16,
         "gap": 0
       },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: bfe9f089b08acb0c7098c71a0277cf6",
+        "w": 332,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · fix(a11y): give every checkbox a re",
+        "w": 288,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "#22 Interaction audit: harness, 12 findi",
+        "w": 398,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
+        "w": 334,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · Interaction audit: harness, 12 find",
+        "w": 392,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
         "h": 16,
         "gap": 0
       },
@@ -25916,48 +21925,6 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
     "underTouch44": 130,
@@ -26126,7 +22093,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 19,
+    "underTouch44": 18,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/c-eco-mech.png"
   },
@@ -26144,338 +22111,7 @@
     "cls": 0,
     "shifts": [],
     "targetCount": 129,
-    "undersizedAA": [
-      {
-        "n": "Generate enquiries & leads",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Look credible for tenders & proposals",
-        "w": 15,
-        "h": 15,
-        "gap": 17
-      },
-      {
-        "n": "Showcase our work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have a logo (attaching it below)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have vector files (AI / SVG / EPS / P",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We only have images (PNG / JPG / from do",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We have light & dark versions",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'd like the logo cleaned up / redrawn",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We don't have a logo — please design one",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Brand guidelines / colour codes document",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Company profile / brochure (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of projects or work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photos of team / premises",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Letterheads, business cards, signage pho",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client testimonials or reviews",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Videos (site work, promos, walkthroughs)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Awards / certificates (scans)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Corporate & precise",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Modern & bold",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical & detailed",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Premium & understated",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Light & clean",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice — surprise us",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clean modern sans-serif",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Designer's choice",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Real photos of our work & team (preferre",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Professional stock photography",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Technical illustrations / diagrams",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Abstract / 3D graphics",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Subtle & professional (recommended)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Minimal — almost none",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Floating WhatsApp / call button",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Photo gallery / slider",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Animated stats counters",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Client logo strip",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials carousel",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Google Map of our location",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Dark / light mode toggle",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Video section",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ accordion",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Downloadable company profile (PDF)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Hero (headline + main action)",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "About us / who we are",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Vision & mission",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Services / products",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Completed projects / portfolio",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Certifications & registrations",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Clients & partners",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Testimonials",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Our team",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Process — how we work",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "FAQ",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Contact & enquiry form",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "We'll send our own text",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      },
-      {
-        "n": "Mix — we'll send notes, you polish",
-        "w": 15,
-        "h": 15,
-        "gap": 15
-      }
-    ],
+    "undersizedAA": [],
     "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/c-eco-mech-questionnaire.png"
