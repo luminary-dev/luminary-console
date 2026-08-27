@@ -24,9 +24,9 @@ says plainly that no automated test covers it.
 Since that pass, LC-051 moved from Not fixed to Fixed, making the tally **24
 Fixed, 13 Partially fixed, 8 Not fixed** across the original 45.
 
-A further **20 findings, LC-068 to LC-087, were discovered during the
+A further **21 findings, LC-068 to LC-088, were discovered during the
 remediation itself** and are recorded in their own section at the end of this
-document. Nineteen are fixed; one (LC-082) is a deliberate Won't fix with the
+document. Twenty are fixed; one (LC-082) is a deliberate Won't fix with the
 trade written down. They are kept separate because the distinction is the
 point: they were not visible on a first read of the code. They surfaced from
 unit-testing modules that had none, from measuring rendered pages instead of
@@ -43,7 +43,7 @@ scanning the wrong tree. Both had passed lint, typecheck, tests and a local
 build. They are the argument for watching a change land rather than declaring
 it done when the local gates go green.
 
-Whole-document totals: **65 findings, 43 Fixed, 13 Partially fixed, 8 Not
+Whole-document totals: **66 findings, 44 Fixed, 13 Partially fixed, 8 Not
 fixed, 1 Won't fix.**
 
 ---
@@ -1287,4 +1287,36 @@ shared helpers were already correct, and the bug existed only in the two copies
 that had drifted from them. `RateLimitBadge` was checked and was already
 correct.
 Guarded by: tests/relative-time.test.ts::"formats in Colombo time regardless of the runtime's zone", ::"agrees with whenLabel on the hour, so the two clocks cannot diverge", and ::"returns the input unchanged when it is not a date". The second is the one that matters: it pins the two formatters together so they cannot drift apart again.
+Effort: S   Risk of fix: Low   Blocks: —
+
+### LC-088 — Both personal views reported a confident zero for everyone
+Severity: Medium
+Category: UX
+Location: `components/github/PrInbox.tsx`, `app/github/page.tsx`
+Evidence: "Needs my review" and "My pull requests" filter on a `viewerLogin`
+read only from `localStorage`, typed by hand into a text box whose placeholder
+is `octocat`. Until an operator typed their own GitHub login, both views showed
+`· 0`.
+Impact: A confident zero is worse than an empty state. "Needs my review · 0"
+reads as "nothing is waiting on you", which is a statement about the world, not
+about configuration, and it is the first thing on the console's centrepiece
+screen. Every operator saw it on every first visit, and nothing on the page
+suggested the number was a placeholder rather than a fact.
+It was also asking for something the console already had. The operator is
+signed in, so the server knows their email, and `GITHUB_OPERATORS` maps that
+email to a GitHub login: the same mapping notification targeting already
+depends on.
+Reproduction: Open `/github` in a browser that has never set the login.
+Proposed fix: Seed the value server-side from the signed-in operator.
+Resolution: Fixed — `app/github/page.tsx` resolves
+`githubLoginFor(await currentOperator())` and passes it to `PrInbox`, which
+uses it as the initial state so the first paint already filters correctly. A
+value saved in this browser still wins, but it is applied in an effect after
+mount rather than read during render, because reading storage during render
+would make server and client disagree and trip hydration, which is exactly the
+defect LC-087 was. The empty-string case is preserved deliberately: an operator
+who clears the field keeps it cleared instead of the server value reappearing
+on every reload, and an unmapped operator gets an empty box rather than a
+guessed login that would filter the views to someone else's work.
+Guarded by: tests/github-ui.test.tsx::"seeds the login from the operator, so the personal views are not silently empty" and ::"renders an empty login when the operator is not mapped".
 Effort: S   Risk of fix: Low   Blocks: —

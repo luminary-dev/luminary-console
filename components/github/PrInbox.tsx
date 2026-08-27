@@ -38,21 +38,40 @@ export type PrInboxProps = {
   /** Whether any GitHub credential exists, which decides what an empty inbox
    *  means: nothing to show, or nothing ever synced. */
   githubConfigured: boolean;
+  /** The signed-in operator's GitHub login, resolved server-side from
+   *  GITHUB_OPERATORS. Empty when this operator is not mapped. Used as the
+   *  starting value so the personal views work without being asked. */
+  operatorLogin?: string;
 };
 
-export default function PrInbox({ prs, counts, now, githubConfigured }: PrInboxProps) {
+export default function PrInbox({
+  prs,
+  counts,
+  now,
+  githubConfigured,
+  operatorLogin = "",
+}: PrInboxProps) {
   const router = useRouter();
   const loginId = useId();
   const [viewId, setViewId] = useState("everything");
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: "updated", dir: -1 });
   const [selected, setSelected] = useState<number | null>(null);
-  const [viewerLogin, setViewerLogin] = useState("");
+  // Seeded from the server so the first paint already knows who this is, and
+  // so server and client render the same thing. A value saved in this browser
+  // wins, but only after mount: reading localStorage during render would make
+  // the two sides disagree and trip hydration.
+  const [viewerLogin, setViewerLogin] = useState(operatorLogin);
   const rowRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(LOGIN_KEY);
-      if (saved) setViewerLogin(saved);
+      // Functional update so this does not close over viewerLogin: the effect
+      // runs once on mount and must not be re-run when the value changes.
+      // `saved !== null` rather than a truthiness test, so an operator who
+      // deliberately clears the field keeps it cleared instead of having the
+      // server value reappear on every reload.
+      if (saved !== null) setViewerLogin((current) => (saved === current ? current : saved));
     } catch {
       // Storage can be unavailable (private mode); the personal views simply
       // stay empty, which they already explain.
@@ -254,12 +273,14 @@ export default function PrInbox({ prs, counts, now, githubConfigured }: PrInboxP
               type="text"
               autoComplete="off"
               spellCheck={false}
-              placeholder="octocat"
+              placeholder={operatorLogin || "octocat"}
               value={viewerLogin}
               onChange={(e) => changeLogin(e.target.value)}
             />
             <span className="gh-view-note" style={{ marginTop: 2 }}>
-              Kept in this browser only. The two personal views need it to know who you are.
+              {operatorLogin
+                ? "Taken from your operator account. Change it here if you use a different GitHub login; the override is kept in this browser only."
+                : "Kept in this browser only. The two personal views need it to know who you are. Setting GITHUB_OPERATORS fills this in automatically."}
             </span>
           </div>
         </div>
