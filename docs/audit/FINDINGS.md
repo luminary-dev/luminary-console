@@ -24,9 +24,9 @@ says plainly that no automated test covers it.
 Since that pass, LC-051 moved from Not fixed to Fixed, making the tally **24
 Fixed, 13 Partially fixed, 8 Not fixed** across the original 45.
 
-A further **22 findings, LC-068 to LC-089, were discovered during the
+A further **23 findings, LC-068 to LC-090, were discovered during the
 remediation itself** and are recorded in their own section at the end of this
-document. Twenty-one are fixed; one (LC-082) is a deliberate Won't fix with the
+document. Twenty-two are fixed; one (LC-082) is a deliberate Won't fix with the
 trade written down. They are kept separate because the distinction is the
 point: they were not visible on a first read of the code. They surfaced from
 unit-testing modules that had none, from measuring rendered pages instead of
@@ -43,7 +43,7 @@ scanning the wrong tree. Both had passed lint, typecheck, tests and a local
 build. They are the argument for watching a change land rather than declaring
 it done when the local gates go green.
 
-Whole-document totals: **67 findings, 45 Fixed, 13 Partially fixed, 8 Not
+Whole-document totals: **68 findings, 46 Fixed, 13 Partially fixed, 8 Not
 fixed, 1 Won't fix.**
 
 ---
@@ -1355,4 +1355,46 @@ job log helps nobody, and both places now say plainly how many bytes were
 elided rather than trimming in silence. The non-JSON fallback is preserved and
 tested: an unparsable response still prints raw and still exits 0.
 Guarded by: no automated test. CI workflows are not exercised by the unit suite, which is the same structural gap LC-083 recorded: the local gates do not cover platform or pipeline configuration. The fix was verified by reproducing the failure and the pass outside CI, including the non-JSON path.
+Effort: S   Risk of fix: Low   Blocks: —
+
+### LC-090 — Cover art drifted between two different house styles, and the inline-image control was the wrong shape
+Severity: Low
+Category: UX / Content
+Location: `lib/publish/images.ts`, `lib/publish/draft.ts`, `components/PublishStudio.tsx`, `app/api/publish/article/route.ts`
+Evidence: The style prompt asked for "The Adventures of Tintin (2011)
+motion-capture", but the published covers do not agree with each other. Pulled
+four from the landing repo and looked at them: `postgres-everything-database`
+lands on the intended semi-realistic look, while `aws-cost-engineering` and
+`monorepos-2026` are plainly Pixar, with oversized glossy eyes, rounded
+caricature faces and moulded-plastic surfaces. The instruction was there; the
+model ignored it, because "3D animated feature film" plus "expressive faces"
+reads as Pixar to an image model unless it is told otherwise.
+Separately, the operator asked for a checkbox to add one or two illustrations
+inside an article. It shipped as a three-option dropdown, which is why it was
+reported missing: it does not look like the control that was asked for, and it
+sits beside a real checkbox for the draft flag.
+Impact: A blog whose covers alternate between two styles reads as a blog with
+no art direction. This is the studio's shopfront.
+Proposed fix: Say what the style is NOT, and make the control the shape it was
+asked to be.
+Resolution: Fixed. The style prompt now names realistic human proportions,
+naturalistic skin and understated expression, and explicitly rules out Pixar,
+Disney and DreamWorks along with the specific tells (oversized glossy eyes,
+rounded caricature faces, plastic surfaces, toy colours). It also pins the
+midpoint: "if it could pass for a stock photograph it has gone too far one way,
+and if the faces look cute it has gone too far the other", which was added
+after a first pass came back nearly photographic. The house vocabulary the
+existing covers already share is written down rather than left to chance: warm
+golden-hour or lantern light, aged brass and copper, one restrained luminous
+green accent, practical machinery, Sri Lankan setting.
+The cover brief now has to be a metaphor for the article's ARGUMENT rather than
+its topic, and literal technology is banned outright.
+Verified by generating a cover with the real model before and after, and
+looking at both.
+The dropdown is now a checkbox. The count follows the length of the article,
+roughly one illustration per 8000 characters capped at two, because "does this
+article want pictures in it" is the editor's question while 1 against 2 is a
+judgement about the article, and the article is right there to be measured. The
+API still accepts an explicit number so it stays usable directly.
+Guarded by: tests/publish-inline.test.ts, five cases covering unchecked, short, long, the cap and explicit numbers. The style prompt itself has no automated test: image output is not assertable, and pretending otherwise with a snapshot would be theatre.
 Effort: S   Risk of fix: Low   Blocks: —
