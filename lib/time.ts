@@ -57,3 +57,27 @@ export function relTickMs(at: string, now = Date.now()): number | null {
   // Past a fortnight the label is an absolute date: it is done changing.
   return null;
 }
+
+/**
+ * "15 Aug, 23:53" in Colombo time. Same clock as whenLabel, without the year,
+ * for lists where the year is noise.
+ *
+ * The timeZone is the whole point. Two components carried their own copy of
+ * this formatter with no timeZone, so the SERVER rendered UTC and the BROWSER
+ * rendered the viewer's local zone: 18:23 against 23:53 for the same instant
+ * from Colombo. That is a React hydration mismatch (error #418) and, worse, a
+ * timestamp an operator could read five and a half hours wrong depending on
+ * whether hydration had finished. Formatting a date without pinning a zone is
+ * never safe in a server-rendered component, so it lives here once.
+ */
+export function shortWhenLabel(at: string): string {
+  const ms = Date.parse(at);
+  if (!Number.isFinite(ms)) return at;
+  return new Date(ms).toLocaleString("en-GB", {
+    timeZone: "Asia/Colombo",
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
