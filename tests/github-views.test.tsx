@@ -157,10 +157,24 @@ function noBareIcons(container: HTMLElement) {
   }
 }
 
-/** The value rendered for a labelled metric, read the way a reader sees it. */
+/**
+ * The value rendered for a labelled metric.
+ *
+ * Reads the <dd> minus its explanatory note. The note moved INSIDE the <dd>
+ * when IX-011 fixed the `definition-list` axe violation: a <dl> may contain
+ * only dt/dd groups, and the note used to sit beside the <dd> as a sibling
+ * <p>. The assertion is deliberately still an exact match on the value rather
+ * than a substring, because "prints 0 for an absent metric" is precisely the
+ * bug these tests exist to catch, and `toContain` would not catch it.
+ */
 function metricValue(label: string): string {
   const term = screen.getByText(label);
-  return term.nextElementSibling?.textContent?.trim() ?? "";
+  const dd = term.nextElementSibling;
+  if (!dd) return "";
+  const note = dd.querySelector(".gh-metric-note");
+  const noteText = note?.textContent ?? "";
+  const full = dd.textContent ?? "";
+  return (noteText ? full.slice(0, full.length - noteText.length) : full).trim();
 }
 
 // === flaky versus broken ===

@@ -22,7 +22,6 @@
   border-bottom: 2px solid transparent; margin-bottom: -1px;
   transition: color .15s ease, border-color .15s ease;
 }
-.gh-nav-link:hover { color: var(--text); }
 /* The current section is marked by weight, colour AND an underline rule, so
    it does not depend on hue alone. aria-current carries it to a screen
    reader. */
@@ -137,4 +136,17 @@
   .gh-stream-item { grid-template-columns: 1fr; gap: 3px; }
   .gh-nav-list { gap: 0; }
   .gh-nav-link { padding: 8px 10px; }
+}
+
+/* ——— Hover, guarded ———
+   Every :hover rule in this file sits behind `(hover: hover) and (pointer: fine)`.
+   Without the guard a touch device applies the hover style on tap and LEAVES it
+   applied until something else is tapped, so a row a finger brushed stays lit
+   and reads as selected. The interaction audit found 15 unguarded rules across
+   the console, which was every one of them.
+   Rules combining hover with a persistent state (a sorted column, the active
+   tab) are split: the persistent half stays outside this block because it must
+   still apply on touch. */
+@media (hover: hover) and (pointer: fine) {
+  .gh-nav-link:hover { color: var(--text); }
 }

@@ -1,0 +1,232 @@
+[
+  {
+    "route": "/github",
+    "label": "saved view: failing CI",
+    "selector": "button:has-text(\"Failing CI\")",
+    "present": true,
+    "clicked": true,
+    "worstEventMs": 32,
+    "events": [
+      {
+        "name": "pointerover",
+        "duration": 32,
+        "delay": 0
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      }
+    ],
+    "longTasks": [],
+    "budget150": true
+  },
+  {
+    "route": "/github",
+    "label": "saved view: everything",
+    "selector": "button:has-text(\"Everything\")",
+    "present": true,
+    "clicked": true,
+    "worstEventMs": 0,
+    "events": [],
+    "longTasks": [],
+    "budget150": null
+  },
+  {
+    "route": "/github",
+    "label": "sort by author",
+    "selector": "th button:has-text(\"Author\")",
+    "present": true,
+    "clicked": true,
+    "worstEventMs": 24,
+    "events": [
+      {
+        "name": "pointerover",
+        "duration": 24,
+        "delay": 0
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      }
+    ],
+    "longTasks": [],
+    "budget150": true
+  },
+  {
+    "route": "/github/ci",
+    "label": "first tab or filter",
+    "selector": "button",
+    "present": true,
+    "clicked": true,
+    "worstEventMs": 32,
+    "events": [
+      {
+        "name": "pointerover",
+        "duration": 32,
+        "delay": 0
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 32,
+        "delay": 1
+      }
+    ],
+    "longTasks": [],
+    "budget150": true
+  },
+  {
+    "route": "/",
+    "label": "pipeline filter chip",
+    "selector": ".pill, .chip, button",
+    "present": true,
+    "clicked": true,
+    "worstEventMs": 24,
+    "events": [
+      {
+        "name": "pointerover",
+        "duration": 24,
+        "delay": 0
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
+        "delay": 1
+      }
+    ],
+    "longTasks": [],
+    "budget150": true
+  },
+  {
+    "route": "/activity",
+    "label": "first control",
+    "selector": "button, a[href]",
+    "present": true,
+    "clicked": false,
+    "worstEventMs": 0,
+    "events": [],
+    "longTasks": [],
+    "budget150": null
+  }
+]

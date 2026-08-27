@@ -45,7 +45,7 @@ export default function DeleteClient({ slug, company }: { slug: string; company:
   };
 
   return (
-    <div className="card" style={{ borderColor: "rgba(239,68,68,.35)" }}>
+    <div className="card" style={{ borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)" }}>
       <h3 style={{ color: "var(--danger)" }}>Danger zone</h3>
       <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 6 }}>
         When a project is finished, delete the client to remove all documents, the questionnaire
@@ -54,7 +54,7 @@ export default function DeleteClient({ slug, company }: { slug: string; company:
       {error && <div className="form-error">{error}</div>}
       <button
         className="btn ghost small"
-        style={{ marginTop: 12, borderColor: "rgba(239,68,68,.5)", color: "var(--danger)" }}
+        style={{ marginTop: 12, borderColor: "color-mix(in srgb, var(--danger) 50%, transparent)", color: "var(--danger)" }}
         disabled={busy}
         onClick={run}
       >

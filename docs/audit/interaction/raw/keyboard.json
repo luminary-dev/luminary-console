@@ -1,0 +1,257 @@
+[
+  {
+    "path": "/login",
+    "name": "Sign in",
+    "stops": 2,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "",
+      "href": "",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/",
+    "name": "Dashboard",
+    "stops": 19,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/clients/new",
+    "name": "New client",
+    "stops": 12,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/clients/eco-mech",
+    "name": "Client detail",
+    "stops": 60,
+    "reachedEnd": false,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/activity",
+    "name": "Activity",
+    "stops": 5,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/publish",
+    "name": "Publish studio",
+    "stops": 16,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/github",
+    "name": "Pull requests",
+    "stops": 33,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/github/repos",
+    "name": "Repositories",
+    "stops": 46,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/github/ci",
+    "name": "CI",
+    "stops": 60,
+    "reachedEnd": false,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/github/deployments",
+    "name": "Deployments",
+    "stops": 14,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/github/releases",
+    "name": "Releases",
+    "stops": 12,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/github/security",
+    "name": "Security",
+    "stops": 12,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/github/insights",
+    "name": "Insights",
+    "stops": 12,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/github/activity",
+    "name": "Engineering activity",
+    "stops": 60,
+    "reachedEnd": false,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/github/luminary-dev/luminary-console/21",
+    "name": "Pull request detail",
+    "stops": 14,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/c/eco-mech",
+    "name": "Client portal",
+    "stops": 27,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/c/eco-mech/questionnaire",
+    "name": "Questionnaire",
+    "stops": 60,
+    "reachedEnd": false,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  }
+]

@@ -24,7 +24,6 @@
   padding: 5px 12px; cursor: pointer; line-height: 1.6;
   transition: color .15s ease, background .15s ease, border-color .15s ease;
 }
-.gh-chip:hover:not(:disabled) { color: var(--text); }
 .gh-chip[aria-pressed="true"] { color: var(--a-text); background: var(--a-dim); border-color: var(--a-border); }
 .gh-chip:disabled { cursor: default; opacity: .65; }
 .gh-chip-n { font-variant-numeric: tabular-nums; color: inherit; }
@@ -70,9 +69,7 @@
 }
 .gh-row.is-selected { background: var(--a-dim); }
 .gh-row.is-selected > th:first-child { box-shadow: inset 2px 0 0 var(--accent); }
-.gh-row:hover { background: var(--off); }
 .gh-row-link { display: inline-block; font-weight: 600; color: var(--text); max-width: 52ch; }
-.gh-row-link:hover { color: var(--a-text); }
 .gh-row-no { font-family: var(--font-mono), monospace; font-size: 12px; color: var(--label); margin-right: 8px; }
 .gh-row-meta {
   display: flex; gap: 10px; flex-wrap: wrap; margin-top: 2px;
@@ -136,7 +133,6 @@
 /* A control that reads as a link because it changes what is on screen rather
    than where you are. */
 .gh-linkbtn { background: none; border: none; padding: 0; font: inherit; color: var(--a-text); cursor: pointer; text-decoration: underline; }
-.gh-linkbtn:hover { color: var(--accent); }
 
 /* === keyboard hint === */
 .gh-keys { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.9; }
@@ -164,4 +160,31 @@
 @media (max-width: 720px) {
   .gh-head { margin-top: 14px; }
   .gh-scroll { margin-left: -18px; margin-right: -18px; padding: 0 18px; }
+}
+
+/* ——— Hover, guarded ———
+   Every :hover rule in this file sits behind `(hover: hover) and (pointer: fine)`.
+   Without the guard a touch device applies the hover style on tap and LEAVES it
+   applied until something else is tapped, so a row a finger brushed stays lit
+   and reads as selected. The interaction audit found 15 unguarded rules across
+   the console, which was every one of them.
+   Rules combining hover with a persistent state (a sorted column, the active
+   tab) are split: the persistent half stays outside this block because it must
+   still apply on touch. */
+@media (hover: hover) and (pointer: fine) {
+  .gh-chip:hover:not(:disabled) { color: var(--text); }
+  .gh-row:hover { background: var(--off); }
+  .gh-row-link:hover { color: var(--a-text); }
+  .gh-linkbtn:hover { color: var(--accent); }
+}
+
+/* A git ref can be a full 40-character SHA with nothing to break on, and an
+   unbreakable token that long pushed the page 15px sideways at 320px. This is
+   the only horizontal overflow the interaction audit found across 234
+   route-and-viewport measurements, so it is worth the targeted rule rather
+   than a blanket one: `anywhere` only breaks when there is no better
+   opportunity, so ordinary branch names still wrap at their slashes. */
+.gh-env-now,
+.gh-env-now b {
+  overflow-wrap: anywhere;
 }

@@ -153,7 +153,7 @@ export default function DocActions({
         {exists && (
           <button
             className="btn ghost small"
-            style={{ color: "var(--danger)", borderColor: "rgba(239,68,68,.35)" }}
+            style={{ color: "var(--danger)", borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)" }}
             disabled={!!busy}
             onClick={remove}
           >

@@ -1,0 +1,653 @@
+[
+  {
+    "check": "hover dependency",
+    "hoverRevealed": [],
+    "unguardedHoverRules": [],
+    "unguardedCount": 0
+  },
+  {
+    "check": "touch targets",
+    "path": "/login",
+    "name": "Sign in",
+    "total": 4,
+    "under44": 0,
+    "underAA24": 0,
+    "crowdedUnder8px": 0,
+    "worst": [],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/",
+    "name": "Dashboard",
+    "total": 25,
+    "under44": 1,
+    "underAA24": 0,
+    "crowdedUnder8px": 8,
+    "worst": [
+      {
+        "name": "Search clients by name, document number,",
+        "w": 280,
+        "h": 37,
+        "gap": 12,
+        "cls": "q-line"
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/clients/new",
+    "name": "New client",
+    "total": 11,
+    "under44": 0,
+    "underAA24": 0,
+    "crowdedUnder8px": 0,
+    "worst": [],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/clients/eco-mech",
+    "name": "Client detail",
+    "total": 117,
+    "under44": 29,
+    "underAA24": 0,
+    "crowdedUnder8px": 40,
+    "worst": [
+      {
+        "name": "PDF",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "PDF",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "PDF",
+        "w": 24,
+        "h": 44,
+        "gap": 6,
+        "cls": ""
+      },
+      {
+        "name": "PDF",
+        "w": 24,
+        "h": 44,
+        "gap": 6,
+        "cls": ""
+      },
+      {
+        "name": "PDF",
+        "w": 24,
+        "h": 44,
+        "gap": 6,
+        "cls": ""
+      },
+      {
+        "name": "PDF",
+        "w": 24,
+        "h": 44,
+        "gap": 6,
+        "cls": ""
+      },
+      {
+        "name": "PDF",
+        "w": 24,
+        "h": 44,
+        "gap": 6,
+        "cls": ""
+      },
+      {
+        "name": "PDF",
+        "w": 24,
+        "h": 44,
+        "gap": 6,
+        "cls": ""
+      },
+      {
+        "name": "Form",
+        "w": 32,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "HTML",
+        "w": 33,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/activity",
+    "name": "Activity",
+    "total": 4,
+    "under44": 0,
+    "underAA24": 0,
+    "crowdedUnder8px": 0,
+    "worst": [],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/publish",
+    "name": "Publish studio",
+    "total": 16,
+    "under44": 0,
+    "underAA24": 0,
+    "crowdedUnder8px": 0,
+    "worst": [],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/github",
+    "name": "Pull requests",
+    "total": 86,
+    "under44": 16,
+    "underAA24": 0,
+    "crowdedUnder8px": 84,
+    "worst": [
+      {
+        "name": "Your GitHub login",
+        "w": 200,
+        "h": 27,
+        "gap": 0,
+        "cls": "q-line"
+      },
+      {
+        "name": "luminary-dev/luminate #206build(deps): b",
+        "w": 292,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev/luminate #206build(deps): b",
+        "w": 292,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev/medease #771MEDEASE-184: Ad",
+        "w": 296,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev/medease #776build(deps): bu",
+        "w": 312,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev/luminate #201build(deps): b",
+        "w": 314,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev/luminate #201build(deps): b",
+        "w": 314,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev/luminate #201build(deps): b",
+        "w": 314,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev/service-hub #879chore(deps)",
+        "w": 318,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev/service-hub #878chore(deps)",
+        "w": 318,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/github/repos",
+    "name": "Repositories",
+    "total": 46,
+    "under44": 1,
+    "underAA24": 0,
+    "crowdedUnder8px": 43,
+    "worst": [
+      {
+        "name": "CI",
+        "w": 35,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-nav-link"
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/github/ci",
+    "name": "CI",
+    "total": 78,
+    "under44": 28,
+    "underAA24": 0,
+    "crowdedUnder8px": 78,
+    "worst": [
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/github/deployments",
+    "name": "Deployments",
+    "total": 14,
+    "under44": 1,
+    "underAA24": 0,
+    "crowdedUnder8px": 14,
+    "worst": [
+      {
+        "name": "CI",
+        "w": 35,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-nav-link"
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/github/releases",
+    "name": "Releases",
+    "total": 12,
+    "under44": 1,
+    "underAA24": 0,
+    "crowdedUnder8px": 12,
+    "worst": [
+      {
+        "name": "CI",
+        "w": 35,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-nav-link"
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/github/security",
+    "name": "Security",
+    "total": 12,
+    "under44": 1,
+    "underAA24": 0,
+    "crowdedUnder8px": 12,
+    "worst": [
+      {
+        "name": "CI",
+        "w": 35,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-nav-link"
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/github/insights",
+    "name": "Insights",
+    "total": 12,
+    "under44": 1,
+    "underAA24": 0,
+    "crowdedUnder8px": 12,
+    "worst": [
+      {
+        "name": "CI",
+        "w": 35,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-nav-link"
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/github/activity",
+    "name": "Engineering activity",
+    "total": 131,
+    "under44": 28,
+    "underAA24": 0,
+    "crowdedUnder8px": 131,
+    "worst": [
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/github/luminary-dev/luminary-console/21",
+    "name": "Pull request detail",
+    "total": 14,
+    "under44": 1,
+    "underAA24": 0,
+    "crowdedUnder8px": 14,
+    "worst": [
+      {
+        "name": "Build",
+        "w": 38,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/c/eco-mech",
+    "name": "Client portal",
+    "total": 26,
+    "under44": 3,
+    "underAA24": 0,
+    "crowdedUnder8px": 7,
+    "worst": [
+      {
+        "name": "luminary-dev.xyz",
+        "w": 115,
+        "h": 19,
+        "gap": 28,
+        "cls": ""
+      },
+      {
+        "name": "support@luminary-dev.xyz",
+        "w": 147,
+        "h": 16,
+        "gap": 139,
+        "cls": ""
+      },
+      {
+        "name": "support@luminary-dev.xyz",
+        "w": 173,
+        "h": 19,
+        "gap": 28,
+        "cls": ""
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/c/eco-mech/questionnaire",
+    "name": "Questionnaire",
+    "total": 129,
+    "under44": 28,
+    "underAA24": 3,
+    "crowdedUnder8px": 2,
+    "worst": [
+      {
+        "name": "+94 77 16 18 093",
+        "w": 115,
+        "h": 19,
+        "gap": 12,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev.xyz",
+        "w": 115,
+        "h": 19,
+        "gap": 12,
+        "cls": ""
+      },
+      {
+        "name": "support@luminary-dev.xyz",
+        "w": 173,
+        "h": 19,
+        "gap": 12,
+        "cls": ""
+      },
+      {
+        "name": "Other:",
+        "w": 220,
+        "h": 27,
+        "gap": 8,
+        "cls": "q-line"
+      },
+      {
+        "name": "Your name *",
+        "w": 303,
+        "h": 37,
+        "gap": 52,
+        "cls": "q-line"
+      },
+      {
+        "name": "Your role at Ecomech Engineering",
+        "w": 303,
+        "h": 37,
+        "gap": 52,
+        "cls": "q-line"
+      },
+      {
+        "name": "Best email to reach you",
+        "w": 303,
+        "h": 37,
+        "gap": 52,
+        "cls": "q-line"
+      },
+      {
+        "name": "Best phone / WhatsApp",
+        "w": 303,
+        "h": 37,
+        "gap": 52,
+        "cls": "q-line"
+      },
+      {
+        "name": "Core values.",
+        "w": 303,
+        "h": 37,
+        "gap": 72,
+        "cls": "q-line"
+      },
+      {
+        "name": "Slogan or tagline",
+        "w": 303,
+        "h": 37,
+        "gap": 72,
+        "cls": "q-line"
+      }
+    ],
+    "aaFailures": [
+      {
+        "name": "support@luminary-dev.xyz",
+        "tag": "A",
+        "w": 173,
+        "h": 19,
+        "gap": 12,
+        "cls": ""
+      },
+      {
+        "name": "+94 77 16 18 093",
+        "tag": "A",
+        "w": 115,
+        "h": 19,
+        "gap": 12,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev.xyz",
+        "tag": "A",
+        "w": 115,
+        "h": 19,
+        "gap": 12,
+        "cls": ""
+      }
+    ]
+  }
+]

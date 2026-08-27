@@ -400,7 +400,7 @@ export default function BillingCard({
                       />
                       <button
                         className="btn ghost small"
-                        style={{ color: "#ef4444", borderColor: "rgba(239,68,68,.35)" }}
+                        style={{ color: "var(--danger)", borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)" }}
                         disabled={!!busy}
                         onClick={() => remove(b)}
                       >

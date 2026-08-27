@@ -164,7 +164,7 @@ export default function DesignsCard({
                   </div>
                   <div style={{ fontSize: 12, color: "var(--muted)", overflowWrap: "anywhere", marginTop: 2 }}>
                     {d.status === "published" ? (
-                      <a href={url} target="_blank" rel="noopener noreferrer">{domain}/design/{d.id}</a>
+                      <a className="copy-url" href={url} target="_blank" rel="noopener noreferrer">{domain}/design/{d.id}</a>
                     ) : (
                       <span className="mono">{domain}/design/{d.id}</span>
                     )}{" "}

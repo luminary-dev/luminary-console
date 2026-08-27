@@ -112,7 +112,12 @@ export default function PortalProgress({ stage, deliveredAt }: { stage: ClientSt
       {rank < stageRank("delivered") && (
         <p className="pstep-note">
           Questions at any point: reply to any of our emails or write to{" "}
-          <a href="mailto:support@luminary-dev.xyz">support@luminary-dev.xyz</a>.
+          {/* Underlined inline: inside a paragraph the global `a` rule leaves
+              colour as the only cue, which fails for colour-blind readers. */}
+          <a href="mailto:support@luminary-dev.xyz" style={{ textDecoration: "underline" }}>
+            support@luminary-dev.xyz
+          </a>
+          .
         </p>
       )}
     </div>
