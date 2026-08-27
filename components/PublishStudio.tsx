@@ -196,15 +196,13 @@ function ArticleForm() {
             <textarea className="q-box" rows={16} value={f.body} onChange={set("body")} required />
           </label>
           <div className="q-field half">
-            <label style={{ display: "flex", gap: 8, alignItems: "center", cursor: "pointer", marginTop: 22 }}>
+            <label className="check-row">
               <input
                 type="checkbox"
                 checked={inlineImages}
                 onChange={(e) => setInlineImages(e.target.checked)}
               />
-              <span className="q-label" style={{ margin: 0 }}>
-                Add illustrations inside the article
-              </span>
+              <span className="q-label">Add illustrations inside the article</span>
             </label>
             <span className="gh-view-note" style={{ marginTop: 4 }}>
               One or two, placed under well-spaced sections. The count follows the length of the
@@ -212,9 +210,9 @@ function ArticleForm() {
             </span>
           </div>
           <div className="q-field half">
-            <label style={{ display: "flex", gap: 8, alignItems: "center", cursor: "pointer", marginTop: 22 }}>
+            <label className="check-row">
               <input type="checkbox" checked={isDraftPost} onChange={(e) => setIsDraftPost(e.target.checked)} />
-              <span className="q-label" style={{ margin: 0 }}>Mark as draft (hidden until the flag is removed)</span>
+              <span className="q-label">Mark as draft (hidden until the flag is removed)</span>
             </label>
           </div>
         </div>

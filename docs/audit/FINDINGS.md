@@ -24,9 +24,9 @@ says plainly that no automated test covers it.
 Since that pass, LC-051 moved from Not fixed to Fixed, making the tally **24
 Fixed, 13 Partially fixed, 8 Not fixed** across the original 45.
 
-A further **23 findings, LC-068 to LC-090, were discovered during the
+A further **24 findings, LC-068 to LC-091, were discovered during the
 remediation itself** and are recorded in their own section at the end of this
-document. Twenty-two are fixed; one (LC-082) is a deliberate Won't fix with the
+document. Twenty-three are fixed; one (LC-082) is a deliberate Won't fix with the
 trade written down. They are kept separate because the distinction is the
 point: they were not visible on a first read of the code. They surfaced from
 unit-testing modules that had none, from measuring rendered pages instead of
@@ -43,7 +43,7 @@ scanning the wrong tree. Both had passed lint, typecheck, tests and a local
 build. They are the argument for watching a change land rather than declaring
 it done when the local gates go green.
 
-Whole-document totals: **68 findings, 46 Fixed, 13 Partially fixed, 8 Not
+Whole-document totals: **69 findings, 47 Fixed, 13 Partially fixed, 8 Not
 fixed, 1 Won't fix.**
 
 ---
@@ -1397,4 +1397,36 @@ article want pictures in it" is the editor's question while 1 against 2 is a
 judgement about the article, and the article is right there to be measured. The
 API still accepts an explicit number so it stays usable directly.
 Guarded by: tests/publish-inline.test.ts, five cases covering unchecked, short, long, the cap and explicit numbers. The style prompt itself has no automated test: image output is not assertable, and pretending otherwise with a snapshot would be theatre.
+Effort: S   Risk of fix: Low   Blocks: —
+
+### LC-091 — Every checkbox in the product failed the WCAG 2.2 AA target size
+Severity: Medium
+Category: Accessibility
+Location: `app/globals.css` (`.q-check`, and the new `.check-row`), `components/PublishStudio.tsx`
+Evidence: Measured in a real browser at iPhone 15 dimensions. The publish
+portal's checkboxes rendered a 13x13 control on a 22px row; the client
+questionnaire's 71 checkboxes rendered 15x15 on a 20px row. WCAG 2.2 AA 2.5.8
+(Target Size Minimum) requires 24x24 CSS px, and Apple's HIG asks for 44x44.
+Every one of them was under the AA floor, on touch and with a mouse.
+The criterion's user-agent exception does not apply, because the author is the
+one overriding the control's size.
+Impact: The questionnaire is the form clients fill in, more often on a phone
+than not, and 71 mis-sized targets is the whole form. A fiddly checkbox on a
+client-facing document is a bad look before it is an accessibility failure. It
+was found only by asking whether a newly added control worked on mobile, and
+then measuring rather than eyeballing: the labels are fully clickable and look
+fine in a screenshot, so nothing about them reads as broken.
+Reproduction: Render `/c/<slug>/questionnaire` at 393px and measure any
+`.q-check` row.
+Proposed fix: Make the row own the height.
+Resolution: Fixed. `.q-check` now has a 24px floor with a 17px control, which
+holds the AA minimum for a mouse while keeping the console dense, and a
+`pointer: coarse` block takes it to 44px with a 20px control on touch. Padding
+rather than centring, so the box still aligns with the FIRST line of an option
+that wraps. The publish portal's two checkboxes moved from duplicated inline
+styles to a shared `.check-row` at 44px.
+Verified by measuring every checkbox on both pages afterwards, at phone and
+desktop, with the pointer media feature emulated both ways: 0 below 24px.
+Guarded by: no automated test. jsdom performs no layout, so a target size is not assertable there; this needs the axe-in-CI pass that `docs/TESTING.md` still records as unbuilt.
+Note: `TasksCard`, `DocActions` and the questionnaire's send-a-copy row use their own checkbox markup and were NOT swept in this change. They are console-side rather than client-facing, and are recorded here rather than silently left.
 Effort: S   Risk of fix: Low   Blocks: —

@@ -255,8 +255,23 @@ select.q-line:focus-visible {
 .q-checks { display: flex; flex-wrap: wrap; gap: 10px 18px; }
 .q-checks.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 @media (max-width: 640px) { .q-checks.grid { grid-template-columns: 1fr; } }
-.q-check { display: inline-flex; align-items: flex-start; gap: 9px; font-size: 13.5px; cursor: pointer; line-height: 1.45; }
-.q-check input { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-top: 3px; }
+/* min-height 24px is the WCAG 2.2 AA floor (2.5.8 Target Size Minimum), which
+   applies to a mouse as much as a finger: the criterion's user-agent exception
+   does not cover us, because we override the control's size here. Coarse
+   pointers get the full 44px below. */
+.q-check { display: inline-flex; align-items: flex-start; gap: 9px; font-size: 13.5px; cursor: pointer; line-height: 1.45; min-height: 24px; padding: 2px 0; }
+.q-check input { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
+/* On a touch device the same row has to be a tap target. WCAG 2.2 AA (2.5.8)
+   asks for 24x24 CSS px, Apple's HIG for 44x44, and a 15px box on a 20px row
+   is neither. Scoped to coarse pointers so the desktop console keeps its
+   density, and padded rather than centred so the box still lines up with the
+   FIRST line of a option that wraps onto two.
+   This one matters most on the client questionnaire, which is filled in on a
+   phone more often than not. */
+@media (pointer: coarse) {
+  .q-check { min-height: 44px; padding: 6px 0; }
+  .q-check input { width: 20px; height: 20px; margin-top: 1px; }
+}
 .q-other { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; max-width: 100%; }
 .q-other .q-line { width: 220px; max-width: 100%; padding: 4px 2px; font-size: 13.5px; }
 
@@ -619,3 +634,24 @@ body {
     min-height: 44px;
   }
 }
+
+/* Checkbox rows are tap targets before they are layout.
+   WCAG 2.2 AA (2.5.8 Target Size Minimum) asks for 24x24 CSS px and Apple's
+   HIG asks for 44x44. A bare checkbox renders at 13x13 with a 22px row, which
+   fails the AA minimum outright and is a fiddly tap on a phone. The row owns
+   the height so the whole label is the target, which is also why the control
+   and its text sit inside one <label>. */
+.check-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+  min-height: 44px;
+}
+.check-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.check-row .q-label { margin: 0; }
