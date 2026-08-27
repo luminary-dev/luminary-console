@@ -359,3 +359,41 @@ describe("saved views", () => {
     expect(header.getAttribute("aria-sort")).toBe("ascending");
   });
 });
+
+describe("LC-088 the personal views know who you are", () => {
+  afterEach(cleanup);
+
+  it("seeds the login from the operator, so the personal views are not silently empty", () => {
+    // Both personal views counted zero for everyone until the reader typed
+    // their own GitHub login into a text box, and a confident
+    // "Needs my review · 0" is worse than an empty state: it reads as
+    // "nothing is waiting on you". The server knows the operator, and
+    // GITHUB_OPERATORS maps them to a login, so it is passed in.
+    const prs = [pr({ number: 1 })];
+    render(
+      <PrInbox
+        prs={prs}
+        counts={viewCounts(prs, { now: NOW })}
+        now={NOW}
+        githubConfigured
+        operatorLogin="dhanikaa"
+      />,
+    );
+    expect((screen.getByLabelText(/your github login/i) as HTMLInputElement).value).toBe("dhanikaa");
+  });
+
+  it("renders an empty login when the operator is not mapped", () => {
+    // No GITHUB_OPERATORS entry means no guess: an invented login would
+    // filter the views to someone else's work.
+    const prs = [pr({ number: 1 })];
+    render(
+      <PrInbox
+        prs={prs}
+        counts={viewCounts(prs, { now: NOW })}
+        now={NOW}
+        githubConfigured
+      />,
+    );
+    expect((screen.getByLabelText(/your github login/i) as HTMLInputElement).value).toBe("");
+  });
+});

@@ -11,7 +11,8 @@ import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
 import { MAIN_ID } from "@/components/SkipLink";
 import { fetchRateLimit } from "@/lib/github/api";
-import { githubConfigured } from "@/lib/github/config";
+import { githubConfigured, githubLoginFor } from "@/lib/github/config";
+import { currentOperator } from "@/lib/operator";
 import { listAllPullRequests } from "@/lib/github/projection";
 import { groupFailures, viewCounts } from "@/lib/github/views";
 import FailureGroups from "@/components/github/FailureGroups";
@@ -87,12 +88,24 @@ async function InboxData() {
   const counts = viewCounts(prs, { now });
   const groups = groupFailures(prs);
   const configured = githubConfigured();
+  // The console already knows who is signed in, and GITHUB_OPERATORS already
+  // maps that operator to a GitHub login. Making the reader type their own
+  // login into a text box to see "needs my review" was asking them for
+  // something the server had all along, and until they did, both personal
+  // views read a confident zero.
+  const operatorLogin = githubLoginFor(await currentOperator()) ?? "";
   const rate = configured ? await readRateLimit() : null;
   const lastSync = prs.reduce((latest, pr) => (pr.syncedAt > latest ? pr.syncedAt : latest), "");
 
   return (
     <>
-      <PrInbox prs={prs} counts={counts} now={now} githubConfigured={configured} />
+      <PrInbox
+        prs={prs}
+        counts={counts}
+        now={now}
+        githubConfigured={configured}
+        operatorLogin={operatorLogin}
+      />
 
       <section className="card" aria-labelledby="gh-failures-title">
         <h2 className="gh-card-title" id="gh-failures-title">
