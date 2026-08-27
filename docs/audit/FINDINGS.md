@@ -24,9 +24,9 @@ says plainly that no automated test covers it.
 Since that pass, LC-051 moved from Not fixed to Fixed, making the tally **24
 Fixed, 13 Partially fixed, 8 Not fixed** across the original 45.
 
-A further **21 findings, LC-068 to LC-088, were discovered during the
+A further **22 findings, LC-068 to LC-089, were discovered during the
 remediation itself** and are recorded in their own section at the end of this
-document. Twenty are fixed; one (LC-082) is a deliberate Won't fix with the
+document. Twenty-one are fixed; one (LC-082) is a deliberate Won't fix with the
 trade written down. They are kept separate because the distinction is the
 point: they were not visible on a first read of the code. They surfaced from
 unit-testing modules that had none, from measuring rendered pages instead of
@@ -43,7 +43,7 @@ scanning the wrong tree. Both had passed lint, typecheck, tests and a local
 build. They are the argument for watching a change land rather than declaring
 it done when the local gates go green.
 
-Whole-document totals: **66 findings, 44 Fixed, 13 Partially fixed, 8 Not
+Whole-document totals: **67 findings, 45 Fixed, 13 Partially fixed, 8 Not
 fixed, 1 Won't fix.**
 
 ---
@@ -1319,4 +1319,40 @@ who clears the field keeps it cleared instead of the server value reappearing
 on every reload, and an unmapped operator gets an empty box rather than a
 guessed login that would filter the views to someone else's work.
 Guarded by: tests/github-ui.test.tsx::"seeds the login from the operator, so the personal views are not silently empty" and ::"renders an empty login when the operator is not mapped".
+Effort: S   Risk of fix: Low   Blocks: —
+
+### LC-089 — Every article publish reported failure after succeeding
+Severity: High
+Category: Correctness / Operations
+Location: `.github/workflows/ops-run.yml` (the "Call the route" step)
+Evidence: Run 33029970914 is marked `failure`, yet its own log shows
+`← 200`, `↳ result stored for relay`, and the pull request it opened,
+dhanikaa/luminary-landing-page#97, exists and is open. The step ran under
+`bash -e` with `set -o pipefail` and ended with:
+`echo "$RESP" | jq "$FILTER" 2>/dev/null | head -c 4000 || echo "$RESP" | head -c 4000`
+`head -c` closes the pipe as soon as it has its bytes, sending SIGPIPE
+upstream. Under `pipefail` the pipeline exits 141, so the `||` fallback runs,
+and the fallback is ITSELF a pipeline with the same flaw. Nothing caught it, it
+was the last command in the group, and `-e` failed the step.
+`/api/publish/article` returns the cover image as a base64 data URL, so its
+response is roughly 200KB every time and the 4000-byte cap was always exceeded.
+Reproduced exactly outside CI: exit 141, with the line after the group never
+reached.
+Impact: Every publish went red after doing real, irreversible work. The article
+was drafted (paid Anthropic and OpenAI calls), the cover was generated, the
+branch was pushed and the pull request opened, and then the console reported a
+failure. The obvious operator response to a failed publish is to run it again,
+and a second run either collides with the in-flight pull request or spends the
+money a second time. A tool that lies about whether it did the thing is worse
+than one that fails honestly, and this one lied in the direction that invites a
+destructive retry.
+Reproduction: Dispatch any relayed route whose response exceeds 4000 bytes.
+Proposed fix: Do not truncate with a pipe.
+Resolution: Fixed — the response is pretty-printed once into a variable and
+truncated with bash substring expansion (`${PRETTY:0:4000}`), which cannot
+raise SIGPIPE. The log echo is bounded the same way, since 200KB of base64 in a
+job log helps nobody, and both places now say plainly how many bytes were
+elided rather than trimming in silence. The non-JSON fallback is preserved and
+tested: an unparsable response still prints raw and still exits 0.
+Guarded by: no automated test. CI workflows are not exercised by the unit suite, which is the same structural gap LC-083 recorded: the local gates do not cover platform or pipeline configuration. The fix was verified by reproducing the failure and the pass outside CI, including the non-JSON path.
 Effort: S   Risk of fix: Low   Blocks: —
