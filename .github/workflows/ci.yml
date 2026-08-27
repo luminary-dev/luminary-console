@@ -64,12 +64,67 @@ jobs:
         env:
           TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # The commit message arrives through the ENVIRONMENT, never through
+          # `${{ }}` interpolation into the script. Interpolation splices the
+          # raw text into the command before bash parses it, so a commit
+          # message containing $(...) or backticks executes on a runner that
+          # holds every secret above. actionlint flags this; it is why the
+          # lint job exists.
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          [ -z "$TG_TOKEN" ] && exit 0
+          if [ -z "$TG_TOKEN" ]; then
+            exit 0
+          fi
           curl -s "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
             -d chat_id="$TG_CHAT" \
-            -d text="Console CI failed on main: ${{ github.event.head_commit.message }} — https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            -d text="Console CI failed on main: ${COMMIT_MESSAGE} ${RUN_URL}" \
             > /dev/null
+
+  workflows:
+    name: 3 · Workflow lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+      # actionlint validates the workflow schema, expression syntax, action
+      # references and runner labels, AND it runs shellcheck over every
+      # `run:` block when shellcheck is on PATH. One tool, both jobs.
+      #
+      # It earns its place: the first run flagged a script injection in this
+      # very file, where a commit message was interpolated straight into a
+      # curl command on a runner holding every secret the pipeline has.
+      #
+      # An honest note on the limit. This would NOT have caught LC-089, the
+      # SIGPIPE-under-pipefail bug that failed every article publish after it
+      # had already succeeded: shellcheck returns clean on that pattern,
+      # verified directly. Static analysis of shell is a floor, not a
+      # guarantee, and pipeline bugs still need a real run to find.
+      - name: Install shellcheck
+        env:
+          SHELLCHECK_VERSION: 0.11.0
+        run: |
+          set -euo pipefail
+          ASSET="shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+          curl -sSfL -O "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/${ASSET}"
+          tar -xJf "${ASSET}"
+          sudo install "shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
+          shellcheck --version
+      - name: Install actionlint
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+        run: |
+          set -euo pipefail
+          ASSET="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          BASE="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}"
+          curl -sSfL -O "${BASE}/${ASSET}"
+          curl -sSfL -O "${BASE}/actionlint_${ACTIONLINT_VERSION}_checksums.txt"
+          grep " ${ASSET}$" "actionlint_${ACTIONLINT_VERSION}_checksums.txt" | sha256sum -c -
+          tar -xzf "${ASSET}" actionlint
+          sudo install actionlint /usr/local/bin/actionlint
+          actionlint --version
+      - name: Lint workflows and their shell
+        run: actionlint
 
   security:
     name: 2 · Security scan

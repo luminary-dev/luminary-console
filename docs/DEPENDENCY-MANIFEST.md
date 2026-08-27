@@ -118,3 +118,28 @@ with functional change:
 Take these as one deliberate batch: bump, run `npm test`, confirm a PDF
 renders and one drafting call succeeds, then commit the lockfile. The
 Chromium and puppeteer pair must move together.
+
+## CI-only tools, pinned in the workflow rather than package.json
+
+Neither ships in `node_modules`: both are single binaries downloaded in the
+`3 · Workflow lint` job, so they add nothing to install time or the bundle.
+
+| Tool | Version | Resolved | Why pinned |
+| --- | --- | --- | --- |
+| `actionlint` | 1.7.12 | 2026-08-27 | Workflow schema, expressions, action refs, runner labels. Also drives shellcheck. Checksum-verified against the published `checksums.txt` |
+| `shellcheck` | 0.11.0 | 2026-08-27 | Shell analysis of every `run:` block, invoked by actionlint when present on PATH |
+
+Both are pinned rather than floating on `latest` for the same reason the
+gitleaks binary is: a scanner that silently becomes a different program is
+worse than no scanner, because the build stays green either way.
+
+What the pair does and does not buy, measured rather than assumed:
+
+- It **found a real script injection** on its first run. `ci.yml` interpolated
+  `github.event.head_commit.message` directly into a `curl` command, on a
+  runner holding the Telegram, R2, Anthropic and Vercel secrets. A commit
+  message containing `$(...)` would have executed there.
+- It would **not** have caught LC-089, the SIGPIPE-under-pipefail bug that
+  failed every article publish after the publish had already succeeded.
+  Verified directly: `shellcheck` returns clean, exit 0, on that exact
+  pattern. Static analysis of shell is a floor, not a guarantee.
