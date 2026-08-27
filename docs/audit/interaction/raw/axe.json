@@ -1,0 +1,414 @@
+[
+  {
+    "path": "/login",
+    "name": "Sign in",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "label",
+        "impact": "critical",
+        "help": "Form elements must have labels",
+        "nodes": 2,
+        "targets": [
+          "input[type=\"email\"]",
+          "input[type=\"password\"]"
+        ]
+      }
+    ],
+    "total": 2
+  },
+  {
+    "path": "/",
+    "name": "Dashboard",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 8,
+        "targets": [
+          "small",
+          ".card:nth-child(3) > div > .pill:nth-child(4)",
+          "div[role=\"group\"] > button:nth-child(1)",
+          "button:nth-child(5)"
+        ]
+      }
+    ],
+    "total": 8
+  },
+  {
+    "path": "/clients/new",
+    "name": "New client",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 1,
+        "targets": [
+          "small"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "help": "Form elements must have labels",
+        "nodes": 5,
+        "targets": [
+          ".half.q-field:nth-child(3) > input",
+          ".q-field:nth-child(4) > input",
+          ".half.q-field:nth-child(5) > input",
+          ".half.q-field:nth-child(6) > input"
+        ]
+      }
+    ],
+    "total": 6
+  },
+  {
+    "path": "/clients/eco-mech",
+    "name": "Client detail",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 51,
+        "targets": [
+          "small",
+          "div:nth-child(1) > span:nth-child(2) > .copy-url.mono[target=\"_blank\"]",
+          "div:nth-child(2) > span:nth-child(2) > .copy-url.mono[target=\"_blank\"]",
+          "div:nth-child(3) > span:nth-child(2) > .copy-url.mono[target=\"_blank\"]"
+        ]
+      }
+    ],
+    "total": 51
+  },
+  {
+    "path": "/activity",
+    "name": "Activity",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 1,
+        "targets": [
+          "small"
+        ]
+      }
+    ],
+    "total": 1
+  },
+  {
+    "path": "/publish",
+    "name": "Publish studio",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 1,
+        "targets": [
+          "small"
+        ]
+      },
+      {
+        "id": "label",
+        "impact": "critical",
+        "help": "Form elements must have labels",
+        "nodes": 3,
+        "targets": [
+          ".q-line[required=\"\"][value=\"\"]",
+          ".half.q-field:nth-child(4) > .q-line[value=\"\"]",
+          "textarea[rows=\"16\"]"
+        ]
+      }
+    ],
+    "total": 4
+  },
+  {
+    "path": "/github",
+    "name": "Pull requests",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 108,
+        "targets": [
+          "small",
+          ".gh-lede",
+          ".gh-chip[type=\"button\"]:nth-child(8)",
+          ".gh-chip[type=\"button\"]:nth-child(8) > .gh-chip-n"
+        ]
+      }
+    ],
+    "total": 108
+  },
+  {
+    "path": "/github/repos",
+    "name": "Repositories",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 36,
+        "targets": [
+          "small",
+          "a[href$=\"repos\"]",
+          ".gh-lede",
+          ".gh-row:nth-child(1) > td:nth-child(4) > .is-ok.gh-status > span"
+        ]
+      }
+    ],
+    "total": 36
+  },
+  {
+    "path": "/github/ci",
+    "name": "CI",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 60,
+        "targets": [
+          "small",
+          "a[href=\"/github/ci\"]",
+          ".gh-lede",
+          ".gh-group:nth-child(2) > .gh-group-prs > li:nth-child(1) > a"
+        ]
+      }
+    ],
+    "total": 60
+  },
+  {
+    "path": "/github/deployments",
+    "name": "Deployments",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 23,
+        "targets": [
+          "small",
+          "a[href$=\"deployments\"]",
+          ".gh-lede",
+          ".gh-row:nth-child(1) > td:nth-child(4) > .is-ok.gh-status > span"
+        ]
+      }
+    ],
+    "total": 23
+  },
+  {
+    "path": "/github/releases",
+    "name": "Releases",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 3,
+        "targets": [
+          "small",
+          "a[href$=\"releases\"]",
+          ".gh-lede"
+        ]
+      }
+    ],
+    "total": 3
+  },
+  {
+    "path": "/github/security",
+    "name": "Security",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 3,
+        "targets": [
+          "small",
+          "a[href$=\"security\"]",
+          ".gh-lede"
+        ]
+      }
+    ],
+    "total": 3
+  },
+  {
+    "path": "/github/insights",
+    "name": "Insights",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 3,
+        "targets": [
+          "small",
+          "a[href$=\"insights\"]",
+          ".gh-lede"
+        ]
+      },
+      {
+        "id": "definition-list",
+        "impact": "serious",
+        "help": "<dl> elements must only directly contain properly-ordered <dt> and <dd> groups, <script>, <template> or <div> elements",
+        "nodes": 4,
+        "targets": [
+          "section[aria-labelledby=\"ins-throughput\"] > dl",
+          "section[aria-labelledby=\"ins-cycle\"] > dl",
+          "section[aria-labelledby=\"ins-review-load\"] > dl",
+          "section[aria-labelledby=\"ins-size\"] > dl"
+        ]
+      }
+    ],
+    "total": 7
+  },
+  {
+    "path": "/github/activity",
+    "name": "Engineering activity",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 102,
+        "targets": [
+          "small",
+          ".gh-nav-link[aria-current=\"page\"][href$=\"activity\"]",
+          ".gh-lede",
+          "nav[aria-label=\"Filter by kind\"] > .gh-chips > .gh-chip[aria-current=\"true\"][href$=\"activity\"]"
+        ]
+      }
+    ],
+    "total": 102
+  },
+  {
+    "path": "/github/luminary-dev/luminary-console/21",
+    "name": "Pull request detail",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 19,
+        "targets": [
+          "small",
+          ".gh-lede",
+          ".pill",
+          ".gh-line:nth-child(1) > .is-ok.gh-status > span"
+        ]
+      }
+    ],
+    "total": 19
+  },
+  {
+    "path": "/c/eco-mech",
+    "name": "Client portal",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 19,
+        "targets": [
+          ".pstep-note > a",
+          "a[href$=\"questionnaire\"] > span:nth-child(1)",
+          "a[href$=\"estimate\"] > span:nth-child(1)",
+          "a[href$=\"quotation\"] > span:nth-child(1)"
+        ]
+      },
+      {
+        "id": "link-in-text-block",
+        "impact": "serious",
+        "help": "Links must be distinguishable without relying on color",
+        "nodes": 1,
+        "targets": [
+          ".pstep-note > a"
+        ]
+      }
+    ],
+    "total": 20
+  },
+  {
+    "path": "/c/eco-mech/questionnaire",
+    "name": "Questionnaire",
+    "state": "at rest",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 17,
+        "targets": [
+          ".on",
+          ".pill",
+          "section:nth-child(2) > .q-eyebrow",
+          "section:nth-child(3) > .q-eyebrow"
+        ]
+      }
+    ],
+    "total": 17
+  },
+  {
+    "path": "/",
+    "name": "Sign out confirmation",
+    "state": "overlay open",
+    "opened": true,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 8,
+        "targets": [
+          "small",
+          ".card:nth-child(3) > div > .pill:nth-child(4)",
+          "div[role=\"group\"] > .pill:nth-child(1)",
+          "div[role=\"group\"] > .pill:nth-child(5)"
+        ]
+      }
+    ],
+    "total": 8
+  },
+  {
+    "path": "/",
+    "name": "Command palette",
+    "state": "overlay open",
+    "opened": true,
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "nodes": 8,
+        "targets": [
+          "small",
+          ".card:nth-child(3) > div > .pill:nth-child(4)",
+          "div[role=\"group\"] > .pill:nth-child(1)",
+          "div[role=\"group\"] > .pill:nth-child(5)"
+        ]
+      }
+    ],
+    "total": 8
+  }
+]

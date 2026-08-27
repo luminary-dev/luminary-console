@@ -11,3 +11,11 @@ next-env.d.ts
 
 # Coverage output from `npm run test:coverage`.
 coverage/
+
+# Interaction audit artifacts. The harness and its reports are committed;
+# these are not. The auth state holds a real session token.
+docs/audit/interaction/.auth/
+docs/audit/interaction/test-results/
+docs/audit/interaction/playwright-report/
+docs/audit/interaction/.auth/dev-key.pem
+docs/audit/interaction/.auth/dev-cert.pem

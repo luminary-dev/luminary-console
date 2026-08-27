@@ -11,6 +11,10 @@ export default defineConfig({
     environment: "node",
     globals: false,
     include: ["tests/**/*.test.ts", "tests/**/*.test.tsx"],
+    // The interaction audit is Playwright, driving a real browser against a
+    // real build. It lives under tests/ for discoverability but must never be
+    // collected here: vitest would import a spec that expects a browser.
+    exclude: ["tests/interaction/**", "node_modules/**"],
     setupFiles: ["tests/setup.ts"],
     // Component tests opt into jsdom per file with
     // `// @vitest-environment jsdom`.

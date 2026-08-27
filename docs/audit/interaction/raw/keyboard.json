@@ -1,0 +1,282 @@
+[
+  {
+    "path": "/login",
+    "name": "Sign in",
+    "stops": 2,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 1,
+    "noRingSample": [
+      "INPUT \"\""
+    ],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "",
+      "href": "",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/",
+    "name": "Dashboard",
+    "stops": 18,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 1,
+    "noRingSample": [
+      "INPUT \"Search clients by name, document number, or \""
+    ],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/clients/new",
+    "name": "New client",
+    "stops": 5,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 1,
+    "noRingSample": [
+      "INPUT \"\""
+    ],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/clients/eco-mech",
+    "name": "Client detail",
+    "stops": 82,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 2,
+    "noRingSample": [
+      "SELECT \"Lifecycle stage\"",
+      "INPUT \"\""
+    ],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/activity",
+    "name": "Activity",
+    "stops": 5,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/publish",
+    "name": "Publish studio",
+    "stops": 8,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 2,
+    "noRingSample": [
+      "TEXTAREA \"\"",
+      "INPUT \"\""
+    ],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/github",
+    "name": "Pull requests",
+    "stops": 33,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 1,
+    "noRingSample": [
+      "INPUT \"Your GitHub login\""
+    ],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/github/repos",
+    "name": "Repositories",
+    "stops": 46,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/github/ci",
+    "name": "CI",
+    "stops": 78,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/github/deployments",
+    "name": "Deployments",
+    "stops": 14,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/github/releases",
+    "name": "Releases",
+    "stops": 12,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/github/security",
+    "name": "Security",
+    "stops": 12,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/github/insights",
+    "name": "Insights",
+    "stops": 12,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/github/activity",
+    "name": "Engineering activity",
+    "stops": 107,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/github/luminary-dev/luminary-console/21",
+    "name": "Pull request detail",
+    "stops": 14,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/c/eco-mech",
+    "name": "Client portal",
+    "stops": 27,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 1,
+    "noRingSample": [
+      "INPUT \"Your name (optional)\""
+    ],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  },
+  {
+    "path": "/c/eco-mech/questionnaire",
+    "name": "Questionnaire",
+    "stops": 120,
+    "reachedEnd": false,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 46,
+    "noRingSample": [
+      "INPUT \"Your name *\"",
+      "INPUT \"Your role at Ecomech Engineering\"",
+      "INPUT \"Best email to reach you\"",
+      "INPUT \"Best phone / WhatsApp\"",
+      "TEXTAREA \"Describe Ecomech Engineering in 2–3 sentence\"",
+      "TEXTAREA \"Your vision.\"",
+      "TEXTAREA \"Your mission.\"",
+      "INPUT \"Core values.\""
+    ],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": false
+    }
+  }
+]

@@ -18,7 +18,14 @@
     "test:live:project": "tsx --env-file=.env.local scripts/tests/suite-project.ts",
     "test:live:client": "tsx --env-file=.env.local scripts/tests/suite-client.ts",
     "test:live:ops": "tsx --env-file=.env.local scripts/tests/suite-ops.ts",
-    "test:live:notify": "tsx --env-file=.env.local scripts/tests/suite-notify.ts"
+    "test:live:notify": "tsx --env-file=.env.local scripts/tests/suite-notify.ts",
+    "ix": "dotenv -e .env.local -- playwright test",
+    "ix:viewport": "dotenv -e .env.local -- playwright test --project=w320 --project=w360 --project=w390 --project=w430 --project=w768 --project=w834 --project=w1024 --project=w1280 --project=w1440 --project=w1920 --project=w2560 --project=w3440 --project=landscape-640x360",
+    "ix:a11y": "dotenv -e .env.local -- playwright test --project=axe",
+    "ix:touch": "dotenv -e .env.local -- playwright test --project=touch",
+    "ix:keyboard": "dotenv -e .env.local -- playwright test --project=keyboard",
+    "ix:perf": "dotenv -e .env.local -- playwright test --project=perf",
+    "ix:inventory": "playwright test --project=inventory"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",
@@ -35,7 +42,9 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@eslint/js": "9.39.5",
+    "@playwright/test": "1.62.1",
     "@testing-library/react": "16.3.2",
     "@testing-library/user-event": "14.6.6",
     "@types/node": "^26",
@@ -44,6 +53,7 @@
     "@types/web-push": "^3.6.4",
     "@vitest/coverage-v8": "4.1.11",
     "dotenv": "^17.0.0",
+    "dotenv-cli": "11.0.0",
     "eslint": "9.39.5",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-no-unsanitized": "4.1.5",

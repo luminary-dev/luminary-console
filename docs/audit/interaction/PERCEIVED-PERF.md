@@ -1,0 +1,25 @@
+# Perceived performance
+
+Generated 2026-08-27. Latency is the browser's own `event` timing entry, not
+wall-clock around an await, so it measures the interaction rather than
+Playwright's round trip. Budget from section 3.6: 150ms, with anything over
+200ms a finding.
+
+| Route | Interaction | Clicked | Worst event | Within 150ms | Long tasks over 50ms |
+| --- | --- | --- | ---: | --- | ---: |
+| `/github` | saved view: failing CI | yes | 32ms | yes | 0 |
+| `/github` | saved view: everything | yes | 0ms | not measured | 0 |
+| `/github` | sort by author | yes | 32ms | yes | 0 |
+| `/github/ci` | first tab or filter | yes | 32ms | yes | 0 |
+| `/` | pipeline filter chip | yes | 32ms | yes | 0 |
+| `/activity` | first control | **no** | 0ms | not measured | 0 |
+
+## Layout shift
+
+Worst CLS observed on load, across every route and width: **0.0091**.
+
+## Coverage gap
+
+These are load-time and single-click measurements. Section 3.6 also asks for
+debounce and cancellation behaviour, optimistic rollback, race conditions on
+rapid filter switching, and Slow 3G. None of those is covered yet.
