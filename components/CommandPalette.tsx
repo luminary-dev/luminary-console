@@ -7,8 +7,16 @@
 // Accessibility (LC-043): the overlay is a dialog, the input is a combobox
 // owning a single listbox, and arrow keys move aria-activedescendant across
 // BOTH result groups rather than only the name matches.
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+//
+// The trap, the background scroll lock, Escape and the focus return come from
+// useOverlayBehaviour, the same primitive the confirmation dialogs use
+// (IX-004, IX-005, IX-006). This overlay had none of them: Tab walked straight
+// out into the page behind the veil on the first press, and it kept doing so
+// because the only tab stop it owns (the input) is surrounded by a result list
+// that is rebuilt on every keystroke.
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useOverlayBehaviour } from "./useOverlayBehaviour";
 
 export type PaletteItem = { slug: string; company: string; docNoBase: string };
 
@@ -35,19 +43,37 @@ export default function CommandPalette({ items }: { items: PaletteItem[] }) {
   const [content, setContent] = useState<ContentState | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const openRef = useRef(open);
 
+  const dismiss = useCallback(() => setOpen(false), []);
+
+  const { captureTrigger } = useOverlayBehaviour({
+    open,
+    overlayRef: dialogRef,
+    onDismiss: dismiss,
+  });
+
+  useEffect(() => {
+    openRef.current = open;
+  }, [open]);
+
+  // Escape is not handled here any more: useOverlayBehaviour owns it, and only
+  // for the topmost overlay, so a confirmation opened above the palette is not
+  // dismissed together with it.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
+        // Before the overlay renders, while whatever the user was on still
+        // has focus.
+        if (!openRef.current) captureTrigger();
         setOpen((v) => !v);
-      } else if (e.key === "Escape") {
-        setOpen(false);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [captureTrigger]);
 
   useEffect(() => {
     if (open) {
@@ -152,6 +178,7 @@ export default function CommandPalette({ items }: { items: PaletteItem[] }) {
         style={{ position: "absolute", inset: 0, border: "none", background: "transparent", cursor: "default", padding: 0 }}
       />
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Search clients"

@@ -11,13 +11,13 @@ Screenshots are under `screens/<project>/<route>.png`.
 | `/login` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/` | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err | 1 err |
 | `/clients/new` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
-| `/clients/eco-mech` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
+| `/clients/eco-mech` | OK | OK | OK | OK | OK | OK | OK | 1 err | OK | OK | OK | OK | OK |
 | `/activity` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/publish` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/github` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/github/repos` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/github/ci` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
-| `/github/deployments` | +15px | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
+| `/github/deployments` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/github/releases` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/github/security` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/github/insights` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
@@ -27,8 +27,8 @@ Screenshots are under `screens/<project>/<route>.png`.
 | `/c/eco-mech/questionnaire` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 | `/c/eco-mech/quotation` | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK | OK |
 
-**Horizontal overflow: 1 of 234 measurements.**
-- `/github/deployments` at 320px scrolls 15px
+**Horizontal overflow: 0 of 234 measurements.**
+None.
 
 ## Layout shift
 

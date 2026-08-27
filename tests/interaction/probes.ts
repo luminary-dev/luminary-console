@@ -143,7 +143,15 @@ export function targetProbe(): TargetHit[] {
   const els = Array.from(document.querySelectorAll<HTMLElement>(SELECTOR)).filter((el) => {
     const r = el.getBoundingClientRect();
     const s = getComputedStyle(el);
-    return r.width > 0 && r.height > 0 && s.visibility !== "hidden" && s.display !== "none";
+    if (r.width === 0 || r.height === 0) return false;
+    if (s.visibility === "hidden" || s.display === "none") return false;
+    // Spam honeypots are deliberately unreachable: parked far off-screen at
+    // zero opacity so a bot fills them and a person never sees them. Counting
+    // one as an undersized tap target is a false positive, and it showed up
+    // as a 4x4 control with a 10041px neighbour gap, which is the giveaway.
+    if (Number(s.opacity) === 0) return false;
+    if (r.right < 0 || r.bottom < 0 || r.left > window.innerWidth * 3) return false;
+    return true;
   });
 
   const boxes = els.map((el) => el.getBoundingClientRect());

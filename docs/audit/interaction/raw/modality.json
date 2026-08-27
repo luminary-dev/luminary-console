@@ -2,64 +2,27 @@
   {
     "check": "hover dependency",
     "hoverRevealed": [],
-    "unguardedHoverRules": [
-      "a:hover",
-      ".btn:hover",
-      ".th-sort:hover, th[aria-sort=\"ascending\"] .th-sort, th[aria-sort=\"descending\"] .th-sort",
-      ".q-file-btn:hover:not(:disabled)",
-      ".q-file-x:hover",
-      ".btn-danger:hover:not(:disabled)",
-      ".hist > summary:hover",
-      ".task-x:hover",
-      ".lang-btn:hover",
-      ".app-tab.on, .app-tab:hover",
-      ".gh-chip:hover:not(:disabled)",
-      ".gh-row:hover",
-      ".gh-row-link:hover",
-      ".gh-linkbtn:hover",
-      ".gh-nav-link:hover"
-    ],
-    "unguardedCount": 15
+    "unguardedHoverRules": [],
+    "unguardedCount": 0
   },
   {
     "check": "touch targets",
     "path": "/login",
     "name": "Sign in",
-    "total": 5,
-    "under44": 5,
+    "total": 4,
+    "under44": 2,
     "underAA24": 0,
     "crowdedUnder8px": 0,
     "worst": [
       {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 132,
-        "cls": "theme-toggle"
-      },
-      {
-        "name": "Continue",
-        "w": 100,
-        "h": 38,
-        "gap": 22,
-        "cls": "btn"
-      },
-      {
-        "name": "Skip to content",
-        "w": 124,
-        "h": 42,
-        "gap": 178,
-        "cls": "skip-link"
-      },
-      {
-        "name": "INPUT",
+        "name": "Email",
         "w": 303,
         "h": 37,
         "gap": 48,
         "cls": "q-line"
       },
       {
-        "name": "INPUT",
+        "name": "Password",
         "w": 303,
         "h": 37,
         "gap": 22,
@@ -72,45 +35,10 @@
     "path": "/",
     "name": "Dashboard",
     "total": 25,
-    "under44": 19,
-    "underAA24": 4,
+    "under44": 3,
+    "underAA24": 2,
     "crowdedUnder8px": 8,
     "worst": [
-      {
-        "name": "Client",
-        "w": 54,
-        "h": 16,
-        "gap": 28,
-        "cls": "th-sort"
-      },
-      {
-        "name": "Created↓",
-        "w": 63,
-        "h": 16,
-        "gap": 20,
-        "cls": "th-sort"
-      },
-      {
-        "name": "Open → Ecomech Engineering Lanka (Pvt) L",
-        "w": 33,
-        "h": 39,
-        "gap": 57,
-        "cls": ""
-      },
-      {
-        "name": "Outstanding",
-        "w": 90,
-        "h": 16,
-        "gap": 20,
-        "cls": "th-sort"
-      },
-      {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 10,
-        "cls": "theme-toggle"
-      },
       {
         "name": "All · 1",
         "w": 75,
@@ -119,32 +47,18 @@
         "cls": "pill"
       },
       {
-        "name": "Revoke",
-        "w": 69,
-        "h": 29,
-        "gap": 33,
-        "cls": "btn ghost small"
+        "name": "Development · 1",
+        "w": 131,
+        "h": 23,
+        "gap": 6,
+        "cls": "pill"
       },
       {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 10,
-        "cls": "btn ghost small"
-      },
-      {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 55,
-        "cls": "btn ghost small"
-      },
-      {
-        "name": "Publish",
-        "w": 69,
-        "h": 33,
-        "gap": 10,
-        "cls": "btn ghost small app-hide"
+        "name": "Search clients by name, document number,",
+        "w": 280,
+        "h": 37,
+        "gap": 12,
+        "cls": "q-line"
       }
     ]
   },
@@ -152,76 +66,48 @@
     "check": "touch targets",
     "path": "/clients/new",
     "name": "New client",
-    "total": 12,
-    "under44": 11,
+    "total": 11,
+    "under44": 6,
     "underAA24": 0,
     "crowdedUnder8px": 0,
     "worst": [
       {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 10,
-        "cls": "theme-toggle"
-      },
-      {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 10,
-        "cls": "btn ghost small"
-      },
-      {
-        "name": "← Dashboard",
-        "w": 105,
-        "h": 33,
-        "gap": 10,
-        "cls": "btn ghost small app-hide"
-      },
-      {
-        "name": "Skip to content",
-        "w": 124,
-        "h": 42,
-        "gap": 66,
-        "cls": "skip-link"
-      },
-      {
-        "name": "Create client & generate documents",
-        "w": 265,
-        "h": 38,
-        "gap": 22,
-        "cls": "btn"
-      },
-      {
-        "name": "INPUT",
+        "name": "Company name *",
         "w": 323,
         "h": 37,
         "gap": 48,
         "cls": "q-line"
       },
       {
-        "name": "INPUT",
+        "name": "Subdomain slug",
         "w": 323,
         "h": 37,
         "gap": 48,
         "cls": "q-line"
       },
       {
-        "name": "INPUT",
+        "name": "Contact person",
         "w": 323,
         "h": 37,
         "gap": 48,
         "cls": "q-line"
       },
       {
-        "name": "INPUT",
+        "name": "Address",
         "w": 323,
         "h": 37,
         "gap": 48,
         "cls": "q-line"
       },
       {
-        "name": "INPUT",
+        "name": "Email",
+        "w": 323,
+        "h": 37,
+        "gap": 48,
+        "cls": "q-line"
+      },
+      {
+        "name": "Phone",
         "w": 323,
         "h": 37,
         "gap": 48,
@@ -233,78 +119,78 @@
     "check": "touch targets",
     "path": "/clients/eco-mech",
     "name": "Client detail",
-    "total": 118,
-    "under44": 110,
-    "underAA24": 42,
-    "crowdedUnder8px": 37,
+    "total": 117,
+    "under44": 41,
+    "underAA24": 12,
+    "crowdedUnder8px": 41,
     "worst": [
       {
         "name": "PDF",
-        "w": 23,
-        "h": 19,
-        "gap": 8,
-        "cls": ""
-      },
-      {
-        "name": "PDF",
-        "w": 23,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
         "name": "PDF",
-        "w": 23,
-        "h": 19,
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "PDF",
+        "w": 24,
+        "h": 44,
         "gap": 6,
         "cls": ""
       },
       {
         "name": "PDF",
-        "w": 23,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 6,
         "cls": ""
       },
       {
         "name": "PDF",
-        "w": 23,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 6,
         "cls": ""
       },
       {
         "name": "PDF",
-        "w": 23,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 6,
         "cls": ""
       },
       {
         "name": "PDF",
-        "w": 23,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 6,
         "cls": ""
       },
       {
         "name": "PDF",
-        "w": 23,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 6,
         "cls": ""
       },
       {
         "name": "Form",
         "w": 32,
-        "h": 17,
-        "gap": 5,
+        "h": 44,
+        "gap": 0,
         "cls": ""
       },
       {
         "name": "HTML",
         "w": 33,
-        "h": 19,
+        "h": 44,
         "gap": 0,
         "cls": ""
       }
@@ -314,54 +200,18 @@
     "check": "touch targets",
     "path": "/activity",
     "name": "Activity",
-    "total": 5,
-    "under44": 5,
+    "total": 4,
+    "under44": 0,
     "underAA24": 0,
     "crowdedUnder8px": 0,
-    "worst": [
-      {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 10,
-        "cls": "theme-toggle"
-      },
-      {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 10,
-        "cls": "btn ghost small"
-      },
-      {
-        "name": "See more",
-        "w": 81,
-        "h": 29,
-        "gap": 210,
-        "cls": "btn ghost small"
-      },
-      {
-        "name": "← Dashboard",
-        "w": 105,
-        "h": 33,
-        "gap": 10,
-        "cls": "btn ghost small app-hide"
-      },
-      {
-        "name": "Skip to content",
-        "w": 124,
-        "h": 42,
-        "gap": 66,
-        "cls": "skip-link"
-      }
-    ]
+    "worst": []
   },
   {
     "check": "touch targets",
     "path": "/publish",
     "name": "Publish studio",
-    "total": 17,
-    "under44": 14,
+    "total": 16,
+    "under44": 7,
     "underAA24": 1,
     "crowdedUnder8px": 0,
     "worst": [
@@ -380,56 +230,35 @@
         "cls": ""
       },
       {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 10,
-        "cls": "theme-toggle"
+        "name": "Title *",
+        "w": 323,
+        "h": 37,
+        "gap": 48,
+        "cls": "q-line"
       },
       {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 10,
-        "cls": "btn ghost small"
+        "name": "Slug",
+        "w": 323,
+        "h": 37,
+        "gap": 48,
+        "cls": "q-line"
       },
       {
-        "name": "New article",
-        "w": 91,
-        "h": 29,
-        "gap": 8,
-        "cls": "btn small"
+        "name": "Tags (comma-separated)",
+        "w": 323,
+        "h": 37,
+        "gap": 48,
+        "cls": "q-line"
       },
       {
-        "name": "New project",
-        "w": 95,
-        "h": 29,
-        "gap": 8,
-        "cls": "btn small ghost"
+        "name": "Excerpt",
+        "w": 323,
+        "h": 37,
+        "gap": 48,
+        "cls": "q-line"
       },
       {
-        "name": "← Dashboard",
-        "w": 105,
-        "h": 33,
-        "gap": 10,
-        "cls": "btn ghost small app-hide"
-      },
-      {
-        "name": "Skip to content",
-        "w": 124,
-        "h": 42,
-        "gap": 123,
-        "cls": "skip-link"
-      },
-      {
-        "name": "Generate cover & open PR",
-        "w": 205,
-        "h": 38,
-        "gap": 23,
-        "cls": "btn"
-      },
-      {
-        "name": "INPUT",
+        "name": "Cover image scene",
         "w": 323,
         "h": 37,
         "gap": 48,
@@ -441,80 +270,80 @@
     "check": "touch targets",
     "path": "/github",
     "name": "Pull requests",
-    "total": 87,
-    "under44": 85,
-    "underAA24": 5,
+    "total": 86,
+    "under44": 16,
+    "underAA24": 0,
     "crowdedUnder8px": 84,
     "worst": [
       {
-        "name": "Author",
-        "w": 54,
-        "h": 16,
-        "gap": 22,
-        "cls": "th-sort"
-      },
-      {
-        "name": "Updated↓",
-        "w": 63,
-        "h": 16,
-        "gap": 409,
-        "cls": "th-sort"
-      },
-      {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
+        "name": "Your GitHub login",
+        "w": 200,
+        "h": 27,
         "gap": 0,
-        "cls": "theme-toggle"
+        "cls": "q-line"
       },
       {
-        "name": "Pull request",
-        "w": 97,
-        "h": 16,
+        "name": "luminary-dev/luminate #206build(deps): b",
+        "w": 292,
+        "h": 35,
         "gap": 0,
-        "cls": "th-sort"
+        "cls": ""
       },
       {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
+        "name": "luminary-dev/luminate #206build(deps): b",
+        "w": 292,
+        "h": 35,
         "gap": 0,
-        "cls": "btn ghost small"
+        "cls": ""
       },
       {
-        "name": "Open drafts, parked on purpose.",
-        "w": 96,
-        "h": 29,
+        "name": "luminary-dev/medease #771MEDEASE-184: Ad",
+        "w": 296,
+        "h": 35,
         "gap": 0,
-        "cls": "gh-chip"
+        "cls": ""
       },
       {
-        "name": "← Dashboard",
-        "w": 105,
-        "h": 33,
+        "name": "luminary-dev/medease #776build(deps): bu",
+        "w": 312,
+        "h": 35,
         "gap": 0,
-        "cls": "btn ghost small app-hide"
+        "cls": ""
       },
       {
-        "name": "Open pull requests with at least one fai",
-        "w": 132,
-        "h": 29,
+        "name": "luminary-dev/luminate #201build(deps): b",
+        "w": 314,
+        "h": 35,
         "gap": 0,
-        "cls": "gh-chip"
+        "cls": ""
       },
       {
-        "name": "Every open pull request across the organ",
-        "w": 132,
-        "h": 29,
+        "name": "luminary-dev/luminate #201build(deps): b",
+        "w": 314,
+        "h": 35,
         "gap": 0,
-        "cls": "gh-chip"
+        "cls": ""
       },
       {
-        "name": "Open pull requests where you are a reque",
-        "w": 160,
-        "h": 29,
+        "name": "luminary-dev/luminate #201build(deps): b",
+        "w": 314,
+        "h": 35,
         "gap": 0,
-        "cls": "gh-chip"
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev/service-hub #879chore(deps)",
+        "w": 318,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "luminary-dev/service-hub #878chore(deps)",
+        "w": 318,
+        "h": 35,
+        "gap": 0,
+        "cls": ""
       }
     ]
   },
@@ -522,80 +351,17 @@
     "check": "touch targets",
     "path": "/github/repos",
     "name": "Repositories",
-    "total": 47,
-    "under44": 46,
-    "underAA24": 32,
+    "total": 46,
+    "under44": 1,
+    "underAA24": 0,
     "crowdedUnder8px": 43,
     "worst": [
       {
-        "name": "Open PRs",
-        "w": 69,
-        "h": 16,
-        "gap": 0,
-        "cls": "th-sort"
-      },
-      {
-        "name": "Last push",
-        "w": 76,
-        "h": 16,
-        "gap": 149,
-        "cls": "th-sort"
-      },
-      {
         "name": "CI",
         "w": 35,
-        "h": 36,
+        "h": 44,
         "gap": 0,
         "cls": "gh-nav-link"
-      },
-      {
-        "name": "Repository↑",
-        "w": 84,
-        "h": 16,
-        "gap": 0,
-        "cls": "th-sort"
-      },
-      {
-        "name": "Open alerts",
-        "w": 90,
-        "h": 16,
-        "gap": 66,
-        "cls": "th-sort"
-      },
-      {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 0,
-        "cls": "theme-toggle"
-      },
-      {
-        "name": "CI pass rate",
-        "w": 97,
-        "h": 16,
-        "gap": 20,
-        "cls": "th-sort"
-      },
-      {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 0,
-        "cls": "btn ghost small"
-      },
-      {
-        "name": "luminary-dev/aurora",
-        "w": 123,
-        "h": 19,
-        "gap": 0,
-        "cls": "gh-row-link"
-      },
-      {
-        "name": "luminary-dev/.github",
-        "w": 125,
-        "h": 19,
-        "gap": 0,
-        "cls": "gh-row-link"
       }
     ]
   },
@@ -603,78 +369,78 @@
     "check": "touch targets",
     "path": "/github/ci",
     "name": "CI",
-    "total": 79,
-    "under44": 59,
-    "underAA24": 22,
+    "total": 78,
+    "under44": 31,
+    "underAA24": 0,
     "crowdedUnder8px": 78,
     "worst": [
       {
         "name": "ci",
-        "w": 10,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 19,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       }
@@ -684,24 +450,17 @@
     "check": "touch targets",
     "path": "/github/deployments",
     "name": "Deployments",
-    "total": 15,
-    "under44": 14,
+    "total": 14,
+    "under44": 3,
     "underAA24": 2,
     "crowdedUnder8px": 14,
     "worst": [
       {
         "name": "CI",
         "w": 35,
-        "h": 36,
+        "h": 44,
         "gap": 0,
         "cls": "gh-nav-link"
-      },
-      {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 0,
-        "cls": "theme-toggle"
       },
       {
         "name": "Open Preview",
@@ -711,53 +470,11 @@
         "cls": ""
       },
       {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 0,
-        "cls": "btn ghost small"
-      },
-      {
         "name": "Open Production",
         "w": 101,
         "h": 22,
         "gap": 0,
         "cls": ""
-      },
-      {
-        "name": "Releases",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Security",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Insights",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Activity",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "← Dashboard",
-        "w": 105,
-        "h": 33,
-        "gap": 0,
-        "cls": "btn ghost small app-hide"
       }
     ]
   },
@@ -765,78 +482,15 @@
     "check": "touch targets",
     "path": "/github/releases",
     "name": "Releases",
-    "total": 13,
-    "under44": 12,
+    "total": 12,
+    "under44": 1,
     "underAA24": 0,
     "crowdedUnder8px": 12,
     "worst": [
       {
         "name": "CI",
         "w": 35,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 0,
-        "cls": "theme-toggle"
-      },
-      {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 0,
-        "cls": "btn ghost small"
-      },
-      {
-        "name": "Releases",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Security",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Insights",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Activity",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "← Dashboard",
-        "w": 105,
-        "h": 33,
-        "gap": 0,
-        "cls": "btn ghost small app-hide"
-      },
-      {
-        "name": "Deployments",
-        "w": 102,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Repositories",
-        "w": 110,
-        "h": 36,
+        "h": 44,
         "gap": 0,
         "cls": "gh-nav-link"
       }
@@ -846,78 +500,15 @@
     "check": "touch targets",
     "path": "/github/security",
     "name": "Security",
-    "total": 13,
-    "under44": 12,
+    "total": 12,
+    "under44": 1,
     "underAA24": 0,
     "crowdedUnder8px": 12,
     "worst": [
       {
         "name": "CI",
         "w": 35,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 0,
-        "cls": "theme-toggle"
-      },
-      {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 0,
-        "cls": "btn ghost small"
-      },
-      {
-        "name": "Releases",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Security",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Insights",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Activity",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "← Dashboard",
-        "w": 105,
-        "h": 33,
-        "gap": 0,
-        "cls": "btn ghost small app-hide"
-      },
-      {
-        "name": "Deployments",
-        "w": 102,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Repositories",
-        "w": 110,
-        "h": 36,
+        "h": 44,
         "gap": 0,
         "cls": "gh-nav-link"
       }
@@ -927,78 +518,15 @@
     "check": "touch targets",
     "path": "/github/insights",
     "name": "Insights",
-    "total": 13,
-    "under44": 12,
+    "total": 12,
+    "under44": 1,
     "underAA24": 0,
     "crowdedUnder8px": 12,
     "worst": [
       {
         "name": "CI",
         "w": 35,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 0,
-        "cls": "theme-toggle"
-      },
-      {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 0,
-        "cls": "btn ghost small"
-      },
-      {
-        "name": "Releases",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Security",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Insights",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Activity",
-        "w": 80,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "← Dashboard",
-        "w": 105,
-        "h": 33,
-        "gap": 0,
-        "cls": "btn ghost small app-hide"
-      },
-      {
-        "name": "Deployments",
-        "w": 102,
-        "h": 36,
-        "gap": 0,
-        "cls": "gh-nav-link"
-      },
-      {
-        "name": "Repositories",
-        "w": 110,
-        "h": 36,
+        "h": 44,
         "gap": 0,
         "cls": "gh-nav-link"
       }
@@ -1008,78 +536,78 @@
     "check": "touch targets",
     "path": "/github/activity",
     "name": "Engineering activity",
-    "total": 132,
-    "under44": 121,
-    "underAA24": 49,
+    "total": 131,
+    "under44": 35,
+    "underAA24": 0,
     "crowdedUnder8px": 131,
     "worst": [
       {
         "name": "ci",
-        "w": 10,
-        "h": 16,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 16,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 16,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 16,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 16,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 16,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 16,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 16,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 16,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
         "name": "ci",
-        "w": 10,
-        "h": 16,
+        "w": 24,
+        "h": 44,
         "gap": 0,
         "cls": ""
       }
@@ -1089,8 +617,8 @@
     "check": "touch targets",
     "path": "/github/luminary-dev/luminary-console/21",
     "name": "Pull request detail",
-    "total": 15,
-    "under44": 14,
+    "total": 14,
+    "under44": 10,
     "underAA24": 10,
     "crowdedUnder8px": 14,
     "worst": [
@@ -1100,13 +628,6 @@
         "h": 17,
         "gap": 0,
         "cls": ""
-      },
-      {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 0,
-        "cls": "theme-toggle"
       },
       {
         "name": "Files changed",
@@ -1121,13 +642,6 @@
         "h": 22,
         "gap": 0,
         "cls": ""
-      },
-      {
-        "name": "Sign out",
-        "w": 74,
-        "h": 29,
-        "gap": 0,
-        "cls": "btn ghost small"
       },
       {
         "name": "2 · Security scan",
@@ -1163,6 +677,20 @@
         "h": 17,
         "gap": 0,
         "cls": ""
+      },
+      {
+        "name": "1 · Lint, typecheck & test",
+        "w": 195,
+        "h": 17,
+        "gap": 0,
+        "cls": ""
+      },
+      {
+        "name": "GitGuardian Security Checks",
+        "w": 203,
+        "h": 17,
+        "gap": 0,
+        "cls": ""
       }
     ]
   },
@@ -1170,80 +698,38 @@
     "check": "touch targets",
     "path": "/c/eco-mech",
     "name": "Client portal",
-    "total": 28,
-    "under44": 21,
-    "underAA24": 11,
+    "total": 26,
+    "under44": 4,
+    "underAA24": 0,
     "crowdedUnder8px": 7,
     "worst": [
       {
-        "name": "INPUT",
-        "w": 4,
-        "h": 4,
-        "gap": 10028,
+        "name": "luminary-dev.xyz",
+        "w": 115,
+        "h": 19,
+        "gap": 28,
         "cls": ""
       },
       {
-        "name": "Select this ✓",
-        "w": 86,
-        "h": 14,
-        "gap": 14,
+        "name": "support@luminary-dev.xyz",
+        "w": 147,
+        "h": 16,
+        "gap": 139,
         "cls": ""
       },
       {
-        "name": "Select this ✓",
-        "w": 86,
-        "h": 14,
-        "gap": 14,
+        "name": "support@luminary-dev.xyz",
+        "w": 173,
+        "h": 19,
+        "gap": 28,
         "cls": ""
       },
       {
-        "name": "Preview →",
-        "w": 68,
-        "h": 18,
-        "gap": 14,
-        "cls": ""
-      },
-      {
-        "name": "Preview →",
-        "w": 68,
-        "h": 18,
-        "gap": 14,
-        "cls": ""
-      },
-      {
-        "name": "Preview →",
-        "w": 68,
-        "h": 18,
-        "gap": 14,
-        "cls": ""
-      },
-      {
-        "name": "Request changes",
-        "w": 99,
-        "h": 14,
-        "gap": 14,
-        "cls": ""
-      },
-      {
-        "name": "Request changes",
-        "w": 99,
-        "h": 14,
-        "gap": 16,
-        "cls": ""
-      },
-      {
-        "name": "Request changes",
-        "w": 99,
-        "h": 14,
-        "gap": 14,
-        "cls": ""
-      },
-      {
-        "name": "Toggle light and dark theme",
-        "w": 52,
-        "h": 28,
-        "gap": 195,
-        "cls": "theme-toggle"
+        "name": "Your name (optional)",
+        "w": 327,
+        "h": 37,
+        "gap": 20,
+        "cls": "q-line"
       }
     ]
   },
@@ -1251,18 +737,11 @@
     "check": "touch targets",
     "path": "/c/eco-mech/questionnaire",
     "name": "Questionnaire",
-    "total": 131,
-    "under44": 105,
+    "total": 129,
+    "under44": 99,
     "underAA24": 64,
     "crowdedUnder8px": 2,
     "worst": [
-      {
-        "name": "INPUT",
-        "w": 4,
-        "h": 4,
-        "gap": 10041,
-        "cls": ""
-      },
       {
         "name": "Generate enquiries & leads",
         "w": 15,
@@ -1321,6 +800,13 @@
       },
       {
         "name": "We have a logo (attaching it below)",
+        "w": 15,
+        "h": 15,
+        "gap": 15,
+        "cls": ""
+      },
+      {
+        "name": "We have vector files (AI / SVG / EPS / P",
         "w": 15,
         "h": 15,
         "gap": 15,

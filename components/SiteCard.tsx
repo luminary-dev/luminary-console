@@ -138,7 +138,7 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
             <button className="btn ghost small" disabled={!!busy} onClick={() => call({ action: "redeploy" }, "redeploy")}>
               {busy === "redeploy" ? "…" : "Redeploy"}
             </button>
-            <button className="btn ghost small" style={{ color: "var(--danger, #ef4444)", borderColor: "rgba(239,68,68,.35)", marginLeft: "auto" }} disabled={!!busy} onClick={remove}>
+            <button className="btn ghost small" style={{ color: "var(--danger)", borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)", marginLeft: "auto" }} disabled={!!busy} onClick={remove}>
               {busy === "delete" ? "…" : "Remove"}
             </button>
           </div>

@@ -146,7 +146,7 @@ function ArticleForm() {
       <div className="card">
         <h3>Draft with AI (optional)</h3>
         <div className="q-fields">
-          <div className="q-field">
+          <label className="q-field">
             <span className="q-label">Brief</span>
             <textarea
               className="q-box"
@@ -155,7 +155,7 @@ function ArticleForm() {
               onChange={(e) => setBrief(e.target.value)}
               placeholder="e.g. A practical post on shipping WebSockets on Vercel Fluid Compute: what changed, patterns, pitfalls."
             />
-          </div>
+          </label>
         </div>
         {draftError && <div className="form-error">{draftError}</div>}
         <button type="button" className="btn small" style={{ marginTop: 12 }} disabled={drafting || brief.trim().length < 12} onClick={draft}>
@@ -166,23 +166,23 @@ function ArticleForm() {
       <form className="card" style={{ marginTop: 16 }} onSubmit={publish}>
         <h3>Article</h3>
         <div className="q-fields">
-          <div className="q-field half">
+          <label className="q-field half">
             <span className="q-label">Title <span className="req">*</span></span>
             <input className="q-line" value={f.title} onChange={set("title")} required />
-          </div>
-          <div className="q-field half">
+          </label>
+          <label className="q-field half">
             <span className="q-label">Slug</span>
             <input className="q-line" value={f.slug} onChange={set("slug")} placeholder="auto from title" />
-          </div>
-          <div className="q-field half">
+          </label>
+          <label className="q-field half">
             <span className="q-label">Tags (comma-separated)</span>
             <input className="q-line" value={f.tags} onChange={set("tags")} placeholder="nextjs, devops" />
-          </div>
-          <div className="q-field half">
+          </label>
+          <label className="q-field half">
             <span className="q-label">Excerpt</span>
             <input className="q-line" value={f.excerpt} onChange={set("excerpt")} />
-          </div>
-          <div className="q-field">
+          </label>
+          <label className="q-field">
             <span className="q-label">Cover image scene</span>
             <input
               className="q-line"
@@ -190,11 +190,11 @@ function ArticleForm() {
               onChange={set("imageBrief")}
               placeholder="One sentence: a whimsical physical metaphor for the post (no screenshots)."
             />
-          </div>
-          <div className="q-field">
+          </label>
+          <label className="q-field">
             <span className="q-label">Body (markdown) <span className="req">*</span></span>
             <textarea className="q-box" rows={16} value={f.body} onChange={set("body")} required />
-          </div>
+          </label>
           <div className="q-field half">
             <label style={{ display: "flex", gap: 8, alignItems: "center", cursor: "pointer", marginTop: 22 }}>
               <input
@@ -285,7 +285,7 @@ function ProjectForm() {
       <div className="card">
         <h3>Draft with AI</h3>
         <div className="q-fields">
-          <div className="q-field">
+          <label className="q-field">
             <span className="q-label">Brief</span>
             <textarea
               className="q-box"
@@ -294,7 +294,7 @@ function ProjectForm() {
               onChange={(e) => setBrief(e.target.value)}
               placeholder="What was built, for whom, with what stack, and the results. Include the live URL or GitHub repo. e.g. 'Engineering project: a Terraform module registry with OPA policy gates… github.com/…'"
             />
-          </div>
+          </label>
         </div>
         {draftError && <div className="form-error">{draftError}</div>}
         <button type="button" className="btn small" style={{ marginTop: 12 }} disabled={drafting || brief.trim().length < 12} onClick={draft}>
@@ -305,7 +305,7 @@ function ProjectForm() {
       <form className="card" style={{ marginTop: 16 }} onSubmit={publish}>
         <h3>Project entry</h3>
         <div className="q-fields">
-          <div className="q-field">
+          <label className="q-field">
             <span className="q-label">Thumbnail scene <span className="req">*</span></span>
             <input
               className="q-line"
@@ -314,8 +314,8 @@ function ProjectForm() {
               placeholder="One sentence: the physical scene for the day/dusk thumbnail pair."
               required
             />
-          </div>
-          <div className="q-field">
+          </label>
+          <label className="q-field">
             <span className="q-label">Entry (JSON, review before publishing) <span className="req">*</span></span>
             <textarea
               className="q-box"
@@ -325,7 +325,7 @@ function ProjectForm() {
               style={{ fontFamily: "ui-monospace, monospace", fontSize: 12.5 }}
               required
             />
-          </div>
+          </label>
         </div>
         {error && <div className="form-error">{error}</div>}
         {busy && (

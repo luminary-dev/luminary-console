@@ -9,15 +9,15 @@
 // Accessibility (LC-043): Tab is trapped inside the open dialog, focus goes
 // back to whatever opened it on close, and the veil dismisses through a real
 // button rather than a mouse handler on a non-interactive div.
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+//
+// The trap, the background scroll lock and the focus return all live in
+// useOverlayBehaviour, shared with the command palette (IX-004, IX-005,
+// IX-006). The trap this file used to carry only intervened at the edges of a
+// focusable list it rebuilt from a selector that still counted tabindex="-1"
+// nodes, which left the browser's own tab order in charge everywhere else.
+import { useCallback, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useOverlayBehaviour } from "./useOverlayBehaviour";
 
 export type ConfirmOptions = {
   title: string;
@@ -29,9 +29,6 @@ export type ConfirmOptions = {
   prompt?: { placeholder?: string; initial?: string };
 };
 
-const FOCUSABLE =
-  'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
-
 export function useConfirm() {
   const uid = useId();
   const titleId = `${uid}-title`;
@@ -42,17 +39,6 @@ export function useConfirm() {
   const [pw, setPw] = useState("");
   const resolver = useRef<((v: string | null) => void) | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-  /** Whatever had focus when confirm() was called, so it can be handed back. */
-  const trigger = useRef<HTMLElement | null>(null);
-
-  const confirm = useCallback((o: ConfirmOptions) => {
-    trigger.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    setPw(o.prompt?.initial ?? "");
-    setOpts(o);
-    return new Promise<string | null>((resolve) => {
-      resolver.current = resolve;
-    });
-  }, []);
 
   const close = useCallback((v: string | null) => {
     resolver.current?.(v);
@@ -60,39 +46,28 @@ export function useConfirm() {
     setOpts(null);
   }, []);
 
-  // Escape closes; Tab is trapped. The trap lives on the window rather than
-  // on the dialog node so it also pulls focus back in when it has already
-  // escaped into the page behind the veil.
-  useEffect(() => {
-    if (!opts) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { close(null); return; }
-      if (e.key !== "Tab") return;
-      const root = modalRef.current;
-      if (!root) return;
-      const stops = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE));
-      const first = stops[0];
-      const last = stops[stops.length - 1];
-      if (!first || !last) return;
-      const here = document.activeElement;
-      const leaving = e.shiftKey ? here === first || !root.contains(here) : here === last || !root.contains(here);
-      if (leaving) {
-        e.preventDefault();
-        (e.shiftKey ? last : first).focus();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [opts, close]);
+  const dismiss = useCallback(() => close(null), [close]);
 
-  // Runs after the portal has unmounted, so React cannot pull focus back to
-  // the body afterwards. No-op on first mount, where nothing was stored.
-  useEffect(() => {
-    if (opts) return;
-    const el = trigger.current;
-    trigger.current = null;
-    el?.focus();
-  }, [opts]);
+  // Focus trap, scroll lock, Escape and focus return, all shared with the
+  // command palette.
+  const { captureTrigger } = useOverlayBehaviour({
+    open: opts !== null,
+    overlayRef: modalRef,
+    onDismiss: dismiss,
+  });
+
+  const confirm = useCallback(
+    (o: ConfirmOptions) => {
+      // Synchronously, before the dialog renders and its autoFocus fires.
+      captureTrigger();
+      setPw(o.prompt?.initial ?? "");
+      setOpts(o);
+      return new Promise<string | null>((resolve) => {
+        resolver.current = resolve;
+      });
+    },
+    [captureTrigger],
+  );
 
   const needsInput = Boolean(opts?.password || opts?.prompt);
 

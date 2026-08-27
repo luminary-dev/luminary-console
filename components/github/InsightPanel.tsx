@@ -37,10 +37,18 @@ function Metric({
 }) {
   const absent = value === NO_DATA;
   return (
+    // The note lives INSIDE the <dd>, not beside it. A <dl> may contain only
+    // dt/dd groups, and axe recurses into a <div> child and applies the same
+    // rule there, so a sibling <p> failed `definition-list` on all four
+    // panels. Nesting it keeps the markup valid and renders identically:
+    // .gh-metric-v is a block and .gh-metric-note only sets colour, size,
+    // line-height and a 4px top margin.
     <div>
       <dt className="gh-metric-k">{label}</dt>
-      <dd className={`gh-metric-v${absent ? " is-absent" : ""}`}>{value}</dd>
-      {note ? <p className="gh-metric-note">{note}</p> : null}
+      <dd className={`gh-metric-v${absent ? " is-absent" : ""}`}>
+        {value}
+        {note ? <p className="gh-metric-note">{note}</p> : null}
+      </dd>
     </div>
   );
 }

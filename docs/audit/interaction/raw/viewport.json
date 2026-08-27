@@ -12,9 +12,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/login.png"
   },
@@ -77,9 +77,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 10,
+    "underTouch44": 9,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/clients-new.png"
   },
@@ -96,7 +96,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "Copy",
@@ -303,7 +303,7 @@
         "gap": 7
       }
     ],
-    "underTouch44": 108,
+    "underTouch44": 107,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/clients-eco-mech.png"
   },
@@ -320,9 +320,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/activity.png"
   },
@@ -339,9 +339,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/publish.png"
   },
@@ -358,7 +358,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -385,7 +385,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 65,
+    "underTouch44": 64,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github.png"
   },
@@ -402,7 +402,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -597,7 +597,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-repos.png"
   },
@@ -614,7 +614,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "Scheduled",
@@ -749,7 +749,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 44,
+    "underTouch44": 43,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-ci.png"
   },
@@ -761,31 +761,12 @@
     "status": 200,
     "errorBoundary": false,
     "consoleErrors": [],
-    "scrollableBy": 15,
-    "documentScrollWidth": 335,
-    "overflowHits": [
-      {
-        "tag": "B",
-        "cls": "",
-        "id": "",
-        "text": "4223df4df534994a56cbea60303e57fe5da59dcd",
-        "right": 335,
-        "width": 300,
-        "insideScroller": false
-      },
-      {
-        "tag": "B",
-        "cls": "",
-        "id": "",
-        "text": "88404f332c488e5c514bfe36697ce5e39f5c016b",
-        "right": 335,
-        "width": 300,
-        "insideScroller": false
-      }
-    ],
+    "scrollableBy": 0,
+    "documentScrollWidth": 320,
+    "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -800,7 +781,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-deployments.png"
   },
@@ -817,9 +798,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-releases.png"
   },
@@ -836,9 +817,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-security.png"
   },
@@ -855,9 +836,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-insights.png"
   },
@@ -874,7 +855,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
       {
         "n": "Scheduled",
@@ -1133,15 +1114,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 95,
+    "underTouch44": 93,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-activity.png"
   },
@@ -1158,7 +1133,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -1221,7 +1196,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-luminary-dev-luminary-console-21.png"
   },
@@ -1238,7 +1213,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -1319,7 +1294,7 @@
         "gap": 12
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/c-eco-mech.png"
   },
@@ -1336,7 +1311,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -1705,7 +1680,7 @@
         "gap": 12
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/c-eco-mech-questionnaire.png"
   },
@@ -1724,15 +1699,15 @@
     "shifts": [
       {
         "value": 0.00011920928955078125,
-        "at": 3765,
+        "at": 1500,
         "sources": [
           "SPAN."
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/c-eco-mech-quotation.png"
   },
@@ -1749,9 +1724,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/login.png"
   },
@@ -1814,9 +1789,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/clients-new.png"
   },
@@ -1833,7 +1808,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "Copy",
@@ -2064,7 +2039,7 @@
         "gap": 7
       }
     ],
-    "underTouch44": 110,
+    "underTouch44": 109,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/clients-eco-mech.png"
   },
@@ -2079,20 +2054,11 @@
     "scrollableBy": 0,
     "documentScrollWidth": 360,
     "overflowHits": [],
-    "cls": 0.0015,
-    "shifts": [
-      {
-        "value": 0.0015030120849609376,
-        "at": 5038,
-        "sources": [
-          "?",
-          "?"
-        ]
-      }
-    ],
-    "targetCount": 5,
+    "cls": 0,
+    "shifts": [],
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/activity.png"
   },
@@ -2109,9 +2075,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/publish.png"
   },
@@ -2128,7 +2094,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -2155,7 +2121,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 74,
+    "underTouch44": 73,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github.png"
   },
@@ -2172,7 +2138,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -2367,7 +2333,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-repos.png"
   },
@@ -2384,7 +2350,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "Scheduled",
@@ -2519,7 +2485,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 52,
+    "underTouch44": 51,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-ci.png"
   },
@@ -2536,7 +2502,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -2551,7 +2517,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-deployments.png"
   },
@@ -2568,9 +2534,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-releases.png"
   },
@@ -2587,9 +2553,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-security.png"
   },
@@ -2606,9 +2572,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-insights.png"
   },
@@ -2625,7 +2591,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
       {
         "n": "Scheduled",
@@ -2902,15 +2868,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 100,
+    "underTouch44": 98,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-activity.png"
   },
@@ -2927,7 +2887,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -2990,7 +2950,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-luminary-dev-luminary-console-21.png"
   },
@@ -3007,7 +2967,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -3076,7 +3036,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/c-eco-mech.png"
   },
@@ -3093,7 +3053,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -3474,7 +3434,7 @@
         "gap": 12
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/c-eco-mech-questionnaire.png"
   },
@@ -3493,15 +3453,15 @@
     "shifts": [
       {
         "value": 0.00006781684027777778,
-        "at": 2804,
+        "at": 1456,
         "sources": [
           "SPAN."
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/c-eco-mech-quotation.png"
   },
@@ -3518,9 +3478,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/login.png"
   },
@@ -3583,9 +3543,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/clients-new.png"
   },
@@ -3602,7 +3562,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -3857,7 +3817,7 @@
         "gap": 7
       }
     ],
-    "underTouch44": 110,
+    "underTouch44": 109,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/clients-eco-mech.png"
   },
@@ -3874,9 +3834,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/activity.png"
   },
@@ -3893,7 +3853,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [
       {
         "n": "Mark as draft (hidden until the flag is ",
@@ -3902,7 +3862,7 @@
         "gap": 23
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/publish.png"
   },
@@ -3919,7 +3879,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -3952,7 +3912,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 81,
+    "underTouch44": 80,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github.png"
   },
@@ -3969,7 +3929,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -4164,7 +4124,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github-repos.png"
   },
@@ -4181,7 +4141,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "Scheduled",
@@ -4316,7 +4276,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 59,
+    "underTouch44": 58,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github-ci.png"
   },
@@ -4333,7 +4293,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -4348,7 +4308,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github-deployments.png"
   },
@@ -4365,9 +4325,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github-releases.png"
   },
@@ -4384,9 +4344,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github-security.png"
   },
@@ -4403,9 +4363,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github-insights.png"
   },
@@ -4422,7 +4382,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
@@ -4711,15 +4671,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 121,
+    "underTouch44": 120,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github-activity.png"
   },
@@ -4736,7 +4690,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -4799,7 +4753,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/github-luminary-dev-luminary-console-21.png"
   },
@@ -4816,7 +4770,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -4885,7 +4839,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/c-eco-mech.png"
   },
@@ -4902,7 +4856,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -5289,7 +5243,7 @@
         "gap": 12
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/c-eco-mech-questionnaire.png"
   },
@@ -5308,16 +5262,16 @@
     "shifts": [
       {
         "value": 0.001670904619197279,
-        "at": 1441,
+        "at": 2145,
         "sources": [
           "DIV.section",
           "SPAN."
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w390/c-eco-mech-quotation.png"
   },
@@ -5334,9 +5288,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/login.png"
   },
@@ -5399,9 +5353,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/clients-new.png"
   },
@@ -5418,7 +5372,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -5697,7 +5651,7 @@
         "gap": 19
       }
     ],
-    "underTouch44": 111,
+    "underTouch44": 110,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/clients-eco-mech.png"
   },
@@ -5714,9 +5668,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/activity.png"
   },
@@ -5733,7 +5687,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [
       {
         "n": "Mark as draft (hidden until the flag is ",
@@ -5742,7 +5696,7 @@
         "gap": 23
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/publish.png"
   },
@@ -5759,7 +5713,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -5792,7 +5746,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 82,
+    "underTouch44": 81,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github.png"
   },
@@ -5809,7 +5763,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -6004,7 +5958,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github-repos.png"
   },
@@ -6021,7 +5975,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "Scheduled",
@@ -6156,7 +6110,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 60,
+    "underTouch44": 59,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github-ci.png"
   },
@@ -6173,7 +6127,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -6188,7 +6142,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github-deployments.png"
   },
@@ -6205,9 +6159,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github-releases.png"
   },
@@ -6224,9 +6178,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github-security.png"
   },
@@ -6243,9 +6197,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github-insights.png"
   },
@@ -6262,8 +6216,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
@@ -6641,15 +6601,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 122,
+    "underTouch44": 121,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github-activity.png"
   },
@@ -6666,7 +6620,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -6729,7 +6683,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/github-luminary-dev-luminary-console-21.png"
   },
@@ -6746,7 +6700,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -6815,7 +6769,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/c-eco-mech.png"
   },
@@ -6832,7 +6786,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -7225,7 +7179,7 @@
         "gap": 12
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/c-eco-mech-questionnaire.png"
   },
@@ -7244,7 +7198,7 @@
     "shifts": [
       {
         "value": 0.0012452734653942915,
-        "at": 1461,
+        "at": 1395,
         "sources": [
           "DIV.tbl-row",
           "SPAN.",
@@ -7252,9 +7206,9 @@
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w430/c-eco-mech-quotation.png"
   },
@@ -7271,9 +7225,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/login.png"
   },
@@ -7336,9 +7290,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/clients-new.png"
   },
@@ -7355,7 +7309,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -7598,7 +7552,7 @@
         "gap": 19
       }
     ],
-    "underTouch44": 111,
+    "underTouch44": 110,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/clients-eco-mech.png"
   },
@@ -7615,9 +7569,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/activity.png"
   },
@@ -7634,9 +7588,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/publish.png"
   },
@@ -7653,7 +7607,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -7782,7 +7736,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 82,
+    "underTouch44": 81,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github.png"
   },
@@ -7799,7 +7753,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -8000,7 +7954,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-repos.png"
   },
@@ -8017,7 +7971,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "luminary-dev/service-hub #879chore(deps)",
@@ -8248,7 +8202,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 60,
+    "underTouch44": 59,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-ci.png"
   },
@@ -8265,7 +8219,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -8280,7 +8234,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-deployments.png"
   },
@@ -8297,9 +8251,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-releases.png"
   },
@@ -8316,9 +8270,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-security.png"
   },
@@ -8335,9 +8289,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-insights.png"
   },
@@ -8354,8 +8308,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
@@ -8865,15 +8825,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 126,
+    "underTouch44": 125,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-activity.png"
   },
@@ -8890,7 +8844,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -8953,7 +8907,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-luminary-dev-luminary-console-21.png"
   },
@@ -8970,7 +8924,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -9039,7 +8993,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/c-eco-mech.png"
   },
@@ -9056,7 +9010,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -9317,7 +9271,7 @@
         "gap": 15
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/c-eco-mech-questionnaire.png"
   },
@@ -9336,7 +9290,7 @@
     "shifts": [
       {
         "value": 0.009123242382581036,
-        "at": 1457,
+        "at": 1623,
         "sources": [
           "DIV.section",
           "DIV.totals",
@@ -9344,9 +9298,9 @@
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/c-eco-mech-quotation.png"
   },
@@ -9363,9 +9317,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/login.png"
   },
@@ -9428,9 +9382,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/clients-new.png"
   },
@@ -9447,7 +9401,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -9684,7 +9638,7 @@
         "gap": 19
       }
     ],
-    "underTouch44": 111,
+    "underTouch44": 110,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/clients-eco-mech.png"
   },
@@ -9701,9 +9655,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/activity.png"
   },
@@ -9720,9 +9674,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/publish.png"
   },
@@ -9739,7 +9693,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -9868,7 +9822,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 82,
+    "underTouch44": 81,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/github.png"
   },
@@ -9885,7 +9839,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -10086,7 +10040,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/github-repos.png"
   },
@@ -10103,7 +10057,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "luminary-dev/service-hub #879chore(deps)",
@@ -10334,7 +10288,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 60,
+    "underTouch44": 59,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/github-ci.png"
   },
@@ -10351,7 +10305,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -10366,7 +10320,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/github-deployments.png"
   },
@@ -10383,9 +10337,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/github-releases.png"
   },
@@ -10402,9 +10356,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/github-security.png"
   },
@@ -10421,9 +10375,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/github-insights.png"
   },
@@ -10440,8 +10394,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
@@ -10963,15 +10923,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 131,
+    "underTouch44": 130,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/github-activity.png"
   },
@@ -10988,7 +10942,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -11051,7 +11005,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/github-luminary-dev-luminary-console-21.png"
   },
@@ -11068,7 +11022,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -11137,7 +11091,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/c-eco-mech.png"
   },
@@ -11154,7 +11108,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -11439,7 +11393,7 @@
         "gap": 15
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/c-eco-mech-questionnaire.png"
   },
@@ -11458,15 +11412,15 @@
     "shifts": [
       {
         "value": 0.000015151108242333207,
-        "at": 1262,
+        "at": 1842,
         "sources": [
           "SPAN."
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w834/c-eco-mech-quotation.png"
   },
@@ -11483,9 +11437,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/login.png"
   },
@@ -11554,9 +11508,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/clients-new.png"
   },
@@ -11567,13 +11521,15 @@
     "name": "Client detail",
     "status": 200,
     "errorBoundary": false,
-    "consoleErrors": [],
+    "consoleErrors": [
+      "pageerror: Minified React error #418; visit https://react.dev/errors/418?args[]=text&args[]= for the full message or use the non-minified dev environment for full errors a"
+    ],
     "scrollableBy": 0,
     "documentScrollWidth": 1024,
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -11816,7 +11772,7 @@
         "gap": 19
       }
     ],
-    "underTouch44": 111,
+    "underTouch44": 110,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/clients-eco-mech.png"
   },
@@ -11833,9 +11789,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/activity.png"
   },
@@ -11852,9 +11808,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/publish.png"
   },
@@ -11871,7 +11827,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -12006,7 +11962,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 86,
+    "underTouch44": 85,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/github.png"
   },
@@ -12023,7 +11979,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -12230,7 +12186,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/github-repos.png"
   },
@@ -12247,7 +12203,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "luminary-dev/service-hub #879chore(deps)",
@@ -12478,7 +12434,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 60,
+    "underTouch44": 59,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/github-ci.png"
   },
@@ -12495,7 +12451,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -12510,7 +12466,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/github-deployments.png"
   },
@@ -12527,9 +12483,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/github-releases.png"
   },
@@ -12546,9 +12502,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/github-security.png"
   },
@@ -12565,9 +12521,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/github-insights.png"
   },
@@ -12584,8 +12540,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
@@ -13107,15 +13069,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 131,
+    "underTouch44": 130,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/github-activity.png"
   },
@@ -13132,7 +13088,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -13195,7 +13151,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/github-luminary-dev-luminary-console-21.png"
   },
@@ -13212,7 +13168,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -13281,7 +13237,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/c-eco-mech.png"
   },
@@ -13298,7 +13254,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -13571,7 +13527,7 @@
         "gap": 15
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/c-eco-mech-questionnaire.png"
   },
@@ -13590,15 +13546,15 @@
     "shifts": [
       {
         "value": 0.000019402553637822468,
-        "at": 1172,
+        "at": 1825,
         "sources": [
           "SPAN."
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1024/c-eco-mech-quotation.png"
   },
@@ -13615,9 +13571,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/login.png"
   },
@@ -13686,9 +13642,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/clients-new.png"
   },
@@ -13705,7 +13661,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -13948,7 +13904,7 @@
         "gap": 19
       }
     ],
-    "underTouch44": 111,
+    "underTouch44": 110,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/clients-eco-mech.png"
   },
@@ -13965,9 +13921,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/activity.png"
   },
@@ -13984,9 +13940,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/publish.png"
   },
@@ -14003,7 +13959,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -14168,7 +14124,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 86,
+    "underTouch44": 85,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/github.png"
   },
@@ -14185,7 +14141,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -14392,7 +14348,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/github-repos.png"
   },
@@ -14409,7 +14365,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "luminary-dev/service-hub #879chore(deps)",
@@ -14640,7 +14596,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 60,
+    "underTouch44": 59,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/github-ci.png"
   },
@@ -14657,7 +14613,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -14672,7 +14628,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/github-deployments.png"
   },
@@ -14689,9 +14645,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/github-releases.png"
   },
@@ -14708,9 +14664,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/github-security.png"
   },
@@ -14727,9 +14683,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/github-insights.png"
   },
@@ -14746,8 +14702,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
@@ -15281,15 +15243,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 131,
+    "underTouch44": 130,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/github-activity.png"
   },
@@ -15306,7 +15262,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -15369,7 +15325,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/github-luminary-dev-luminary-console-21.png"
   },
@@ -15386,7 +15342,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -15455,7 +15411,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/c-eco-mech.png"
   },
@@ -15472,7 +15428,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -15745,7 +15701,7 @@
         "gap": 15
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/c-eco-mech-questionnaire.png"
   },
@@ -15764,15 +15720,15 @@
     "shifts": [
       {
         "value": 0.000011920928955078125,
-        "at": 1123,
+        "at": 1196,
         "sources": [
           "SPAN."
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1280/c-eco-mech-quotation.png"
   },
@@ -15789,9 +15745,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/login.png"
   },
@@ -15860,9 +15816,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/clients-new.png"
   },
@@ -15879,7 +15835,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -16122,7 +16078,7 @@
         "gap": 19
       }
     ],
-    "underTouch44": 111,
+    "underTouch44": 110,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/clients-eco-mech.png"
   },
@@ -16139,9 +16095,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/activity.png"
   },
@@ -16158,9 +16114,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/publish.png"
   },
@@ -16177,7 +16133,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -16342,7 +16298,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 86,
+    "underTouch44": 85,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github.png"
   },
@@ -16359,7 +16315,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -16566,7 +16522,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-repos.png"
   },
@@ -16583,7 +16539,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "luminary-dev/service-hub #879chore(deps)",
@@ -16814,7 +16770,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 60,
+    "underTouch44": 59,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-ci.png"
   },
@@ -16831,7 +16787,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -16846,7 +16802,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-deployments.png"
   },
@@ -16863,9 +16819,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-releases.png"
   },
@@ -16882,9 +16838,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-security.png"
   },
@@ -16901,9 +16857,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-insights.png"
   },
@@ -16920,8 +16876,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
@@ -17455,15 +17417,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 131,
+    "underTouch44": 130,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-activity.png"
   },
@@ -17480,7 +17436,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -17543,7 +17499,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-luminary-dev-luminary-console-21.png"
   },
@@ -17560,7 +17516,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -17629,7 +17585,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/c-eco-mech.png"
   },
@@ -17646,7 +17602,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -17919,7 +17875,7 @@
         "gap": 15
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/c-eco-mech-questionnaire.png"
   },
@@ -17938,15 +17894,15 @@
     "shifts": [
       {
         "value": 0.0000083724494170096,
-        "at": 1334,
+        "at": 1327,
         "sources": [
           "SPAN."
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/c-eco-mech-quotation.png"
   },
@@ -17963,9 +17919,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/login.png"
   },
@@ -18034,9 +17990,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/clients-new.png"
   },
@@ -18053,7 +18009,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -18296,7 +18252,7 @@
         "gap": 19
       }
     ],
-    "underTouch44": 111,
+    "underTouch44": 110,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/clients-eco-mech.png"
   },
@@ -18313,9 +18269,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/activity.png"
   },
@@ -18332,9 +18288,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/publish.png"
   },
@@ -18351,7 +18307,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -18516,7 +18472,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 86,
+    "underTouch44": 85,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/github.png"
   },
@@ -18533,7 +18489,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -18740,7 +18696,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/github-repos.png"
   },
@@ -18757,7 +18713,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "luminary-dev/service-hub #879chore(deps)",
@@ -18988,7 +18944,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 60,
+    "underTouch44": 59,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/github-ci.png"
   },
@@ -19005,7 +18961,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -19020,7 +18976,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/github-deployments.png"
   },
@@ -19037,9 +18993,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/github-releases.png"
   },
@@ -19056,9 +19012,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/github-security.png"
   },
@@ -19075,9 +19031,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/github-insights.png"
   },
@@ -19094,8 +19050,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
@@ -19629,15 +19591,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 131,
+    "underTouch44": 130,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/github-activity.png"
   },
@@ -19654,7 +19610,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -19717,7 +19673,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/github-luminary-dev-luminary-console-21.png"
   },
@@ -19734,7 +19690,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -19803,7 +19759,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/c-eco-mech.png"
   },
@@ -19820,7 +19776,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -20093,7 +20049,7 @@
         "gap": 15
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/c-eco-mech-questionnaire.png"
   },
@@ -20112,15 +20068,15 @@
     "shifts": [
       {
         "value": 0.000003924585664223251,
-        "at": 17450,
+        "at": 1365,
         "sources": [
           "SPAN."
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1920/c-eco-mech-quotation.png"
   },
@@ -20137,9 +20093,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/login.png"
   },
@@ -20208,9 +20164,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/clients-new.png"
   },
@@ -20227,7 +20183,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -20470,7 +20426,7 @@
         "gap": 19
       }
     ],
-    "underTouch44": 111,
+    "underTouch44": 110,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/clients-eco-mech.png"
   },
@@ -20487,9 +20443,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/activity.png"
   },
@@ -20506,9 +20462,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/publish.png"
   },
@@ -20525,7 +20481,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -20690,7 +20646,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 86,
+    "underTouch44": 85,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/github.png"
   },
@@ -20707,7 +20663,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -20914,7 +20870,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/github-repos.png"
   },
@@ -20931,7 +20887,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "luminary-dev/service-hub #879chore(deps)",
@@ -21162,7 +21118,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 60,
+    "underTouch44": 59,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/github-ci.png"
   },
@@ -21179,7 +21135,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -21194,7 +21150,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/github-deployments.png"
   },
@@ -21211,9 +21167,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/github-releases.png"
   },
@@ -21230,9 +21186,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/github-security.png"
   },
@@ -21249,9 +21205,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/github-insights.png"
   },
@@ -21268,8 +21224,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
@@ -21803,15 +21765,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 131,
+    "underTouch44": 130,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/github-activity.png"
   },
@@ -21828,7 +21784,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -21891,7 +21847,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/github-luminary-dev-luminary-console-21.png"
   },
@@ -21908,7 +21864,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -21977,7 +21933,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/c-eco-mech.png"
   },
@@ -21994,7 +21950,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -22267,7 +22223,7 @@
         "gap": 15
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/c-eco-mech-questionnaire.png"
   },
@@ -22286,15 +22242,15 @@
     "shifts": [
       {
         "value": 0.000001655684577094184,
-        "at": 1229,
+        "at": 1985,
         "sources": [
           "SPAN."
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w2560/c-eco-mech-quotation.png"
   },
@@ -22311,9 +22267,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/login.png"
   },
@@ -22382,9 +22338,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/clients-new.png"
   },
@@ -22401,7 +22357,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -22644,7 +22600,7 @@
         "gap": 19
       }
     ],
-    "underTouch44": 111,
+    "underTouch44": 110,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/clients-eco-mech.png"
   },
@@ -22661,9 +22617,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/activity.png"
   },
@@ -22680,9 +22636,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/publish.png"
   },
@@ -22699,7 +22655,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -22864,7 +22820,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 86,
+    "underTouch44": 85,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/github.png"
   },
@@ -22881,7 +22837,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -23088,7 +23044,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/github-repos.png"
   },
@@ -23105,7 +23061,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "luminary-dev/service-hub #879chore(deps)",
@@ -23336,7 +23292,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 60,
+    "underTouch44": 59,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/github-ci.png"
   },
@@ -23353,7 +23309,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -23368,7 +23324,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/github-deployments.png"
   },
@@ -23385,9 +23341,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/github-releases.png"
   },
@@ -23404,9 +23360,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/github-security.png"
   },
@@ -23423,9 +23379,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/github-insights.png"
   },
@@ -23442,8 +23398,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
@@ -23977,15 +23939,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 131,
+    "underTouch44": 130,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/github-activity.png"
   },
@@ -24002,7 +23958,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -24065,7 +24021,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/github-luminary-dev-luminary-console-21.png"
   },
@@ -24082,7 +24038,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -24151,7 +24107,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/c-eco-mech.png"
   },
@@ -24168,7 +24124,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -24441,7 +24397,7 @@
         "gap": 15
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/c-eco-mech-questionnaire.png"
   },
@@ -24460,15 +24416,15 @@
     "shifts": [
       {
         "value": 9.169394304729283e-7,
-        "at": 1148,
+        "at": 1850,
         "sources": [
           "SPAN."
         ]
       }
     ],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w3440/c-eco-mech-quotation.png"
   },
@@ -24485,9 +24441,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/login.png"
   },
@@ -24550,9 +24506,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 12,
+    "targetCount": 11,
     "undersizedAA": [],
-    "underTouch44": 11,
+    "underTouch44": 10,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/clients-new.png"
   },
@@ -24569,7 +24525,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 118,
+    "targetCount": 117,
     "undersizedAA": [
       {
         "n": "eco-mech.luminary-dev.xyz/questionnaire",
@@ -24830,7 +24786,7 @@
         "gap": 19
       }
     ],
-    "underTouch44": 111,
+    "underTouch44": 110,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/clients-eco-mech.png"
   },
@@ -24847,9 +24803,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 5,
+    "targetCount": 4,
     "undersizedAA": [],
-    "underTouch44": 5,
+    "underTouch44": 4,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/activity.png"
   },
@@ -24866,7 +24822,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 17,
+    "targetCount": 16,
     "undersizedAA": [
       {
         "n": "Mark as draft (hidden until the flag is ",
@@ -24875,7 +24831,7 @@
         "gap": 23
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/publish.png"
   },
@@ -24892,7 +24848,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 87,
+    "targetCount": 86,
     "undersizedAA": [
       {
         "n": "Pull request",
@@ -24961,7 +24917,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 82,
+    "underTouch44": 81,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/github.png"
   },
@@ -24978,7 +24934,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 47,
+    "targetCount": 46,
     "undersizedAA": [
       {
         "n": "Repository↑",
@@ -25179,7 +25135,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 46,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/github-repos.png"
   },
@@ -25196,7 +25152,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 79,
+    "targetCount": 78,
     "undersizedAA": [
       {
         "n": "luminary-dev/medease #771MEDEASE-184: Ad",
@@ -25367,7 +25323,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 60,
+    "underTouch44": 59,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/github-ci.png"
   },
@@ -25384,7 +25340,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "Open Preview",
@@ -25399,7 +25355,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/github-deployments.png"
   },
@@ -25416,9 +25372,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/github-releases.png"
   },
@@ -25435,9 +25391,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/github-security.png"
   },
@@ -25454,9 +25410,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 13,
+    "targetCount": 12,
     "undersizedAA": [],
-    "underTouch44": 12,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/github-insights.png"
   },
@@ -25473,8 +25429,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 132,
+    "targetCount": 131,
     "undersizedAA": [
+      {
+        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
+        "w": 340,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "#21 fix(a11y): give every checkbox a rea",
         "w": 292,
@@ -25996,15 +25958,9 @@
         "w": 10,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "ci",
-        "w": 10,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 131,
+    "underTouch44": 130,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/github-activity.png"
   },
@@ -26021,7 +25977,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 15,
+    "targetCount": 14,
     "undersizedAA": [
       {
         "n": "1 · Lint, typecheck & test",
@@ -26084,7 +26040,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 13,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/github-luminary-dev-luminary-console-21.png"
   },
@@ -26101,7 +26057,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 28,
+    "targetCount": 26,
     "undersizedAA": [
       {
         "n": "Preview →",
@@ -26170,7 +26126,7 @@
         "gap": 14
       }
     ],
-    "underTouch44": 21,
+    "underTouch44": 19,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/c-eco-mech.png"
   },
@@ -26187,7 +26143,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 131,
+    "targetCount": 129,
     "undersizedAA": [
       {
         "n": "Generate enquiries & leads",
@@ -26520,7 +26476,7 @@
         "gap": 15
       }
     ],
-    "underTouch44": 105,
+    "underTouch44": 103,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/c-eco-mech-questionnaire.png"
   },
@@ -26537,9 +26493,9 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 6,
+    "targetCount": 5,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 5,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/landscape-640x360/c-eco-mech-quotation.png"
   }

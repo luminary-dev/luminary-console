@@ -5,10 +5,8 @@
     "stops": 2,
     "reachedEnd": true,
     "tabOrderRegressions": 0,
-    "stopsWithoutVisibleRing": 1,
-    "noRingSample": [
-      "INPUT \"\""
-    ],
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
     "focusableButInvisible": [],
     "firstTab": {
       "text": "",
@@ -19,53 +17,46 @@
   {
     "path": "/",
     "name": "Dashboard",
-    "stops": 18,
+    "stops": 19,
     "reachedEnd": true,
     "tabOrderRegressions": 0,
-    "stopsWithoutVisibleRing": 1,
-    "noRingSample": [
-      "INPUT \"Search clients by name, document number, or \""
-    ],
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
     "focusableButInvisible": [],
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
     "path": "/clients/new",
     "name": "New client",
-    "stops": 5,
+    "stops": 12,
     "reachedEnd": true,
     "tabOrderRegressions": 0,
-    "stopsWithoutVisibleRing": 1,
-    "noRingSample": [
-      "INPUT \"\""
-    ],
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
     "focusableButInvisible": [],
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
     "path": "/clients/eco-mech",
     "name": "Client detail",
-    "stops": 82,
-    "reachedEnd": true,
+    "stops": 60,
+    "reachedEnd": false,
     "tabOrderRegressions": 0,
-    "stopsWithoutVisibleRing": 2,
-    "noRingSample": [
-      "SELECT \"Lifecycle stage\"",
-      "INPUT \"\""
-    ],
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
     "focusableButInvisible": [],
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
@@ -80,25 +71,22 @@
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
     "path": "/publish",
     "name": "Publish studio",
-    "stops": 8,
+    "stops": 16,
     "reachedEnd": true,
     "tabOrderRegressions": 0,
-    "stopsWithoutVisibleRing": 2,
-    "noRingSample": [
-      "TEXTAREA \"\"",
-      "INPUT \"\""
-    ],
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
     "focusableButInvisible": [],
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
@@ -107,15 +95,13 @@
     "stops": 33,
     "reachedEnd": true,
     "tabOrderRegressions": 0,
-    "stopsWithoutVisibleRing": 1,
-    "noRingSample": [
-      "INPUT \"Your GitHub login\""
-    ],
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
     "focusableButInvisible": [],
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
@@ -130,14 +116,14 @@
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
     "path": "/github/ci",
     "name": "CI",
-    "stops": 78,
-    "reachedEnd": true,
+    "stops": 60,
+    "reachedEnd": false,
     "tabOrderRegressions": 0,
     "stopsWithoutVisibleRing": 0,
     "noRingSample": [],
@@ -145,7 +131,7 @@
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
@@ -160,7 +146,7 @@
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
@@ -175,7 +161,7 @@
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
@@ -190,7 +176,7 @@
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
@@ -205,14 +191,14 @@
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
     "path": "/github/activity",
     "name": "Engineering activity",
-    "stops": 107,
-    "reachedEnd": true,
+    "stops": 60,
+    "reachedEnd": false,
     "tabOrderRegressions": 0,
     "stopsWithoutVisibleRing": 0,
     "noRingSample": [],
@@ -220,7 +206,7 @@
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
@@ -235,7 +221,7 @@
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
@@ -244,39 +230,28 @@
     "stops": 27,
     "reachedEnd": true,
     "tabOrderRegressions": 0,
-    "stopsWithoutVisibleRing": 1,
-    "noRingSample": [
-      "INPUT \"Your name (optional)\""
-    ],
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
     "focusableButInvisible": [],
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   },
   {
     "path": "/c/eco-mech/questionnaire",
     "name": "Questionnaire",
-    "stops": 120,
+    "stops": 60,
     "reachedEnd": false,
     "tabOrderRegressions": 0,
-    "stopsWithoutVisibleRing": 46,
-    "noRingSample": [
-      "INPUT \"Your name *\"",
-      "INPUT \"Your role at Ecomech Engineering\"",
-      "INPUT \"Best email to reach you\"",
-      "INPUT \"Best phone / WhatsApp\"",
-      "TEXTAREA \"Describe Ecomech Engineering in 2–3 sentence\"",
-      "TEXTAREA \"Your vision.\"",
-      "TEXTAREA \"Your mission.\"",
-      "INPUT \"Core values.\""
-    ],
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
     "focusableButInvisible": [],
     "firstTab": {
       "text": "Skip to content",
       "href": "#main-content",
-      "visibleOnFocus": false
+      "visibleOnFocus": true
     }
   }
 ]

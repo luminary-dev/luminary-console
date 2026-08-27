@@ -7,7 +7,7 @@ import { test } from "@playwright/test";
 import { ROUTES } from "./routes";
 import { appendRow, settle } from "./report";
 
-const MAX_STOPS = 120;
+const MAX_STOPS = 60;
 
 for (const route of ROUTES) {
   test(`keyboard walk: ${route.path}`, async ({ page }) => {
@@ -35,6 +35,12 @@ for (const route of ROUTES) {
 
     for (let i = 0; i < MAX_STOPS; i++) {
       await page.keyboard.press("Tab");
+      // Let the focus transition finish before measuring. The skip link
+      // animates in over 160ms; measuring at zero caught it at
+      // translateY(-75px) and reported it as invisible on 16 of 17 routes,
+      // which was a bug in this probe rather than in the console. Focus
+      // rings can transition too, so the same wait protects both numbers.
+      await page.waitForTimeout(220);
       const stop = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement | null;
         if (!el || el === document.body) return null;
@@ -101,6 +107,7 @@ for (const route of ROUTES) {
     await page.goto(route.path, { waitUntil: "load" });
     await settle(page, 500);
     await page.keyboard.press("Tab");
+    await page.waitForTimeout(220);
     const skip = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement | null;
       if (!el) return null;

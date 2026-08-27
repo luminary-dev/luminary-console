@@ -2,7 +2,7 @@
 
 // Two-step sign-in: email + password, then the 6-digit code emailed to that
 // address. The pending state lives in an HttpOnly cookie set by the API.
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -16,6 +16,10 @@ export default function LoginPage() {
   const [note, setNote] = useState<string | null>(null);
   const timedOut = typeof window !== "undefined" && window.location.search.includes("timedout");
   const router = useRouter();
+  // The code field carries a hint alongside its label, so it is associated
+  // explicitly: an implicit label would fold the hint into the accessible name.
+  const codeId = useId();
+  const codeHintId = useId();
 
   const post = async (body: Record<string, string>) => {
     setBusy(true);
@@ -68,7 +72,7 @@ export default function LoginPage() {
       )}
       {step === "creds" ? (
         <form onSubmit={submitCreds} style={{ marginTop: 28 }}>
-          <div className="q-field">
+          <label className="q-field">
             <span className="q-label">Email</span>
             <input
               className="q-line"
@@ -79,8 +83,8 @@ export default function LoginPage() {
               autoFocus
               required
             />
-          </div>
-          <div className="q-field">
+          </label>
+          <label className="q-field">
             <span className="q-label">Password</span>
             <input
               className="q-line"
@@ -90,7 +94,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-          </div>
+          </label>
           {error && <div className="form-error">{error}</div>}
           <button className="btn" style={{ marginTop: 22 }} disabled={busy}>
             {busy ? "Checking…" : "Continue"}
@@ -99,9 +103,11 @@ export default function LoginPage() {
       ) : (
         <form onSubmit={submitCode} style={{ marginTop: 28 }}>
           <div className="q-field">
-            <span className="q-label">Enter the 6-digit code</span>
-            {note && <div className="q-hint">{note} It expires in 10 minutes.</div>}
+            <label className="q-label" htmlFor={codeId}>Enter the 6-digit code</label>
+            {note && <div className="q-hint" id={codeHintId}>{note} It expires in 10 minutes.</div>}
             <input
+              id={codeId}
+              aria-describedby={note ? codeHintId : undefined}
               className="q-line"
               inputMode="numeric"
               pattern="[0-9]{6}"

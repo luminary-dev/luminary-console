@@ -5,46 +5,46 @@
     "selector": "button:has-text(\"Failing CI\")",
     "present": true,
     "clicked": true,
-    "worstEventMs": 32,
+    "worstEventMs": 24,
     "events": [
       {
         "name": "pointerover",
-        "duration": 32,
+        "duration": 24,
+        "delay": 0
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
-        "delay": 1
-      },
-      {
-        "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       }
     ],
@@ -68,46 +68,46 @@
     "selector": "th button:has-text(\"Author\")",
     "present": true,
     "clicked": true,
-    "worstEventMs": 32,
+    "worstEventMs": 24,
     "events": [
       {
         "name": "pointerover",
-        "duration": 32,
-        "delay": 0
-      },
-      {
-        "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
+        "delay": 1
+      },
+      {
+        "name": "pointerenter",
+        "duration": 24,
         "delay": 1
       }
     ],
@@ -120,46 +120,46 @@
     "selector": "button",
     "present": true,
     "clicked": true,
-    "worstEventMs": 32,
+    "worstEventMs": 40,
     "events": [
       {
         "name": "pointerover",
-        "duration": 32,
+        "duration": 40,
         "delay": 0
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 40,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 40,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 40,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 40,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 40,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 40,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 40,
         "delay": 1
       }
     ],
@@ -172,46 +172,46 @@
     "selector": ".pill, .chip, button",
     "present": true,
     "clicked": true,
-    "worstEventMs": 32,
+    "worstEventMs": 24,
     "events": [
       {
         "name": "pointerover",
-        "duration": 32,
+        "duration": 24,
         "delay": 0
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       },
       {
         "name": "pointerenter",
-        "duration": 32,
+        "duration": 24,
         "delay": 1
       }
     ],
