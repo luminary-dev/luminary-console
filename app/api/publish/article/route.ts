@@ -21,8 +21,19 @@ export async function POST(req: Request) {
   }
   const title = String(body.title || "").trim();
   let markdown = String(body.body || "").trim();
-  // 0, 1 or 2 in-article illustrations, placed under well-spaced sections.
-  const inlineCount = Math.min(2, Math.max(0, Number(body.inlineImages) || 0));
+  // In-article illustrations, placed under well-spaced sections.
+  //
+  // `inlineImages` accepts a number for an explicit count, or `true` to let
+  // the length of the piece decide. The console sends the boolean, because
+  // "does this article want pictures in it" is the question an editor
+  // actually has; picking 1 against 2 is a judgement about the article, and
+  // the article is right here to be measured. Roughly one illustration per
+  // 8000 characters, capped at 2, so a short post gets one and a long one
+  // gets two.
+  const inlineCount =
+    body.inlineImages === true
+      ? Math.min(2, Math.max(1, Math.round(markdown.length / 8000)))
+      : Math.min(2, Math.max(0, Number(body.inlineImages) || 0));
   const excerpt = String(body.excerpt || "").trim();
   const imageBrief = String(body.imageBrief || "").trim();
   const draftFlag = Boolean(body.draft);
