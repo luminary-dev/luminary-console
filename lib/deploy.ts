@@ -1,11 +1,14 @@
 // Vercel deployment automation for delivered client SITES — the CLI's method,
 // not the GitHub integration: fetch the repo's files (GitHub tarball API) and
 // UPLOAD them to Vercel to build, using VERCEL_TOKEN. This avoids the
-// Vercel<->GitHub OAuth integration entirely; private repos just need a GitHub
-// token (GH_TOKEN, a fine-grained PAT with read access to the org). Public
-// repos need no token. Raw HTTP + Node zlib/crypto — a tiny in-memory untar.
+// Vercel<->GitHub OAuth integration entirely; private repos need a GitHub
+// credential — the App's installation token, or GH_TOKEN as the legacy
+// fallback (lib/github/auth decides). Public repos need no credential.
+// Raw HTTP + Node zlib/crypto — a tiny in-memory untar.
 import { gunzipSync } from "node:zlib";
 import { createHash } from "node:crypto";
+import { authHeader } from "./github/auth";
+import { githubConfigured } from "./github/config";
 
 const API = "https://api.vercel.com";
 const teamQs = () => (process.env.VERCEL_TEAM_ID ? `?teamId=${process.env.VERCEL_TEAM_ID}` : "");
@@ -80,16 +83,17 @@ export function untar(tar: Buffer): TarFile[] {
 
 /** Download + extract a repo at a ref via the GitHub tarball API. */
 async function fetchRepoFiles(org: string, name: string, ref: string): Promise<TarFile[]> {
-  const token = process.env.GH_TOKEN;
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "User-Agent": "luminary-console",
     "X-GitHub-Api-Version": "2022-11-28",
   };
-  if (token) headers.Authorization = `Bearer ${token}`;
+  // App installation token preferred, GH_TOKEN fallback. Only attach a header
+  // when a credential exists at all: public repos deploy fine without one.
+  if (githubConfigured()) headers.Authorization = (await authHeader()).header;
   const res = await fetch(`https://api.github.com/repos/${org}/${name}/tarball/${ref}`, { headers, redirect: "follow" });
-  if (res.status === 404) throw new Error(`manual:repo ${org}/${name}@${ref} not found (or GH_TOKEN lacks access)`);
-  if (res.status === 401 || res.status === 403) throw new Error("manual:GH_TOKEN missing or lacks read access to the repo");
+  if (res.status === 404) throw new Error(`manual:repo ${org}/${name}@${ref} not found (or the GitHub App/GH_TOKEN lacks access to it)`);
+  if (res.status === 401 || res.status === 403) throw new Error("manual:no GitHub credential with read access to the repo (App or GH_TOKEN)");
   if (!res.ok) throw new Error(`GitHub tarball failed (${res.status})`);
   const gz = Buffer.from(await res.arrayBuffer());
   const files = untar(gunzipSync(gz));
