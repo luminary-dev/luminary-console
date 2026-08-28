@@ -77,6 +77,14 @@ jobs:
       SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      # GitHub credential for routes that read org repos — a site deploy
+      # downloads the repo's tarball, so without one every private repo 404s.
+      # The App is preferred; GH_TOKEN is the legacy fallback. Actions secret
+      # names may not start with GITHUB_, hence GH_APP_* feeding GITHUB_APP_*.
+      GITHUB_APP_ID: ${{ secrets.GH_APP_ID }}
+      GITHUB_APP_PRIVATE_KEY: ${{ secrets.GH_APP_PRIVATE_KEY }}
+      GITHUB_APP_INSTALLATION_ID: ${{ secrets.GH_APP_INSTALLATION_ID }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
