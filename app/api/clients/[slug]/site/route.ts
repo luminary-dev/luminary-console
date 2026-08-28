@@ -133,16 +133,19 @@ export async function POST(
 
     return NextResponse.json({ error: "Unknown action" }, { status: 400 });
   } catch (e) {
-    // lib/deploy signals "no Vercel credentials" with a `manual:` message.
-    // That one is an authored, safe sentence with an action attached, so it
-    // survives; everything else goes through the mapper and stays internal.
+    // lib/deploy signals a missing/insufficient credential with a `manual:`
+    // message. Those are authored, safe sentences, so the specific reason
+    // survives to the operator (a blanket "Vercel isn't configured" once sent
+    // a day of debugging at the wrong service); everything else goes through
+    // the mapper and stays internal.
     const msg = e instanceof Error ? e.message : "";
     if (msg.startsWith("manual:")) {
+      const reason = msg.slice("manual:".length);
       const body = problem(
         "conflict",
-        "Vercel isn't configured, so this can't be deployed from here. Use 'Set URL' to record a site you deployed manually.",
+        `This can't be deployed from here: ${reason}. Fix the credential, or use 'Set URL' to record a site you deployed manually.`,
       );
-      console.error(`[${body.requestId}] site action ${action} on ${slug}: Vercel not configured`);
+      console.error(`[${body.requestId}] site action ${action} on ${slug}: ${reason}`);
       return NextResponse.json(body, { status: body.status });
     }
     const { body, status } = problemResponse(e, `site action ${action} on ${slug}`);
