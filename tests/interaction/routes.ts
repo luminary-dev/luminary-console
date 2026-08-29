@@ -47,6 +47,15 @@ export const ROUTES: Route[] = [
     needs: "at least one client in the index",
   },
   {
+    path: "/clients",
+    pattern: "app/clients/page.tsx",
+    name: "Clients",
+    surface: "console",
+    auth: "operator",
+    purpose: "Every client, filterable by stage, searchable, virtualised past 100 rows.",
+    needs: "at least one client in the index",
+  },
+  {
     path: "/clients/new",
     pattern: "app/clients/new/page.tsx",
     name: "New client",

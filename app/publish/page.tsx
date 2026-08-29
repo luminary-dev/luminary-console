@@ -1,7 +1,5 @@
-import Link from "next/link";
 import PublishStudio from "@/components/PublishStudio";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
 import AppTabBar from "@/components/AppTabBar";
 
 export const metadata = { title: "Publish" };
@@ -13,25 +11,11 @@ export const metadata = { title: "Publish" };
 // desk it's written at.
 export default function PublishPage() {
   return (
-    <main className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Publish to the landing page</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            ← Dashboard
-          </Link>
-        </div>
-      </div>
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id="main-content" tabIndex={-1} />
+    <main className="wrap" style={{ paddingBottom: 80 }}>
+      {/* showNewClient is off: this page is a form you may be part-way
+          through, and a primary button that navigates away from unsaved input
+          does not belong beside it. */}
+      <ConsoleTopbar current="/publish" subtitle="Publish" showNewClient={false} />
 
       <PublishStudio />
       <AppTabBar />

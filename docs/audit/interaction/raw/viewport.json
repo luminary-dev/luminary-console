@@ -33,7 +33,28 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 26,
+    "targetCount": 13,
+    "undersizedAA": [],
+    "underTouch44": 9,
+    "focusableInvisible": [],
+    "screenshot": "docs/audit/interaction/screens/w320/root.png"
+  },
+  {
+    "project": "w320",
+    "width": 320,
+    "path": "/clients",
+    "name": "Clients",
+    "status": 200,
+    "errorBoundary": false,
+    "consoleErrors": [
+      "An SSL certificate error occurred when fetching the script."
+    ],
+    "scrollableBy": 0,
+    "documentScrollWidth": 320,
+    "overflowHits": [],
+    "cls": 0,
+    "shifts": [],
+    "targetCount": 22,
     "undersizedAA": [
       {
         "n": "All · 1",
@@ -60,9 +81,9 @@
         "gap": 20
       }
     ],
-    "underTouch44": 20,
+    "underTouch44": 16,
     "focusableInvisible": [],
-    "screenshot": "docs/audit/interaction/screens/w320/root.png"
+    "screenshot": "docs/audit/interaction/screens/w320/clients.png"
   },
   {
     "project": "w320",
@@ -320,7 +341,7 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 8,
+    "targetCount": 4,
     "undersizedAA": [],
     "underTouch44": 4,
     "focusableInvisible": [],
@@ -333,15 +354,17 @@
     "name": "Publish studio",
     "status": 200,
     "errorBoundary": false,
-    "consoleErrors": [],
+    "consoleErrors": [
+      "An SSL certificate error occurred when fetching the script."
+    ],
     "scrollableBy": 0,
     "documentScrollWidth": 320,
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 16,
+    "targetCount": 21,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/publish.png"
   },
@@ -360,7 +383,7 @@
     "shifts": [
       {
         "value": 0.06717212677001953,
-        "at": 324,
+        "at": 319,
         "sources": [
           "SECTION.card"
         ]
@@ -656,6 +679,12 @@
         "gap": 0
       },
       {
+        "n": "ci",
+        "w": 10,
+        "h": 19,
+        "gap": 0
+      },
+      {
         "n": "CI",
         "w": 13,
         "h": 19,
@@ -824,7 +853,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 44,
+    "underTouch44": 45,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-ci.png"
   },
@@ -930,8 +959,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 134,
+    "targetCount": 133,
     "undersizedAA": [
+      {
+        "n": "ci",
+        "w": 10,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "ci",
         "w": 10,
@@ -1125,7 +1160,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 70,
+    "underTouch44": 68,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w320/github-activity.png"
   },
@@ -1398,7 +1433,28 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 20,
+    "targetCount": 13,
+    "undersizedAA": [],
+    "underTouch44": 9,
+    "focusableInvisible": [],
+    "screenshot": "docs/audit/interaction/screens/w360/root.png"
+  },
+  {
+    "project": "w360",
+    "width": 360,
+    "path": "/clients",
+    "name": "Clients",
+    "status": 200,
+    "errorBoundary": false,
+    "consoleErrors": [
+      "An SSL certificate error occurred when fetching the script."
+    ],
+    "scrollableBy": 0,
+    "documentScrollWidth": 360,
+    "overflowHits": [],
+    "cls": 0,
+    "shifts": [],
+    "targetCount": 22,
     "undersizedAA": [
       {
         "n": "All · 1",
@@ -1425,9 +1481,9 @@
         "gap": 20
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 16,
     "focusableInvisible": [],
-    "screenshot": "docs/audit/interaction/screens/w360/root.png"
+    "screenshot": "docs/audit/interaction/screens/w360/clients.png"
   },
   {
     "project": "w360",
@@ -1722,15 +1778,17 @@
     "name": "Publish studio",
     "status": 200,
     "errorBoundary": false,
-    "consoleErrors": [],
+    "consoleErrors": [
+      "An SSL certificate error occurred when fetching the script."
+    ],
     "scrollableBy": 0,
     "documentScrollWidth": 360,
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 16,
+    "targetCount": 21,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/publish.png"
   },
@@ -1745,11 +1803,11 @@
     "scrollableBy": 0,
     "documentScrollWidth": 360,
     "overflowHits": [],
-    "cls": 0.0238,
+    "cls": 0.0337,
     "shifts": [
       {
-        "value": 0.023767632378472223,
-        "at": 304,
+        "value": 0.03370915364583334,
+        "at": 315,
         "sources": [
           "SECTION.card"
         ]
@@ -2045,6 +2103,12 @@
         "gap": 0
       },
       {
+        "n": "ci",
+        "w": 10,
+        "h": 19,
+        "gap": 0
+      },
+      {
         "n": "CI",
         "w": 13,
         "h": 19,
@@ -2213,7 +2277,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 63,
+    "underTouch44": 64,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-ci.png"
   },
@@ -2319,8 +2383,14 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 134,
+    "targetCount": 133,
     "undersizedAA": [
+      {
+        "n": "ci",
+        "w": 10,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "ci",
         "w": 10,
@@ -2514,7 +2584,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 89,
+    "underTouch44": 90,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w360/github-activity.png"
   },
@@ -2775,7 +2845,28 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 20,
+    "targetCount": 13,
+    "undersizedAA": [],
+    "underTouch44": 9,
+    "focusableInvisible": [],
+    "screenshot": "docs/audit/interaction/screens/w768/root.png"
+  },
+  {
+    "project": "w768",
+    "width": 768,
+    "path": "/clients",
+    "name": "Clients",
+    "status": 200,
+    "errorBoundary": false,
+    "consoleErrors": [
+      "An SSL certificate error occurred when fetching the script."
+    ],
+    "scrollableBy": 0,
+    "documentScrollWidth": 768,
+    "overflowHits": [],
+    "cls": 0,
+    "shifts": [],
+    "targetCount": 22,
     "undersizedAA": [
       {
         "n": "All · 1",
@@ -2802,9 +2893,9 @@
         "gap": 20
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 16,
     "focusableInvisible": [],
-    "screenshot": "docs/audit/interaction/screens/w768/root.png"
+    "screenshot": "docs/audit/interaction/screens/w768/clients.png"
   },
   {
     "project": "w768",
@@ -3111,15 +3202,17 @@
     "name": "Publish studio",
     "status": 200,
     "errorBoundary": false,
-    "consoleErrors": [],
+    "consoleErrors": [
+      "An SSL certificate error occurred when fetching the script."
+    ],
     "scrollableBy": 0,
     "documentScrollWidth": 768,
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 16,
+    "targetCount": 21,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/publish.png"
   },
@@ -3138,7 +3231,7 @@
     "shifts": [
       {
         "value": 0.008456585928797722,
-        "at": 295,
+        "at": 431,
         "sources": [
           "SECTION.card"
         ]
@@ -4166,6 +4259,12 @@
         "gap": 0
       },
       {
+        "n": "ci",
+        "w": 10,
+        "h": 19,
+        "gap": 0
+      },
+      {
         "n": "CI",
         "w": 13,
         "h": 19,
@@ -4334,7 +4433,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 126,
+    "underTouch44": 127,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-ci.png"
   },
@@ -4440,8 +4539,26 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 134,
+    "targetCount": 133,
     "undersizedAA": [
+      {
+        "n": "Production: 20e101b87fa60acb7617fa993fb5",
+        "w": 347,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: 0f1cdea7388b96327c00764e3f651de",
+        "w": 331,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "ci",
+        "w": 10,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "ci",
         "w": 10,
@@ -4753,51 +4870,9 @@
         "w": 288,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
-        "w": 334,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "CI · Interaction audit: harness, 12 find",
-        "w": 392,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "CI · fix(a11y): give every checkbox a re",
-        "w": 288,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "Preview: 4223df4df534994a56cbea60303e57f",
-        "w": 342,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "Production: 88404f332c488e5c514bfe36697c",
-        "w": 350,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "#20 ci: add actionlint and shellcheck, a",
-        "w": 398,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 129,
+    "underTouch44": 127,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w768/github-activity.png"
   },
@@ -5001,7 +5076,7 @@
     "shifts": [
       {
         "value": 0.0090654615778476,
-        "at": 1119,
+        "at": 937,
         "sources": [
           "DIV.section",
           "DIV.totals"
@@ -5048,7 +5123,28 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 20,
+    "targetCount": 13,
+    "undersizedAA": [],
+    "underTouch44": 9,
+    "focusableInvisible": [],
+    "screenshot": "docs/audit/interaction/screens/w1440/root.png"
+  },
+  {
+    "project": "w1440",
+    "width": 1440,
+    "path": "/clients",
+    "name": "Clients",
+    "status": 200,
+    "errorBoundary": false,
+    "consoleErrors": [
+      "An SSL certificate error occurred when fetching the script."
+    ],
+    "scrollableBy": 0,
+    "documentScrollWidth": 1440,
+    "overflowHits": [],
+    "cls": 0,
+    "shifts": [],
+    "targetCount": 22,
     "undersizedAA": [
       {
         "n": "All · 1",
@@ -5081,9 +5177,9 @@
         "gap": 20
       }
     ],
-    "underTouch44": 14,
+    "underTouch44": 16,
     "focusableInvisible": [],
-    "screenshot": "docs/audit/interaction/screens/w1440/root.png"
+    "screenshot": "docs/audit/interaction/screens/w1440/clients.png"
   },
   {
     "project": "w1440",
@@ -5390,15 +5486,17 @@
     "name": "Publish studio",
     "status": 200,
     "errorBoundary": false,
-    "consoleErrors": [],
+    "consoleErrors": [
+      "An SSL certificate error occurred when fetching the script."
+    ],
     "scrollableBy": 0,
     "documentScrollWidth": 1440,
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 16,
+    "targetCount": 21,
     "undersizedAA": [],
-    "underTouch44": 6,
+    "underTouch44": 11,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/publish.png"
   },
@@ -5417,7 +5515,7 @@
     "shifts": [
       {
         "value": 0.003649124710648148,
-        "at": 302,
+        "at": 297,
         "sources": [
           "SECTION.card"
         ]
@@ -6751,6 +6849,12 @@
         "gap": 0
       },
       {
+        "n": "ci",
+        "w": 10,
+        "h": 19,
+        "gap": 0
+      },
+      {
         "n": "CI",
         "w": 13,
         "h": 19,
@@ -6919,7 +7023,7 @@
         "gap": 0
       }
     ],
-    "underTouch44": 126,
+    "underTouch44": 127,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-ci.png"
   },
@@ -7025,8 +7129,44 @@
     "overflowHits": [],
     "cls": 0,
     "shifts": [],
-    "targetCount": 134,
+    "targetCount": 133,
     "undersizedAA": [
+      {
+        "n": "Production: 20e101b87fa60acb7617fa993fb5",
+        "w": 347,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "#25 feat(dashboard): group the menu, dro",
+        "w": 474,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "Preview: 0f1cdea7388b96327c00764e3f651de",
+        "w": 331,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · feat(dashboard): group the menu, dr",
+        "w": 468,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "CI · feat(dashboard): group the menu, dr",
+        "w": 468,
+        "h": 16,
+        "gap": 0
+      },
+      {
+        "n": "ci",
+        "w": 10,
+        "h": 16,
+        "gap": 0
+      },
       {
         "n": "ci",
         "w": 10,
@@ -7530,57 +7670,9 @@
         "w": 288,
         "h": 16,
         "gap": 0
-      },
-      {
-        "n": "Preview: ca3d482f53fcc643a2cbecf206768a8",
-        "w": 334,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "CI · Interaction audit: harness, 12 find",
-        "w": 392,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "Preview: fd15e0277354defb1db46b533a2db0e",
-        "w": 340,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "CI · fix(a11y): give every checkbox a re",
-        "w": 288,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "Preview: 4223df4df534994a56cbea60303e57f",
-        "w": 342,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "Production: 88404f332c488e5c514bfe36697c",
-        "w": 350,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "#20 ci: add actionlint and shellcheck, a",
-        "w": 398,
-        "h": 16,
-        "gap": 0
-      },
-      {
-        "n": "CI · Merge pull request #20 from luminar",
-        "w": 782,
-        "h": 16,
-        "gap": 0
       }
     ],
-    "underTouch44": 131,
+    "underTouch44": 130,
     "focusableInvisible": [],
     "screenshot": "docs/audit/interaction/screens/w1440/github-activity.png"
   },

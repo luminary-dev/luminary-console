@@ -14,6 +14,13 @@
     "total": 0
   },
   {
+    "path": "/clients",
+    "name": "Clients",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
     "path": "/clients/new",
     "name": "New client",
     "state": "at rest",
