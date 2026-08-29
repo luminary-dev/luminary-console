@@ -261,6 +261,15 @@ summary:focus-visible,
 }
 
 .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; }
+/* The wordmark is the text colour, not the link colour.
+   It became a link when the topbar was unified so clicking it returns you to
+   the hub, and it silently inherited `a { color: var(--a-text) }`, which had
+   just been darkened to #3f7305 for contrast. Two correct changes that
+   combined into a dark green wordmark in light mode. It is black on light and
+   white on dark again, which is what it always was.
+   The hover is left to the global `a:hover` rule below: same specificity,
+   declared later, so it still turns accent under a real pointer. */
+.brand a { color: var(--text); }
 .brand span { color: var(--accent); }
 .brand small { font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-left: 10px; }
 
