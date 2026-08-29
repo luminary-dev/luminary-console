@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getClients, getIndex } from "@/lib/store";
-import { STAGES, STAGE_LABELS, currentStage } from "@/lib/stage";
+import { STAGES, currentStage } from "@/lib/stage";
 import { clientMoney, fmtLKR, overdueSummary } from "@/lib/money";
 import { recentActivity, isNotifiable, getNotificationsSeenAt, getReadKeys, entryKey } from "@/lib/activity";
 import MarkAllRead from "@/components/MarkAllRead";
