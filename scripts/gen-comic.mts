@@ -1,73 +1,57 @@
-// Generates the console's comic strip into public/comic/.
+// Draws the console's comic into public/comic/.
 //
-// Run once, commit the output. The images are static assets, so the console
-// never calls OpenAI at render time and the strip costs nothing to show:
+//   OPENAI_API_KEY=... npx tsx scripts/gen-comic.mts
+//   OPENAI_API_KEY=... npx tsx scripts/gen-comic.mts 03-define-tiny.jpg
 //
-//   npx tsx --env-file=.env.local scripts/gen-comic.mts
+// Run once, commit the output. The panels are static assets, so the console
+// never calls OpenAI at render time and the comic costs nothing to show.
 //
-// The prompts live here rather than in a chat log so the strip can be
-// regenerated, extended or re-styled by someone who was not there. Panels are
-// deliberately WORDLESS: image models render lettering as convincing gibberish,
-// and a speech bubble full of nonsense is worse than none. The captions are
-// real HTML text in components/ComicStrip.tsx, which also makes them readable
-// by a screen reader and translatable.
+// Panels and dialogue live in lib/comic.ts, which the page also renders from.
+// This file is only the drawing half: it turns each panel's `scene` into a JPEG.
+// Panels are drawn WORDLESS on purpose and lettered in HTML afterwards; the
+// note at the top of lib/comic.ts explains why.
 import { writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { generateImage } from "../lib/publish/images";
+import { PANELS } from "../lib/comic";
+import { generateImage, type ImageSize } from "../lib/publish/images";
 
-/** Webtoon, not the house 3D-animation look: this is a different artefact. */
-const STYLE = `ART STYLE, follow exactly: a panel from a modern Korean manhwa webtoon. Clean confident digital linework with varied line weight, flat cel shading with soft gradient lighting, subtle halftone screentone texture in the shadows, expressive exaggerated faces and body language, dynamic camera angle. Bold and readable at a glance.
+/** The comic's own look, deliberately not the house blog style. That one is
+ *  built around a specific place and its people; a comic set in a named city
+ *  would read as being about the city rather than about the work. */
+const STYLE = `ART STYLE, follow exactly: a still frame from a modern 3D animated feature film, at the craft level of Pixar, DreamWorks and Illumination. Appealing stylised characters with clear silhouettes, slightly exaggerated cartoon proportions and big readable expressions. Art-directed colour, soft global illumination, subsurface scattering in skin, cinematic rim light, shallow depth of field. Comedic timing carried by pose and expression.
 
-Palette: warm muted earth tones, aged brass and copper, worn timber, deep teal shadow, with ONE luminous lime-green accent used sparingly for the machine's glow.
+NOT photorealistic. NOT live action. NOT a photograph, and not a render aiming at realism. If it could be mistaken for a photograph, the style is wrong.
 
-Setting: a cluttered, characterful engineering workshop in Colombo, Sri Lanka. South Asian characters. Ceiling fans, tropical light through shutters, tea glasses, rolled drawings, brass instruments.
+SETTING: a bright contemporary design and software studio in an unspecified modern city. Exposed brick, pale timber, tall industrial windows, trailing plants, monitors, mugs, sticky notes, cables. The cast is young, international and ethnically mixed, in ordinary casual modern clothes. No national or cultural markers of any kind: no flags, no traditional dress, no regional decor.
 
-The recurring machine is "the Console": an absurd, lovable brass-and-timber contraption filling one wall, with gauges, levers, pneumatic tubes, a paper feed and one big glowing green dial.
+THE CONSOLE: a wonderfully absurd retro-futuristic machine filling one wall, built from brass, cream enamel and chunky plastic, with gauges, levers, pneumatic tubes, a paper feed and one enormous glowing lime-green dial. Lovable rather than menacing, and with more personality than the rest of the furniture put together.
 
-ABSOLUTELY NO TEXT of any kind: no speech bubbles, no signs, no labels, no numerals, no logos, no watermarks, no captions. The panel must carry its beat through composition, expression and action alone.
+PALETTE: warm daylight and amber lamplight against cool shadow, with the machine's lime green as the single accent.
 
-Wide horizontal panel, cinematic 3:2 composition, one unmistakable focal subject.`;
+ABSOLUTELY NO TEXT of any kind: no speech balloons, no captions, no signs, no labels, no numerals, no logos, no watermarks, no readable interface text. The panel carries its beat through composition, expression and action alone.`;
 
-/** Four beats. Each caption is rendered as real text beside the panel. */
-const PANELS = [
-  {
-    file: "01-the-ask.jpg",
-    alt: "A client bursts into the workshop at closing time while three engineers freeze over their tea.",
-    scene:
-      "Late afternoon, golden light through shutters. A cheerful client in a bright shirt bursts through the workshop door mid-stride, one finger raised, mouth open, radiating the confidence of someone about to say something small. Three engineers freeze at a workbench, tea glasses halfway to their mouths, eyes wide. The great brass Console machine looms dark and dormant along the back wall.",
-  },
-  {
-    file: "02-the-look.jpg",
-    alt: "The senior engineer smiles and reaches for a large glowing green dial.",
-    scene:
-      "Tight low-angle close-up. The eldest engineer, unbothered, sets her tea down with great deliberation and reaches one hand toward an enormous brass dial that is beginning to glow lime green. A slow, knowing half-smile. Behind her the other two lean back out of frame, bracing. Dust motes in the light.",
-  },
-  {
-    file: "03-the-machine.jpg",
-    alt: "The machine erupts: documents fly, pneumatic tubes fire, a tiny subdomain sprouts from a pot.",
-    scene:
-      "Explosive wide shot of joyful mechanical chaos. The Console erupts into motion: gears spinning, pneumatic tubes firing capsules across the ceiling, a blizzard of freshly printed documents fanning through the air, an invoice folding itself mid-flight, a small green seedling shaped like a signpost sprouting from a clay pot on top of the machine. The three engineers duck, delighted. Paper everywhere.",
-  },
-  {
-    file: "04-still-hot.jpg",
-    alt: "Silence. Everything is finished, neatly stacked, and the tea is still steaming.",
-    scene:
-      "Sudden stillness. One sheet of paper drifts down to land on a neat, perfectly squared stack of finished documents. The machine sits innocent, its green dial dimming. The client stands blinking, finger still raised, having not finished the sentence. The eldest engineer picks her tea back up: it is still steaming. The other two are already back on their stools.",
-  },
-] as const;
+const SIZE: Record<string, ImageSize> = {
+  wide: "1536x1024",
+  square: "1024x1024",
+};
 
 async function main(): Promise<void> {
   mkdirSync("public/comic", { recursive: true });
+  const only = process.argv[2]; // optional: redraw one panel by filename
+  if (only && !PANELS.some((p) => p.file === only)) {
+    throw new Error(`No panel named ${only}. Known: ${PANELS.map((p) => p.file).join(", ")}`);
+  }
   for (const panel of PANELS) {
+    if (only && panel.file !== only) continue;
     const out = `public/comic/${panel.file}`;
-    // Skip what is already there. Each panel is a paid generation, and a
-    // rerun after a network blip should not spend four times to replace three
-    // good images. Delete a file to force it to be redrawn.
-    if (existsSync(out) && !process.env.COMIC_FORCE) {
+    // Skip what is already drawn. Each panel is a paid generation, and a rerun
+    // after a network blip should not spend nine times over to replace eight
+    // good images. Name a panel as an argument, or set COMIC_FORCE, to redraw.
+    if (existsSync(out) && !process.env.COMIC_FORCE && !only) {
       process.stdout.write(`${panel.file} exists, skipping\n`);
       continue;
     }
-    process.stdout.write(`generating ${panel.file} ... `);
-    const bytes = await generateImage(`${panel.scene}\n\n${STYLE}`);
+    process.stdout.write(`drawing ${panel.file} (${panel.size}) ... `);
+    const bytes = await generateImage(`${panel.scene}\n\n${STYLE}`, SIZE[panel.size]!);
     writeFileSync(out, bytes);
     process.stdout.write(`${Math.round(bytes.length / 1024)}KB\n`);
   }

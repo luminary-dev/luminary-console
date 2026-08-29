@@ -1,49 +1,21 @@
-// The strip at the bottom of the hub.
+// The comic at the bottom of the hub.
 //
-// The hub is deliberately sparse: four tiles, and two cards that only appear
+// The hub is deliberately sparse: four tiles, and two cards that appear only
 // when there is something to say. On a quiet day that leaves a lot of empty
 // screen, so this fills it with something worth scrolling to rather than
 // another metric nobody asked for.
 //
-// The panels are WORDLESS by design and the captions below them are real HTML
-// text. Image models render lettering as convincing gibberish, so a speech
-// bubble would be nonsense at 2x; and text in the markup is selectable,
-// translatable, and read aloud by a screen reader, which text baked into a
-// JPEG never is.
+// Panels, dialogue and balloon positions all live in lib/comic.ts. This file
+// is only the rendering: a two-column comic page where the wide panels span
+// both columns, collapsing to one column on narrow screens.
 //
-// Regenerate or restyle with `npx tsx scripts/gen-comic.mts`, which holds the
-// prompts.
+// The balloons are HTML laid over the artwork, not lettering baked into it.
+// lib/comic.ts explains that decision; the consequence here is that a balloon
+// is real text, so it is selectable, translatable, announced by a screen
+// reader in reading order after its panel's description, and stays sharp when
+// the page is zoomed to 400 percent.
 import Image from "next/image";
-
-/** Native size of every panel, so the browser reserves the box before the
- *  image arrives and the page below never jumps. */
-const PANEL_W = 1536;
-const PANEL_H = 1024;
-
-type Panel = { src: string; alt: string; caption: string };
-
-const PANELS: Panel[] = [
-  {
-    src: "/comic/01-the-ask.jpg",
-    alt: "A client bursts into the workshop with one finger raised while three engineers freeze over their tea.",
-    caption: "Four fifty-five on a Friday. The client has one small change.",
-  },
-  {
-    src: "/comic/02-the-look.jpg",
-    alt: "The senior engineer sets down her tea and reaches for a large brass dial glowing green.",
-    caption: "It is never one small change. She reaches for the dial anyway.",
-  },
-  {
-    src: "/comic/03-the-machine.jpg",
-    alt: "The machine erupts: papers everywhere, capsules flying through tubes, a signpost sprouting from a pot.",
-    caption: "Estimate, questionnaire, quotation, contract, subdomain. All of it, at once.",
-  },
-  {
-    src: "/comic/04-still-hot.jpg",
-    alt: "Stillness. A neat stack of finished documents, the dial dimming, the client mid-blink.",
-    caption: "Finished before he finished the sentence. The tea is still hot.",
-  },
-];
+import { PANELS, PANEL_PX } from "@/lib/comic";
 
 export default function ComicStrip() {
   return (
@@ -56,29 +28,46 @@ export default function ComicStrip() {
       </div>
 
       {/* Safari drops list semantics from any list styled `list-style: none`.
-          That is survivable here without a redundant role="list", because the
-          panel number in each caption is real text and carries the order. */}
-      <ol className="comic-strip">
-        {PANELS.map((panel, i) => (
-          <li className="comic-panel" key={panel.src}>
-            <Image
-              className="comic-img"
-              src={panel.src}
-              alt={panel.alt}
-              width={PANEL_W}
-              height={PANEL_H}
-              sizes="(max-width: 720px) 100vw, 720px"
-              // The first panel is the only one that can be near the fold, and
-              // even that only on a tall screen with both cards hidden.
-              // Everything below it waits until it is scrolled towards.
-              loading={i === 0 ? "eager" : "lazy"}
-            />
-            <p className="comic-caption">
-              <span className="comic-n">{i + 1}</span>
-              {panel.caption}
-            </p>
-          </li>
-        ))}
+          Survivable without a redundant role="list": each panel is numbered in
+          text for a screen reader, which carries the reading order. */}
+      <ol className="comic-page">
+        {PANELS.map((panel, i) => {
+          const px = PANEL_PX[panel.size];
+          return (
+            <li className={`comic-panel is-${panel.size}`} key={panel.file}>
+              {/* The frame is the positioning context for the balloons and the
+                  container the balloon type scales against, so a line keeps its
+                  proportion to the drawing at every width. */}
+              <div className="comic-frame" style={{ aspectRatio: `${px.w} / ${px.h}` }}>
+                <span className="sr-only">Panel {i + 1}. </span>
+                <Image
+                  className="comic-img"
+                  src={`/comic/${panel.file}`}
+                  alt={panel.alt}
+                  width={px.w}
+                  height={px.h}
+                  sizes={panel.size === "wide" ? "(max-width: 960px) 100vw, 920px" : "(max-width: 640px) 100vw, 460px"}
+                  // Only the first panel can be near the fold, and only on a
+                  // tall screen with both cards hidden. The rest wait until
+                  // they are scrolled towards.
+                  loading={i === 0 ? "eager" : "lazy"}
+                />
+                {panel.bubbles.map((bubble, j) => (
+                  <p
+                    className={`comic-bubble is-${bubble.kind ?? "speech"} tail-${bubble.tail}`}
+                    key={`${panel.file}-${j}`}
+                    style={{ left: `${bubble.x}%`, top: `${bubble.y}%`, width: `${bubble.w}%` }}
+                  >
+                    {/* Who is speaking is obvious in the drawing and invisible
+                        to a screen reader, so it is supplied in text. */}
+                    <span className="sr-only">{bubble.who}: </span>
+                    {bubble.text}
+                  </p>
+                ))}
+              </div>
+            </li>
+          );
+        })}
       </ol>
     </section>
   );
