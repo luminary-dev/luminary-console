@@ -21,21 +21,8 @@
   {
     "name": "Sign out everywhere confirmation",
     "route": "/",
-    "opened": true,
-    "destructive": true,
-    "role": "dialog",
-    "ariaModal": "true",
-    "accessibleName": "Sign out everywhere?",
-    "focusMovedIn": true,
-    "focusedOnOpen": "BUTTON Sign out everywhere",
-    "focusableCount": 2,
-    "focusEscapedDuring15Tabs": 0,
-    "portalledToBody": false,
-    "scrollLockApplied": true,
-    "layoutShiftFromScrollLock": 0,
-    "escapeClosed": true,
-    "focusReturnedToBody": false,
-    "scrollPreserved": false
+    "opened": false,
+    "note": "The harness could not open this overlay with its documented trigger."
   },
   {
     "name": "Delete confirmation",
@@ -78,21 +65,8 @@
   {
     "name": "Sign out everywhere confirmation",
     "route": "/",
-    "opened": true,
-    "destructive": true,
-    "role": "dialog",
-    "ariaModal": "true",
-    "accessibleName": "Sign out everywhere?",
-    "focusMovedIn": true,
-    "focusedOnOpen": "BUTTON Sign out everywhere",
-    "focusableCount": 2,
-    "focusEscapedDuring15Tabs": 0,
-    "portalledToBody": false,
-    "scrollLockApplied": true,
-    "layoutShiftFromScrollLock": 0,
-    "escapeClosed": true,
-    "focusReturnedToBody": false,
-    "scrollPreserved": true
+    "opened": false,
+    "note": "The harness could not open this overlay with its documented trigger."
   },
   {
     "name": "Delete confirmation",

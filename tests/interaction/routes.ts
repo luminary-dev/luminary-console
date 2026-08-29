@@ -80,6 +80,15 @@ export const ROUTES: Route[] = [
     purpose: "Drafts and publishes blog articles and portfolio projects.",
   },
 
+  {
+    path: "/settings",
+    pattern: "app/settings/page.tsx",
+    name: "Settings",
+    surface: "console",
+    auth: "operator",
+    purpose: "Signed-in devices and the client CSV export. Occasional, deliberate actions.",
+  },
+
   // ——— console, engineering ———
   {
     path: "/github",

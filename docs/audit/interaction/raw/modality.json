@@ -20,11 +20,32 @@
     "check": "touch targets",
     "path": "/",
     "name": "Dashboard",
-    "total": 25,
-    "under44": 1,
+    "total": 21,
+    "under44": 4,
     "underAA24": 0,
-    "crowdedUnder8px": 8,
+    "crowdedUnder8px": 11,
     "worst": [
+      {
+        "name": "Publish",
+        "w": 68,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      },
+      {
+        "name": "Activity",
+        "w": 71,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      },
+      {
+        "name": "Engineering",
+        "w": 97,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      },
       {
         "name": "Search clients by name, document number,",
         "w": 280,
@@ -152,12 +173,23 @@
   },
   {
     "check": "touch targets",
+    "path": "/settings",
+    "name": "Settings",
+    "total": 6,
+    "under44": 0,
+    "underAA24": 0,
+    "crowdedUnder8px": 0,
+    "worst": [],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
     "path": "/github",
     "name": "Pull requests",
-    "total": 86,
-    "under44": 16,
+    "total": 152,
+    "under44": 60,
     "underAA24": 0,
-    "crowdedUnder8px": 84,
+    "crowdedUnder8px": 150,
     "worst": [
       {
         "name": "Your GitHub login",
@@ -216,14 +248,14 @@
         "cls": ""
       },
       {
-        "name": "luminary-dev/service-hub #879chore(deps)",
+        "name": "luminary-dev/service-hub #889chore(deps)",
         "w": 318,
         "h": 35,
         "gap": 0,
         "cls": ""
       },
       {
-        "name": "luminary-dev/service-hub #878chore(deps)",
+        "name": "luminary-dev/service-hub #888chore(deps)",
         "w": 318,
         "h": 35,
         "gap": 0,
@@ -255,10 +287,10 @@
     "check": "touch targets",
     "path": "/github/ci",
     "name": "CI",
-    "total": 78,
-    "under44": 28,
+    "total": 144,
+    "under44": 68,
     "underAA24": 0,
-    "crowdedUnder8px": 78,
+    "crowdedUnder8px": 144,
     "worst": [
       {
         "name": "ci",
@@ -275,60 +307,60 @@
         "cls": "gh-row-link"
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": "gh-row-link"
       },
       {
-        "name": "ci",
-        "w": 24,
+        "name": "CI",
+        "w": 35,
         "h": 44,
         "gap": 0,
-        "cls": "gh-row-link"
+        "cls": "gh-nav-link"
       },
       {
-        "name": "ci",
-        "w": 24,
-        "h": 44,
+        "name": "luminary-dev/luminate #206build(deps): b",
+        "w": 292,
+        "h": 35,
         "gap": 0,
-        "cls": "gh-row-link"
+        "cls": ""
       }
     ],
     "aaFailures": []
@@ -413,10 +445,10 @@
     "check": "touch targets",
     "path": "/github/activity",
     "name": "Engineering activity",
-    "total": 131,
-    "under44": 28,
+    "total": 134,
+    "under44": 9,
     "underAA24": 0,
-    "crowdedUnder8px": 131,
+    "crowdedUnder8px": 134,
     "worst": [
       {
         "name": "ci",
@@ -433,60 +465,53 @@
         "cls": ""
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
-        "name": "ci",
+        "name": "CI",
         "w": 24,
         "h": 44,
         "gap": 0,
         "cls": ""
       },
       {
-        "name": "ci",
-        "w": 24,
+        "name": "CI",
+        "w": 35,
         "h": 44,
         "gap": 0,
-        "cls": ""
-      },
-      {
-        "name": "ci",
-        "w": 24,
-        "h": 44,
-        "gap": 0,
-        "cls": ""
+        "cls": "gh-nav-link"
       }
     ],
     "aaFailures": []

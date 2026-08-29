@@ -115,6 +115,80 @@ summary:focus-visible,
 .portal-link .no--actions { flex-shrink: 1; min-width: 0; }
 
 .topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0 4px; }
+
+/* ——— The console menu ———
+   The dashboard topbar used to be seven identical ghost pills in one row:
+   navigation, account controls and the primary action, all wearing the same
+   clothes. Finding "Publish" meant reading all seven labels. These three rules
+   split it into where you GO, what you CONTROL, and the one thing you DO.
+   Nothing here changes what is on the bar; it changes what each thing looks
+   like it is. */
+.topnav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  margin-right: 14px;
+  padding-right: 14px;
+  border-right: 1px solid var(--border);
+}
+.topnav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: 9px;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.topnav-link[aria-current="page"] { color: var(--text); background: var(--off); }
+/* The unread count is a number, so it reads as one: mono, tabular, and it
+   does not change the link's width as it climbs from 9 to 10. */
+.topnav-count {
+  font-family: var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--a-text);
+  background: var(--a-dim);
+  border-radius: 100px;
+  padding: 1px 7px;
+}
+.topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+/* One line of text does not need a card. The outstanding figure used to sit
+   in a full card next to a duplicate set of stage chips; with the chips gone
+   the card was mostly empty, which reads as badly as a crowded one. A strip
+   keeps the information and gives the space back. */
+.summary-strip {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding: 0 22px;
+}
+.summary-strip__k {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--label);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.summary-strip p { font-size: 13.5px; margin: 0; }
+@media (max-width: 720px) { .summary-strip { padding: 0 18px; } }
+
+@media (max-width: 720px) {
+  /* The nav group is .app-hide in the installed app, but a narrow browser
+     still gets it, and a vertical border between wrapped rows reads as a
+     stray line rather than a separator. */
+  .topnav { border-right: none; padding-right: 0; margin-right: 0; }
+}
+
 .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; }
 .brand span { color: var(--accent); }
 .brand small { font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-left: 10px; }

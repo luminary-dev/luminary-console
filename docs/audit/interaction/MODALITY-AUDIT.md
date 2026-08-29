@@ -1,6 +1,6 @@
 # Modality audit
 
-Generated 2026-08-27. Touch measurements come from WebKit at iPhone 15
+Generated 2026-08-29. Touch measurements come from WebKit at iPhone 15
 dimensions, which is real Safari rather than Chromium pretending.
 
 ## Hover dependency (section 3.3)
@@ -20,13 +20,13 @@ only targets that fail the criterion including its spacing exception.
 
 | Route | Targets | <44px | <24px AA | Neighbours under 8px |
 | --- | ---: | ---: | ---: | ---: |
+| `/github/ci` | 144 | 68 | 0 | 144 |
+| `/github` | 152 | 60 | 0 | 150 |
 | `/clients/eco-mech` | 117 | 29 | 0 | 40 |
-| `/github/ci` | 78 | 28 | 0 | 78 |
-| `/github/activity` | 131 | 28 | 0 | 131 |
 | `/c/eco-mech/questionnaire` | 129 | 28 | 3 | 2 |
-| `/github` | 86 | 16 | 0 | 84 |
+| `/github/activity` | 134 | 9 | 0 | 134 |
+| `/` | 21 | 4 | 0 | 11 |
 | `/c/eco-mech` | 26 | 3 | 0 | 7 |
-| `/` | 25 | 1 | 0 | 8 |
 | `/github/repos` | 46 | 1 | 0 | 43 |
 | `/github/deployments` | 14 | 1 | 0 | 14 |
 | `/github/releases` | 12 | 1 | 0 | 12 |
@@ -37,27 +37,29 @@ only targets that fail the criterion including its spacing exception.
 | `/clients/new` | 11 | 0 | 0 | 0 |
 | `/activity` | 4 | 0 | 0 | 0 |
 | `/publish` | 16 | 0 | 0 | 0 |
+| `/settings` | 6 | 0 | 0 | 0 |
 
-**Total: 139 targets under 44px, 3 failing WCAG 2.5.8 outright.**
+**Total: 207 targets under 44px, 3 failing WCAG 2.5.8 outright.**
 
 ## Keyboard (section 3.5)
 
 | Route | Tab stops | Order jumps | Stops with no visible ring | Skip link visible on focus |
 | --- | ---: | ---: | ---: | --- |
 | `/login` | 2 | 0 | 0 | yes |
-| `/` | 19 | 0 | 0 | yes |
+| `/` | 15 | 0 | 0 | yes |
 | `/clients/new` | 12 | 0 | 0 | yes |
 | `/clients/eco-mech` | 60 | 0 | 0 | yes |
 | `/activity` | 5 | 0 | 0 | yes |
 | `/publish` | 16 | 0 | 0 | yes |
-| `/github` | 33 | 0 | 0 | yes |
+| `/settings` | 7 | 0 | 0 | yes |
+| `/github` | 60 | 0 | 0 | yes |
 | `/github/repos` | 46 | 0 | 0 | yes |
 | `/github/ci` | 60 | 0 | 0 | yes |
 | `/github/deployments` | 14 | 0 | 0 | yes |
 | `/github/releases` | 12 | 0 | 0 | yes |
 | `/github/security` | 12 | 0 | 0 | yes |
 | `/github/insights` | 12 | 0 | 0 | yes |
-| `/github/activity` | 60 | 0 | 0 | yes |
+| `/github/activity` | 47 | 0 | 0 | yes |
 | `/github/luminary-dev/luminary-console/21` | 14 | 0 | 0 | yes |
 | `/c/eco-mech` | 27 | 0 | 0 | yes |
 | `/c/eco-mech/questionnaire` | 60 | 0 | 0 | yes |

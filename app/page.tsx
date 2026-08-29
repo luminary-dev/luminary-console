@@ -10,7 +10,6 @@ import { relTime } from "@/lib/time";
 import type { ClientStage } from "@/lib/types";
 import ClientTable, { type ClientRow } from "@/components/ClientTable";
 import CommandPalette from "@/components/CommandPalette";
-import SessionsCard from "@/components/SessionsCard";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
 import PushToggle from "@/components/PushToggle";
@@ -114,26 +113,32 @@ export default async function Dashboard() {
           Luminary<span>.</span>
           <small>Console</small>
         </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <ThemeToggle />
-          <PushToggle />
-          <SignOut />
-          {/* .app-hide: in the installed app the tab bar owns navigation and
-              CSV export is a desktop affair — hidden there, unchanged on web. */}
-          <Link className="btn ghost small app-hide" href="/github">
+        {/* Three groups, not seven identical pills. Where you GO, what you
+            control, and the one thing you DO. They used to sit in a single
+            undifferentiated row, so finding "Publish" meant reading all seven
+            labels every time.
+            .app-hide: the installed app's tab bar owns navigation, so the nav
+            group is hidden there and unchanged on the web. */}
+        <nav className="topnav app-hide" aria-label="Sections">
+          <Link className="topnav-link" href="/github">
             Engineering
           </Link>
-          <Link className="btn ghost small app-hide" href="/activity">
-            Activity{unread > 0 ? ` · ${unread}` : ""}
+          <Link className="topnav-link" href="/activity">
+            Activity
+            {unread > 0 && <span className="topnav-count">{unread}</span>}
           </Link>
-          <Link className="btn ghost small app-hide" href="/publish">
+          <Link className="topnav-link" href="/publish">
             Publish
           </Link>
-          {index.length > 0 && (
-            <a className="btn ghost small app-hide" href="/api/clients/export">
-              Export CSV
-            </a>
-          )}
+        </nav>
+
+        <div className="topbar-actions">
+          <ThemeToggle />
+          <PushToggle />
+          <Link className="btn ghost small app-hide" href="/settings">
+            Settings
+          </Link>
+          <SignOut />
           <Link className="btn app-hide" href="/clients/new">
             + New client
           </Link>
@@ -241,18 +246,15 @@ export default async function Dashboard() {
         </div>
       )}
 
+      {/* The stage chips used to live here too, and again inside the client
+          table below, where they are actually clickable filters. Two rows of
+          near-identical chips a few hundred pixels apart read as clutter and
+          taught nobody which set did anything. This card keeps only what is
+          unique to it: the money. */}
       {index.length > 0 && (
-        <div className="card">
-          <h3>Pipeline</h3>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
-            {STAGES.map((s) => (
-              <span key={s} className={`pill${counts[s] === 0 ? " grey" : ""}`}>
-                <i />
-                {STAGE_LABELS[s]} · {counts[s]}
-              </span>
-            ))}
-          </div>
-          <p style={{ marginTop: 12, fontSize: 13.5 }}>
+        <div className="summary-strip">
+          <span className="summary-strip__k">Outstanding</span>
+          <p>
             {outstandingClients > 0 ? (
               <>
                 <b className="mono">{fmtLKR(outstandingTotal)}</b> outstanding across{" "}
@@ -288,7 +290,6 @@ export default async function Dashboard() {
         <ClientTable rows={rows} />
       )}
 
-      <SessionsCard />
       <CommandPalette items={rows.map((r) => ({ slug: r.slug, company: r.company, docNoBase: r.docNoBase }))} />
       <AppTabBar />
     </main>

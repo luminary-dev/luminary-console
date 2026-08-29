@@ -42,6 +42,13 @@
     "total": 0
   },
   {
+    "path": "/settings",
+    "name": "Settings",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
     "path": "/github",
     "name": "Pull requests",
     "state": "at rest",
@@ -121,8 +128,8 @@
   {
     "path": "/",
     "name": "Sign out confirmation",
-    "state": "overlay open",
-    "opened": true,
+    "state": "overlay could NOT be opened by the harness",
+    "opened": false,
     "violations": [],
     "total": 0
   },
