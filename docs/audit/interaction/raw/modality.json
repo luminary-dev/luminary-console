@@ -20,11 +20,18 @@
     "check": "touch targets",
     "path": "/",
     "name": "Dashboard",
-    "total": 21,
-    "under44": 4,
+    "total": 14,
+    "under44": 5,
     "underAA24": 0,
-    "crowdedUnder8px": 11,
+    "crowdedUnder8px": 4,
     "worst": [
+      {
+        "name": "Clients",
+        "w": 66,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      },
       {
         "name": "Publish",
         "w": 68,
@@ -38,6 +45,60 @@
         "h": 36,
         "gap": 4,
         "cls": "topnav-link"
+      },
+      {
+        "name": "Luminary.",
+        "w": 96,
+        "h": 28,
+        "gap": 38,
+        "cls": ""
+      },
+      {
+        "name": "Engineering",
+        "w": 97,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      }
+    ],
+    "aaFailures": []
+  },
+  {
+    "check": "touch targets",
+    "path": "/clients",
+    "name": "Clients",
+    "total": 23,
+    "under44": 6,
+    "underAA24": 0,
+    "crowdedUnder8px": 12,
+    "worst": [
+      {
+        "name": "Clients",
+        "w": 66,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      },
+      {
+        "name": "Publish",
+        "w": 68,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      },
+      {
+        "name": "Activity",
+        "w": 71,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      },
+      {
+        "name": "Luminary.",
+        "w": 96,
+        "h": 28,
+        "gap": 38,
+        "cls": ""
       },
       {
         "name": "Engineering",
@@ -164,11 +225,47 @@
     "check": "touch targets",
     "path": "/publish",
     "name": "Publish studio",
-    "total": 16,
-    "under44": 0,
+    "total": 22,
+    "under44": 5,
     "underAA24": 0,
-    "crowdedUnder8px": 0,
-    "worst": [],
+    "crowdedUnder8px": 4,
+    "worst": [
+      {
+        "name": "Clients",
+        "w": 66,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      },
+      {
+        "name": "Publish",
+        "w": 68,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      },
+      {
+        "name": "Activity",
+        "w": 71,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      },
+      {
+        "name": "Luminary.",
+        "w": 96,
+        "h": 28,
+        "gap": 38,
+        "cls": ""
+      },
+      {
+        "name": "Engineering",
+        "w": 97,
+        "h": 36,
+        "gap": 4,
+        "cls": "topnav-link"
+      }
+    ],
     "aaFailures": []
   },
   {
@@ -288,10 +385,17 @@
     "path": "/github/ci",
     "name": "CI",
     "total": 144,
-    "under44": 68,
+    "under44": 69,
     "underAA24": 0,
     "crowdedUnder8px": 144,
     "worst": [
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": "gh-row-link"
+      },
       {
         "name": "ci",
         "w": 24,
@@ -354,13 +458,6 @@
         "h": 44,
         "gap": 0,
         "cls": "gh-nav-link"
-      },
-      {
-        "name": "luminary-dev/luminate #206build(deps): b",
-        "w": 292,
-        "h": 35,
-        "gap": 0,
-        "cls": ""
       }
     ],
     "aaFailures": []
@@ -445,11 +542,18 @@
     "check": "touch targets",
     "path": "/github/activity",
     "name": "Engineering activity",
-    "total": 134,
-    "under44": 9,
+    "total": 133,
+    "under44": 10,
     "underAA24": 0,
-    "crowdedUnder8px": 134,
+    "crowdedUnder8px": 133,
     "worst": [
+      {
+        "name": "ci",
+        "w": 24,
+        "h": 44,
+        "gap": 0,
+        "cls": ""
+      },
       {
         "name": "ci",
         "w": 24,

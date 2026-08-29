@@ -17,7 +17,22 @@
   {
     "path": "/",
     "name": "Dashboard",
-    "stops": 15,
+    "stops": 14,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
+    "path": "/clients",
+    "name": "Clients",
+    "stops": 17,
     "reachedEnd": true,
     "tabOrderRegressions": 0,
     "stopsWithoutVisibleRing": 0,
@@ -77,7 +92,7 @@
   {
     "path": "/publish",
     "name": "Publish studio",
-    "stops": 16,
+    "stops": 21,
     "reachedEnd": true,
     "tabOrderRegressions": 0,
     "stopsWithoutVisibleRing": 0,
@@ -212,8 +227,8 @@
   {
     "path": "/github/activity",
     "name": "Engineering activity",
-    "stops": 47,
-    "reachedEnd": true,
+    "stops": 60,
+    "reachedEnd": false,
     "tabOrderRegressions": 0,
     "stopsWithoutVisibleRing": 0,
     "noRingSample": [],

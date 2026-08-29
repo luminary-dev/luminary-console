@@ -10,10 +10,11 @@ Screenshots are under `screens/<project>/<route>.png`.
 | --- | --- | --- | --- | --- |
 | `/login` | OK | OK | OK | OK |
 | `/` | 1 err | 1 err | 1 err | 1 err |
+| `/clients` | 1 err | 1 err | 1 err | 1 err |
 | `/clients/new` | OK | OK | OK | OK |
 | `/clients/eco-mech` | OK | OK | OK | OK |
 | `/activity` | OK | OK | OK | OK |
-| `/publish` | OK | OK | OK | OK |
+| `/publish` | 1 err | 1 err | 1 err | 1 err |
 | `/settings` | OK | OK | OK | OK |
 | `/github` | OK | OK | OK | OK |
 | `/github/repos` | OK | OK | OK | OK |
@@ -28,7 +29,7 @@ Screenshots are under `screens/<project>/<route>.png`.
 | `/c/eco-mech/questionnaire` | OK | OK | OK | OK |
 | `/c/eco-mech/quotation` | OK | OK | OK | OK |
 
-**Horizontal overflow: 0 of 76 measurements.**
+**Horizontal overflow: 0 of 80 measurements.**
 None.
 
 ## Layout shift

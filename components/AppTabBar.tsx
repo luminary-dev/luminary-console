@@ -31,8 +31,9 @@ const TABS: {
         <path d="M5 9.5V21h5v-6h4v6h5V9.5" />
       </svg>
     ),
-    // Client detail pages are drill-downs from the dashboard — keep Home lit.
-    isActive: (p) => p === "/" || (p.startsWith("/clients/") && p !== "/clients/new"),
+    // Client drill-downs light Clients now, not Home: the list they came from
+    // lives there. Home is the hub and nothing drills down from it.
+    isActive: (p) => p === "/",
   },
   {
     href: "/github",
@@ -51,6 +52,18 @@ const TABS: {
     // The whole engineering section keeps this tab lit, including the sub
     // views and a pull request drill-down.
     isActive: (p) => p === "/github" || p.startsWith("/github/"),
+  },
+  {
+    href: "/clients",
+    label: "Clients",
+    icon: (
+      // A folder, which reads as "the client records" at 22px far better than
+      // a person silhouette, since a client here is a project not a contact.
+      <svg viewBox="0 0 24 24" {...stroke}>
+        <path d="M3 7.5a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
+      </svg>
+    ),
+    isActive: (p) => p === "/clients" || (p.startsWith("/clients/") && p !== "/clients/new"),
   },
   {
     href: "/activity",

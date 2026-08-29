@@ -1,296 +1,139 @@
+// The hub: the first screen after signing in.
+//
+// It answers one question, "what should I look at", and nothing else. The four
+// sections are always here so the console has a stable shape; the two things
+// below them appear only when there is something to say. A card that always
+// reads "nothing outstanding" trains you to stop looking at it, which is the
+// opposite of what a landing screen is for.
+//
+// The client table used to live here as well. It moved to /clients: telling
+// you what needs attention and listing every client are different jobs and
+// they want different shapes.
 import Link from "next/link";
-import { getClients, getIndex } from "@/lib/store";
-import { STAGES, currentStage } from "@/lib/stage";
-import { clientMoney, fmtLKR, overdueSummary } from "@/lib/money";
-import { recentActivity, isNotifiable, getNotificationsSeenAt, getReadKeys, entryKey } from "@/lib/activity";
+import AppTabBar from "@/components/AppTabBar";
+import CommandPalette from "@/components/CommandPalette";
+import ConsoleTopbar, { SECTIONS } from "@/components/ConsoleTopbar";
 import MarkAllRead from "@/components/MarkAllRead";
 import RelativeTime from "@/components/RelativeTime";
-import { displayName } from "@/lib/admins";
+import { fmtLKR } from "@/lib/money";
 import { relTime } from "@/lib/time";
-import type { ClientStage } from "@/lib/types";
-import ClientTable, { type ClientRow } from "@/components/ClientTable";
-import CommandPalette from "@/components/CommandPalette";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import PushToggle from "@/components/PushToggle";
-import AppTabBar from "@/components/AppTabBar";
+import { loadClientOverview, loadUnreadActivity } from "@/lib/console-overview";
 
-export const metadata = { title: "Clients" };
+export const metadata = { title: "Console" };
 export const dynamic = "force-dynamic";
 
-const STATUS_LABEL: Record<string, string> = {
-  created: "Estimate sent",
-  answers_in: "Answers in: drafting",
-  drafts_ready: "Drafts ready",
+/** One line of context per section, so the tiles say what they are for. */
+const SECTION_NOTE: Record<string, string> = {
+  "/clients": "Documents, billing, designs and handover for every client.",
+  "/github": "Pull requests, CI, deployments, releases and security.",
+  "/activity": "Everything that has happened, across clients and repositories.",
+  "/publish": "Draft and publish articles and portfolio projects.",
 };
 
-export default async function Dashboard() {
-  const index = (await getIndex()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  // The index carries only slug, company, status, createdAt and the doc
-  // number. Stage, money, overdue and open tasks all live inside the full
-  // record, so the pipeline counts and the outstanding total genuinely need
-  // every record read, and the rows the table shows need exactly the same
-  // ones: there is no smaller correct set to fetch here. What is not
-  // acceptable is opening one R2 connection per client at once, which is what
-  // Promise.all over the index did, so the fan-out is bounded instead
-  // (LC-030). The table virtualizes above 100 rows, so a large index costs
-  // reads, not render time.
-  const records = await getClients(index.map((e) => e.slug));
-
-  // Client-portal notifications: uploads, questions, acceptances, submissions.
-  // Only for clients that still exist (so deleted/test clients never show), and
-  // "unread" = anything since the feed was last opened on the Activity page.
-  const companyOf = new Map(index.map((e) => [e.slug, e.company]));
-  const [activity, seenAt, readKeys] = await Promise.all([
-    recentActivity(100),
-    getNotificationsSeenAt(),
-    getReadKeys(),
-  ]);
-  // The Recent-updates card is an inbox: every action against a client —
-  // admin and portal alike — except sign-in noise (the "console" target),
-  // minus anything already seen (globally marked read, or individually
-  // dismissed by opening it). The full history stays on /activity.
-  // Deleted-client events still show (as plain text, no link), so nothing an
-  // admin did quietly disappears.
-  const feedEvents = activity.filter(
-    (e) => isNotifiable(e) && e.at > seenAt && !readKeys.has(entryKey(e)),
-  );
-  const unread = feedEvents.length;
+export default async function Hub() {
+  const [overview, activity] = await Promise.all([loadClientOverview(), loadUnreadActivity()]);
+  const { outstandingTotal, outstandingClients, overdueTotal, overdueClients, total } = overview;
+  const { events, unread } = activity;
+  // Only clients that still exist get an "Open" link; see the feed below.
+  const companyOf = new Map(overview.rows.map((r) => [r.slug, r.company]));
   const now = Date.now();
-  const counts = Object.fromEntries(STAGES.map((s) => [s, 0])) as Record<ClientStage, number>;
-  let outstandingTotal = 0;
-  let outstandingClients = 0;
-  let overdueClients = 0;
-  let overdueTotal = 0;
-  const rows: ClientRow[] = [];
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const openTasks: { slug: string; company: string; text: string; due?: string; assignee?: string }[] = [];
-  index.forEach((e, i) => {
-    const rec = records[i];
-    if (!rec) return;
-    const stage = currentStage(rec);
-    counts[stage]++;
-    for (const t of rec.tasks ?? []) {
-      if (!t.done) {
-        openTasks.push({
-          slug: e.slug,
-          company: e.company,
-          text: t.text,
-          ...(t.due !== undefined ? { due: t.due } : {}),
-          ...(t.assignee !== undefined ? { assignee: t.assignee } : {}),
-        });
-      }
-    }
-    const money = clientMoney(rec);
-    if (money.outstanding > 0) {
-      outstandingTotal += money.outstanding;
-      outstandingClients++;
-    }
-    const od = overdueSummary(rec);
-    if (od.count > 0) {
-      overdueClients++;
-      overdueTotal += od.total;
-    }
-    rows.push({
-      slug: e.slug,
-      company: e.company,
-      docNoBase: e.docNoBase,
-      status: e.status,
-      statusLabel: STATUS_LABEL[e.status] ?? e.status,
-      stage,
-      createdAt: e.createdAt,
-      outstanding: money.outstanding,
-      overdue: od.count > 0,
-    });
-  });
-  // Earliest due first (overdue naturally leads); undated tasks last.
-  openTasks.sort((a, b) => (a.due || "9999-99-99").localeCompare(b.due || "9999-99-99"));
 
   return (
     <main className="wrap" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Console</small>
-        </div>
-        {/* Three groups, not seven identical pills. Where you GO, what you
-            control, and the one thing you DO. They used to sit in a single
-            undifferentiated row, so finding "Publish" meant reading all seven
-            labels every time.
-            .app-hide: the installed app's tab bar owns navigation, so the nav
-            group is hidden there and unchanged on the web. */}
-        <nav className="topnav app-hide" aria-label="Sections">
-          <Link className="topnav-link" href="/github">
-            Engineering
-          </Link>
-          <Link className="topnav-link" href="/activity">
-            Activity
-            {unread > 0 && <span className="topnav-count">{unread}</span>}
-          </Link>
-          <Link className="topnav-link" href="/publish">
-            Publish
-          </Link>
-        </nav>
+      <ConsoleTopbar unread={unread} />
 
-        <div className="topbar-actions">
-          <ThemeToggle />
-          <PushToggle />
-          <Link className="btn ghost small app-hide" href="/settings">
-            Settings
-          </Link>
-          <SignOut />
-          <Link className="btn app-hide" href="/clients/new">
-            + New client
-          </Link>
-        </div>
-      </div>
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id="main-content" tabIndex={-1} />
-
-
-      {feedEvents.length > 0 && (
-        <div className="card">
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <h3 style={{ margin: 0 }}>
-              Recent updates
-              <span className="new-pill" style={{ marginLeft: 8 }}>
-                {unread} new
-              </span>
-            </h3>
-            <span style={{ marginLeft: "auto" }}>
-              <MarkAllRead />
+      <nav className="hub" aria-label="Console sections">
+        {SECTIONS.map((s) => (
+          <Link className="hub-tile" key={s.href} href={s.href}>
+            <span className="hub-tile__name">
+              {s.label}
+              {s.href === "/clients" && total > 0 && <span className="hub-tile__n">{total}</span>}
+              {s.href === "/activity" && unread > 0 && (
+                <span className="hub-tile__n is-accent">{unread}</span>
+              )}
             </span>
-          </div>
-          <p className="app-hide" style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            Unseen actions across your clients: document publishes, invoices, payments, stage
-            changes and emails, plus uploads, questions and acceptances from the portals.
-            Opening an update clears it; the full history lives in{" "}
-            <Link href="/activity">Activity</Link>.
-          </p>
-          <div style={{ marginTop: 8 }}>
-            {feedEvents.slice(0, 8).map((e, i) => {
-              const company = companyOf.get(e.target);
-              return (
-                <div
-                  key={`${e.at}-${i}`}
-                  style={{
-                    display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap",
-                    padding: "10px 0", borderTop: "1px solid var(--border)",
-                  }}
-                >
-                  <span style={{ fontWeight: 600, fontSize: 13.5 }}>{e.actor}</span>
-                  <span style={{ fontSize: 13.5 }}>{e.action}</span>
-                  {e.detail && (
-                    <span className="mono" style={{ fontSize: 12, color: "var(--muted)", overflowWrap: "anywhere" }}>
-                      {e.detail}
-                    </span>
-                  )}
-                  <span style={{ marginLeft: "auto", display: "flex", gap: 12, alignItems: "baseline", whiteSpace: "nowrap" }}>
-                    <RelativeTime
-                      at={e.at}
-                      initial={relTime(e.at, now)}
-                      className="rel-time"
-                    />
-                    {company ? (
-                      /* bare <a>: routes through /api/activity/open, which marks
-                         this one update read and redirects to the client page —
-                         a Link would prefetch and mark it read on hover. */
-                      <a
-                        href={`/api/activity/open?at=${encodeURIComponent(e.at)}&target=${encodeURIComponent(e.target)}&action=${encodeURIComponent(e.action)}`}
-                      >
-                        Open →
-                      </a>
-                    ) : (
-                      <span style={{ color: "var(--muted)" }}>{e.target}</span>
-                    )}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+            <span className="hub-tile__note">{SECTION_NOTE[s.href]}</span>
+          </Link>
+        ))}
+      </nav>
 
-      {openTasks.length > 0 && (
-        <div className="card">
-          <h3>Open tasks</h3>
-          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            Across all clients, earliest due first. {openTasks.length} open.
-          </p>
-          <div style={{ marginTop: 8 }}>
-            {openTasks.slice(0, 12).map((t, i) => {
-              const overdue = t.due && t.due < todayStr;
-              return (
-                <div
-                  key={`${t.slug}-${i}`}
-                  style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap", padding: "9px 0", borderTop: "1px solid var(--border)" }}
-                >
-                  <span style={{ fontSize: 13.5 }}>{t.text}</span>
-                  {(t.due || t.assignee) && (
-                    <span style={{ fontSize: 12, color: overdue ? "var(--danger, #d33)" : "var(--muted)", fontWeight: overdue ? 700 : 400 }}>
-                      {t.due ? `due ${t.due}${overdue ? " · overdue" : ""}` : ""}
-                      {t.due && t.assignee ? " · " : ""}
-                      {t.assignee ? displayName(t.assignee) : ""}
-                    </span>
-                  )}
-                  <span style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "baseline" }}>
-                    <Link href={`/clients/${t.slug}`}>{t.company} →</Link>
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* The stage chips used to live here too, and again inside the client
-          table below, where they are actually clickable filters. Two rows of
-          near-identical chips a few hundred pixels apart read as clutter and
-          taught nobody which set did anything. This card keeps only what is
-          unique to it: the money. */}
-      {index.length > 0 && (
-        <div className="summary-strip">
-          <span className="summary-strip__k">Outstanding</span>
-          <p>
-            {outstandingClients > 0 ? (
+      {/* Only when there is money to chase. */}
+      {outstandingClients > 0 && (
+        <section className="card" aria-labelledby="hub-money">
+          <h3 id="hub-money">Outstanding</h3>
+          <p style={{ marginTop: 8, fontSize: 13.5 }}>
+            <b className="mono">{fmtLKR(outstandingTotal)}</b> across {outstandingClients} client
+            {outstandingClients > 1 ? "s" : ""}.
+            {overdueClients > 0 && (
               <>
-                <b className="mono">{fmtLKR(outstandingTotal)}</b> outstanding across{" "}
-                {outstandingClients} client{outstandingClients > 1 ? "s" : ""}.
-                {overdueClients > 0 && (
-                  <>
-                    {" "}
-                    <b className="mono" style={{ color: "var(--danger, #d33)" }}>{fmtLKR(overdueTotal)}</b>{" "}
-                    <span style={{ color: "var(--danger, #d33)" }}>
-                      overdue across {overdueClients} client{overdueClients > 1 ? "s" : ""}.
-                    </span>
-                  </>
-                )}
+                {" "}
+                <b className="mono" style={{ color: "var(--danger)" }}>
+                  {fmtLKR(overdueTotal)}
+                </b>{" "}
+                <span style={{ color: "var(--danger)" }}>
+                  overdue across {overdueClients} client{overdueClients > 1 ? "s" : ""}.
+                </span>
               </>
-            ) : (
-              <span style={{ color: "var(--muted)" }}>
-                Nothing outstanding: every published invoice is settled.
-              </span>
             )}
           </p>
-        </div>
+          <Link className="btn ghost small" href="/clients" style={{ marginTop: 14 }}>
+            Open clients
+          </Link>
+        </section>
       )}
 
-      {index.length === 0 ? (
-        <div className="card">
-          <h3>Clients</h3>
-          <p style={{ color: "var(--muted)", marginTop: 10, fontSize: 14 }}>
-            No clients yet. Create the first one and the estimate, questionnaire and subdomain are
-            generated automatically.
-          </p>
-        </div>
-      ) : (
-        <ClientTable rows={rows} />
+      {/* Only when something is genuinely unread. */}
+      {events.length > 0 && (
+        <section className="card" aria-labelledby="hub-updates">
+          <div className="card-head">
+            <h3 id="hub-updates">
+              Recent updates <span className="pill">{unread} new</span>
+            </h3>
+            <MarkAllRead />
+          </div>
+          <ul className="hub-feed">
+            {events.map((e, i) => {
+              const company = companyOf.get(e.target);
+              return (
+                <li className="hub-feed__row" key={`${e.at}-${i}`}>
+                  <span className="hub-feed__what">
+                    <b>{e.actor}</b> {e.action}{" "}
+                    {e.detail ? <span className="mono">{e.detail}</span> : null}
+                  </span>
+                  <RelativeTime at={e.at} initial={relTime(e.at, now)} className="rel-time" />
+                  {company ? (
+                    /* A bare <a>, not a Link: this routes through
+                       /api/activity/open, which marks this one update read and
+                       then redirects. A Link would prefetch on hover and mark
+                       it read without anyone opening it. */
+                    <a
+                      className="hub-feed__open"
+                      href={`/api/activity/open?at=${encodeURIComponent(e.at)}&target=${encodeURIComponent(e.target)}&action=${encodeURIComponent(e.action)}`}
+                    >
+                      Open
+                    </a>
+                  ) : (
+                    /* The client is gone. The event still shows, as plain
+                       text, so nothing an admin did quietly disappears. */
+                    <span className="hub-feed__open is-gone">{e.target}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <Link className="btn ghost small" href="/activity" style={{ marginTop: 14 }}>
+            All activity
+          </Link>
+        </section>
       )}
 
-      <CommandPalette items={rows.map((r) => ({ slug: r.slug, company: r.company, docNoBase: r.docNoBase }))} />
+      <CommandPalette
+        items={overview.rows.map((r) => ({
+          slug: r.slug,
+          company: r.company,
+          docNoBase: r.docNoBase,
+        }))}
+      />
       <AppTabBar />
     </main>
   );

@@ -127,6 +127,12 @@ summary:focus-visible,
   display: flex;
   align-items: center;
   gap: 4px;
+  /* Wrapping and min-width: 0 together are what stop this pushing the page
+     sideways. Four links come to 314px, which does not fit a 320px phone, and
+     a nowrap flex row in a flex parent will happily overflow rather than
+     shrink. */
+  flex-wrap: wrap;
+  min-width: 0;
   margin-left: auto;
   margin-right: 14px;
   padding-right: 14px;
@@ -158,6 +164,70 @@ summary:focus-visible,
 }
 .topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
+/* ——— The hub ———
+   Four tiles, the console's four sections, always in the same order and
+   always present. The two cards below them are conditional, so the tiles are
+   the only fixed thing on the first screen: the shape does not change with
+   how much work is outstanding, which is what makes it navigable by muscle
+   memory. */
+.hub {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 22px;
+}
+.hub-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-height: 112px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color .15s ease, transform .15s ease;
+}
+.hub-tile__name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15.5px;
+  font-weight: 700;
+}
+.hub-tile__n {
+  font-family: var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--label);
+  background: var(--off);
+  border-radius: 100px;
+  padding: 2px 8px;
+}
+.hub-tile__n.is-accent { color: var(--a-text); background: var(--a-dim); }
+.hub-tile__note { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+
+.hub-feed { list-style: none; margin: 4px 0 0; padding: 0; }
+.hub-feed__row {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  padding: 11px 0;
+  border-top: 1px solid var(--border);
+  font-size: 13.5px;
+}
+.hub-feed__what { flex: 1 1 260px; }
+.hub-feed__what .mono { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.hub-feed__open { white-space: nowrap; }
+.hub-feed__open.is-gone { color: var(--muted); }
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+@media (max-width: 900px) { .hub { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .hub { grid-template-columns: 1fr; } }
+
+
 /* One line of text does not need a card. The outstanding figure used to sit
    in a full card next to a duplicate set of stage chips; with the chips gone
    the card was mostly empty, which reads as badly as a crowded one. A strip
@@ -185,8 +255,9 @@ summary:focus-visible,
 @media (max-width: 720px) {
   /* The nav group is .app-hide in the installed app, but a narrow browser
      still gets it, and a vertical border between wrapped rows reads as a
-     stray line rather than a separator. */
-  .topnav { border-right: none; padding-right: 0; margin-right: 0; }
+     stray line rather than a separator. margin-left: auto goes too: once the
+     bar wraps, pushing the group right just strands it. */
+  .topnav { border-right: none; padding-right: 0; margin-right: 0; margin-left: 0; }
 }
 
 .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; }
@@ -635,6 +706,8 @@ body {
    still apply on touch. */
 @media (hover: hover) and (pointer: fine) {
   a:hover { color: var(--accent); }
+  .hub-tile:hover { border-color: var(--a-border); transform: translateY(-1px); }
+  .hub-tile:hover .hub-tile__name { color: var(--a-text); }
   .btn:hover { transform: translateY(-1px); color: #0d0d0f; }
   .q-file-btn:hover:not(:disabled) { border-color: var(--a-text); }
   .q-file-x:hover { color: #ef4444; background: rgba(239,68,68,.1); }
