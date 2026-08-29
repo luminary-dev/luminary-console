@@ -209,7 +209,17 @@ export async function proxy(request: NextRequest) {
     pathname === "/apple-touch-icon.png" ||
     pathname === "/icon-192.png" ||
     pathname === "/icon-512.png" ||
-    pathname === "/badge.png"
+    pathname === "/badge.png" ||
+    // The hub's comic strip. A prefix rather than four exact paths because
+    // the strip is a whole directory of decorative artwork that is meant to
+    // be extended, and nothing but artwork is ever written there.
+    //
+    // This exemption is load-bearing, not cosmetic: next/image optimises
+    // these through an internal fetch that carries no session cookie, so
+    // without it the gate answers the optimiser with the /login HTML and
+    // every panel fails as "isn't a valid image ... received null" while the
+    // reserved boxes still lay out perfectly and hide the breakage.
+    pathname.startsWith("/comic/")
   ) {
     // /login is a rendered page and needs the nonce; the rest are static
     // assets that must stay cacheable, so only /login gets no-store.

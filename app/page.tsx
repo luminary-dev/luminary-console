@@ -11,6 +11,7 @@
 // they want different shapes.
 import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
+import ComicStrip from "@/components/ComicStrip";
 import CommandPalette from "@/components/CommandPalette";
 import ConsoleTopbar, { SECTIONS } from "@/components/ConsoleTopbar";
 import MarkAllRead from "@/components/MarkAllRead";
@@ -126,6 +127,11 @@ export default async function Hub() {
           </Link>
         </section>
       )}
+
+      {/* Last, because it is the only thing here that is not work. On a quiet
+          day the two cards above are both hidden and the hub is four tiles on
+          a lot of empty screen; this gives the scroll somewhere to go. */}
+      <ComicStrip />
 
       <CommandPalette
         items={overview.rows.map((r) => ({

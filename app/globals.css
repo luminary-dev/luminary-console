@@ -227,6 +227,57 @@ summary:focus-visible,
 @media (max-width: 900px) { .hub { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .hub { grid-template-columns: 1fr; } }
 
+/* The comic strip at the bottom of the hub.
+
+   A webtoon column, not a console grid: 720px even though .wrap is 1080px,
+   because a comic reads better in one narrow scroll and these panels are
+   landscape, so at full width each one would be most of a laptop viewport.
+
+   The panels carry no lettering. Every word is in .comic-caption, which is
+   real text, and so is selectable, translatable and read aloud. */
+.comic { width: 720px; max-width: 100%; margin: 46px auto 0; }
+.comic-head { margin-bottom: 18px; text-align: center; }
+.comic-title { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.comic-sub { margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+
+.comic-strip { list-style: none; margin: 0; padding: 0; }
+.comic-panel + .comic-panel { margin-top: 12px; }
+.comic-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  /* Holds the panel's box while it decodes, so the strip does not flash the
+     desk background between rows on a slow connection. */
+  background: var(--off);
+}
+.comic-caption {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+  margin-top: 9px;
+  padding: 0 2px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.comic-n {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-family: var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--a-text);
+  background: var(--a-dim);
+}
+@media (max-width: 720px) {
+  .comic { margin-top: 34px; }
+  .comic-caption { font-size: 12.5px; }
+}
+
 
 /* One line of text does not need a card. The outstanding figure used to sit
    in a full card next to a duplicate set of stage chips; with the chips gone

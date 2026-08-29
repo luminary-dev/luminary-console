@@ -28,8 +28,13 @@ Every number below was measured, before and after. None is an estimate.
 | Worst CLS on load | 0.0000 | 0.0091 |
 | Routes answering 200 with no error boundary | 234 of 234 | 234 of 234 |
 
-Severity counts: Critical 0, High 4, Medium 6, Low 2. Twelve findings, all
-twelve fixed.
+Severity counts: Critical 0, High 4, Medium 7, Low 2. Thirteen findings, all
+thirteen fixed.
+
+IX-013 was added later, on 2026-08-29, while building the hub's comic strip. It
+is the only one here that the harness did not find. It is recorded because of
+how it was missed: the suite was entirely geometry probes, and an image that
+fails to load still occupies exactly the right amount of space.
 
 ---
 
@@ -248,6 +253,46 @@ Evidence: axe rule `link-in-text-block`, 1 node on the client portal. A
 `mailto:` link inside a paragraph, with the global `a { text-decoration: none }`
 removing its underline.
 Fix: an explicit underline on that link.
+Resolution: **Fixed.**
+
+---
+
+### IX-013 — A whole green sweep could not see four missing images
+Severity: Medium
+Category: Harness blind spot
+Location: `proxy.ts:213` (the public-asset list), `tests/interaction/viewport.spec.ts`
+Evidence: the hub's comic strip was added and the viewport sweep passed 261 of
+261, axe passed 22 of 22, CLS measured 0 at all 13 widths. Every panel was
+blank. `proxy.ts` enumerates public assets one exact path at a time and
+`/comic/` was not among them, so the session gate answered `next/image`'s
+optimiser with the `/login` HTML: raw asset `307`, optimiser `400`, server log
+`isn't a valid image ... received null`, once per panel. The only trace was in
+the web server's stdout, which no assertion reads.
+
+The reason nothing failed is worth stating plainly, because it generalises past
+this one bug. An `<img>` carrying `width` and `height` reserves its box from
+markup alone. Whatever comes back, the geometry is identical: nothing overflows,
+nothing shifts, the screenshot shows a tidy rectangle, and every probe the
+harness had was a geometry probe. The suite was measuring the shape of the hole
+where the content should be and reporting it as correct.
+
+Reproduction: comment out the `/comic/` line in `proxy.ts`, `rm -rf
+.next/cache/images`, rebuild, run `--project=w1280`. Both steps matter: the
+optimiser caches decoded images on disk, and a stale `next start` that Playwright
+reuses will serve the previous build. Two runs of this reproduction were invalid
+for exactly those reasons before the third one held.
+Fix: exempt the `/comic/` prefix in `proxy.ts`, and add `brokenImageProbe()` in
+`tests/interaction/probes.ts`, asserted per route per width beside the overflow
+check. `complete && naturalWidth === 0` separates a failed load from a lazy image
+that was never requested. The spec now scrolls to the bottom after screenshotting
+so lazy panels are actually fetched before being probed.
+Verified: with the exemption removed the hub fails with `4 image(s) that loaded
+and are not images`; with it restored, 21 of 21 pass and the other 20 routes were
+clean throughout, so nothing else in the console was silently broken. Both
+deliberate failures are preserved in `raw/viewport.json`, which is an append log
+across every run: the two rows with a non-empty `brokenImages` are the sabotage,
+one for the missing file and one for the disabled exemption. They are the only
+two in 400 probed rows, and every row after them is clean.
 Resolution: **Fixed.**
 
 ---

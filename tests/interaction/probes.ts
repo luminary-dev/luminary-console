@@ -298,3 +298,27 @@ export function stickyHoverProbe(): string[] {
   }
   return out;
 }
+
+/** Images that were requested and came back as something that is not an image.
+ *
+ *  This exists because the rest of the harness cannot see this class of bug.
+ *  An <img> with width and height reserves its box from the markup alone, so
+ *  a panel that 404s or is answered with a login page still lays out to the
+ *  exact right size: overflow measures 0, CLS measures 0, the screenshot shows
+ *  a tidy blank rectangle, and every assertion passes. The comic strip shipped
+ *  through a full green sweep in precisely that state.
+ *
+ *  `complete && naturalWidth === 0` is the discriminator. A lazy image that
+ *  has not been requested yet is `complete === false`, so it is not counted;
+ *  an image that finished loading successfully has a non-zero natural width.
+ *  Both are correct states, and neither is what this looks for. */
+export function brokenImageProbe(): string[] {
+  return Array.from(document.images)
+    .filter((img) => {
+      // An <img> with no src at all is a different defect and not this one.
+      const src = img.getAttribute("src");
+      if (!src) return false;
+      return img.complete && img.naturalWidth === 0;
+    })
+    .map((img) => (img.currentSrc || img.src || "").slice(0, 160));
+}
