@@ -14,8 +14,16 @@
 // is real text, so it is selectable, translatable, announced by a screen
 // reader in reading order after its panel's description, and stays sharp when
 // the page is zoomed to 400 percent.
-import Image from "next/image";
-import { PANELS, PANEL_PX } from "@/lib/comic";
+//
+// A plain <img> rather than next/image, and that is deliberate. The comic sits
+// behind the session gate like the rest of the console, and the image
+// optimiser resolves a local path through an internal fetch that carries no
+// session cookie, so every panel comes back as the login page: verified, and
+// it fails silently because width and height reserve the box whatever arrives.
+// The browser's own request does carry the cookie. The resizing the optimiser
+// would have done is done ahead of time by scripts/optimise-comic.mts instead,
+// which is what `srcSet` below is selecting from.
+import { PANELS, PANEL_PX, variantsFor } from "@/lib/comic";
 
 export default function ComicStrip() {
   return (
@@ -33,6 +41,10 @@ export default function ComicStrip() {
       <ol className="comic-page">
         {PANELS.map((panel, i) => {
           const px = PANEL_PX[panel.size];
+          const variants = variantsFor(panel);
+          // Largest last, and used as the plain src: it is the fallback for
+          // anything that ignores srcSet, so it should be the good one.
+          const fallback = variants[variants.length - 1]!;
           return (
             <li className={`comic-panel is-${panel.size}`} key={panel.file}>
               {/* The frame is the positioning context for the balloons and the
@@ -40,17 +52,28 @@ export default function ComicStrip() {
                   proportion to the drawing at every width. */}
               <div className="comic-frame" style={{ aspectRatio: `${px.w} / ${px.h}` }}>
                 <span className="sr-only">Panel {i + 1}. </span>
-                <Image
+                {/* A bare <img> on purpose. See the note at the top of this
+                    file: next/image cannot reach a gated asset, so the
+                    variants are pre-encoded and selected here instead. */}
+                <img
                   className="comic-img"
-                  src={`/comic/${panel.file}`}
+                  src={fallback.url}
+                  srcSet={variants.map((v) => `${v.url} ${v.w}w`).join(", ")}
+                  sizes={
+                    panel.size === "wide"
+                      ? "(max-width: 960px) 100vw, 920px"
+                      : "(max-width: 640px) 100vw, 460px"
+                  }
                   alt={panel.alt}
+                  // The intrinsic size, so the box is reserved before the file
+                  // arrives and nothing below the comic moves when it does.
                   width={px.w}
                   height={px.h}
-                  sizes={panel.size === "wide" ? "(max-width: 960px) 100vw, 920px" : "(max-width: 640px) 100vw, 460px"}
                   // Only the first panel can be near the fold, and only on a
                   // tall screen with both cards hidden. The rest wait until
                   // they are scrolled towards.
                   loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
                 />
                 {panel.bubbles.map((bubble, j) => (
                   <p

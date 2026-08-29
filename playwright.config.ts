@@ -57,6 +57,11 @@ export default defineConfig({
     // an inventory that has drifted invalidates everything after it.
     { name: "inventory", testMatch: /enumerated-routes\.spec\.ts/ },
 
+    // The only project that deliberately has NO session, so it is the only one
+    // that can tell a protected asset from a merely present one. No dependency
+    // on setup: signing in is the one thing it must not do.
+    { name: "gating", testMatch: /gating\.spec\.ts/ },
+
     // The viewport matrix from section 5.1. Widths are the audit's subject,
     // so they are declared here rather than hidden inside a test.
     ...(

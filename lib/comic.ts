@@ -55,6 +55,34 @@ export const PANEL_PX = {
   square: { w: 1024, h: 1024 },
 } as const;
 
+/** The widths each panel is pre-encoded to as WebP, by scripts/optimise-comic.mts.
+ *
+ *  These exist because the comic sits behind the session gate, which rules out
+ *  next/image: the optimiser resolves a local image through an internal fetch
+ *  that carries no session cookie, so every panel would come back as the login
+ *  page. The browser's own request for a plain <img> does carry the cookie. So
+ *  the resizing that next/image would have done at runtime is done here ahead
+ *  of time instead, and the panels stay private without shipping 1.4MB of JPEG.
+ *
+ *  Two widths per panel is the whole ladder: a wide panel is never rendered
+ *  above 920 CSS px and a square never above 460, so 1536 and 1024 already
+ *  cover a 2x display and anything larger would be encoding pixels no screen
+ *  will ask for. */
+export const VARIANT_WIDTHS: Record<Panel["size"], readonly number[]> = {
+  wide: [768, 1536],
+  square: [512, 1024],
+};
+
+/** The WebP variants of `panel`, smallest first, as `[url, width]` pairs. The
+ *  generator writes exactly these paths and the page reads exactly these paths,
+ *  so a variant cannot be referenced that was never encoded. */
+export function variantsFor(panel: Panel): { url: string; w: number }[] {
+  return VARIANT_WIDTHS[panel.size].map((w) => ({
+    url: `/comic/${panel.file.replace(/\.jpg$/, `-${w}.webp`)}`,
+    w,
+  }));
+}
+
 /** Every panel asks for a clean top third. It is where balloons go, it is where
  *  the eye starts, and it is the easiest thing for the model to honour. */
 const CLEAR_TOP =

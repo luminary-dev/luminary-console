@@ -209,17 +209,17 @@ export async function proxy(request: NextRequest) {
     pathname === "/apple-touch-icon.png" ||
     pathname === "/icon-192.png" ||
     pathname === "/icon-512.png" ||
-    pathname === "/badge.png" ||
-    // The hub's comic strip. A prefix rather than four exact paths because
-    // the strip is a whole directory of decorative artwork that is meant to
-    // be extended, and nothing but artwork is ever written there.
+    pathname === "/badge.png"
+    // NOT /comic/. The hub's comic is deliberately behind the gate with the
+    // rest of the console, so a signed-out visitor gets /login for a panel
+    // exactly as they would for a client record.
     //
-    // This exemption is load-bearing, not cosmetic: next/image optimises
-    // these through an internal fetch that carries no session cookie, so
-    // without it the gate answers the optimiser with the /login HTML and
-    // every panel fails as "isn't a valid image ... received null" while the
-    // reserved boxes still lay out perfectly and hide the breakage.
-    pathname.startsWith("/comic/")
+    // That choice is what forces the comic to use a plain <img> with
+    // pre-encoded variants rather than next/image: the optimiser resolves a
+    // local path through an internal fetch that carries no session cookie, so
+    // with the gate in front of it every panel comes back as the login page.
+    // See components/ComicStrip.tsx. Adding /comic/ here would quietly make
+    // the artwork public again, which is the opposite of what was asked for.
   ) {
     // /login is a rendered page and needs the nonce; the rest are static
     // assets that must stay cacheable, so only /login gets no-store.

@@ -281,18 +281,25 @@ Reproduction: comment out the `/comic/` line in `proxy.ts`, `rm -rf
 optimiser caches decoded images on disk, and a stale `next start` that Playwright
 reuses will serve the previous build. Two runs of this reproduction were invalid
 for exactly those reasons before the third one held.
-Fix: exempt the `/comic/` prefix in `proxy.ts`, and add `brokenImageProbe()` in
+Fix, first attempt: exempt the `/comic/` prefix in `proxy.ts`. That worked and
+was later **reversed**, because it also made the artwork readable without a
+session and the decision went the other way. See `docs/adr/0003-the-comic-is-private.md`.
+Fix, as it stands: the comic no longer goes through `next/image` at all. It uses
+a plain `<img>` with `srcSet` over WebP variants pre-encoded by
+`scripts/optimise-comic.mts`, so the browser fetches the panel itself, with the
+session cookie, and the optimiser is never involved.
+Fix to the harness, unchanged and the durable half: `brokenImageProbe()` in
 `tests/interaction/probes.ts`, asserted per route per width beside the overflow
 check. `complete && naturalWidth === 0` separates a failed load from a lazy image
-that was never requested. The spec now scrolls to the bottom after screenshotting
-so lazy panels are actually fetched before being probed.
-Verified: with the exemption removed the hub fails with `4 image(s) that loaded
-and are not images`; with it restored, 21 of 21 pass and the other 20 routes were
-clean throughout, so nothing else in the console was silently broken. Both
-deliberate failures are preserved in `raw/viewport.json`, which is an append log
-across every run: the two rows with a non-empty `brokenImages` are the sabotage,
-one for the missing file and one for the disabled exemption. They are the only
-two in 400 probed rows, and every row after them is clean.
+that was never requested. The viewport spec now scrolls to the bottom after
+screenshotting so lazy panels are actually fetched before being probed.
+Verified: with the exemption removed and `next/image` still in place the hub
+failed with `4 image(s) that loaded and are not images`; the probe caught an
+injected missing file the same way. Under the current arrangement 21 of 21 pass
+at w1280 and the other 20 routes were clean throughout, so nothing else in the
+console was silently broken. Those deliberate failures are preserved in
+`raw/viewport.json`, which is an append log across every run: the rows with a
+non-empty `brokenImages` are the sabotage, and every row after them is clean.
 Resolution: **Fixed.**
 
 ---
