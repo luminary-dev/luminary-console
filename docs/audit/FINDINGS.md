@@ -1397,6 +1397,13 @@ article want pictures in it" is the editor's question while 1 against 2 is a
 judgement about the article, and the article is right there to be measured. The
 API still accepts an explicit number so it stays usable directly.
 Guarded by: tests/publish-inline.test.ts, five cases covering unchecked, short, long, the cap and explicit numbers. The style prompt itself has no automated test: image output is not assertable, and pretending otherwise with a snapshot would be theatre.
+Update, 2026-08-29: the art direction was changed on the operator's call. The
+anti-Pixar clause is gone; Pixar, Disney Animation and DreamWorks are now named
+as the reference craft level, and the single guardrail is against
+photorealism. The finding's diagnosis still holds (the covers were drifting
+between two looks, and naming the unwanted one is what stopped the drift), but
+the look chosen is the opposite of the one this entry originally landed on.
+That is a taste decision and it belongs to the studio, not to the audit.
 Effort: S   Risk of fix: Low   Blocks: —
 
 ### LC-091 — Every checkbox in the product failed the WCAG 2.2 AA target size
