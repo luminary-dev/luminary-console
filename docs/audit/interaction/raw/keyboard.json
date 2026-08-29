@@ -17,7 +17,7 @@
   {
     "path": "/",
     "name": "Dashboard",
-    "stops": 19,
+    "stops": 15,
     "reachedEnd": true,
     "tabOrderRegressions": 0,
     "stopsWithoutVisibleRing": 0,
@@ -90,10 +90,25 @@
     }
   },
   {
+    "path": "/settings",
+    "name": "Settings",
+    "stops": 7,
+    "reachedEnd": true,
+    "tabOrderRegressions": 0,
+    "stopsWithoutVisibleRing": 0,
+    "noRingSample": [],
+    "focusableButInvisible": [],
+    "firstTab": {
+      "text": "Skip to content",
+      "href": "#main-content",
+      "visibleOnFocus": true
+    }
+  },
+  {
     "path": "/github",
     "name": "Pull requests",
-    "stops": 33,
-    "reachedEnd": true,
+    "stops": 60,
+    "reachedEnd": false,
     "tabOrderRegressions": 0,
     "stopsWithoutVisibleRing": 0,
     "noRingSample": [],
@@ -197,8 +212,8 @@
   {
     "path": "/github/activity",
     "name": "Engineering activity",
-    "stops": 60,
-    "reachedEnd": false,
+    "stops": 47,
+    "reachedEnd": true,
     "tabOrderRegressions": 0,
     "stopsWithoutVisibleRing": 0,
     "noRingSample": [],
