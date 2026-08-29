@@ -1,8 +1,11 @@
-// Image generation for the publish portal — OpenAI gpt-image-2, in the
-// Luminary landing page's house illustration style: stills that read like
-// frames from a 3D animated feature film (the Adventures-of-Tintin motion
-// capture look) — stylised-realistic characters, warm cinematic light,
-// richly detailed environments, Sri Lankan settings and people.
+// Image generation for the publish portal, OpenAI gpt-image-2, in the Luminary
+// landing page's house illustration style: stills that read like frames from a
+// modern 3D animated feature film. Expressive stylised characters, warm
+// cinematic light, richly detailed environments, Sri Lankan settings and
+// people.
+//
+// The one thing this must never be is photorealistic. Every other axis has
+// room in it; that one does not.
 //
 // All landing-page artwork is 1536×1024 JPEG:
 //   - blog covers        → public/blog/<slug>/cover.jpg
@@ -13,13 +16,11 @@
 const API = "https://api.openai.com/v1/images/generations";
 export const IMAGE_SIZE = "1536x1024";
 
-const STYLE = `RENDERING STYLE, follow exactly: a still frame from a 3D animated feature film in the style of Steven Spielberg's "The Adventures of Tintin" (2011), Weta Digital motion-capture. Characters have REALISTIC HUMAN PROPORTIONS and naturalistic anatomy: normal-sized eyes, real skin texture with pores and subtle imperfection, individually rendered hair, understated facial expression. Cinematic camera work: shallow depth of field with real bokeh, motivated practical lighting, volumetric haze.
+const STYLE = `RENDERING STYLE, follow exactly: a still frame from a modern 3D animated feature film, the craft level of Pixar, Walt Disney Animation and DreamWorks. Appealing stylised characters with clear silhouettes and readable, expressive faces. Art-directed colour with a deliberate palette, sculpted forms, soft global illumination, subsurface scattering in skin, cinematic depth of field and rim light. Everything is designed rather than captured: cleaner, warmer and more intentional than a camera would ever produce.
 
-It is an ANIMATED film frame, not a photograph. Forms are subtly sculpted and slightly heightened, colour is art-directed rather than accidental, and everything is a shade cleaner and more deliberate than a camera would catch. Aim for the exact midpoint between photorealism and caricature: if it could pass for a stock photograph it has gone too far one way, and if the faces look cute it has gone too far the other.
+NOT photorealistic. NOT live action. NOT a photograph, a film still of real actors, a render aiming at realism, or documentary imagery. If it could be mistaken for a photograph, the style is wrong. Faces and hands are stylised, not scanned. Skin, cloth and metal read as beautifully rendered animation surfaces, not as camera footage.
 
-NOT Pixar, NOT Disney, NOT DreamWorks. No oversized glossy eyes, no rounded caricature faces, no smooth plastic skin, no bright saturated toy colours, no wide cartoon smiles. If the faces look cute or the surfaces look like moulded plastic, the style is wrong.
-
-HOUSE PALETTE AND SUBJECT VOCABULARY: warm golden-hour or lantern-lit key light against cooler shadow; aged brass, copper, oiled steel and worn timber; one restrained accent of luminous green from a dial, gauge, filament or screen; intricate practical machinery with visible gears, pipes, rivets and linkages; richly detailed environments with real wear. Sri Lankan setting and South Asian characters where people appear, dressed as working engineers and craftspeople.
+HOUSE PALETTE AND SUBJECT VOCABULARY: warm golden-hour or lantern-lit key light against cooler shadow; aged brass, copper, oiled steel and worn timber; one restrained accent of luminous green from a dial, gauge, filament or screen; intricate practical machinery with visible gears, pipes, rivets and linkages; richly detailed environments with honest wear. Sri Lankan setting and South Asian characters where people appear, dressed as working engineers and craftspeople.
 
 No text, no lettering, no numerals, no logos, no watermarks, no user interfaces, no screenshots. Wide 3:2 editorial composition with one unmistakable focal subject.`;
 
