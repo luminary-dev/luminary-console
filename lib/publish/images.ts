@@ -52,8 +52,13 @@ export function thumbPrompts(scene: string): { light: string; dark: string } {
   };
 }
 
+/** The sizes the API accepts. Landing-page artwork is always the 3:2 default;
+ *  the comic is the only caller that asks for anything else, because a page of
+ *  identically shaped panels reads as a contact sheet rather than a comic. */
+export type ImageSize = "1536x1024" | "1024x1024" | "1024x1536";
+
 /** Generate one image; returns JPEG bytes. Throws with a readable message. */
-export async function generateImage(prompt: string): Promise<Buffer> {
+export async function generateImage(prompt: string, size: ImageSize = IMAGE_SIZE): Promise<Buffer> {
   const key = process.env.OPENAI_API_KEY;
   if (!key) throw new Error("OPENAI_API_KEY is not configured.");
   const model = process.env.OPENAI_IMAGE_MODEL || "gpt-image-2";
@@ -65,7 +70,7 @@ export async function generateImage(prompt: string): Promise<Buffer> {
       body: JSON.stringify({
         model,
         prompt,
-        size: IMAGE_SIZE,
+        size,
         ...(withFormat ? { output_format: "jpeg" } : {}),
       }),
     });

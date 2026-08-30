@@ -298,3 +298,58 @@ export function stickyHoverProbe(): string[] {
   }
   return out;
 }
+
+/** Images that were requested and came back as something that is not an image.
+ *
+ *  This exists because the rest of the harness cannot see this class of bug.
+ *  An <img> with width and height reserves its box from the markup alone, so
+ *  a panel that 404s or is answered with a login page still lays out to the
+ *  exact right size: overflow measures 0, CLS measures 0, the screenshot shows
+ *  a tidy blank rectangle, and every assertion passes. The comic strip shipped
+ *  through a full green sweep in precisely that state.
+ *
+ *  `complete && naturalWidth === 0` is the discriminator. A lazy image that
+ *  has not been requested yet is `complete === false`, so it is not counted;
+ *  an image that finished loading successfully has a non-zero natural width.
+ *  Both are correct states, and neither is what this looks for. */
+export function brokenImageProbe(): string[] {
+  return Array.from(document.images)
+    .filter((img) => {
+      // An <img> with no src at all is a different defect and not this one.
+      const src = img.getAttribute("src");
+      if (!src) return false;
+      return img.complete && img.naturalWidth === 0;
+    })
+    .map((img) => (img.currentSrc || img.src || "").slice(0, 160));
+}
+
+/** Comic balloons that have grown outside the panel they belong to.
+ *
+ *  The balloons are HTML laid over artwork, positioned in percentages that
+ *  were chosen against each drawing. Their SIZE, though, comes from the text
+ *  and the font, so a longer line, a bigger clamp or a face with a different
+ *  x-height can push one off its panel. `overflow: hidden` on the frame means
+ *  that does not spill onto the page and nothing else in this harness would
+ *  notice: it just quietly clips a word off the end of a sentence.
+ *
+ *  Swapping the lettering face is exactly the change that provokes it, which
+ *  is why this exists. Reported as strings so a failure names the line. */
+export function balloonSpillProbe(): string[] {
+  const out: string[] = [];
+  document.querySelectorAll(".comic-panel").forEach((panel, i) => {
+    const frame = panel.getBoundingClientRect();
+    panel.querySelectorAll(".comic-bubble").forEach((bubble) => {
+      const b = bubble.getBoundingClientRect();
+      // A pixel of tolerance: sub-pixel layout should not be a finding.
+      const over =
+        b.left < frame.left - 1 ||
+        b.right > frame.right + 1 ||
+        b.top < frame.top - 1 ||
+        b.bottom > frame.bottom + 1;
+      if (over) {
+        out.push(`panel ${i + 1}: "${(bubble.textContent || "").trim().slice(0, 40)}"`);
+      }
+    });
+  });
+  return out;
+}

@@ -7,7 +7,7 @@
 // failing audit run stops collecting data and the point of this pass is data.
 import { test, expect } from "@playwright/test";
 import { ALL_HTML_ROUTES } from "./routes";
-import { overflowProbe, targetProbe } from "./probes";
+import { overflowProbe, targetProbe, brokenImageProbe, balloonSpillProbe } from "./probes";
 import { appendRow, settle, slugFor, OUT } from "./report";
 
 // Overflow is enforced. Everything else is observed.
@@ -77,6 +77,36 @@ for (const route of ALL_HTML_ROUTES) {
     const shot = `${OUT}/screens/${project}/${slugFor(route.path)}.png`;
     await page.screenshot({ path: shot, fullPage: false });
 
+    // Only now, after the screenshot and every layout measurement above, walk
+    // the page to the bottom. Lazy images are never requested while they are
+    // below the fold, so a strip of them cannot be checked without scrolling,
+    // and scrolling first would change what the screenshot captures. Boxes are
+    // reserved from markup, so this moves nothing and adds no shift.
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page
+      .waitForFunction(
+        // Only images that are actually rendered. An image inside a
+        // `display: none` container never loads and never will, so waiting on
+        // it burns the whole timeout and then reports nothing: the hub's comic
+        // is hidden below 1024px and in portrait, which is seven of the
+        // thirteen widths here.
+        () =>
+          Array.from(document.images).every(
+            (i) => i.complete || i.getBoundingClientRect().width === 0,
+          ),
+        null,
+        { timeout: 10_000 },
+      )
+      .catch(() => {
+        /* A still-loading image is not proof of a broken one; probe anyway. */
+      });
+    const brokenImages = await page.evaluate(brokenImageProbe);
+    // Fonts have to be settled first: a balloon measured mid-swap is sized
+    // against the fallback face, not the one that ships.
+    await page.evaluate(() => document.fonts.ready);
+    const balloonSpill = await page.evaluate(balloonSpillProbe);
+    await page.evaluate(() => window.scrollTo(0, 0));
+
     appendRow("raw/viewport.json", {
       project,
       width,
@@ -94,6 +124,8 @@ for (const route of ALL_HTML_ROUTES) {
       undersizedAA: undersized.map((t) => ({ n: t.name, w: t.width, h: t.height, gap: t.nearestGap })),
       underTouch44: underTouch.length,
       focusableInvisible: focusableInvisible.map((t) => t.name),
+      brokenImages,
+      balloonSpill,
       screenshot: shot,
     });
 
@@ -129,5 +161,27 @@ for (const route of ALL_HTML_ROUTES) {
             .join(", ")}`,
       ).toBe(0);
     }
+
+    // Enforced for the same reason overflow is: there is no viewport, theme or
+    // data shape in which a requested image coming back as not-an-image is the
+    // correct outcome. It is listed second because a page that scrolls sideways
+    // is the more urgent of the two.
+    expect(
+      brokenImages,
+      `${route.path} has ${brokenImages.length} image(s) that loaded and are not images ` +
+        `at ${width}px: ${brokenImages.slice(0, 3).join(", ")}. A 404, a redirect to /login ` +
+        `or an unoptimisable file all land here, and none of them disturb the layout, ` +
+        `because width and height reserve the box whatever comes back.`,
+    ).toEqual([]);
+
+    // Same reasoning as the two above: the frame clips the overflow, so the
+    // only symptom is a word missing from the end of a sentence, which no
+    // geometry check sees and no screenshot review reliably catches either.
+    expect(
+      balloonSpill,
+      `${route.path} at ${width}px has ${balloonSpill.length} comic balloon(s) larger than ` +
+        `their panel: ${balloonSpill.slice(0, 3).join("; ")}. Either the line got longer or the ` +
+        `lettering got bigger; the balloon's width is a percentage in lib/comic.ts.`,
+    ).toEqual([]);
   });
 }

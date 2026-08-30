@@ -53,6 +53,7 @@ the remaining carets to exact pins is a mechanical follow-up.
 | `eslint-plugin-jsx-a11y` | 6.10.2 | 6.10.2 | **Added.** WCAG 2.2 AA is the floor; this is the automated half of enforcing it | MIT |
 | `eslint-plugin-no-unsanitized` | 4.1.5 | 4.1.5 | **Added.** Required by the security policy. Blocks unsafe DOM sinks | MPL-2.0 |
 | `dotenv` | ^17.0.0 | 17.4.2 | Scripts load `.env.local` before importing the store | BSD-2-Clause |
+| `sharp` | 0.35.3 | 0.35.3 | **Added 2026-08-29.** Pre-encodes the hub comic's WebP variants (`scripts/optimise-comic.mts`). It was already present as a transitive dependency of `next`, which is how the app does image optimisation; this declares it, because a script that imports a package nobody depends on breaks silently the day the parent stops shipping it. Pinned to the version already installed rather than the registry's current 0.35.4, so nothing pulls a second copy. Build-time only: it never runs in a request | Apache-2.0 |
 | `@types/node` | ^26 | 26.1.2 | Types | MIT |
 | `@types/react` | ^19 | 19.2.18 | Types | MIT |
 | `@types/react-dom` | ^19 | 19.2.4 | Types | MIT |

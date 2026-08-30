@@ -11,6 +11,7 @@
 // they want different shapes.
 import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
+import ComicStrip from "@/components/ComicStrip";
 import CommandPalette from "@/components/CommandPalette";
 import ConsoleTopbar, { SECTIONS } from "@/components/ConsoleTopbar";
 import MarkAllRead from "@/components/MarkAllRead";
@@ -39,10 +40,16 @@ export default async function Hub() {
   const now = Date.now();
 
   return (
-    <main className="wrap" style={{ paddingBottom: 80 }}>
-      <ConsoleTopbar unread={unread} />
+    // The console's 1080px column is a div here rather than on <main>, so the
+    // comic below it can run to the edges of the window. Breaking out with
+    // 100vw was the alternative and it is wrong on this app: the scrollbar
+    // gutter is held open permanently, so 100vw is wider than the page by the
+    // width of the scrollbar and every hub view would scroll sideways.
+    <main className="hub-main" style={{ paddingBottom: 80 }}>
+      <div className="wrap">
+        <ConsoleTopbar unread={unread} />
 
-      <nav className="hub" aria-label="Console sections">
+        <nav className="hub" aria-label="Console sections">
         {SECTIONS.map((s) => (
           <Link className="hub-tile" key={s.href} href={s.href}>
             <span className="hub-tile__name">
@@ -126,6 +133,13 @@ export default async function Hub() {
           </Link>
         </section>
       )}
+      </div>
+
+      {/* Outside the column, so it runs to the edges of the window. Last,
+          because it is the only thing here that is not work: on a quiet day
+          both cards above are hidden and the hub is four tiles on a lot of
+          empty screen, and this gives the scroll somewhere to go. */}
+      <ComicStrip />
 
       <CommandPalette
         items={overview.rows.map((r) => ({

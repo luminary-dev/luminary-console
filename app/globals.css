@@ -227,6 +227,175 @@ summary:focus-visible,
 @media (max-width: 900px) { .hub { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .hub { grid-template-columns: 1fr; } }
 
+/* The comic at the bottom of the hub.
+
+   TWO ROWS, four panels then five, and every panel displayed at 3:2 whatever
+   it was drawn at. Height is the whole point of that shape: at their drawn
+   sizes nine panels came to roughly 1235px in a 1440 window, which is a
+   scroll on a screen people open to check one number. Letterboxed and packed
+   four and five to a row it is about 430px, which is not.
+
+   A row is `repeat(N, 1fr)` set inline from the row's own length, because the
+   two rows hold different counts. Nothing here needs to know which panels are
+   wide: they all present the same way, and `object-fit: cover` on the image
+   takes the crop.
+
+   Every word is a .comic-bubble laid over the art, which keeps it real text:
+   selectable, translatable, read aloud, and sharp at 400 percent zoom where
+   baked lettering would blur.
+
+   Full bleed. .comic is a child of <main>, not of the 1080px .wrap, so
+   `width: 100%` here is already the width of the page. That is the entire
+   reason for the markup split in app/page.tsx, and it is scrollbar-safe in a
+   way `100vw` is not: the gutter is held open permanently, so 100vw is wider
+   than the page by the scrollbar and would scroll the hub sideways. */
+.comic { width: 100%; margin: 44px 0 0; }
+
+.comic-page {
+  /* The 2px between panels and between rows is not the page showing through,
+     it is the gutter line itself: the background here is the ink, so what
+     sits between two panels is drawn rather than desk. Every rule on the page
+     is then the same weight, including the outer edge, which per-panel
+     borders never manage because interior edges double up and outer ones do
+     not. */
+  display: grid;
+  gap: 2px;
+  background: #14141a;
+  border-top: 2px solid #14141a;
+  border-bottom: 2px solid #14141a;
+}
+.comic-row {
+  display: grid;
+  /* grid-template-columns is set inline, from the number of panels in it. */
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Positioning context for the balloons, and the container they size against:
+   `cqw` below is a percentage of THIS box, so a line holds its proportion to
+   the drawing at every width without a media query. */
+.comic-frame {
+  container-type: inline-size;
+  position: relative;
+  overflow: hidden;
+  background: var(--off);
+}
+.comic-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Balloons. White with black lettering, in BOTH themes, and the colours are
+   literals rather than tokens on purpose: this is printed artwork, and a
+   speech balloon that inverts with the interface stops looking like part of
+   the drawing. The panels themselves have no dark mode either. Measured
+   18.35:1, so pinning it costs nothing in contrast.
+
+   --font-comic is Unkempt 700, loaded in app/layout.tsx through next/font so
+   it is served from our own origin: the CSP is `font-src 'self' data:` and a
+   Google Fonts URL would be blocked outright. The fallback chain is real
+   rather than decorative, because the balloon is laid over artwork and has to
+   stay legible if the face never arrives. */
+.comic-bubble {
+  position: absolute;
+  z-index: 1;
+  margin: 0;
+  padding: 0.45em 0.7em;
+  border: 2px solid #14141a;
+  border-radius: 1.1em;
+  background: #ffffff;
+  color: #14141a;
+  font-family: var(--font-comic), "Comic Sans MS", var(--font-outfit), system-ui, sans-serif;
+  /* Sized for Unkempt specifically. It has a noticeably smaller x-height than
+     a normal UI face, so the same pixel size reads about 15 percent smaller in
+     the balloon; these numbers are the compensation, set by eye against the
+     art rather than carried over. */
+  font-size: clamp(11px, 3.8cqw, 21px);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
+  /* Lifts the balloon off busy artwork without a glow, which would read as a
+     web page rather than a printed panel. */
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.comic-bubble::after {
+  content: "";
+  position: absolute;
+  width: 0.85em;
+  height: 0.85em;
+  background: inherit;
+  transform: rotate(45deg);
+}
+.tail-bl::after, .tail-br::after {
+  bottom: -0.48em;
+  border-right: 2px solid #14141a;
+  border-bottom: 2px solid #14141a;
+}
+.tail-tl::after, .tail-tr::after {
+  top: -0.48em;
+  border-left: 2px solid #14141a;
+  border-top: 2px solid #14141a;
+}
+.tail-bl::after, .tail-tl::after { left: 17%; }
+.tail-br::after, .tail-tr::after { right: 17%; }
+.tail-none::after { content: none; }
+
+/* The narrator's box. Square, tinted, left-aligned: a caption is written, not
+   spoken, and it should not look like anyone said it. */
+.comic-bubble.is-caption {
+  border-radius: 3px;
+  /* The narrator's box: square, tinted, left-aligned, because a caption is
+     written rather than spoken and should not look like anyone said it.
+     Pinned like the balloons, for the same reason. */
+  background: #fdf2cf;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: clamp(9.5px, 3.1cqw, 16px);
+}
+
+/* The Console talking. Monospaced and inverted, so the machine reads as a
+   different kind of voice from the people without needing to say so.
+
+   These two colours are literals rather than tokens, and deliberately do not
+   flip with the theme. A lit terminal is the same colour in a dark room as in
+   a bright one, and this balloon sits on artwork that has no dark mode either.
+   Tokens were tried first: --ink as the background inverted to near-white in
+   dark mode and left green text on it, at roughly 1.7:1. */
+.comic-bubble.is-machine {
+  border-radius: 4px;
+  border-color: #14141a;
+  background: #14141a;
+  color: #a3e635; /* 12.17:1 on #14141a, measured */
+  font-family: var(--font-mono), monospace;
+  letter-spacing: 0.02em;
+  font-size: clamp(8.5px, 2.75cqw, 15px);
+}
+.comic-bubble.is-machine::after { border-color: #14141a; }
+
+/* WHERE THE COMIC APPEARS, and the short answer is: wide landscape browsers
+   only. Hidden by default and switched on, rather than the other way round,
+   so a context nobody thought about gets no comic instead of a broken one.
+
+   A three-across stripe needs real width. Stacking it for a phone was the
+   previous design and it turned the hub into a very long scroll on the device
+   with the least room, on a screen people open to check one number. Portrait
+   tablets are out for the same reason at 834px; landscape tablets are in.
+
+   `display-mode: standalone` covers the installed app on iOS, and it is last
+   so it wins over the rule above on a wide landscape install. Note this also
+   hides the comic in a DESKTOP installed app, which is the honest reading of
+   "not in the app view": installed means tool, and the comic is a flourish
+   for the browser. */
+.comic { display: none; }
+@media (min-width: 1024px) and (orientation: landscape) {
+  .comic { display: block; }
+}
+@media (display-mode: standalone) {
+  .comic { display: none; }
+}
+
 
 /* One line of text does not need a card. The outstanding figure used to sit
    in a full card next to a duplicate set of stage chips; with the chips gone
@@ -665,7 +834,7 @@ body {
 
   /* Room for the tab bar + home indicator (inline paddingBottom:80 on each
      page's <main> would otherwise win, hence !important). */
-  main.wrap, main.sheet { padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important; }
+  main.wrap, main.sheet, main.hub-main { padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important; }
 
   /* Roomier rhythm: one column of well-spaced cards, bigger tap targets. */
   .wrap > .card, .card { margin-top: 18px; padding: 22px 18px; border-radius: 16px; }
