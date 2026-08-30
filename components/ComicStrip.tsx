@@ -6,8 +6,8 @@
 // another metric nobody asked for.
 //
 // Panels, dialogue and balloon positions all live in lib/comic.ts. This file
-// is only the rendering: a two-column comic page where the wide panels span
-// both columns, collapsing to one column on narrow screens.
+// is only the rendering: two rows of equal-shaped panels, four then five,
+// shown on wide landscape screens and hidden everywhere else.
 //
 // The balloons are HTML laid over the artwork, not lettering baked into it.
 // lib/comic.ts explains that decision; the consequence here is that a balloon
@@ -23,7 +23,11 @@
 // The browser's own request does carry the cookie. The resizing the optimiser
 // would have done is done ahead of time by scripts/optimise-comic.mts instead,
 // which is what `srcSet` below is selecting from.
-import { PANELS, PANEL_PX, variantsFor } from "@/lib/comic";
+import { PANELS, PANEL_PX, DISPLAY_ASPECT, rowsOfPanels, variantsFor } from "@/lib/comic";
+
+/** Panel numbers for screen readers, taken from story order rather than from
+ *  position in a row, so they stay 1..9 across the row break. */
+const PANEL_NUMBER = new Map(PANELS.map((p, i) => [p.file, i + 1]));
 
 export default function ComicStrip() {
   return (
@@ -37,65 +41,77 @@ export default function ComicStrip() {
         One small change: a short and only slightly exaggerated history of this console
       </h2>
 
-      {/* Safari drops list semantics from any list styled `list-style: none`.
-          Survivable without a redundant role="list": each panel is numbered in
-          text for a screen reader, which carries the reading order. */}
-      <ol className="comic-page">
-        {PANELS.map((panel, i) => {
-          const px = PANEL_PX[panel.size];
-          const variants = variantsFor(panel);
-          // Largest last, and used as the plain src: it is the fallback for
-          // anything that ignores srcSet, so it should be the good one.
-          const fallback = variants[variants.length - 1]!;
-          return (
-            <li className={`comic-panel is-${panel.size}`} key={panel.file}>
-              {/* The frame is the positioning context for the balloons and the
-                  container the balloon type scales against, so a line keeps its
-                  proportion to the drawing at every width. */}
-              <div className="comic-frame" style={{ aspectRatio: `${px.w} / ${px.h}` }}>
-                <span className="sr-only">Panel {i + 1}. </span>
-                {/* A bare <img> on purpose. See the note at the top of this
-                    file: next/image cannot reach a gated asset, so the
-                    variants are pre-encoded and selected here instead. */}
-                <img
-                  className="comic-img"
-                  src={fallback.url}
-                  srcSet={variants.map((v) => `${v.url} ${v.w}w`).join(", ")}
-                  sizes={
-                    panel.size === "wide"
-                      ? "(max-width: 960px) 100vw, 920px"
-                      : "(max-width: 640px) 100vw, 460px"
-                  }
-                  alt={panel.alt}
-                  // The intrinsic size, so the box is reserved before the file
-                  // arrives and nothing below the comic moves when it does.
-                  width={px.w}
-                  height={px.h}
-                  // Every panel, including the first. The comic only renders
-                  // on wide landscape screens and sits below the fold even
-                  // there, and where it is hidden the markup is still served:
-                  // lazy is what stops a phone paying for artwork it will
-                  // never be shown.
-                  loading="lazy"
-                  decoding="async"
-                />
-                {panel.bubbles.map((bubble, j) => (
-                  <p
-                    className={`comic-bubble is-${bubble.kind ?? "speech"} tail-${bubble.tail}`}
-                    key={`${panel.file}-${j}`}
-                    style={{ left: `${bubble.x}%`, top: `${bubble.y}%`, width: `${bubble.w}%` }}
-                  >
-                    {/* Who is speaking is obvious in the drawing and invisible
-                        to a screen reader, so it is supplied in text. */}
-                    <span className="sr-only">{bubble.who}: </span>
-                    {bubble.text}
-                  </p>
-                ))}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+      {/* Two rows, declared in lib/comic.ts. Each is its own grid, because the
+          rows hold different numbers of panels and every panel is displayed at
+          the same 3:2 shape, so a row is simply N equal columns.
+
+          A list per row rather than one list with row wrappers inside it: an
+          <ol> may only contain <li>, and a <div> in between is both invalid
+          and an axe `list` failure. Splitting the numbering across two lists
+          costs nothing here because each panel announces its own number. */}
+      <div className="comic-page">
+        {rowsOfPanels().map((row, r) => (
+          <ol
+            className="comic-row"
+            key={`row-${r}`}
+            style={{ gridTemplateColumns: `repeat(${row.length}, 1fr)` }}
+          >
+            {row.map((panel) => {
+              const px = PANEL_PX[panel.size];
+              const variants = variantsFor(panel);
+              // Largest last, and used as the plain src: it is the fallback
+              // for anything that ignores srcSet, so it should be the good one.
+              const fallback = variants[variants.length - 1]!;
+              const n = PANEL_NUMBER.get(panel.file)!;
+              return (
+                <li className="comic-panel" key={panel.file}>
+                  {/* The frame is the positioning context for the balloons and
+                      the container the balloon type scales against, so a line
+                      keeps its proportion to the drawing at every width. It
+                      also imposes the 3:2 crop. */}
+                  <div className="comic-frame" style={{ aspectRatio: DISPLAY_ASPECT }}>
+                    <span className="sr-only">Panel {n}. </span>
+                    {/* A bare <img> on purpose. See the note at the top of this
+                        file: next/image cannot reach a gated asset, so the
+                        variants are pre-encoded and selected here instead. */}
+                    <img
+                      className="comic-img"
+                      src={fallback.url}
+                      srcSet={variants.map((v) => `${v.url} ${v.w}w`).join(", ")}
+                      sizes={`${Math.round(100 / row.length)}vw`}
+                      alt={panel.alt}
+                      // The intrinsic size, so the box is reserved before the
+                      // file arrives and nothing below the comic moves.
+                      width={px.w}
+                      height={px.h}
+                      // Every panel, including the first. The comic only
+                      // renders on wide landscape screens and sits below the
+                      // fold even there, and where it is hidden the markup is
+                      // still served: lazy is what stops a phone paying for
+                      // artwork it will never be shown.
+                      loading="lazy"
+                      decoding="async"
+                      {...(panel.focus ? { style: { objectPosition: panel.focus } } : {})}
+                    />
+                    {panel.bubbles.map((bubble, j) => (
+                      <p
+                        className={`comic-bubble is-${bubble.kind ?? "speech"} tail-${bubble.tail}`}
+                        key={`${panel.file}-${j}`}
+                        style={{ left: `${bubble.x}%`, top: `${bubble.y}%`, width: `${bubble.w}%` }}
+                      >
+                        {/* Who is speaking is obvious in the drawing and
+                            invisible to a screen reader, so it is in text. */}
+                        <span className="sr-only">{bubble.who}: </span>
+                        {bubble.text}
+                      </p>
+                    ))}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        ))}
+      </div>
     </section>
   );
 }

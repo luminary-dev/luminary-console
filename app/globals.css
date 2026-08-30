@@ -229,24 +229,22 @@ summary:focus-visible,
 
 /* The comic at the bottom of the hub.
 
-   HORIZONTAL STRIPES. Three rows of three, each row a continuous band across
-   the page, and the whole thing is one grid rather than any per-row markup.
+   TWO ROWS, four panels then five, and every panel displayed at 3:2 whatever
+   it was drawn at. Height is the whole point of that shape: at their drawn
+   sizes nine panels came to roughly 1235px in a 1440 window, which is a
+   scroll on a screen people open to check one number. Letterboxed and packed
+   four and five to a row it is about 430px, which is not.
 
-   `1.5fr 1fr 1fr` is doing all the work, and it is exact rather than close.
-   The panels alternate wide, square, square: a wide panel is 3:2 and takes
-   1.5 units, a square is 1:1 and takes 1. At column widths of 1.5u, 1u, 1u
-   the wide panel resolves to 1.5u/1.5 = u tall and each square to u/1 = u
-   tall, so every panel in a row is the same height with no cropping and no
-   fixed row height to keep in sync. Gaps do not disturb it either, because
-   they are subtracted before the fr units are distributed.
-
-   The order in lib/comic.ts is therefore load-bearing, and tests/comic.test.ts
-   asserts it: shuffle the panels and the stripes stop lining up.
+   A row is `repeat(N, 1fr)` set inline from the row's own length, because the
+   two rows hold different counts. Nothing here needs to know which panels are
+   wide: they all present the same way, and `object-fit: cover` on the image
+   takes the crop.
 
    Every word is a .comic-bubble laid over the art, which keeps it real text:
    selectable, translatable, read aloud, and sharp at 400 percent zoom where
-   baked lettering would blur. */
-/* Full bleed. .comic is a child of <main>, not of the 1080px .wrap, so
+   baked lettering would blur.
+
+   Full bleed. .comic is a child of <main>, not of the 1080px .wrap, so
    `width: 100%` here is already the width of the page. That is the entire
    reason for the markup split in app/page.tsx, and it is scrollbar-safe in a
    way `100vw` is not: the gutter is held open permanently, so 100vw is wider
@@ -254,18 +252,22 @@ summary:focus-visible,
 .comic { width: 100%; margin: 44px 0 0; }
 
 .comic-page {
+  /* The 2px between panels and between rows is not the page showing through,
+     it is the gutter line itself: the background here is the ink, so what
+     sits between two panels is drawn rather than desk. Every rule on the page
+     is then the same weight, including the outer edge, which per-panel
+     borders never manage because interior edges double up and outer ones do
+     not. */
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  /* No space between panels. The 2px is not a gap in the page showing
-     through, it is the gutter line itself: the grid's own background is the
-     ink, so what sits between two panels is drawn ink rather than desk. The
-     panels therefore touch, and every rule on the page is the same weight,
-     including the outer edge, which per-panel borders never manage because
-     interior edges double up and outer ones do not. */
   gap: 2px;
   background: #14141a;
   border-top: 2px solid #14141a;
   border-bottom: 2px solid #14141a;
+}
+.comic-row {
+  display: grid;
+  /* grid-template-columns is set inline, from the number of panels in it. */
+  gap: 2px;
   list-style: none;
   margin: 0;
   padding: 0;

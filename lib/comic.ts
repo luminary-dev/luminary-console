@@ -47,6 +47,9 @@ export type Panel = {
   alt: string;
   /** The generation prompt for this panel. */
   scene: string;
+  /** `object-position` for the 3:2 crop, when centring it loses something
+   *  that matters. Omitted means centre. */
+  focus?: string;
   bubbles: Bubble[];
 };
 
@@ -54,6 +57,53 @@ export const PANEL_PX = {
   wide: { w: 1536, h: 1024 },
   square: { w: 1024, h: 1024 },
 } as const;
+
+/** Every panel is DISPLAYED at 3:2, whatever it was drawn at.
+ *
+ *  The point is height. Nine panels at their drawn shapes came to about
+ *  1235px at a 1440 window, which is a scroll; letterboxing them and packing
+ *  more into each row brings the whole comic to roughly 430px, which is not.
+ *  The squares therefore lose their top and bottom to `object-fit: cover`.
+ *  That is affordable precisely because every panel was drawn with a clean,
+ *  deliberately empty top third: cutting ~17% off the top of a square still
+ *  leaves clear space where the balloons sit, and the balloons are positioned
+ *  against the displayed box rather than the file, so they need no adjustment.
+ *
+ *  `focus` on a panel overrides where the crop is taken from when the middle
+ *  is the wrong answer. */
+export const DISPLAY_ASPECT = "3 / 2";
+
+/** The two rows, by filename, in reading order.
+ *
+ *  Rows are declared rather than derived. With every panel the same displayed
+ *  shape a row is just `repeat(N, 1fr)`, so the only thing that decides the
+ *  layout is how many panels are in each row, and that is a composition
+ *  choice: four then five puts the establishing shot in the taller band and
+ *  the payoff in the tighter one. tests/comic.test.ts checks that these name
+ *  every panel exactly once, so a panel cannot be added and silently not
+ *  appear. */
+export const ROWS: readonly (readonly string[])[] = [
+  ["01-friday.jpg", "02-the-ask.jpg", "03-define-tiny.jpg", "04-the-list.jpg"],
+  [
+    "05-the-beat.jpg",
+    "06-the-lever.jpg",
+    "07-the-machine.jpg",
+    "08-still-hot.jpg",
+    "09-last-tuesday.jpg",
+  ],
+];
+
+/** The panels of each row, resolved. Throws rather than rendering a gap if a
+ *  row names something that does not exist. */
+export function rowsOfPanels(): Panel[][] {
+  return ROWS.map((row) =>
+    row.map((file) => {
+      const panel = PANELS.find((p) => p.file === file);
+      if (!panel) throw new Error(`ROWS names ${file}, which is not a panel.`);
+      return panel;
+    }),
+  );
+}
 
 /** The widths each panel is pre-encoded to as WebP, by scripts/optimise-comic.mts.
  *
@@ -160,9 +210,17 @@ export const PANELS: Panel[] = [
     file: "09-last-tuesday.jpg",
     size: "square",
     alt: "The client has gone pale at a long receipt pooling on the floor. The engineer sips her coffee. The machine's dial has narrowed to a smug sliver.",
+    // The 3:2 crop takes the top and bottom, and centred it cut the dial down
+    // to a green sliver: the dial IS the punchline of this panel, so the crop
+    // is pulled up to keep it. What it costs is some of the receipt coiled on
+    // the floor, which the rest of the panel already tells you about.
+    focus: "50% 22%",
     scene: `The client has gone pale, staring down at a long printed receipt unspooling from the machine and pooling in coils on the floor. The lead engineer sips her coffee, entirely calm, not looking at him. On the Console the great green dial has narrowed to a smug, knowing sliver of light, almost a half-closed eye. Slightly ominous and very funny. COMPOSITION: leave the top third and the lower right of the frame clean and uncluttered.`,
     bubbles: [
-      { text: "It sent that. Last Tuesday.", who: "Lead engineer", x: 3, y: 5, w: 44, tail: "br" },
+      // Right of centre, not left: the dial is the punchline of this panel and
+      // a balloon in the top-left corner sat directly on it. Here it is over
+      // empty wall and its tail still points back at her.
+      { text: "It sent that. Last Tuesday.", who: "Lead engineer", x: 50, y: 4, w: 44, tail: "bl" },
       { text: "You're welcome.", who: "The Console", x: 58, y: 72, w: 38, tail: "tl", kind: "machine" },
     ],
   },

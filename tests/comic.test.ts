@@ -1,49 +1,46 @@
 // The comic's layout invariants.
 //
-// The hub renders the comic as horizontal stripes using a single CSS grid,
-// `grid-template-columns: 1.5fr 1fr 1fr`, with no per-row markup. That is exact
-// rather than approximate: a 3:2 panel in a 1.5-unit column and a 1:1 panel in
-// a 1-unit column resolve to the same height, so every panel in a row lines up
-// with no cropping and no fixed row height to maintain.
+// The hub renders the comic as two rows, four panels then five, every panel
+// displayed at 3:2 whatever it was drawn at. A row is `repeat(N, 1fr)` taken
+// from its own length, so the only thing deciding the layout is ROWS in
+// lib/comic.ts.
 //
-// It only holds while the panels stay in the order wide, square, square. There
-// is nothing in the CSS that can notice a reordering; the stripes would simply
-// stop lining up and the page would look subtly wrong in a way that is easy to
-// miss and hard to attribute. So the order is asserted here instead.
+// Nothing in the CSS can notice a panel that ROWS forgets to name: it would
+// simply never render, on a page nobody reads closely because it is a comic.
+// So the mapping is asserted here, along with the height budget that is the
+// entire reason for the 3:2 crop.
 import { describe, expect, it } from "vitest";
-import { PANELS, PANEL_PX, VARIANT_WIDTHS, variantsFor } from "@/lib/comic";
-
-const COLUMNS = 3;
+import { PANELS, ROWS, VARIANT_WIDTHS, rowsOfPanels, variantsFor } from "@/lib/comic";
 
 describe("comic layout invariants", () => {
-  it("fills whole rows", () => {
+  it("puts every panel in exactly one row", () => {
+    const named = ROWS.flat();
     expect(
-      PANELS.length % COLUMNS,
-      `The grid is ${COLUMNS} across, so a panel count that is not a multiple of ` +
-        `${COLUMNS} leaves a ragged last row. There are ${PANELS.length} panels.`,
-    ).toBe(0);
+      [...named].sort(),
+      "ROWS in lib/comic.ts is what the page renders from. A panel missing from " +
+        "it is a panel nobody sees, and a panel named twice renders twice.",
+    ).toEqual(PANELS.map((p) => p.file).sort());
+    expect(new Set(named).size, "a file is named in ROWS more than once").toBe(named.length);
   });
 
-  it("repeats wide, square, square so every stripe lines up", () => {
-    const expected = PANELS.map((_, i) => (i % COLUMNS === 0 ? "wide" : "square"));
-    expect(
-      PANELS.map((p) => p.size),
-      "The first panel of each row must be the wide one. See the note above " +
-        "grid-template-columns in app/globals.css.",
-    ).toEqual(expected);
+  it("names only panels that exist", () => {
+    // rowsOfPanels throws on an unknown filename; this is the assertion that
+    // the throw is never reached in the shipped data.
+    expect(() => rowsOfPanels()).not.toThrow();
+    expect(rowsOfPanels().flat().length).toBe(PANELS.length);
   });
 
-  it("gives every panel in a row the same height", () => {
-    // The check the CSS is actually relying on, done in numbers rather than
-    // trusted: column width divided by aspect ratio must be constant per row.
-    const track = (size: (typeof PANELS)[number]["size"]) => (size === "wide" ? 1.5 : 1);
-    for (let start = 0; start < PANELS.length; start += COLUMNS) {
-      const heights = PANELS.slice(start, start + COLUMNS).map((p) => {
-        const px = PANEL_PX[p.size];
-        return track(p.size) / (px.w / px.h);
-      });
-      expect(new Set(heights.map((h) => h.toFixed(6))).size, `row starting at panel ${start + 1}`).toBe(1);
-    }
+  it("keeps the rows short enough not to be a scroll", () => {
+    // The reason the layout is shaped this way, checked rather than trusted.
+    // Row height is the page width divided by the number of panels in it,
+    // times the 3:2 display shape.
+    const WIDTH = 1440;
+    const total = rowsOfPanels().reduce((h, row) => h + (WIDTH / row.length) * (2 / 3), 0);
+    expect(Math.round(total), `${Math.round(total)}px of comic at a ${WIDTH}px window`).toBeLessThan(600);
+  });
+
+  it("reads in story order across the row break", () => {
+    expect(ROWS.flat()).toEqual(PANELS.map((p) => p.file));
   });
 });
 
