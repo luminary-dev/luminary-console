@@ -28,12 +28,14 @@ import { PANELS, PANEL_PX, variantsFor } from "@/lib/comic";
 export default function ComicStrip() {
   return (
     <section className="comic" aria-labelledby="comic-title">
-      <div className="comic-head">
-        <h2 className="comic-title" id="comic-title">
-          One small change
-        </h2>
-        <p className="comic-sub">A short and only slightly exaggerated history of this console.</p>
-      </div>
+      {/* No visible title or standfirst: the comic introduces itself, and a
+          heading over it made the hub look like it had another section of work
+          in it. The heading survives for the document outline and for anyone
+          navigating by headings, who otherwise arrives at nine unexplained
+          images. */}
+      <h2 className="sr-only" id="comic-title">
+        One small change: a short and only slightly exaggerated history of this console
+      </h2>
 
       {/* Safari drops list semantics from any list styled `list-style: none`.
           Survivable without a redundant role="list": each panel is numbered in
@@ -69,10 +71,12 @@ export default function ComicStrip() {
                   // arrives and nothing below the comic moves when it does.
                   width={px.w}
                   height={px.h}
-                  // Only the first panel can be near the fold, and only on a
-                  // tall screen with both cards hidden. The rest wait until
-                  // they are scrolled towards.
-                  loading={i === 0 ? "eager" : "lazy"}
+                  // Every panel, including the first. The comic only renders
+                  // on wide landscape screens and sits below the fold even
+                  // there, and where it is hidden the markup is still served:
+                  // lazy is what stops a phone paying for artwork it will
+                  // never be shown.
+                  loading="lazy"
                   decoding="async"
                 />
                 {panel.bubbles.map((bubble, j) => (

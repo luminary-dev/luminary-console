@@ -743,5 +743,154 @@
     "opened": true,
     "violations": [],
     "total": 0
+  },
+  {
+    "path": "/login",
+    "name": "Sign in",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/",
+    "name": "Dashboard",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/clients",
+    "name": "Clients",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/clients/new",
+    "name": "New client",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/clients/eco-mech",
+    "name": "Client detail",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/activity",
+    "name": "Activity",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/publish",
+    "name": "Publish studio",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/settings",
+    "name": "Settings",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/github",
+    "name": "Pull requests",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/github/repos",
+    "name": "Repositories",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/github/ci",
+    "name": "CI",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/github/deployments",
+    "name": "Deployments",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/github/releases",
+    "name": "Releases",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/github/security",
+    "name": "Security",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/github/insights",
+    "name": "Insights",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/github/activity",
+    "name": "Engineering activity",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/github/luminary-dev/luminary-console/21",
+    "name": "Pull request detail",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/c/eco-mech",
+    "name": "Client portal",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/c/eco-mech/questionnaire",
+    "name": "Questionnaire",
+    "state": "at rest",
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/",
+    "name": "Sign out confirmation",
+    "state": "overlay could NOT be opened by the harness",
+    "opened": false,
+    "violations": [],
+    "total": 0
+  },
+  {
+    "path": "/",
+    "name": "Command palette",
+    "state": "overlay open",
+    "opened": true,
+    "violations": [],
+    "total": 0
   }
 ]

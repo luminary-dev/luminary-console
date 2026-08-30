@@ -85,7 +85,15 @@ for (const route of ALL_HTML_ROUTES) {
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page
       .waitForFunction(
-        () => Array.from(document.images).every((i) => i.complete),
+        // Only images that are actually rendered. An image inside a
+        // `display: none` container never loads and never will, so waiting on
+        // it burns the whole timeout and then reports nothing: the hub's comic
+        // is hidden below 1024px and in portrait, which is seven of the
+        // thirteen widths here.
+        () =>
+          Array.from(document.images).every(
+            (i) => i.complete || i.getBoundingClientRect().width === 0,
+          ),
         null,
         { timeout: 10_000 },
       )
