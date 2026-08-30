@@ -2,11 +2,18 @@ import SessionGuard from "@/components/SessionGuard";
 import SkipLink from "@/components/SkipLink";
 import type { Metadata, Viewport } from "next";
 import { cookies, headers } from "next/headers";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Outfit, JetBrains_Mono, Unkempt } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", display: "swap" });
 const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-mono", display: "swap" });
+// Comic lettering, for the hub comic's speech balloons and nothing else.
+// Loaded through next/font like the other two, which downloads the file at
+// build time and serves it from our own origin: the CSP is `font-src 'self'
+// data:` and a Google Fonts URL would simply be blocked.
+// 700 only. The balloons are the sole user and they are always bold, so
+// shipping the other weights would be bytes nobody downloads a glyph from.
+const comic = Unkempt({ subsets: ["latin"], weight: ["700"], variable: "--font-comic", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Luminary Console", template: "%s · Luminary" },
@@ -39,7 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // subdomains, which run the relaxed document policy instead: see lib/csp.ts.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
-    <html lang="en" suppressHydrationWarning data-theme={theme} className={`${outfit.variable} ${mono.variable}`}>
+    <html lang="en" suppressHydrationWarning data-theme={theme} className={`${outfit.variable} ${mono.variable} ${comic.variable}`}>
       <head>
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <style>{`html{background:#f0f0ee;color-scheme:light}html[data-theme="dark"]{background:#050506;color-scheme:dark}`}</style>

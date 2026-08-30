@@ -322,3 +322,34 @@ export function brokenImageProbe(): string[] {
     })
     .map((img) => (img.currentSrc || img.src || "").slice(0, 160));
 }
+
+/** Comic balloons that have grown outside the panel they belong to.
+ *
+ *  The balloons are HTML laid over artwork, positioned in percentages that
+ *  were chosen against each drawing. Their SIZE, though, comes from the text
+ *  and the font, so a longer line, a bigger clamp or a face with a different
+ *  x-height can push one off its panel. `overflow: hidden` on the frame means
+ *  that does not spill onto the page and nothing else in this harness would
+ *  notice: it just quietly clips a word off the end of a sentence.
+ *
+ *  Swapping the lettering face is exactly the change that provokes it, which
+ *  is why this exists. Reported as strings so a failure names the line. */
+export function balloonSpillProbe(): string[] {
+  const out: string[] = [];
+  document.querySelectorAll(".comic-panel").forEach((panel, i) => {
+    const frame = panel.getBoundingClientRect();
+    panel.querySelectorAll(".comic-bubble").forEach((bubble) => {
+      const b = bubble.getBoundingClientRect();
+      // A pixel of tolerance: sub-pixel layout should not be a finding.
+      const over =
+        b.left < frame.left - 1 ||
+        b.right > frame.right + 1 ||
+        b.top < frame.top - 1 ||
+        b.bottom > frame.bottom + 1;
+      if (over) {
+        out.push(`panel ${i + 1}: "${(bubble.textContent || "").trim().slice(0, 40)}"`);
+      }
+    });
+  });
+  return out;
+}

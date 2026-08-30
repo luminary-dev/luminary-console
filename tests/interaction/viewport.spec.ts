@@ -7,7 +7,7 @@
 // failing audit run stops collecting data and the point of this pass is data.
 import { test, expect } from "@playwright/test";
 import { ALL_HTML_ROUTES } from "./routes";
-import { overflowProbe, targetProbe, brokenImageProbe } from "./probes";
+import { overflowProbe, targetProbe, brokenImageProbe, balloonSpillProbe } from "./probes";
 import { appendRow, settle, slugFor, OUT } from "./report";
 
 // Overflow is enforced. Everything else is observed.
@@ -101,6 +101,10 @@ for (const route of ALL_HTML_ROUTES) {
         /* A still-loading image is not proof of a broken one; probe anyway. */
       });
     const brokenImages = await page.evaluate(brokenImageProbe);
+    // Fonts have to be settled first: a balloon measured mid-swap is sized
+    // against the fallback face, not the one that ships.
+    await page.evaluate(() => document.fonts.ready);
+    const balloonSpill = await page.evaluate(balloonSpillProbe);
     await page.evaluate(() => window.scrollTo(0, 0));
 
     appendRow("raw/viewport.json", {
@@ -121,6 +125,7 @@ for (const route of ALL_HTML_ROUTES) {
       underTouch44: underTouch.length,
       focusableInvisible: focusableInvisible.map((t) => t.name),
       brokenImages,
+      balloonSpill,
       screenshot: shot,
     });
 
@@ -167,6 +172,16 @@ for (const route of ALL_HTML_ROUTES) {
         `at ${width}px: ${brokenImages.slice(0, 3).join(", ")}. A 404, a redirect to /login ` +
         `or an unoptimisable file all land here, and none of them disturb the layout, ` +
         `because width and height reserve the box whatever comes back.`,
+    ).toEqual([]);
+
+    // Same reasoning as the two above: the frame clips the overflow, so the
+    // only symptom is a word missing from the end of a sentence, which no
+    // geometry check sees and no screenshot review reliably catches either.
+    expect(
+      balloonSpill,
+      `${route.path} at ${width}px has ${balloonSpill.length} comic balloon(s) larger than ` +
+        `their panel: ${balloonSpill.slice(0, 3).join("; ")}. Either the line got longer or the ` +
+        `lettering got bigger; the balloon's width is a percentage in lib/comic.ts.`,
     ).toEqual([]);
   });
 }
