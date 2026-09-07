@@ -18,6 +18,7 @@
 //
 // Chromium is launched at most once per serverless invocation, not once per
 // document (LC-032): see the browser lifecycle section below.
+import { existsSync } from "node:fs";
 import type { Browser } from "puppeteer-core";
 
 /** Laptop viewport width the design is laid out at before capture. */
@@ -181,12 +182,47 @@ async function launchBrowser(): Promise<Browser> {
     });
   }
   return puppeteer.launch({
-    executablePath:
-      process.env.CHROME_PATH ||
-      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    executablePath: resolveChromePath(),
+    // Chrome's sandbox needs unprivileged user namespaces, which Ubuntu 24.04
+    // (and so GitHub's ubuntu-latest runners) restrict; and /dev/shm on a
+    // runner is too small for a page render. Neither flag is wanted where a
+    // developer's own Chrome runs.
+    args: process.platform === "linux" ? ["--no-sandbox", "--disable-dev-shm-usage"] : [],
     headless: true,
     protocolTimeout: 120_000,
   });
+}
+
+/** Where the system Chrome lives when we are not on Vercel. An explicit
+ *  CHROME_PATH (or the CHROME_BIN that GitHub's runner images export) is
+ *  used as given; otherwise the platform's usual install locations are
+ *  probed. The ops workflow runs every console route on ubuntu-latest, and
+ *  a billing generate there was failing with "Browser was not found at
+ *  /Applications/Google Chrome.app/..." because only the macOS path was
+ *  known. */
+function resolveChromePath(): string {
+  const explicit = process.env.CHROME_PATH || process.env.CHROME_BIN;
+  if (explicit) return explicit;
+  const candidates =
+    process.platform === "darwin"
+      ? ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"]
+      : process.platform === "win32"
+        ? [
+            "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+          ]
+        : [
+            "/usr/bin/google-chrome",
+            "/usr/bin/google-chrome-stable",
+            "/usr/bin/chromium",
+            "/usr/bin/chromium-browser",
+            "/snap/bin/chromium",
+          ];
+  const found = candidates.find((c) => existsSync(c));
+  if (found) return found;
+  throw new Error(
+    `No Chrome found for PDF rendering on ${process.platform}. Set CHROME_PATH to a Chrome/Chromium binary (looked in: ${candidates.join(", ")}).`,
+  );
 }
 
 /** `connected` can itself throw on a torn-down handle, and "I could not tell"
