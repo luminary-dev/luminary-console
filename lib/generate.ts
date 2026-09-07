@@ -85,7 +85,7 @@ const ESTIMATE_SCHEMA = S.obj(
     })),
     lowTotal: { type: "string", description: "e.g. 'LKR 35,000'" },
     highTotal: S.str,
-    likelyTotal: { type: "string", description: "Midpoint, e.g. '≈ LKR 42,500'" },
+    likelyTotal: { type: "string", description: "Midpoint, e.g. '~LKR 42,500'" },
     totalNote: { type: "string", description: "e.g. 'Single landing page · Not a final bill'" },
     scaling: S.nullable(S.obj(["title", "rows", "note"], {
       title: { type: "string", description: "e.g. 'How cost scales with page count'" },
@@ -154,7 +154,7 @@ const CONTRACT_SCHEMA = S.obj(["agreementDate", "sow", "clauses"], {
   agreementDate: S.str,
   sow: S.obj(["engagement", "term", "deliverables", "fees"], {
     engagement: S.str,
-    term: { type: "string", description: "e.g. '≈ 3 weeks · Aug–Sep 2026'" },
+    term: { type: "string", description: "e.g. '~3 weeks · Aug–Sep 2026'" },
     deliverables: { type: "string", description: "Compact list, ' · ' separated" },
     fees: { type: "string", description: "The fixed total and the 30/70 split, e.g. 'LKR 195,000 fixed · 30% on design approval / 70% on delivery'." },
   }),
