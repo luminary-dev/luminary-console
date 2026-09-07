@@ -197,6 +197,15 @@ export async function proxy(request: NextRequest) {
     // so nothing else under /api/github/ inherits the exemption: the delivery
     // inbox and the processing sweep stay behind the session gate.
     pathname === "/api/github/webhook" ||
+    // The processing sweep runs on Vercel Cron, which sends the CRON_SECRET
+    // bearer and NO session cookie, so — exactly like /api/cron/* — it must
+    // skip the session gate or the cron is 401'd here before its own bearer
+    // check runs, and the whole webhook durability backstop never fires
+    // (AUDIT.md API-01; lib/csrf.ts already treated this path as cron-bearer).
+    // Exact path, not a prefix, so nothing else under /api/github/ inherits
+    // the exemption. The route self-guards: cron via a constant-time bearer,
+    // an operator via a session cookie the route now verifies itself.
+    pathname === "/api/github/process" ||
     pathname.startsWith("/_next") ||
     pathname === "/icon.svg" ||
     pathname === "/favicon.ico" ||
