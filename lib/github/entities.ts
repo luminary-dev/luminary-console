@@ -343,7 +343,10 @@ export function mergeReadiness(pr: PullRequestEntity): MergeReadiness {
   }
 
   if ((pr.unresolvedThreads ?? 0) > 0) blockers.push("unresolved_conversations");
-  if ((pr.behindBy ?? 0) > 0) blockers.push("behind_base");
+  // behindBy is the REST count; mergeableState "behind" is the same fact from
+  // GraphQL, which carries no count. Either means the head is behind its base
+  // (AUDIT.md BUG-01 — GraphQL entities had no behindBy, so this never fired).
+  if ((pr.behindBy ?? 0) > 0 || pr.mergeableState === "behind") blockers.push("behind_base");
   if (pr.mergeableState === "blocked") blockers.push("blocked_by_protection");
 
   // No blockers is its own answer, and keeping it out of the switch leaves the

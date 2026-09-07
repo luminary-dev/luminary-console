@@ -283,6 +283,7 @@ async function fetchOpenPullRequestsGraphQL(limit: number): Promise<PullRequestE
                 createdAt
                 updatedAt
                 mergeable
+                mergeStateStatus
                 url
                 additions
                 deletions
@@ -380,6 +381,7 @@ type GqlPullRequest = {
   createdAt: string;
   updatedAt: string;
   mergeable: string;
+  mergeStateStatus?: string;
   url: string;
   additions?: number;
   deletions?: number;
@@ -505,6 +507,15 @@ export function fromGraphQLPullRequest(repo: string, pr: GqlPullRequest): PullRe
     // GraphQL reports MERGEABLE / CONFLICTING / UNKNOWN, where UNKNOWN means
     // "still computing" and must stay null rather than becoming false.
     mergeable: pr.mergeable === "MERGEABLE" ? true : pr.mergeable === "CONFLICTING" ? false : null,
+    // mergeStateStatus is the GraphQL twin of REST's mergeable_state (uppercase
+    // vs lowercase: BLOCKED/BEHIND/CLEAN/…). Without it the GraphQL entity had
+    // no mergeableState, so mergeReadiness could never see blocked_by_protection
+    // or behind_base — and reconcile/backfill overwrite REST entities with
+    // these, so a blocked PR read "ready to merge" (AUDIT.md BUG-01). Lowercased
+    // so both transports store the same values.
+    ...(pr.mergeStateStatus && pr.mergeStateStatus !== "UNKNOWN"
+      ? { mergeableState: pr.mergeStateStatus.toLowerCase() }
+      : {}),
     ...(pr.additions !== undefined ? { additions: pr.additions } : {}),
     ...(pr.deletions !== undefined ? { deletions: pr.deletions } : {}),
     ...(pr.changedFiles !== undefined ? { changedFiles: pr.changedFiles } : {}),
