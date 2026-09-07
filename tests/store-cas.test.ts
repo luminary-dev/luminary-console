@@ -300,6 +300,60 @@ describe("saveClient under contention", () => {
   });
 });
 
+describe("updateClient under contention (API-02)", () => {
+  it("retries against the winner's record so a concurrent payment is not lost", async () => {
+    const store = await loadStore();
+    await store.saveClient({ ...makeRecord("acme"), payments: [] });
+
+    // A competing writer records a payment between our read and our write, once.
+    let raced = false;
+    r2.hooks.beforePut = (key) => {
+      if (key !== recordKey("acme") || raced) return;
+      raced = true;
+      const current = JSON.parse(r2.read(recordKey("acme")) ?? "null");
+      current.payments = [...(current.payments ?? []), { at: "x", amount: 100, method: "cash" }];
+      r2.put(recordKey("acme"), JSON.stringify(current));
+    };
+
+    const updated = await store.updateClient("acme", (c) => {
+      c.payments = [...(c.payments ?? []), { at: "y", amount: 200, method: "card" }];
+    });
+
+    // Before API-02 the losing write overwrote the record, dropping the 100.
+    const sortNum = (xs: number[]) => [...xs].sort((a, b) => a - b);
+    expect(sortNum((updated?.payments ?? []).map((p) => p.amount))).toEqual([100, 200]);
+    const stored = JSON.parse(r2.read(recordKey("acme")) ?? "null");
+    expect(sortNum(stored.payments.map((p: { amount: number }) => p.amount))).toEqual([100, 200]);
+  });
+
+  it("returns null when the record does not exist", async () => {
+    const store = await loadStore();
+    expect(
+      await store.updateClient("ghost", (c) => {
+        c.notes = "x";
+      }),
+    ).toBeNull();
+  });
+
+  it("throws StoreConflictError when the record keeps changing past the budget", async () => {
+    const store = await loadStore();
+    await store.saveClient({ ...makeRecord("acme"), payments: [] });
+    // Never stop racing: every record write loses.
+    r2.hooks.beforePut = (key) => {
+      if (key !== recordKey("acme")) return;
+      const current = JSON.parse(r2.read(recordKey("acme")) ?? "null");
+      current.notes = `bump-${Math.random()}`;
+      r2.put(recordKey("acme"), JSON.stringify(current));
+    };
+    const err = await store
+      .updateClient("acme", (c) => {
+        c.notes = "mine";
+      })
+      .catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(store.StoreConflictError);
+  });
+});
+
 describe("doc numbers under contention", () => {
   it("LC-002: concurrent creations never receive the same doc number", async () => {
     const store = await loadStore();

@@ -590,6 +590,46 @@ export async function saveClient(record: ClientRecord, opts: SaveClientOptions =
   });
 }
 
+/** Compare-and-swap for a whole client record. Reads the record FRESH with its
+ *  ETag, applies `mutate`, and writes with If-Match through saveClient, so a
+ *  concurrent edit is retried against the newer record rather than silently
+ *  overwritten. This is the fix for AUDIT.md API-02: every mutating route did
+ *  getClient → mutate → saveClient with no ETag, so two near-simultaneous
+ *  writes (two payments, an operator edit racing a portal action) kept only the
+ *  last, dropping the other — worst on money.
+ *
+ *  `mutate` must be PURE / replayable: it runs against a fresh clone each
+ *  attempt and only the last run is kept, so it must not perform side effects
+ *  (send email, write other objects) — do those after this returns. It may
+ *  return a replacement record or mutate the clone in place. Returns null when
+ *  the record does not exist (callers answer 404). Throws StoreConflictError
+ *  when the record keeps changing past the retry budget (callers answer 409). */
+export async function updateClient(
+  slug: string,
+  mutate: (record: ClientRecord) => ClientRecord | void,
+  opts: { attempts?: number } = {},
+): Promise<ClientRecord | null> {
+  const attempts = Math.max(1, opts.attempts ?? CAS_ATTEMPTS);
+  let lastConflict: unknown = null;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    const { record, etag } = await getClientWithEtag(slug);
+    if (!record) return null;
+    const draft = structuredClone(record);
+    const next = mutate(draft) ?? draft;
+    try {
+      await saveClient(next, etag !== undefined ? { expectedEtag: etag } : {});
+      return next;
+    } catch (e) {
+      if (!(e instanceof StoreConflictError)) throw e;
+      lastConflict = e;
+      if (attempt < attempts - 1) await sleep(backoffMs(attempt));
+    }
+  }
+  throw lastConflict instanceof StoreConflictError
+    ? lastConflict
+    : new StoreConflictError(recordKey(slug), attempts, lastConflict);
+}
+
 /** Delete everything under the client's prefix (record, docs, billing,
  *  answers, attachments) plus its index entry. Returns the object count. */
 export async function deleteClient(slug: string): Promise<number> {

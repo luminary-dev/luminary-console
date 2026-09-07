@@ -4,7 +4,7 @@
 // auto-advances the lifecycle to "development" (the 30% design-approval
 // payment is what starts the build).
 import { NextResponse } from "next/server";
-import { getClient, saveClient } from "@/lib/store";
+import { updateClient, StoreConflictError } from "@/lib/store";
 import { advanceStage } from "@/lib/stage";
 import { fmtLKR } from "@/lib/money";
 import { logActivity } from "@/lib/activity";
@@ -26,88 +26,120 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
-  const client = await getClient(slug);
-  if (!client) return NextResponse.json({ error: "Client not found" }, { status: 404 });
 
   const body = await req.json().catch(() => ({}));
   const action = String(body.action || "add");
 
-  if (action === "add") {
-    const amount = typeof body.amount === "number" ? body.amount : NaN;
-    if (!Number.isFinite(amount) || amount <= 0 || amount > 1_000_000_000) {
+  // State-dependent validation lives inside the compare-and-swap closure and
+  // signals failure with this sentinel, so it re-checks the FRESH record on
+  // every retry rather than a copy read before the race (AUDIT.md API-02).
+  class Reject {
+    constructor(
+      readonly status: number,
+      readonly message: string,
+    ) {}
+  }
+
+  try {
+    if (action === "add") {
+      const amount = typeof body.amount === "number" ? body.amount : NaN;
+      if (!Number.isFinite(amount) || amount <= 0 || amount > 1_000_000_000) {
+        return NextResponse.json(
+          { error: "Amount must be a positive number of rupees." },
+          { status: 400 },
+        );
+      }
+      const method =
+        (typeof body.method === "string" && clipText(body.method.trim(), 60)) || "bank transfer";
+      const note = typeof body.note === "string" ? clipText(body.note.trim(), 300) : "";
+      const invoiceSlug = typeof body.invoiceSlug === "string" ? body.invoiceSlug.trim() : "";
+      const at =
+        typeof body.at === "string" && Number.isFinite(Date.parse(body.at))
+          ? new Date(body.at).toISOString()
+          : new Date().toISOString();
+      const payment: Payment = {
+        at,
+        amount: Math.round(amount * 100) / 100,
+        method,
+        ...(note ? { note } : {}),
+        ...(invoiceSlug ? { invoiceSlug } : {}),
+      };
+
+      const updated = await updateClient(slug, (client) => {
+        if (
+          invoiceSlug &&
+          !(client.billing ?? []).some((b) => b.kind === "invoice" && b.slug === invoiceSlug)
+        ) {
+          throw new Reject(400, "No such invoice.");
+        }
+        client.payments = [...(client.payments ?? []), payment];
+        advanceStage(client, "development");
+      });
+      if (!updated) return NextResponse.json({ error: "Client not found" }, { status: 404 });
+
+      // Side effects run AFTER the write lands, using the persisted record —
+      // the mutate closure above may re-run and must stay pure.
+      const actor = await currentOperator();
+      const invoice = invoiceSlug
+        ? (updated.billing ?? []).find((b) => b.slug === invoiceSlug)
+        : undefined;
+      const invoiceName = invoice ? billingLabel(invoice) : "";
+      await logActivity(
+        actor,
+        "recorded payment",
+        slug,
+        `${fmtLKR(payment.amount)}${invoiceName ? ` · ${invoiceName}` : ""} (${method})`,
+      );
+
+      await studioNotice({
+        title: "Payment recorded",
+        company: updated.company,
+        lines: [
+          `${tgEsc(displayName(actor))} recorded ${tgEsc(fmtLKR(payment.amount))}${invoiceName ? ` for the ${tgEsc(invoiceName)}` : ""}`,
+          `Method: ${tgEsc(method)}`,
+        ],
+        url: `https://${CONSOLE_HOST}/clients/${updated.slug}`,
+      });
+
+      return NextResponse.json({ ok: true, payments: updated.payments, stage: updated.stage });
+    }
+
+    if (action === "remove") {
+      const index = Number(body.index);
+      // Optional stable-identity guard: when the client sends the payment's
+      // timestamp, refuse if the row at `index` shifted underneath it, so a
+      // concurrent add/remove can't make the index delete the wrong payment.
+      const expectedAt = typeof body.at === "string" ? body.at : null;
+      let gone: Payment | undefined;
+      const updated = await updateClient(slug, (client) => {
+        const payments = client.payments ?? [];
+        const target = Number.isInteger(index) ? payments[index] : undefined;
+        if (!target || (expectedAt !== null && target.at !== expectedAt)) {
+          throw new Reject(404, "No such payment.");
+        }
+        gone = target;
+        payments.splice(index, 1);
+        client.payments = payments;
+      });
+      if (!updated) return NextResponse.json({ error: "Client not found" }, { status: 404 });
+      await logActivity(
+        "operator",
+        "removed payment",
+        slug,
+        `${fmtLKR(gone!.amount)}${gone!.invoiceSlug ? ` against ${gone!.invoiceSlug}` : ""}`,
+      );
+      return NextResponse.json({ ok: true, payments: updated.payments });
+    }
+
+    return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+  } catch (e) {
+    if (e instanceof Reject) return NextResponse.json({ error: e.message }, { status: e.status });
+    if (e instanceof StoreConflictError) {
       return NextResponse.json(
-        { error: "Amount must be a positive number of rupees." },
-        { status: 400 },
+        { error: "That client was being edited at the same time. Please retry." },
+        { status: 409 },
       );
     }
-    const method =
-      (typeof body.method === "string" && clipText(body.method.trim(), 60)) || "bank transfer";
-    const note = typeof body.note === "string" ? clipText(body.note.trim(), 300) : "";
-    const invoiceSlug = typeof body.invoiceSlug === "string" ? body.invoiceSlug.trim() : "";
-    if (invoiceSlug && !(client.billing ?? []).some((b) => b.kind === "invoice" && b.slug === invoiceSlug)) {
-      return NextResponse.json({ error: "No such invoice." }, { status: 400 });
-    }
-    const at =
-      typeof body.at === "string" && Number.isFinite(Date.parse(body.at))
-        ? new Date(body.at).toISOString()
-        : new Date().toISOString();
-    const payment: Payment = {
-      at,
-      amount: Math.round(amount * 100) / 100,
-      method,
-      ...(note ? { note } : {}),
-      ...(invoiceSlug ? { invoiceSlug } : {}),
-    };
-    client.payments = [...(client.payments ?? []), payment];
-    advanceStage(client, "development");
-    await saveClient(client);
-
-    // Attribute to the signed-in admin (not a generic "operator") and label the
-    // invoice by its stage/kind ("30% design-approval invoice") where we can.
-    const actor = await currentOperator();
-    const invoice = invoiceSlug
-      ? (client.billing ?? []).find((b) => b.slug === invoiceSlug)
-      : undefined;
-    const invoiceName = invoice ? billingLabel(invoice) : "";
-    await logActivity(
-      actor,
-      "recorded payment",
-      slug,
-      `${fmtLKR(payment.amount)}${invoiceName ? ` · ${invoiceName}` : ""} (${method})`,
-    );
-
-    // Team awareness: ping the studio Telegram + the admins' phones so money
-    // in is seen without opening the console. Best-effort — never blocks.
-    await studioNotice({
-      title: "Payment recorded",
-      company: client.company,
-      lines: [
-        `${tgEsc(displayName(actor))} recorded ${tgEsc(fmtLKR(payment.amount))}${invoiceName ? ` for the ${tgEsc(invoiceName)}` : ""}`,
-        `Method: ${tgEsc(method)}`,
-      ],
-      url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
-    });
-
-    return NextResponse.json({ ok: true, payments: client.payments, stage: client.stage });
+    throw e;
   }
-
-  if (action === "remove") {
-    const index = Number(body.index);
-    const payments = client.payments ?? [];
-    const gone = Number.isInteger(index) ? payments[index] : undefined;
-    if (!gone) {
-      return NextResponse.json({ error: "No such payment." }, { status: 404 });
-    }
-    payments.splice(index, 1);
-    await saveClient(client);
-    await logActivity(
-      "operator",
-      "removed payment",
-      slug,
-      `${fmtLKR(gone.amount)}${gone.invoiceSlug ? ` against ${gone.invoiceSlug}` : ""}`,
-    );
-    return NextResponse.json({ ok: true, payments: client.payments });
-  }
-
-  return NextResponse.json({ error: "Unknown action" }, { status: 400 });
 }
