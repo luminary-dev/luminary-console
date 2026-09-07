@@ -21,7 +21,7 @@ export const paras = (s: string) =>
 export type Mode = "web" | "pdf";
 
 const CSS = `
-:root{--bg:#ffffff;--off:#f7f7f5;--text:#0d0d0f;--muted:#6b7280;--subtle:#c4c4c8;--border:rgba(0,0,0,.09);--border-hi:rgba(0,0,0,.14);--accent:#84cc16;--a-text:#5a9e08;--a-dim:rgba(132,204,22,.09);--a-border:rgba(132,204,22,.28);--desk:#f0f0ee;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:'Outfit',system-ui,sans-serif;}
+:root{--bg:#ffffff;--off:#f7f7f5;--text:#0d0d0f;--muted:#6b7280;--subtle:#c4c4c8;--border:rgba(0,0,0,.09);--border-hi:rgba(0,0,0,.14);--accent:#84cc16;--a-text:#5a9e08;--a-dim:rgba(132,204,22,.09);--a-border:rgba(132,204,22,.28);--desk:#f0f0ee;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:'Poppins',system-ui,sans-serif;}
 html[data-theme="dark"]{--bg:#0b0b0d;--off:#141416;--text:#f4f4f5;--muted:#8a8a92;--subtle:#3f3f46;--border:rgba(255,255,255,.09);--border-hi:rgba(255,255,255,.16);--accent:#a3e635;--a-text:#a3e635;--a-dim:rgba(163,230,53,.09);--a-border:rgba(163,230,53,.22);--desk:#050506;}
 html{color-scheme:light;}
 html[data-theme="dark"]{color-scheme:dark;}
@@ -84,7 +84,7 @@ a{color:var(--a-text);text-decoration:none;}
 .sig-lab{font-size:11px;color:var(--muted);margin-top:5px;}
 .ticks{list-style:none;}
 .ticks li{padding-left:18px;position:relative;font-size:12.5px;margin-top:3px;}
-.ticks li:before{content:"\\2713";position:absolute;left:0;color:var(--a-text);font-weight:700;}
+.ticks li:before{content:"";position:absolute;left:0;top:5px;width:11px;height:11px;background:var(--a-text);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.5 8.5l3.5 3.5 7.5-8' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.5 8.5l3.5 3.5 7.5-8' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;}
 .foot{margin-top:26px;padding-top:12px;border-top:1px solid var(--border);text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--muted);}
 .toolbar{position:fixed;top:16px;right:16px;display:flex;gap:8px;z-index:10;}
 .toolbar a,.toolbar button{border:none;cursor:pointer;background:var(--text);color:var(--bg);border-radius:100px;padding:8px 18px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;}
@@ -217,7 +217,7 @@ var printBtn=document.querySelector('[data-lum="print"]');if(printBtn)printBtn.a
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d0d0f'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-size='20' font-weight='900' font-family='system-ui' fill='%2384cc16'%3EL%3C/text%3E%3C/svg%3E">
 ${themeScript}
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>${CSS}</style>
 </head>
 <body class="${opts.mode}">

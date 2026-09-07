@@ -5,6 +5,11 @@ import type { ClientRecord, DocType } from "../types";
 import { esc, paras, clientBlock, metaRow, policyBox, shell, type Mode } from "./shell";
 import { STUDIO_SIGNATURE, STUDIO_SIGNATURE_NAME } from "./signature";
 
+/** "≈" is outside the Latin subset Google Fonts serves for Poppins and
+ *  JetBrains Mono, so it printed in whatever fallback the machine had (Menlo
+ *  on a Mac, DejaVu on the ops runner). "~" reads the same and is in both. */
+const approx = (s: string) => s.replace(/≈\s*/g, "~");
+
 export type EstimateData = {
   confidence: string;
   about: string;
@@ -132,7 +137,7 @@ export function renderEstimate(d: EstimateData, ctx: Ctx): string {
     <div class="totals"><div class="totals-box">
       <div class="t-row"><span>Low estimate</span><span>${esc(d.lowTotal)}</span></div>
       <div class="t-row"><span>High estimate</span><span>${esc(d.highTotal)}</span></div>
-      <div class="t-main"><b>Likely total</b><span class="val">${esc(d.likelyTotal)}</span></div>
+      <div class="t-main"><b>Likely total</b><span class="val">${esc(approx(d.likelyTotal))}</span></div>
       <div class="t-note">${esc(d.totalNote)}</div>
     </div></div>
     ${scaling}
@@ -407,7 +412,7 @@ export function renderContract(d: ContractData, ctx: Ctx): string {
       <div class="sec-k">Statement of Work</div>
       <table class="sow">
         <tr><th>Engagement</th><td>${esc(d.sow.engagement)}</td></tr>
-        <tr><th>Term</th><td>${esc(d.sow.term)}</td></tr>
+        <tr><th>Term</th><td>${esc(approx(d.sow.term))}</td></tr>
         <tr><th>Deliverables</th><td>${esc(d.sow.deliverables)}</td></tr>
         <tr><th>Fees</th><td class="mono" style="font-weight:600;">${esc(d.sow.fees)}</td></tr>
       </table>

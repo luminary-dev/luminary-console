@@ -120,6 +120,7 @@ export async function saveBillingDoc(
   data: unknown,
   status: DocMeta["status"],
   existingSlug?: string,
+  issued?: string,
 ): Promise<BillingDoc> {
   client.billing = client.billing ?? [];
   let doc = existingSlug ? client.billing.find((b) => b.slug === existingSlug) : undefined;
@@ -151,7 +152,7 @@ export async function saveBillingDoc(
     };
     client.billing.push(doc);
   }
-  const ctx = { client, docNo: doc.no, issued: todayLabel() };
+  const ctx = { client, docNo: doc.no, issued: issued ?? todayLabel() };
   const webHtml = renderBilling(kind, data, { ...ctx, mode: "web", pdfHref: `${doc.slug}/pdf` });
   const pdfHtml = renderBilling(kind, data, { ...ctx, mode: "pdf" });
   const pdf = await renderPdf(pdfHtml);

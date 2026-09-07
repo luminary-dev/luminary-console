@@ -80,6 +80,9 @@ at AA contrast on both `--bg` values.
 
 - Sans: **Outfit** (`--font-outfit`, next/font, swap). Weights in use: 500, 700, 800.
   Tight tracking at display sizes (`-.03em` to `-.05em`).
+  - Client-facing documents (`lib/templates/shell.ts`: estimate, quotation, proposal,
+    contract, invoice, receipt, handover) are the exception: their sans is **Poppins**
+    (Google Fonts, 400–800), chosen for the printed documents. The console UI stays Outfit.
 - Mono: **JetBrains Mono** (`--font-jetbrains-mono`) for code, document numbers,
   timestamps, table headers, meta rows, kbd hints. Mono at small sizes carries
   letterspacing (`.02em` to `.14em`) and frequently uppercase.
