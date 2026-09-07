@@ -203,4 +203,17 @@ describe("launch paths", () => {
     expect(atIndex(chromium.state.options, 1).executablePath).toBe("/tmp/serverless-chromium");
     expect(atIndex(chromium.state.options, 1).args).toEqual(["--sparticuz-arg"]);
   });
+
+  it("falls back to the runner's CHROME_BIN when CHROME_PATH is unset", async () => {
+    // GitHub's ubuntu-latest images export CHROME_BIN; the ops workflow runs
+    // every console route there, and the macOS-only default broke billing.
+    delete process.env.CHROME_PATH;
+    process.env.CHROME_BIN = "/usr/bin/google-chrome-from-runner";
+    try {
+      await renderPdf("<p>runner</p>");
+      expect(atIndex(chromium.state.options, 0).executablePath).toBe("/usr/bin/google-chrome-from-runner");
+    } finally {
+      delete process.env.CHROME_BIN;
+    }
+  });
 });
