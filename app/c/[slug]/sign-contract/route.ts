@@ -6,8 +6,9 @@
 // answers ok/already. Electronic signatures are valid under Sri Lanka's
 // Electronic Transactions Act No. 19 of 2006.
 import { NextResponse } from "next/server";
-import { getClient, saveClient } from "@/lib/store";
+import { getClient, updateClient, StoreConflictError } from "@/lib/store";
 import { saveDoc } from "@/lib/pipeline";
+import { logger } from "@/lib/logger";
 import { emailStudio } from "@/lib/email";
 import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
@@ -55,21 +56,46 @@ export async function POST(
   if (!name) return NextResponse.json({ error: "Please type your full name to sign." }, { status: 400 });
 
   const ip = ((req.headers.get("x-forwarded-for") || "").split(",")[0] ?? "").trim();
-  client.contractSignature = { name, at: new Date().toISOString(), ...(ip ? { ip } : {}) };
-  advanceStage(client, "accepted");
+  const signature = { name, at: new Date().toISOString(), ...(ip ? { ip } : {}) };
 
-  // Re-render so the signature stamp shows everywhere the contract renders,
-  // keeping the original issue date so signing doesn't re-date the document.
+  // Re-render once (Chromium is expensive) so the signature stamp shows
+  // everywhere the contract renders, keeping the original issue date so signing
+  // doesn't re-date the document. The stamped meta is applied by the CAS below.
+  let rendered: Awaited<ReturnType<typeof saveDoc>> | null = null;
   try {
     const issuedMs = Date.parse(contract.updatedAt);
     const issued = Number.isFinite(issuedMs)
       ? new Date(issuedMs).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Colombo" })
       : undefined;
-    await saveDoc(client, "contract", contract.data, "published", issued);
+    rendered = await saveDoc(client, "contract", contract.data, "published", issued);
   } catch (e) {
-    console.error("Contract re-render after signing failed:", e);
+    logger.error("Contract re-render after signing failed", { err: e });
   }
-  await saveClient(client);
+
+  // Compare-and-swap the binding signature (AUDIT.md API-02; SEC-01 covers the
+  // missing capability check) so it can't clobber a concurrent record edit and
+  // two racing signs can't both win.
+  let raced: { name: string; at: string } | null = null;
+  let updated;
+  try {
+    updated = await updateClient(slug, (c) => {
+      if (c.contractSignature) {
+        raced = { name: c.contractSignature.name, at: c.contractSignature.at };
+        return;
+      }
+      c.contractSignature = signature;
+      advanceStage(c, "accepted");
+      if (rendered) c.docs.contract = rendered;
+    });
+  } catch (e) {
+    if (e instanceof StoreConflictError) {
+      return NextResponse.json({ error: "Please try again in a moment." }, { status: 409 });
+    }
+    throw e;
+  }
+  if (!updated) return NextResponse.json({ error: "Unknown client." }, { status: 404 });
+  if (raced) return NextResponse.json({ ok: true, already: true, ...(raced as { name: string; at: string }) });
+
   await logActivity(name, "signed the contract", slug, contract.no);
 
   await emailStudio(
@@ -85,5 +111,5 @@ export async function POST(
     url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
   });
 
-  return NextResponse.json({ ok: true, name, at: client.contractSignature.at });
+  return NextResponse.json({ ok: true, name, at: signature.at });
 }

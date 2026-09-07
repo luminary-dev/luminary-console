@@ -3,7 +3,7 @@
 // validation — but it only ever appends to the record and emails the studio;
 // nothing is published and no document changes.
 import { NextResponse } from "next/server";
-import { getClient, saveClient } from "@/lib/store";
+import { updateClient, StoreConflictError } from "@/lib/store";
 import { emailStudio } from "@/lib/email";
 import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
@@ -25,6 +25,14 @@ const MAX_TEXT = 2000;
 /** Keeping unbounded growth off a record that is read on every page load. */
 const MAX_COMMENTS = 200;
 
+/** State-dependent failure raised from inside the compare-and-swap closure. */
+class Reject {
+  constructor(
+    readonly status: number,
+    readonly message: string,
+  ) {}
+}
+
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
@@ -34,8 +42,6 @@ export async function POST(
   if (limited) return limited;
 
   const { slug } = await params;
-  const client = await getClient(slug);
-  if (!client) return NextResponse.json({ error: "Unknown client." }, { status: 404 });
 
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object") {
@@ -47,20 +53,7 @@ export async function POST(
     return NextResponse.json({ ok: true });
   }
 
-  // The document must be one this client can actually see in their portal:
-  // a published core doc, a published billing doc, or the questionnaire
-  // (always live). An unpublished draft is invisible to them, so naming one
-  // is a probe rather than a question.
   const docKey = typeof body.doc === "string" ? body.doc.trim() : "";
-  const doc = docKey ? resolveDoc(client, docKey) : null;
-  if (!doc || !doc.published) {
-    return NextResponse.json(
-      { error: "Please pick one of your documents." },
-      { status: 400 },
-    );
-  }
-  const { label: docLabel, no: docNo } = doc;
-
   const by = typeof body.by === "string" ? clipText(body.by.trim(), MAX_NAME) : "";
   if (!by) {
     return NextResponse.json({ error: "Please add your name." }, { status: 400 });
@@ -77,8 +70,31 @@ export async function POST(
   }
 
   const comment: Comment = { doc: docKey, by, text: rawText, at: new Date().toISOString() };
-  client.comments = [...(client.comments ?? []), comment].slice(-MAX_COMMENTS);
-  await saveClient(client);
+
+  // The document must be one this client can see (published core/billing doc,
+  // or the always-live questionnaire) — checked against the FRESH record inside
+  // the compare-and-swap, so the append can't clobber a concurrent edit
+  // (AUDIT.md API-02) and a doc just unpublished can't slip through.
+  let docLabel = "";
+  let docNo = "";
+  const client = await updateClient(slug, (c) => {
+    const doc = docKey ? resolveDoc(c, docKey) : null;
+    if (!doc || !doc.published) {
+      throw new Reject(400, "Please pick one of your documents.");
+    }
+    docLabel = doc.label;
+    docNo = doc.no;
+    c.comments = [...(c.comments ?? []), comment].slice(-MAX_COMMENTS);
+  }).catch((e: unknown) => {
+    if (e instanceof Reject) return e;
+    if (e instanceof StoreConflictError) return new Reject(409, "Please try again in a moment.");
+    throw e;
+  });
+  if (client instanceof Reject) {
+    return NextResponse.json({ error: client.message }, { status: client.status });
+  }
+  if (!client) return NextResponse.json({ error: "Unknown client." }, { status: 404 });
+
   await logActivity(by, "asked about a document", slug, docNo);
 
   await emailStudio(
