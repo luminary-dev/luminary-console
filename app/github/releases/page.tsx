@@ -8,11 +8,9 @@
 // it, no markdown is parsed, no URL is auto-linked, and the reader loses only
 // the formatting.
 import { Suspense } from "react";
-import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { Eyebrow } from "@/components/PageHead";
 import { githubConfigured } from "@/lib/github/config";
 import type { ReleaseEntity } from "@/lib/github/entities";
 import { listAllReleases } from "@/lib/github/projection";
@@ -23,6 +21,9 @@ import "@/components/github/github-views.css";
 
 export const metadata = { title: "Releases" };
 export const dynamic = "force-dynamic";
+
+/** The word after the section kicker in the page head. */
+const GH_SUB = "Releases";
 
 /** Draft and prerelease are not faults, so they read as quiet rather than red,
  *  but they are never left implicit: a prerelease that looks like a release is
@@ -40,25 +41,14 @@ export function releaseState(release: ReleaseEntity): { label: string; tone: Sta
 
 export default function ReleasesPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Releases</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
+    <main className="wrap gh-page">
+      <ConsoleTopbar current="/github" subtitle="Releases" showNewClient={false} />
 
       <GithubNav current="/github/releases" />
 
       <div className="gh-head">
         <div>
+          <Eyebrow section="engineering" sub={GH_SUB} />
           <h1 className="gh-h1">Releases</h1>
           <p className="gh-lede">
             Every release across the organisation, newest first, with its tag, date, author and

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { relTime } from "@/lib/time";
 import RelativeTime from "./RelativeTime";
+import EmptyState from "./EmptyState";
 import { displayName } from "@/lib/admins";
 
 export type ActivityRow = { at: string; actor: string; action: string; target: string; detail?: string };
@@ -46,7 +47,10 @@ export default function ActivityList({
   return (
     <>
       {entries.length === 0 ? (
-        <p className="empty-note">Nothing logged yet.</p>
+        <EmptyState title="Nothing logged yet">
+          Client actions and operator work land here as they happen: documents, payments, portal
+          acceptances, questions and uploads.
+        </EmptyState>
       ) : visible.length === 0 ? (
         <p className="empty-note">
           {unreadMode ? "You're all caught up. Nothing new since your last visit." : "Nothing in the last 24 hours."}

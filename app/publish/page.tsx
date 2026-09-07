@@ -1,6 +1,7 @@
 import PublishStudio from "@/components/PublishStudio";
 import ConsoleTopbar from "@/components/ConsoleTopbar";
 import AppTabBar from "@/components/AppTabBar";
+import PageHead from "@/components/PageHead";
 
 export const metadata = { title: "Publish" };
 
@@ -16,6 +17,14 @@ export default function PublishPage() {
           through, and a primary button that navigates away from unsaved input
           does not belong beside it. */}
       <ConsoleTopbar current="/publish" subtitle="Publish" showNewClient={false} />
+
+      <PageHead
+        section="publish"
+        title="Publish"
+        lede="Draft and publish articles and portfolio projects. Each one ships as a reviewable pull request against the landing page."
+        illo="card-publish"
+        stamp="Press"
+      />
 
       <PublishStudio />
       <AppTabBar />

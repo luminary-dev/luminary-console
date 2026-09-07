@@ -5,11 +5,9 @@
 // the pull request inbox about what is open. The read is wrapped in Suspense
 // so the shell and the navigation paint immediately and only the table waits.
 import { Suspense } from "react";
-import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { Eyebrow } from "@/components/PageHead";
 import { githubConfigured } from "@/lib/github/config";
 import {
   listAllAlerts,
@@ -26,27 +24,19 @@ import "@/components/github/github-views.css";
 export const metadata = { title: "Repositories" };
 export const dynamic = "force-dynamic";
 
+/** The word after the section kicker in the page head. */
+const GH_SUB = "Repositories";
+
 export default function ReposPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Repositories</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
+    <main className="wrap gh-page">
+      <ConsoleTopbar current="/github" subtitle="Repositories" showNewClient={false} />
 
       <GithubNav current="/github/repos" />
 
       <div className="gh-head">
         <div>
+          <Eyebrow section="engineering" sub={GH_SUB} />
           <h1 className="gh-h1">Repositories</h1>
           <p className="gh-lede">
             One row per repository, with the numbers that say whether it needs attention: open

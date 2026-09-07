@@ -2,10 +2,9 @@
 
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
 import AppTabBar from "@/components/AppTabBar";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import PageHead from "@/components/PageHead";
 import { opsFetch } from "@/lib/ops-fetch";
 
 export default function NewClientPage() {
@@ -49,25 +48,15 @@ export default function NewClientPage() {
 
   return (
     <main className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>New client</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            ← Dashboard
-          </Link>
-        </div>
-      </div>
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id="main-content" tabIndex={-1} />
+      {/* showNewClient is off: this IS the new-client form. */}
+      <ConsoleTopbar current="/clients" subtitle="New client" showNewClient={false} />
 
+      <PageHead
+        section="clients"
+        sub="New"
+        title="New client"
+        lede="A brief and a name. The estimate, the questionnaire, the documents and the subdomain follow from them."
+      />
 
       <form className="card" onSubmit={submit}>
         <h3>Client details</h3>

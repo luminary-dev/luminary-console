@@ -6,11 +6,9 @@
 // every time is broken. Re-running is the right answer to neither, but for
 // opposite reasons, so this screen never lumps them together under "failing".
 import { Suspense } from "react";
-import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { Eyebrow } from "@/components/PageHead";
 import { githubConfigured } from "@/lib/github/config";
 import { isFailingConclusion, type WorkflowRunEntity } from "@/lib/github/entities";
 import { durationTrends, flakeStats, formatDuration } from "@/lib/github/insights";
@@ -26,6 +24,9 @@ import "@/components/github/github-views.css";
 
 export const metadata = { title: "CI" };
 export const dynamic = "force-dynamic";
+
+/** The word after the section kicker in the page head. */
+const GH_SUB = "CI";
 
 /** How many runs the history table shows. Enough to see a pattern, few enough
  *  that the page stays one screen of scroll rather than five. */
@@ -52,25 +53,14 @@ export function runState(run: WorkflowRunEntity): { label: string; tone: StatusT
 
 export default function CiPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>CI</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
+    <main className="wrap gh-page">
+      <ConsoleTopbar current="/github" subtitle="CI" showNewClient={false} />
 
       <GithubNav current="/github/ci" />
 
       <div className="gh-head">
         <div>
+          <Eyebrow section="engineering" sub={GH_SUB} />
           <h1 className="gh-h1">CI</h1>
           <p className="gh-lede">
             Workflow run history, how long each workflow takes, which checks fail and whether they

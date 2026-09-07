@@ -209,7 +209,13 @@ export async function proxy(request: NextRequest) {
     pathname === "/apple-touch-icon.png" ||
     pathname === "/icon-192.png" ||
     pathname === "/icon-512.png" ||
-    pathname === "/badge.png"
+    pathname === "/badge.png" ||
+    // The sign-in page's backdrop. It has to load before anyone has a
+    // session, so it is the ONE illustration on this list, matched by its
+    // exact name prefix rather than its directory: every other picture under
+    // /illustrations/ stays behind the gate with the comic, and a signed-out
+    // request for one gets /login like a request for a client record would.
+    pathname.startsWith("/illustrations/auth-hero.")
     // NOT /comic/. The hub's comic is deliberately behind the gate with the
     // rest of the console, so a signed-out visitor gets /login for a panel
     // exactly as they would for a client record.

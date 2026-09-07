@@ -6,11 +6,9 @@
 // screen says so out loud, so nobody has to go looking for the reason a
 // per-person number is missing.
 import { Suspense } from "react";
-import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { Eyebrow } from "@/components/PageHead";
 import { githubConfigured } from "@/lib/github/config";
 import { buildInsights } from "@/lib/github/insights";
 import { listAllPullRequests, listAllWorkflowRuns } from "@/lib/github/projection";
@@ -22,27 +20,19 @@ import "@/components/github/github-views.css";
 export const metadata = { title: "Insights" };
 export const dynamic = "force-dynamic";
 
+/** The word after the section kicker in the page head. */
+const GH_SUB = "Insights";
+
 export default function InsightsPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Insights</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
+    <main className="wrap gh-page">
+      <ConsoleTopbar current="/github" subtitle="Insights" showNewClient={false} />
 
       <GithubNav current="/github/insights" />
 
       <div className="gh-head">
         <div>
+          <Eyebrow section="engineering" sub={GH_SUB} />
           <h1 className="gh-h1">Insights</h1>
           <p className="gh-lede">
             Team health, framed for changing the process rather than ranking the people in it.

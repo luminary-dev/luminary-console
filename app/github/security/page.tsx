@@ -8,11 +8,9 @@
 // already in someone else's hands while a critical advisory still needs an
 // exploit written for it.
 import { Suspense } from "react";
-import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { Eyebrow } from "@/components/PageHead";
 import { githubConfigured } from "@/lib/github/config";
 import { listAllAlerts } from "@/lib/github/projection";
 import GithubNav, { GithubEmpty, GithubError } from "@/components/github/GithubNav";
@@ -23,27 +21,19 @@ import "@/components/github/github-views.css";
 export const metadata = { title: "Security" };
 export const dynamic = "force-dynamic";
 
+/** The word after the section kicker in the page head. */
+const GH_SUB = "Security";
+
 export default function SecurityPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Security</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
+    <main className="wrap gh-page">
+      <ConsoleTopbar current="/github" subtitle="Security" showNewClient={false} />
 
       <GithubNav current="/github/security" />
 
       <div className="gh-head">
         <div>
+          <Eyebrow section="engineering" sub={GH_SUB} />
           <h1 className="gh-h1">Security</h1>
           <p className="gh-lede">
             Dependabot, code scanning and secret scanning alerts across every repository, ordered

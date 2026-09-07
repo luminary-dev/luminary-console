@@ -2,13 +2,12 @@
 // through /api/activity — same data, one fewer round trip, and it renders
 // server-side so there is no loading state to design. Authed by the proxy
 // like every console route.
-import Link from "next/link";
 import { recentActivity, markNotificationsSeen, getNotificationsSeenAt } from "@/lib/activity";
 import { getIndex } from "@/lib/store";
 import ActivityList from "@/components/ActivityList";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
 import AppTabBar from "@/components/AppTabBar";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import PageHead from "@/components/PageHead";
 
 export const metadata = { title: "Activity" };
 export const dynamic = "force-dynamic";
@@ -34,25 +33,15 @@ export default async function ActivityPage() {
 
   return (
     <main className="wrap" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Activity</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            ← Dashboard
-          </Link>
-        </div>
-      </div>
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id="main-content" tabIndex={-1} />
+      <ConsoleTopbar current="/activity" subtitle="Activity" />
 
+      <PageHead
+        section="activity"
+        title="Activity"
+        lede="Everything that has happened, across clients and repositories."
+        illo="card-activity"
+        stamp={`${entries.length} entr${entries.length === 1 ? "y" : "ies"}`}
+      />
 
       <div className="card">
         <h3>Recent activity</h3>

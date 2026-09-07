@@ -8,10 +8,10 @@
 
 /* === page heading === */
 .gh-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
-.gh-h1 { font-size: 20px; font-weight: 800; letter-spacing: -.03em; line-height: 1.25; }
-.gh-lede { color: var(--muted); font-size: 13px; line-height: 1.6; margin-top: 5px; max-width: 74ch; }
-.gh-card-title { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
-.gh-crumb { font-family: var(--font-mono), monospace; font-size: 11px; letter-spacing: .08em; color: var(--label); }
+.gh-h1 { font-family: var(--font-display); font-size: clamp(28px, 4vw, 38px); font-weight: 400; letter-spacing: .01em; line-height: 1; text-transform: uppercase; margin-top: 6px; }
+.gh-lede { color: var(--ink-soft); font-size: 13px; line-height: 1.6; margin-top: 8px; max-width: 74ch; }
+/* .gh-card-title takes the display face from the .card h3 rule in app/globals.css. */
+.gh-crumb { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--muted); }
 
 /* === saved view chips === */
 .gh-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
@@ -24,7 +24,7 @@
   padding: 5px 12px; cursor: pointer; line-height: 1.6;
   transition: color .15s ease, background .15s ease, border-color .15s ease;
 }
-.gh-chip[aria-pressed="true"] { color: var(--a-text); background: var(--a-dim); border-color: var(--a-border); }
+.gh-chip[aria-pressed="true"] { color: var(--brand-ink); background: var(--brand); border-color: var(--panel-line); box-shadow: var(--sticker-shadow); }
 .gh-chip:disabled { cursor: default; opacity: .65; }
 .gh-chip-n { font-variant-numeric: tabular-nums; color: inherit; }
 /* The count needs a shape of its own or "needs my review 4" reads as one
@@ -59,7 +59,7 @@
 .gh-table thead th {
   font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em;
   text-transform: uppercase; color: var(--label); font-weight: 600;
-  padding: 7px 10px; border-bottom: 1.5px solid var(--border-hi); white-space: nowrap;
+  padding: 7px 10px; border-bottom: 2px solid var(--panel-line); white-space: nowrap;
 }
 /* Density 8: rows are tight enough that a full inbox fits one screen, with
    the second meta line carrying branch and age instead of extra columns. */
@@ -68,7 +68,7 @@
   font-size: 13px; font-weight: 400; line-height: 1.45;
 }
 .gh-row.is-selected { background: var(--a-dim); }
-.gh-row.is-selected > th:first-child { box-shadow: inset 2px 0 0 var(--accent); }
+.gh-row.is-selected > th:first-child { box-shadow: inset 3px 0 0 var(--brand); }
 .gh-row-link { display: inline-block; font-weight: 600; color: var(--text); max-width: 52ch; }
 .gh-row-no { font-family: var(--font-mono), monospace; font-size: 12px; color: var(--label); margin-right: 8px; }
 .gh-row-meta {
@@ -81,9 +81,11 @@
 /* === status vocabulary: icon plus words, never hue alone === */
 .gh-status { display: inline-flex; align-items: flex-start; gap: 6px; line-height: 1.4; }
 .gh-status svg { width: 13px; height: 13px; flex-shrink: 0; margin-top: 2px; }
+/* Green passing, coral failing, amber running or waiting, grey idle. */
 .gh-status.is-ok { color: var(--a-text); }
 .gh-status.is-bad { color: var(--danger); }
-.gh-status.is-warn, .gh-status.is-idle { color: var(--muted); }
+.gh-status.is-warn { color: var(--amber-text); }
+.gh-status.is-idle { color: var(--muted); }
 .gh-status-strong { font-weight: 600; }
 
 /* === verdict block on the detail page === */
@@ -95,7 +97,8 @@
    tone, so a wall of red never buries the wording that says what to do. */
 .gh-blockers svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 3px; }
 .gh-blockers li.is-bad svg { color: var(--danger); }
-.gh-blockers li.is-warn svg, .gh-blockers li.is-idle svg { color: var(--muted); }
+.gh-blockers li.is-warn svg { color: var(--amber); }
+.gh-blockers li.is-idle svg { color: var(--muted); }
 .gh-blockers li.is-ok svg { color: var(--a-text); }
 
 /* === checks and reviews lists === */
@@ -137,23 +140,30 @@
 /* === keyboard hint === */
 .gh-keys { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.9; }
 .gh-keys kbd {
-  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600;
-  border: 1px solid var(--border-hi); border-radius: 5px; padding: 2px 6px;
-  color: var(--text); background: var(--off); margin: 0 2px;
+  font-family: var(--mono); font-size: 10.5px; font-weight: 600;
+  border: 1.5px solid var(--panel-line); border-radius: 5px; padding: 1px 6px;
+  color: var(--ink); background: var(--surface-2); margin: 0 2px;
+  box-shadow: 0 1.5px 0 0 var(--panel-line);
 }
 
 /* === loading skeleton: same grid as a real row, so nothing jumps === */
-.gh-skel { display: block; height: 11px; border-radius: 4px; background: var(--off); border: 1px solid var(--border); }
+/* Shimmer like film grain: a light band crossing a bone-coloured bar. The
+   gradient and keyframes are shared with .skel in app/globals.css. */
+.gh-skel {
+  display: block; height: 11px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--bg-sunk) 0%, var(--surface-2) 45%, var(--bg-sunk) 90%);
+  background-size: 220% 100%;
+  border: 1px solid var(--hairline);
+}
 .gh-skel + .gh-skel { margin-top: 5px; }
 .gh-skel--wide { width: 100%; }
 .gh-skel--half { width: 52%; }
 @media (prefers-reduced-motion: no-preference) {
-  .gh-skel { animation: gh-pulse 1.4s ease-in-out infinite; }
+  .gh-skel { animation: skel-shimmer 1.6s linear infinite; }
 }
-@keyframes gh-pulse { 50% { opacity: .55; } }
 
 /* === empty and error notes === */
-.gh-note { color: var(--muted); font-size: 13.5px; line-height: 1.7; margin-top: 10px; max-width: 74ch; }
+.gh-note { color: var(--ink-soft); font-size: 13.5px; line-height: 1.7; margin-top: 10px; max-width: 74ch; }
 .gh-note b { color: var(--text); }
 .gh-note code { font-family: var(--font-mono), monospace; font-size: 12.5px; color: var(--text); }
 
@@ -173,7 +183,7 @@
    still apply on touch. */
 @media (hover: hover) and (pointer: fine) {
   .gh-chip:hover:not(:disabled) { color: var(--text); }
-  .gh-row:hover { background: var(--off); }
+  .gh-row:hover { background: var(--surface-2); }
   .gh-row-link:hover { color: var(--a-text); }
   .gh-linkbtn:hover { color: var(--accent); }
 }

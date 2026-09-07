@@ -4,12 +4,10 @@
 // deliberately. On the dashboard they took a full card and a topbar slot each,
 // competing every day with the work you actually came to do. Here they cost
 // nothing until you go looking.
-import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import PageHead from "@/components/PageHead";
 import SessionsCard from "@/components/SessionsCard";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
 import { getIndex } from "@/lib/store";
 
 export const metadata = { title: "Settings" };
@@ -20,20 +18,13 @@ export default async function SettingsPage() {
 
   return (
     <main className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Settings</small>
-        </div>
-        <div className="topbar-actions">
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            Back to the dashboard
-          </Link>
-        </div>
-      </div>
-      <div id={MAIN_ID} tabIndex={-1} />
+      <ConsoleTopbar subtitle="Settings" showNewClient={false} />
+
+      <PageHead
+        section="settings"
+        title="Settings"
+        lede="Signed-in devices and a CSV export. Things you do occasionally and deliberately."
+      />
 
       <SessionsCard />
 

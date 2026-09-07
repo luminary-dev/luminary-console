@@ -5,11 +5,9 @@
 // old" instead of a blank screen. The read is wrapped in Suspense so the shell
 // and the keyboard hint paint immediately and only the list waits.
 import { Suspense } from "react";
-import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import PageHead from "@/components/PageHead";
 import { fetchRateLimit } from "@/lib/github/api";
 import { githubConfigured, githubLoginFor } from "@/lib/github/config";
 import { currentOperator } from "@/lib/operator";
@@ -24,33 +22,22 @@ import "@/components/github/github.css";
 export const metadata = { title: "Pull requests" };
 export const dynamic = "force-dynamic";
 
+/** The word after the section kicker in the page head. */
+const GH_SUB = "Pull requests";
+
 export default function GitHubInboxPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Pull requests</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
+    <main className="wrap gh-page">
+      <ConsoleTopbar current="/github" subtitle="Pull requests" showNewClient={false} />
 
-      <div className="gh-head">
-        <div>
-          <h1 className="gh-h1">Pull requests</h1>
-          <p className="gh-lede">
-            Every open pull request across the organisation, with one merge verdict each and the
-            specific thing blocking it. Read from the stored projection, so it is as fresh as the
-            last sync.
-          </p>
-        </div>
-      </div>
+      <PageHead
+        section="engineering"
+        sub={GH_SUB}
+        title="Pull requests"
+        lede="Every open pull request across the organisation, with one merge verdict each and the specific thing blocking it. Read from the stored projection, so it is as fresh as the last sync."
+        illo="card-engineering"
+        stamp="Repair bench"
+      />
 
       <Suspense fallback={<InboxSkeleton />}>
         <InboxData />

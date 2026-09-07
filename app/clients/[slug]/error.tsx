@@ -10,6 +10,7 @@
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Illustration from "@/components/Illustration";
 
 export default function ClientError({
   error,
@@ -43,9 +44,13 @@ export default function ClientError({
       <div id="main-content" tabIndex={-1} />
 
 
-      <div className="card">
+      <div className="card panel--hero">
+        <div className="lost">
+        <div className="lost__art">
+          <Illustration id="error-404" sizes="(max-width: 600px) 40vw, 260px" />
+        </div>
         <h3>This client could not be loaded</h3>
-        <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 6, lineHeight: 1.65 }}>
+        <p>
           {slug ? (
             <>
               The record for <b className="mono">{slug}</b> did not come back from the store.
@@ -56,7 +61,7 @@ export default function ClientError({
           The record has not been changed: opening a client only reads it. A retry is usually enough,
           and the client&apos;s documents and portal stay live either way.
         </p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
+        <div className="lost__actions">
           <button className="btn" onClick={() => reset()}>
             Try again
           </button>
@@ -65,10 +70,11 @@ export default function ClientError({
           </Link>
         </div>
         {error.digest && (
-          <p className="k" style={{ marginTop: 16 }}>
+          <p className="k">
             Reference {error.digest}
           </p>
         )}
+        </div>
       </div>
     </main>
   );

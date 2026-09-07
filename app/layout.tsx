@@ -2,7 +2,7 @@ import SessionGuard from "@/components/SessionGuard";
 import SkipLink from "@/components/SkipLink";
 import type { Metadata, Viewport } from "next";
 import { cookies, headers } from "next/headers";
-import { Outfit, JetBrains_Mono, Unkempt } from "next/font/google";
+import { Anton, Outfit, JetBrains_Mono, Unkempt } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", display: "swap" });
@@ -14,6 +14,10 @@ const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500", "600"],
 // 700 only. The balloons are the sole user and they are always bold, so
 // shipping the other weights would be bytes nobody downloads a glyph from.
 const comic = Unkempt({ subsets: ["latin"], weight: ["700"], variable: "--font-comic", display: "swap" });
+// The display face: page titles, panel titles, big numbers. Anton is a single
+// bold condensed weight, which is the "issue title" register the redesign
+// wants, and one file. Never body copy: at reading sizes it is a wall.
+const display = Anton({ subsets: ["latin"], weight: ["400"], variable: "--font-anton", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Luminary Console", template: "%s · Luminary" },
@@ -32,8 +36,9 @@ export const viewport: Viewport = {
   // globals.css, which are 0 in browser portrait — web view unchanged.
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f0f0ee" },
-    { media: "(prefers-color-scheme: dark)", color: "#050506" },
+    // The two page grounds from app/globals.css: bone paper and ink-teal.
+    { media: "(prefers-color-scheme: light)", color: "#F3EEE2" },
+    { media: "(prefers-color-scheme: dark)", color: "#0F1518" },
   ],
 };
 
@@ -46,10 +51,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // subdomains, which run the relaxed document policy instead: see lib/csp.ts.
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
-    <html lang="en" suppressHydrationWarning data-theme={theme} className={`${outfit.variable} ${mono.variable} ${comic.variable}`}>
+    <html lang="en" suppressHydrationWarning data-theme={theme} className={`${outfit.variable} ${mono.variable} ${comic.variable} ${display.variable}`}>
       <head>
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-        <style>{`html{background:#f0f0ee;color-scheme:light}html[data-theme="dark"]{background:#050506;color-scheme:dark}`}</style>
+        {/* Painted before the stylesheet arrives so the first frame is the right
+            ground. These two are --bg in app/globals.css; change both together. */}
+        <style>{`html{background:#F3EEE2;color-scheme:light}html[data-theme="dark"]{background:#0F1518;color-scheme:dark}`}</style>
       </head>
       <body>
         {/* First tab stop on every page, so a keyboard user is not walked

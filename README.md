@@ -146,6 +146,11 @@ npm test            # Vitest: unit, component and integration
 npm run test:coverage
 ```
 
+The console's illustrations (the workshop artwork behind page headers, the
+sign-in backdrop, the mascot) are generated once and committed as WebP:
+`OPENAI_API_KEY=... npx tsx scripts/generate-illustrations.ts`. The design
+system itself is documented in [`REDESIGN_NOTES.md`](REDESIGN_NOTES.md).
+
 The `test:live:*` scripts are different: they drive the real product against
 real backends, spend real money, open real pull requests and send real push
 notifications to phones. Only `test:live:ops` is zero-cost. They are named

@@ -11,6 +11,7 @@
 // text. The digest is the correlation handle, and it is safe by construction.
 import { useEffect } from "react";
 import Link from "next/link";
+import Illustration from "@/components/Illustration";
 
 export default function ConsoleError({
   error,
@@ -27,7 +28,9 @@ export default function ConsoleError({
     <main className="wrap" style={{ paddingBottom: 80 }}>
       <div className="topbar">
         <div className="brand">
-          Luminary<span>.</span>
+          <Link href="/">
+            Luminary<span>.</span>
+          </Link>
           <small>Console</small>
         </div>
       </div>
@@ -38,26 +41,31 @@ export default function ConsoleError({
       <div id="main-content" tabIndex={-1} />
 
 
-      <div className="card">
-        <h3>This page could not load</h3>
-        <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 6, lineHeight: 1.65 }}>
-          Something the console needed to read did not come back. This is almost always the record
-          store being briefly unreachable, and it usually clears on a retry. Nothing has been changed
-          or lost: loading a page only reads.
-        </p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
-          <button className="btn" onClick={() => reset()}>
-            Try again
-          </button>
-          <Link className="btn ghost" href="/">
-            Back to the dashboard
-          </Link>
-        </div>
-        {error.digest && (
-          <p className="k" style={{ marginTop: 16 }}>
-            Reference {error.digest}
+      <div className="card panel--hero">
+        <div className="lost">
+          <div className="lost__art">
+            <Illustration id="error-404" sizes="(max-width: 600px) 40vw, 260px" />
+          </div>
+          <h3>This page could not load</h3>
+          <p>
+            Something the console needed to read did not come back. This is almost always the record
+            store being briefly unreachable, and it usually clears on a retry. Nothing has been changed
+            or lost: loading a page only reads.
           </p>
-        )}
+          <div className="lost__actions">
+            <button className="btn" onClick={() => reset()}>
+              Try again
+            </button>
+            <Link className="btn ghost" href="/">
+              Back to the dashboard
+            </Link>
+          </div>
+          {error.digest && (
+            <p className="k">
+              Reference {error.digest}
+            </p>
+          )}
+        </div>
       </div>
     </main>
   );

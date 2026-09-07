@@ -13,6 +13,7 @@
 import { test, expect, request } from "@playwright/test";
 import { BASE_URL } from "../../playwright.config";
 import { PANELS, variantsFor } from "../../lib/comic";
+import { DEFAULT_ASSETS, variantsFor as illoVariants } from "../../lib/illustrations/assets";
 
 /** A request context with no storage state at all: no cookies, no session.
  *  storageState is omitted rather than set to undefined, which is what a
@@ -41,6 +42,34 @@ test("a signed-out visitor cannot read the comic", async () => {
           `public assets.`,
       ).toBe(307);
       expect(res.headers()["location"] ?? "").toContain("/login");
+    }
+  } finally {
+    await api.dispose();
+  }
+});
+
+test("a signed-out visitor cannot read the illustrations, except the sign-in backdrop", async () => {
+  const api = await stranger();
+  try {
+    for (const asset of DEFAULT_ASSETS) {
+      for (const mode of ["light", "dark"] as const) {
+        for (const v of illoVariants(asset, mode)) {
+          const res = await api.get(v.url, { maxRedirects: 0 });
+          if (asset.id === "auth-hero") {
+            // The one exception, and it is deliberate: the sign-in page needs
+            // its backdrop before anyone has a session. proxy.ts lists it by
+            // name prefix so nothing else under /illustrations/ inherits it.
+            expect(res.status(), `${v.url} is the sign-in backdrop and must stay public`).toBe(200);
+          } else {
+            expect(
+              res.status(),
+              `${v.url} answered ${res.status()} to a request with no session. Illustrations are ` +
+                `private like the comic: check that proxy.ts has not widened the auth-hero exemption.`,
+            ).toBe(307);
+            expect(res.headers()["location"] ?? "").toContain("/login");
+          }
+        }
+      }
     }
   } finally {
     await api.dispose();

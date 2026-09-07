@@ -4,6 +4,7 @@
 // address. The pending state lives in an HttpOnly cookie set by the API.
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
+import Illustration from "@/components/Illustration";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export default function LoginPage() {
@@ -58,14 +59,24 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="sheet sheet--auth">
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+    // The workshop runs full bleed behind the page; the card floats in the
+    // open space the picture leaves on its left. The picture is public (it has
+    // to load before anyone has a session: see proxy.ts) and decorative: with
+    // it missing this is a card on bone paper, which is the whole page anyway.
+    <div className="auth">
+      <div className="auth__art" aria-hidden="true">
+        <Illustration id="auth-hero" eager sizes="100vw" />
+      </div>
+      <div className="auth__top">
         <ThemeToggle />
       </div>
-      <div className="brand" style={{ fontSize: 26 }}>
+      <main className="sheet sheet--auth panel--hero">
+      <div className="brand">
         Luminary<span>.</span>
       </div>
-      <div className="k" style={{ marginTop: 8, letterSpacing: ".16em" }}>Studio console</div>
+      <div className="eyebrow" style={{ marginTop: 10 }}>
+        Studio console<span className="no">Sign in</span>
+      </div>
 
       {timedOut && step === "creds" && (
         <div className="notice" style={{ marginTop: 18 }}>You were signed out after 30 minutes of inactivity.</div>
@@ -108,7 +119,7 @@ export default function LoginPage() {
             <input
               id={codeId}
               aria-describedby={note ? codeHintId : undefined}
-              className="q-line"
+              className="q-line mono"
               inputMode="numeric"
               pattern="[0-9]{6}"
               maxLength={6}
@@ -117,7 +128,7 @@ export default function LoginPage() {
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
               autoFocus
               required
-              style={{ fontSize: 22, letterSpacing: ".35em", fontFamily: "var(--mono)" }}
+              style={{ fontSize: 22, letterSpacing: ".35em" }}
             />
           </div>
           {error && <div className="form-error">{error}</div>}
@@ -135,6 +146,13 @@ export default function LoginPage() {
           </button>
         </form>
       )}
-    </main>
+      </main>
+      {/* The shop's motto, hand-lettered, the one place the hand face is
+          allowed near the interface. Hidden on narrow screens with the rest
+          of the decoration. */}
+      <p className="bubble bubble--hand bubble--bottom auth__tag" aria-hidden="true">
+        Fixed right, or fixed again for free.
+      </p>
+    </div>
   );
 }

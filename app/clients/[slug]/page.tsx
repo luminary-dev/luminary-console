@@ -1,12 +1,11 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClient } from "@/lib/store";
 import { DOC_LABELS, type DocType } from "@/lib/types";
 import DocActions from "@/components/DocActions";
 import CopyLink from "@/components/CopyLink";
 import RetryStage2 from "@/components/RetryStage2";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import PageHead from "@/components/PageHead";
 import AppTabBar from "@/components/AppTabBar";
 import DeleteClient from "@/components/DeleteClient";
 import SendToClient from "@/components/SendToClient";
@@ -69,31 +68,17 @@ export default async function ClientPage({
 
   return (
     <main className="wrap" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>{client.company}</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            ← Dashboard
-          </Link>
-        </div>
-      </div>
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id="main-content" tabIndex={-1} />
+      <ConsoleTopbar current="/clients" subtitle={client.company} showNewClient={false} />
 
+      <PageHead
+        section="clients"
+        sub={client.docNoBase}
+        title={client.company}
+        lede={`${client.projectLabel} · created ${client.createdAt.slice(0, 10)}`}
+      />
 
       <div className="card">
-        <h3>{client.company}</h3>
-        <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 4 }}>
-          {client.projectLabel} · doc no. {client.docNoBase} · created {client.createdAt.slice(0, 10)}
-        </p>
+        <h3>Status</h3>
         {(() => {
           const openTasks = (client.tasks ?? []).filter((t) => !t.done).length;
           const money = clientMoney(client);

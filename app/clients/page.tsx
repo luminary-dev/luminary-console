@@ -8,6 +8,8 @@ import AppTabBar from "@/components/AppTabBar";
 import ClientTable from "@/components/ClientTable";
 import CommandPalette from "@/components/CommandPalette";
 import ConsoleTopbar from "@/components/ConsoleTopbar";
+import EmptyState from "@/components/EmptyState";
+import PageHead from "@/components/PageHead";
 import { loadClientOverview, loadUnreadActivity } from "@/lib/console-overview";
 
 export const metadata = { title: "Clients" };
@@ -20,16 +22,29 @@ export default async function ClientsPage() {
     <main className="wrap" style={{ paddingBottom: 80 }}>
       <ConsoleTopbar current="/clients" unread={unread} />
 
+      <PageHead
+        section="clients"
+        title="Clients"
+        lede={
+          rows.length === 0
+            ? "Every client, with documents, billing, designs and handover."
+            : `${rows.length} client${rows.length === 1 ? "" : "s"}. Documents, billing, designs and handover for each.`
+        }
+      />
+
       {rows.length === 0 ? (
         <div className="card">
-          <h3>Clients</h3>
-          <p style={{ color: "var(--muted)", marginTop: 10, fontSize: 14 }}>
-            No clients yet. Create the first one and the estimate, questionnaire and subdomain are
-            generated automatically.
-          </p>
-          <Link className="btn" href="/clients/new" style={{ marginTop: 16 }}>
-            + New client
-          </Link>
+          <EmptyState
+            title="No clients yet"
+            action={
+              <Link className="btn" href="/clients/new">
+                + New client
+              </Link>
+            }
+          >
+            Create the first one and the estimate, questionnaire and subdomain are generated
+            automatically.
+          </EmptyState>
         </div>
       ) : (
         <ClientTable rows={rows} />

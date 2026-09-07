@@ -19,3 +19,10 @@ docs/audit/interaction/test-results/
 docs/audit/interaction/playwright-report/
 docs/audit/interaction/.auth/dev-key.pem
 docs/audit/interaction/.auth/dev-cert.pem
+
+# Illustration PNG masters from scripts/generate-illustrations.ts. Two to
+# three megabytes each, eighteen of them. The WebP variants beside them are
+# what the pages load and are committed; a master can be regenerated with the
+# script (a paid call) or re-encoded from the 1536 variant, which is already
+# full resolution. REDESIGN_NOTES.md records the decision.
+public/illustrations/*.png

@@ -10,11 +10,9 @@
 // missed, so it is called out above the fold, again on its environment, and
 // again on its own row.
 import { Suspense } from "react";
-import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { Eyebrow } from "@/components/PageHead";
 import { githubConfigured } from "@/lib/github/config";
 import type { DeploymentEntity } from "@/lib/github/entities";
 import { listAllDeployments } from "@/lib/github/projection";
@@ -26,6 +24,9 @@ import "@/components/github/github-views.css";
 
 export const metadata = { title: "Deployments" };
 export const dynamic = "force-dynamic";
+
+/** The word after the section kicker in the page head. */
+const GH_SUB = "Deployments";
 
 /** GitHub's deployment states, said in words with a tone attached. "inactive"
  *  is not a failure: it means a newer deployment superseded this one. */
@@ -96,25 +97,14 @@ export function groupByEnvironment(deployments: DeploymentEntity[]): Environment
 
 export default function DeploymentsPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Deployments</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
+    <main className="wrap gh-page">
+      <ConsoleTopbar current="/github" subtitle="Deployments" showNewClient={false} />
 
       <GithubNav current="/github/deployments" />
 
       <div className="gh-head">
         <div>
+          <Eyebrow section="engineering" sub={GH_SUB} />
           <h1 className="gh-h1">Deployments</h1>
           <p className="gh-lede">
             What version is on each environment, who put it there and when. Grouped by

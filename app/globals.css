@@ -1,33 +1,117 @@
-/* Luminary tokens — console UI + client questionnaire form. */
-/* --subtle is a BORDER/DOT token, never a text colour: #c4c4c8 on #ffffff is
-   1.74:1 and #3f3f46 on #0b0b0d is 1.88:1, both far under the 4.5:1 AA floor
-   for small text (LC-040). Small mono labels (table headers, .k, save state)
-   use --label, which clears AAA on the card surface in both themes:
-   #545965 on #ffffff is 7.01:1, #9a9aa3 on #0b0b0d is 7.05:1, and neither
-   drops below 5.9:1 on --off or --desk. */
+/* ————————————————————————————————————————————————————————————————————————
+   Luminary Console tokens: two palettes, one system.
+
+   "Daylight / Paper" is the light mode: warm bone paper, warm ink, the lime
+   and amber reading as printed spot colours. "Workshop Night" is the dark
+   mode: ink-teal ground, one warm lamp, brighter lime. Everything below the
+   two palette blocks references these names and nothing else; a hex outside
+   this section is a bug, with the two documented exceptions in the comic
+   (printed artwork that has no dark mode) and the global error page (which
+   renders without this stylesheet).
+
+   Contrast. Every TEXT token clears WCAG AA (4.5:1) on every surface it can
+   land on, including the 9 percent brand tint composited over the sunk
+   surface, which is the worst case. tests/tokens-contrast.test.ts computes
+   the pairs from this file so a value cannot drift under the floor unnoticed.
+   Where the brief's value did not clear the floor it was deepened and the
+   brief's value kept for fills, where contrast rules do not apply:
+     --muted   brief #8B8474 (3.5:1)  → #5B5648 for text
+     --a-text  brand #6FA80B (2.7:1)  → #3A6A06 for text on paper
+     --danger  coral #D8551F (3.8:1)  → #A83C15 for text on paper
+     --amber-text  amber #CF8A0F (2.7:1) → #8A5A05 for text on paper
+
+   Legacy names. The console was built on --bg/--off/--desk/--text/--accent
+   and 36 components carry those in inline styles. They are kept as aliases
+   of the new names rather than rewritten, so a component that says
+   var(--muted) keeps working and gets the new colour. New CSS should use the
+   new names. */
 :root {
-  --bg: #ffffff; --off: #f7f7f5; --text: #0d0d0f; --muted: #636a75;
-  --label: #545965;
-  --subtle: #c4c4c8; --border: rgba(0,0,0,.09); --border-hi: rgba(0,0,0,.14);
-  /* --a-text is the READABLE accent, not the brand accent. --accent stays
-     #84cc16 for fills, borders and glyphs, where contrast rules do not apply.
-     The text form has to clear 4.5:1 on every surface it lands on, and the
-     worst of those is not white: it is --a-dim composited over --desk, which
-     is #e6eddb. #5a9e08 managed 2.91:1 there and was responsible for 480 of
-     the 486 axe violations in the interaction audit, on its own.
-     Verified: 4.77:1 at worst across --bg, --off, --desk and each of those
-     under the accent tint. */
-  --accent: #84cc16; --a-text: #3f7305; --a-dim: rgba(132,204,22,.09);
-  --a-border: rgba(132,204,22,.28); --desk: #f0f0ee; --r: 18px;
-  --danger: #dc2626;
+  /* — surfaces — */
+  --bg: #F3EEE2;            /* page ground: warm bone paper */
+  --bg-sunk: #E9E2D0;       /* wells, inset areas, skeleton bones */
+  --surface: #FBF8F0;       /* cards and panels */
+  --surface-2: #F5F0E4;     /* raised chips, kbd, sub-panels */
+  /* — ink — */
+  --ink: #191612;           /* primary text, warm near-black */
+  --ink-soft: #4B4539;      /* secondary text (8.2:1 on --bg) */
+  --muted: #5B5648;         /* annotations, eyebrows, mono labels (≥4.96:1 everywhere) */
+  --label: var(--muted);
+  /* — lines — */
+  --panel-line: #201C15;    /* comic-panel borders: bold, ink */
+  --hairline: #D9D0BC;      /* row dividers */
+  --hairline-hi: #C9BFA8;   /* emphasised divider, input rest state */
+  --subtle: #C9BFA8;        /* border and dot token, NEVER text */
+  /* — colour — */
+  --brand: #6FA80B;         /* lime, deepened for paper; fills and glyphs */
+  --brand-ink: #12200A;     /* text on a brand fill (5.9:1) */
+  --a-text: #3A6A06;        /* brand as TEXT (≥4.5:1 on every surface and tint) */
+  --a-dim: rgba(111,168,11,.10);
+  --a-border: rgba(111,168,11,.36);
+  --amber: #CF8A0F;         /* marigold, the lamp */
+  --amber-text: #8A5A05;    /* amber as text: "running", "due soon" */
+  --amber-dim: rgba(207,138,15,.12);
+  --teal: #1E6E69;          /* cool accent; 5.7:1 so it may carry text */
+  --teal-dim: rgba(30,110,105,.10);
+  --coral: #D8551F;         /* the pop; fills, dots, borders */
+  --danger: #A83C15;        /* coral as TEXT: failing, overdue */
+  --danger-dim: rgba(216,85,31,.10);
+  --focus: #6FA80B;
+  /* — texture and depth — */
+  --grain-opacity: 0.05;
+  --grain-blend: multiply;
+  --panel-shadow: 3px 3px 0 0 rgba(32,28,21,.14), 0 10px 24px -14px rgba(32,28,21,.35);
+  --panel-shadow-lift: 4px 5px 0 0 rgba(32,28,21,.16), 0 16px 30px -14px rgba(32,28,21,.40);
+  --sticker-shadow: 0 2px 0 0 var(--panel-line);
+  --glow: none;
+  --lamp: transparent;      /* the dark-mode vignette; nothing in daylight */
+  /* — shape and type — */
+  --r: 14px;                /* the panel radius */
+  --font-display: var(--font-anton), "Arial Narrow", Impact, sans-serif;
+  --font-hand: var(--font-comic), "Comic Sans MS", cursive;
+  --sans: var(--font-outfit), system-ui, sans-serif;
+  --mono: var(--font-mono), ui-monospace, monospace;
+  /* — legacy aliases (see the note above) — */
+  --desk: var(--bg);
+  --off: var(--surface-2);
+  --text: var(--ink);
+  --border: var(--hairline);
+  --border-hi: var(--hairline-hi);
+  --accent: var(--brand);
 }
 html[data-theme="dark"] {
-  --bg: #0b0b0d; --off: #141416; --text: #f4f4f5; --muted: #8a8a92;
-  --label: #9a9aa3;
-  --subtle: #3f3f46; --border: rgba(255,255,255,.09); --border-hi: rgba(255,255,255,.16);
-  --accent: #a3e635; --a-text: #a3e635; --a-dim: rgba(163,230,53,.09);
-  --a-border: rgba(163,230,53,.22); --desk: #050506;
-  --danger: #f87171;
+  --bg: #0F1518;
+  --bg-sunk: #0A0F11;
+  --surface: #1A2126;
+  --surface-2: #212B31;
+  --ink: #ECE5D6;
+  --ink-soft: #B7B1A2;
+  --muted: #A5AEA9;         /* ≥4.69:1 on every surface and tint */
+  --panel-line: #46545B;
+  --panel-rim: #6A4E1E;     /* warm lamp-lit rim on hero panels */
+  --hairline: #2A343A;
+  --hairline-hi: #364248;
+  --subtle: #364248;
+  --brand: #9AE027;
+  --brand-ink: #0E1407;
+  --a-text: #9AE027;        /* 9:1 on --surface-2; the accent doubles as text at night */
+  --a-dim: rgba(154,224,39,.10);
+  --a-border: rgba(154,224,39,.30);
+  --amber: #F2B84C;
+  --amber-text: #F2B84C;
+  --amber-dim: rgba(242,184,76,.13);
+  --teal: #46B3A7;
+  --teal-dim: rgba(70,179,167,.12);
+  --coral: #F0703A;
+  --danger: #F0703A;        /* 4.9:1 on --surface-2 */
+  --danger-dim: rgba(240,112,58,.13);
+  --focus: #9AE027;
+  --grain-opacity: 0.08;
+  --grain-blend: overlay;
+  --panel-shadow: 3px 3px 0 0 rgba(0,0,0,.45), 0 12px 28px -14px rgba(0,0,0,.7);
+  --panel-shadow-lift: 4px 5px 0 0 rgba(0,0,0,.5), 0 18px 34px -14px rgba(0,0,0,.75);
+  --sticker-shadow: 0 2px 0 0 #0A0F11;
+  --glow: 0 0 40px rgba(242,184,76,.28);
+  --lamp: radial-gradient(60vmax 60vmax at 82% -10%, rgba(242,184,76,.20), rgba(242,184,76,.06) 40%, transparent 70%);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html {
@@ -42,12 +126,55 @@ html {
 }
 html[data-theme="dark"] { color-scheme: dark; }
 body {
-  background: var(--desk); color: var(--text);
-  font-family: var(--font-outfit), system-ui, sans-serif;
+  background: var(--bg); color: var(--ink);
+  font-family: var(--sans);
   line-height: 1.6; -webkit-font-smoothing: antialiased;
+  /* Colour follows the theme in a short fade, so a toggle away from the
+     circular wipe (a keyboard change, the OS flipping at dusk) still reads as
+     the lamp coming on rather than a hard cut. [data-reveal] switches it off
+     for the wipe itself; see the note on .theme-toggle. */
+  transition: background-color .28s ease, color .28s ease;
 }
+
+/* ——— The workshop's atmosphere: two fixed layers, no markup ———
+   ::before is the grain: one tile of SVG fractal noise, greyscale, blended
+   over the whole page at --grain-opacity. A data: URI so it costs no request
+   and passes the CSP (img-src allows data:). A FIXED element that never
+   changes is composited once and scrolled as a texture, which is why this is
+   cheap where a repeating background on <body> would repaint on scroll.
+   ::after is the lamp: a warm radial pool from the top right in dark mode and
+   transparent in daylight. Both are pointer-events: none and sit above the
+   page (z-index 9990) but below the skip link (10000) and any dialog veil is
+   fine underneath a texture. Together they are decoration: the app is
+   complete with them removed. */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9990;
+}
+body::before {
+  opacity: var(--grain-opacity);
+  mix-blend-mode: var(--grain-blend);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+body::after {
+  background: var(--lamp);
+  z-index: 0;
+}
+/* Print gets the paper without the fibre: grain over text is noise on a page
+   someone is trying to read, and a fixed layer would tile onto every sheet. */
+@media print { body::before, body::after { display: none; } }
 a { color: var(--a-text); text-decoration: none; }
-.mono { font-family: var(--font-mono), ui-monospace, monospace; }
+.mono { font-family: var(--mono); }
+/* The display face. Anton is one weight, so weight declarations are noise on
+   it; size and tracking do the work. Never on body copy. */
+.display { font-family: var(--font-display); font-weight: 400; letter-spacing: .01em; }
+/* The hand-lettered face, for balloon text and the odd sticker ONLY. */
+.hand { font-family: var(--font-hand); font-weight: 700; }
 
 /* Visible keyboard focus everywhere (LC-042), ported from the landing page:
    accent ring, 2px, 3px offset, per design-language rule 6.8. Only
@@ -61,7 +188,7 @@ summary:focus-visible,
 [tabindex]:focus-visible {
   /* No border-radius here on purpose: the outline already follows each
      control's own radius, and forcing 6px would square off the pills. */
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
 /* The bordered inputs draw their own accent edge on focus; the ring sits
@@ -93,8 +220,10 @@ summary:focus-visible,
 .wrap--narrow { max-width: min(720px, calc(100% - 32px)); }
 .sheet {
   width: 880px; max-width: calc(100% - 32px); margin: 40px auto 80px;
-  background: var(--bg); border: 1px solid var(--border);
+  background: var(--surface); border: 2px solid var(--panel-line);
   border-radius: var(--r); padding: clamp(28px, 5vw, 52px);
+  box-shadow: var(--panel-shadow);
+  position: relative; z-index: 1;
 }
 .sheet--narrow { width: 640px; }
 .sheet--auth { width: 420px; margin-top: 14vh; }
@@ -114,7 +243,14 @@ summary:focus-visible,
    min-width: auto and will not shrink below its content without it. */
 .portal-link .no--actions { flex-shrink: 1; min-width: 0; }
 
-.topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0 4px; }
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 0 14px;
+  /* The masthead rule: one bold line under the bar, the way a page of a
+     comic is ruled off from its header. */
+  border-bottom: 2px solid var(--panel-line);
+  position: relative; z-index: 1;
+}
 
 /* ——— The console menu ———
    The dashboard topbar used to be seven identical ghost pills in one row:
@@ -142,25 +278,37 @@ summary:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 7px 12px;
-  border-radius: 9px;
+  padding: 7px 11px;
+  border-radius: 8px;
   color: var(--muted);
-  font-size: 13.5px;
+  /* Mono caps: the section names read as the running heads of a technical
+     manual, which is the annotation register the whole bar now speaks. */
+  font-family: var(--mono);
+  font-size: 11px;
   font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
   white-space: nowrap;
+  transition: color .15s ease, background-color .15s ease;
 }
-.topnav-link[aria-current="page"] { color: var(--text); background: var(--off); }
+.topnav-link[aria-current="page"] {
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: inset 0 -2px 0 var(--brand);
+}
 /* The unread count is a number, so it reads as one: mono, tabular, and it
    does not change the link's width as it climbs from 9 to 10. */
 .topnav-count {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--mono);
   font-variant-numeric: tabular-nums;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  color: var(--a-text);
-  background: var(--a-dim);
+  color: var(--brand-ink);
+  background: var(--brand);
+  border: 1.5px solid var(--panel-line);
   border-radius: 100px;
-  padding: 1px 7px;
+  padding: 0 6px;
+  line-height: 1.6;
 }
 .topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
@@ -176,37 +324,68 @@ summary:focus-visible,
   gap: 14px;
   margin-top: 22px;
 }
+/* A tile is a comic panel: a drawn header at the top, the words beneath it,
+   and a mono issue number in the corner. The picture is decorative, cropped
+   to a letterbox by the frame, and the tile is complete without it: if the
+   file never arrives the frame is a plain tinted band and the words stand. */
 .hub-tile {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 7px;
   min-height: 112px;
-  padding: 20px;
-  border: 1px solid var(--border);
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--panel-line);
   border-radius: var(--r);
-  background: var(--bg);
-  color: var(--text);
-  transition: border-color .15s ease, transform .15s ease;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--panel-shadow);
+  transition: transform .18s cubic-bezier(.16,1,.3,1), box-shadow .18s ease;
 }
+.hub-tile__illo {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 8;
+  background: var(--bg-sunk);
+  border-bottom: 2px solid var(--panel-line);
+  overflow: hidden;
+}
+.hub-tile__illo .illo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hub-tile__no {
+  position: absolute; top: 10px; left: 10px; z-index: 1;
+  font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .12em;
+  color: var(--ink); background: var(--surface);
+  border: 1.5px solid var(--panel-line); border-radius: 6px; padding: 2px 7px;
+  box-shadow: var(--sticker-shadow);
+}
+.hub-tile__body { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px 16px; }
 .hub-tile__name {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 15.5px;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: .01em;
+  line-height: 1.1;
+  text-transform: uppercase;
 }
 .hub-tile__n {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--mono);
   font-variant-numeric: tabular-nums;
   font-size: 11px;
   font-weight: 700;
-  color: var(--label);
-  background: var(--off);
+  letter-spacing: 0;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1.5px solid var(--panel-line);
   border-radius: 100px;
-  padding: 2px 8px;
+  padding: 1px 8px;
+  line-height: 1.5;
+  box-shadow: var(--sticker-shadow);
 }
-.hub-tile__n.is-accent { color: var(--a-text); background: var(--a-dim); }
-.hub-tile__note { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.hub-tile__n.is-accent { color: var(--brand-ink); background: var(--brand); }
+.hub-tile__note { font-size: 12.5px; line-height: 1.5; color: var(--ink-soft); }
 
 .hub-feed { list-style: none; margin: 4px 0 0; padding: 0; }
 .hub-feed__row {
@@ -410,7 +589,7 @@ summary:focus-visible,
   padding: 0 22px;
 }
 .summary-strip__k {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--mono);
   font-size: 10px;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -429,7 +608,7 @@ summary:focus-visible,
   .topnav { border-right: none; padding-right: 0; margin-right: 0; margin-left: 0; }
 }
 
-.brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; }
+.brand { font-family: var(--font-display); font-size: 24px; font-weight: 400; letter-spacing: .02em; line-height: 1; text-transform: uppercase; }
 /* The wordmark is the text colour, not the link colour.
    It became a link when the topbar was unified so clicking it returns you to
    the hub, and it silently inherited `a { color: var(--a-text) }`, which had
@@ -438,51 +617,101 @@ summary:focus-visible,
    white on dark again, which is what it always was.
    The hover is left to the global `a:hover` rule below: same specificity,
    declared later, so it still turns accent under a real pointer. */
-.brand a { color: var(--text); }
+.brand a { color: var(--ink); }
 .brand span { color: var(--accent); }
-.brand small { font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-left: 10px; }
+.brand small {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--muted); font-weight: 600; margin-left: 12px;
+  /* A client's full company name is the subtitle on its page. Clipped rather
+     than wrapped so a long one cannot make the masthead two lines tall; the
+     page title beneath carries the whole name. */
+  display: inline-block; vertical-align: middle; max-width: 26ch;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
-.doc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
-.doc-title { font-size: clamp(22px, 4vw, 28px); font-weight: 800; letter-spacing: -0.03em; }
-.pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--a-text); background: var(--a-dim); border: 1px solid var(--a-border); border-radius: 100px; padding: 4px 12px; }
-.pill i { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
-.pill.grey { color: var(--muted); background: var(--off); border-color: var(--border-hi); }
+.doc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; padding-bottom: 22px; border-bottom: 2px solid var(--panel-line); }
+.doc-title { font-family: var(--font-display); font-size: clamp(26px, 4vw, 34px); font-weight: 400; letter-spacing: .01em; line-height: 1.05; text-transform: uppercase; }
+/* Status stickers. Never hue alone: the dot and the words travel together.
+   Green is live, paid, passing; amber is running, due soon, waiting; coral is
+   failing, overdue, blocked; grey is draft and idle. */
+.pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--a-text); background: var(--a-dim); border: 1.5px solid var(--a-border); border-radius: 100px; padding: 3px 11px; line-height: 1.6; }
+.pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); flex-shrink: 0; }
+.pill.grey { color: var(--muted); background: var(--surface-2); border-color: var(--hairline-hi); }
 .pill.grey i { background: var(--subtle); }
+.pill.amber { color: var(--amber-text); background: var(--amber-dim); border-color: var(--amber); }
+.pill.amber i { background: var(--amber); }
+.pill.coral { color: var(--danger); background: var(--danger-dim); border-color: var(--coral); }
+.pill.coral i { background: var(--coral); }
+.pill.solid { color: var(--brand-ink); background: var(--brand); border-color: var(--panel-line); }
+.pill.solid i { background: var(--brand-ink); }
 
-.card { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-top: 16px; }
+/* The comic panel: surface fill, a bold ink border, the panel radius and an
+   offset shadow, as if the card were pasted onto the page. Hover lifts it
+   (guarded, below). .card is the working panel; .panel--hero, further down,
+   is the heavier framing reserved for a page's header moment. */
+.card { position: relative; background: var(--surface); border: 2px solid var(--panel-line); border-radius: var(--r); padding: 20px 22px; margin-top: 16px; box-shadow: var(--panel-shadow); }
 /* Console pages use .wrap (the portal uses .portal, left untouched): give their
    stacked cards a roomier rhythm — more gap between cards and more padding
    inside — so dense pages like the client detail read less cluttered. */
 .wrap > .card { margin-top: 22px; padding: 26px 28px; }
-.wrap > .card > h3 { font-size: 16px; }
+.wrap > .card > h3 { font-size: 20px; }
 @media (max-width: 720px) { .wrap > .card { margin-top: 16px; padding: 18px 18px; } }
-.card h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
-.k { font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--label); }
+.card h3, .gh-card-title, .modal-title {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: 19px; letter-spacing: .02em; line-height: 1.15; text-transform: uppercase;
+}
+.card h3 .pill { font-family: var(--mono); text-transform: uppercase; letter-spacing: .1em; vertical-align: 3px; margin-left: 6px; }
+.k, .eyebrow { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 
-.btn { border: none; cursor: pointer; background: var(--accent); color: #0d0d0f; font-family: inherit; font-size: 13.5px; font-weight: 700; border-radius: 100px; padding: 10px 22px; transition: transform .15s ease, opacity .15s ease; display: inline-block; }
+/* Sticker buttons. A pill with a real ink edge and a hard 2px drop, so it
+   reads as something stuck onto the page; pressing it takes the drop away
+   and moves the sticker down by the same amount, which is the whole tactile
+   trick. The primary is the brand green; in dark mode it also carries the
+   lamp glow. Ghost is the outline pill. */
+.btn {
+  cursor: pointer; display: inline-block;
+  background: var(--brand); color: var(--brand-ink);
+  border: 2px solid var(--panel-line);
+  font-family: inherit; font-size: 13.5px; font-weight: 700; line-height: 1.4;
+  border-radius: 100px; padding: 8px 20px;
+  box-shadow: var(--sticker-shadow), var(--glow);
+  transition: transform .12s ease, box-shadow .12s ease, opacity .15s ease, background-color .15s ease;
+}
+.btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 0 0 0 var(--panel-line), var(--glow); }
 .btn:disabled { opacity: .55; cursor: wait; transform: none; }
-.btn.ghost { background: transparent; border: 1px solid var(--border-hi); color: var(--text); font-weight: 600; }
-.btn.small { padding: 6px 14px; font-size: 12px; }
+.btn.ghost { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: var(--sticker-shadow); }
+html[data-theme="dark"] .btn.ghost { background: transparent; }
+.btn.small { padding: 5px 13px; font-size: 12px; }
 
-/* Landing-page theme switch: sliding accent knob, sun/moon, circular wipe. */
+/* The workshop lamp: the theme switch. Same control, same place, same wipe;
+   only the skin changed. The knob is the bulb. In daylight it is lit amber
+   and sits left; at night it slides right, cools to the surface colour and
+   shows a moon, and the track behind it keeps a faint amber afterglow so the
+   control still reads as "the lamp" when it is off. Position and icon are
+   driven by [data-theme] so there is nothing to mismatch on hydration. */
 .theme-toggle {
-  position: relative; width: 52px; height: 28px; flex-shrink: 0;
-  border: 1px solid var(--border); border-radius: 100px;
-  background: var(--off); cursor: pointer; padding: 0;
-  box-shadow: inset 2px 2px 5px rgba(0,0,0,.12), inset -2px -2px 5px rgba(255,255,255,.6);
+  position: relative; width: 54px; height: 28px; flex-shrink: 0;
+  border: 2px solid var(--panel-line); border-radius: 100px;
+  background: var(--surface-2); cursor: pointer; padding: 0;
+  box-shadow: var(--sticker-shadow);
+  transition: background-color .28s ease, transform .12s ease;
 }
-html[data-theme="dark"] .theme-toggle {
-  box-shadow: inset 2px 2px 6px rgba(0,0,0,.55), inset -2px -2px 6px rgba(255,255,255,.04);
-}
-.theme-toggle:active { transform: scale(.96); }
+html[data-theme="dark"] .theme-toggle { background: var(--bg-sunk); }
+.theme-toggle:active { transform: translateY(1px); box-shadow: 0 1px 0 0 var(--panel-line); }
 .theme-toggle__knob {
-  position: absolute; top: 50%; left: 3px; transform: translateY(-50%);
-  width: 22px; height: 22px; border-radius: 50%;
-  background: var(--accent); color: #0d0d0f;
+  position: absolute; top: 50%; left: 2px; transform: translateY(-50%);
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--amber); color: var(--ink);
+  border: 1.5px solid var(--panel-line);
+  box-shadow: 0 0 0 3px var(--amber-dim), 0 0 14px rgba(207,138,15,.55);
   display: flex; align-items: center; justify-content: center;
-  transition: transform .3s cubic-bezier(.5, 1.4, .6, 1);
+  transition: transform .3s cubic-bezier(.5, 1.4, .6, 1), background-color .28s ease, box-shadow .28s ease;
 }
-html[data-theme="dark"] .theme-toggle__knob { transform: translate(22px, -50%); }
+html[data-theme="dark"] .theme-toggle__knob {
+  transform: translate(26px, -50%);
+  background: var(--surface-2); color: var(--amber);
+  box-shadow: 0 0 0 3px rgba(242,184,76,.10), 0 0 10px rgba(242,184,76,.18);
+}
 .theme-toggle__ico { position: absolute; display: flex; align-items: center; justify-content: center; }
 .theme-toggle__ico svg { width: 12px; height: 12px; }
 .theme-toggle__moon { display: none; }
@@ -492,8 +721,12 @@ html[data-theme="dark"] .theme-toggle__moon { display: flex; }
    the fully recoloured page rather than a mid-lerp one. */
 html[data-reveal] *, html[data-reveal] body { transition: none !important; }
 
-.form-error { margin-top: 14px; padding: 12px 16px; border-radius: 10px; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.35); font-size: 13.5px; }
-.notice { margin-top: 14px; padding: 12px 16px; border-radius: 10px; background: var(--a-dim); border: 1px solid var(--a-border); font-size: 13.5px; }
+/* Notices are the console's callouts, and they take the balloon shape: a
+   rounded bubble with an ink edge. Tinted by tone. No tail here, because a
+   notice inside a form is a note in the margin, not a line someone spoke;
+   .bubble, further down, is the spoken version for empty states and tips. */
+.form-error { margin-top: 14px; padding: 12px 16px; border-radius: 12px; background: var(--danger-dim); border: 2px solid var(--coral); font-size: 13.5px; line-height: 1.6; }
+.notice { margin-top: 14px; padding: 12px 16px; border-radius: 12px; background: var(--a-dim); border: 2px solid var(--panel-line); font-size: 13.5px; line-height: 1.6; }
 /* Notice with its own actions, e.g. the restored-draft banner (LC-021). */
 .notice--row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .notice--row .btn { flex-shrink: 0; }
@@ -508,8 +741,8 @@ html[data-reveal] *, html[data-reveal] body { transition: none !important; }
 .table-scroll { position: relative; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 8px -22px 0; padding: 0 22px; }
 table.list { width: 100%; border-collapse: collapse; margin-top: 8px; min-width: 560px; }
 .table-scroll table.list { margin-top: 0; }
-table.list th { text-align: left; font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--label); font-weight: 600; padding: 8px 10px; border-bottom: 1.5px solid var(--border-hi); }
-table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+table.list th { text-align: left; font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 8px 10px; border-bottom: 2px solid var(--panel-line); }
+table.list td { padding: 12px 10px; border-bottom: 1px solid var(--hairline); font-size: 13.5px; vertical-align: middle; }
 /* Sortable header: a real button inside the th so sorting is focusable and
    operable by keyboard (LC-041). It inherits the header's mono type, so the
    column reads identically whether or not it sorts. */
@@ -539,9 +772,9 @@ th[aria-sort="ascending"] .th-sort, th[aria-sort="descending"] .th-sort { color:
 .q-line, .q-box, select.q-line {
   width: 100%; font-family: inherit; font-size: 14px; color: var(--text); background: transparent;
 }
-.q-line { border: none; border-bottom: 1px solid var(--border-hi); padding: 8px 2px; border-radius: 0; }
-.q-box { border: 1px solid var(--border-hi); border-radius: 10px; padding: 10px 12px; line-height: 1.6; min-height: 64px; resize: vertical; }
-.q-line:focus, .q-box:focus { outline: none; border-color: var(--accent); }
+.q-line { border: none; border-bottom: 1.5px solid var(--hairline-hi); padding: 8px 2px; border-radius: 0; transition: border-color .15s ease; }
+.q-box { border: 1.5px solid var(--hairline-hi); border-radius: 10px; padding: 10px 12px; line-height: 1.6; min-height: 64px; resize: vertical; background: var(--surface); transition: border-color .15s ease; }
+.q-line:focus, .q-box:focus { outline: none; border-color: var(--brand); }
 /* Restated here, after the `outline: none` above, and that order is the whole
    point.
    Both selectors are one class plus one pseudo-class, so they carry identical
@@ -558,15 +791,15 @@ th[aria-sort="ascending"] .th-sort, th[aria-sort="descending"] .th-sort { color:
 .q-line:focus-visible,
 .q-box:focus-visible,
 select.q-line:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 .q-line::placeholder, .q-box::placeholder { color: var(--muted); }
 @media (max-width: 820px) { .q-line, .q-box { font-size: 16px; } }
 
 .q-section { padding-top: 22px; border-top: 1px solid var(--border); margin-top: 24px; }
-.q-eyebrow { font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--a-text); }
-.q-h { font-size: 18px; font-weight: 700; letter-spacing: -.02em; margin-top: 6px; }
+.q-eyebrow { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--a-text); }
+.q-h { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: .01em; text-transform: uppercase; line-height: 1.1; margin-top: 6px; }
 .q-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .q-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
 .q-field { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
@@ -619,11 +852,11 @@ select.q-line:focus-visible {
   border: none; background: none; color: var(--muted); font-size: 16px; line-height: 1;
   border-radius: 6px; cursor: pointer;
 }
-.q-file-err { font-size: 12.5px; color: #ef4444; line-height: 1.5; }
+.q-file-err { font-size: 12.5px; color: var(--danger); line-height: 1.5; }
 
 /* Confirmation dialog (replaces window.confirm/prompt) */
 .modal-veil {
-  position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px;
+  position: fixed; inset: 0; z-index: 9995; display: grid; place-items: center; padding: 20px;
   background: color-mix(in srgb, var(--bg) 55%, transparent);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   animation: veil-in .16s ease both;
@@ -637,28 +870,28 @@ select.q-line:focus-visible {
 }
 .modal {
   position: relative;
-  width: 100%; max-width: 420px; background: var(--off);
-  border: 1px solid var(--border-hi); border-radius: 16px; padding: 22px 22px 18px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, .35);
+  width: 100%; max-width: 420px; background: var(--surface);
+  border: 2px solid var(--panel-line); border-radius: var(--r); padding: 22px 22px 18px;
+  box-shadow: var(--panel-shadow-lift), 0 24px 70px rgba(0, 0, 0, .35);
   animation: modal-in .2s cubic-bezier(.2, .9, .3, 1.2) both;
 }
-.modal-title { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
 .modal-title.danger { color: var(--danger); }
-.modal-body { margin-top: 10px; font-size: 13.5px; line-height: 1.65; color: var(--muted); }
-.modal-body b { color: var(--text); }
+.modal-body { margin-top: 10px; font-size: 13.5px; line-height: 1.65; color: var(--ink-soft); }
+.modal-body b { color: var(--ink); }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
-.btn-danger { background: var(--danger); border-color: var(--danger); color: var(--bg); }
+.btn-danger { background: var(--coral); border-color: var(--panel-line); color: #fff; }
+html[data-theme="dark"] .btn-danger { color: var(--brand-ink); }
 @keyframes veil-in { from { opacity: 0; } }
 @keyframes modal-in { from { opacity: 0; transform: translateY(10px) scale(.97); } }
 @media (prefers-reduced-motion: reduce) { .modal-veil, .modal { animation: none; } }
 
-.copy-block { margin-top: 30px; padding: 16px 18px; background: var(--off); border: 1px solid var(--border); border-radius: 12px; }
+.copy-block { margin-top: 30px; padding: 16px 18px; background: var(--surface-2); border: 1.5px solid var(--hairline-hi); border-radius: 12px; }
 .submit-bar { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .submit-note { font-size: 12.5px; color: var(--muted); max-width: 420px; }
 
 .done { text-align: center; padding: 60px 12px 40px; }
 .done-mark { width: 64px; height: 64px; border-radius: 50%; background: var(--a-dim); border: 1px solid var(--a-border); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--a-text); font-size: 28px; }
-.done h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+.done h2 { font-family: var(--font-display); font-size: 30px; font-weight: 400; letter-spacing: .01em; text-transform: uppercase; }
 .done p { color: var(--muted); font-size: 14.5px; max-width: 46ch; margin: 12px auto 0; }
 
 .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; padding: 20px 0; border-bottom: 1px solid var(--border); }
@@ -683,7 +916,7 @@ select.q-line:focus-visible {
 .portal-hero__inner { width: 880px; max-width: calc(100% - 32px); margin: 0 auto; padding: 20px 0 36px; }
 .portal-hero__top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .portal-hero__eyebrow { margin-top: 34px; }
-.portal-hero h1 { font-size: clamp(28px, 5.2vw, 46px); font-weight: 800; letter-spacing: -0.035em; line-height: 1.04; margin: 12px 0 0; }
+.portal-hero h1 { font-family: var(--font-display); font-size: clamp(32px, 5.6vw, 54px); font-weight: 400; letter-spacing: .01em; line-height: 1.02; text-transform: uppercase; margin: 12px 0 0; }
 .portal-hero__sub { color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 54ch; margin: 13px 0 0; }
 .portal-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
 .portal-stat { display: inline-flex; align-items: center; gap: 9px; border: 1px solid var(--border-hi); border-radius: 100px; padding: 8px 15px; font-size: 13px; background: var(--bg); }
@@ -713,7 +946,7 @@ select.q-line:focus-visible {
   border: 1px solid var(--border-hi); background: var(--bg);
   font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600; color: var(--muted);
 }
-.pstep.is-done .pstep-dot { background: var(--accent); border-color: var(--accent); color: #0d0d0f; }
+.pstep.is-done .pstep-dot { background: var(--brand); border-color: var(--panel-line); color: var(--brand-ink); }
 /* The connecting line runs behind the dots; the current dot's tint must sit on
    an OPAQUE base, or the green line shows through it and looks like it cuts
    through the circle. Layer the translucent tint over --bg to stay opaque. */
@@ -856,9 +1089,9 @@ body {
     padding: 6px max(10px, env(safe-area-inset-left, 0px))
              calc(8px + env(safe-area-inset-bottom, 0px))
              max(10px, env(safe-area-inset-right, 0px));
-    background: color-mix(in srgb, var(--desk) 86%, transparent);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
     -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
-    border-top: 1px solid var(--border);
+    border-top: 2px solid var(--panel-line);
   }
   .app-tab {
     flex: 1; min-width: 0;
@@ -884,12 +1117,16 @@ body {
    still apply on touch. */
 @media (hover: hover) and (pointer: fine) {
   a:hover { color: var(--accent); }
-  .hub-tile:hover { border-color: var(--a-border); transform: translateY(-1px); }
+  .hub-tile:hover { transform: translate(-1px, -2px); box-shadow: var(--panel-shadow-lift); }
   .hub-tile:hover .hub-tile__name { color: var(--a-text); }
-  .btn:hover { transform: translateY(-1px); color: #0d0d0f; }
+  .hub-tile:hover .hub-tile__illo .illo { transform: scale(1.03); }
+  .card:hover { box-shadow: var(--panel-shadow-lift); }
+  .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 3px 0 0 var(--panel-line), var(--glow); }
+  .btn.ghost:hover:not(:disabled) { background: var(--surface-2); }
+  .topnav-link:hover { color: var(--ink); background: var(--surface); }
   .q-file-btn:hover:not(:disabled) { border-color: var(--a-text); }
-  .q-file-x:hover { color: #ef4444; background: rgba(239,68,68,.1); }
-  .btn-danger:hover:not(:disabled) { filter: brightness(1.08); }
+  .q-file-x:hover { color: var(--danger); background: var(--danger-dim); }
+  .btn-danger:hover:not(:disabled) { filter: brightness(1.06); }
   .hist > summary:hover { color: var(--text); }
   .task-x:hover { color: var(--danger); }
   .lang-btn:hover { color: var(--text); }
@@ -1001,4 +1238,230 @@ body {
 .q-foot a {
   /* No sizing. This rule exists to carry the comment. */
   overflow-wrap: anywhere;
+}
+
+/* ————————————————————————————————————————————————————————————————————————
+   Workshop primitives. Everything from here down was added by the
+   comic-editorial redesign (REDESIGN_NOTES.md). The rules above are the
+   console's existing vocabulary re-skinned in place; these are the new words.
+   ———————————————————————————————————————————————————————————————————————— */
+
+/* ——— Eyebrow + title block ———
+   Every page header is the same three lines: a mono kicker with the section's
+   issue number ("CLIENTS — No.01"), a display title, an optional lede. The
+   kicker is the console's running head; the number is fixed per section so a
+   regular reader learns them. */
+.page-head {
+  position: relative;
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; flex-wrap: wrap;
+  margin-top: 26px;
+}
+.page-head__text { min-width: 0; flex: 1 1 320px; }
+.page-head__actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.eyebrow { display: inline-flex; align-items: center; gap: 10px; }
+.eyebrow .no { color: var(--ink); }
+.eyebrow .no::before { content: ""; display: inline-block; width: 18px; height: 1.5px; background: var(--panel-line); vertical-align: middle; margin-right: 10px; }
+.page-title {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(30px, 4.6vw, 44px); line-height: .98; letter-spacing: .01em;
+  text-transform: uppercase; margin-top: 8px;
+  overflow-wrap: anywhere;
+}
+.page-lede { color: var(--ink-soft); font-size: 13.5px; line-height: 1.6; margin-top: 8px; max-width: 72ch; }
+
+/* The illustrated header: a letterboxed strip behind the title block, framed
+   as a panel. Text is live HTML in front of a scrim, never baked in, and the
+   strip is a fixed height so the layout is identical with the file missing.
+   Section pages use it slim; the hub uses it tall. */
+.page-head--illo {
+  display: block;
+  margin-top: 22px;
+  border: 2px solid var(--panel-line);
+  border-radius: var(--r);
+  background: var(--surface);
+  box-shadow: var(--panel-shadow);
+  overflow: hidden;
+}
+.page-head--illo .page-head__art {
+  position: relative; height: clamp(120px, 22vw, 200px); overflow: hidden;
+  background: var(--bg-sunk); border-bottom: 2px solid var(--panel-line);
+}
+.page-head--illo .page-head__art .illo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.page-head--illo .page-head__inner {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; flex-wrap: wrap;
+  padding: 16px 20px 18px;
+}
+.page-head--illo .page-title { margin-top: 6px; }
+.page-head--illo .page-lede { margin-top: 6px; }
+/* The corner stamp: mono issue number and date, the way a cover carries them. */
+.page-stamp {
+  position: absolute; top: 12px; right: 12px; z-index: 1;
+  display: inline-flex; gap: 8px; align-items: center;
+  font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink); background: var(--surface);
+  border: 1.5px solid var(--panel-line); border-radius: 6px; padding: 3px 8px;
+  box-shadow: var(--sticker-shadow);
+}
+.page-stamp i { width: 5px; height: 5px; border-radius: 50%; background: var(--coral); }
+
+/* ——— Hero panel ———
+   Heavier framing for a page's one big moment: thicker border, a warm rim
+   at night, a halftone corner. Nothing that holds a table wears it. */
+.panel--hero {
+  border-width: 3px;
+  box-shadow: var(--panel-shadow-lift), var(--glow);
+}
+html[data-theme="dark"] .panel--hero { border-color: var(--panel-rim); }
+.panel--hero::after {
+  content: ""; position: absolute; top: 0; right: 0; width: 140px; height: 140px; pointer-events: none;
+  background-image: radial-gradient(circle, var(--panel-line) .8px, transparent .9px);
+  background-size: 7px 7px;
+  opacity: .28;
+  -webkit-mask-image: radial-gradient(circle at top right, #000 0, transparent 70%);
+  mask-image: radial-gradient(circle at top right, #000 0, transparent 70%);
+  border-top-right-radius: inherit;
+}
+
+/* ——— Speech bubble ———
+   The spoken callout: a balloon with a tail, in the console's own colours (the
+   hub comic's .comic-bubble is pinned white because it sits on printed
+   artwork; this one lives in the interface and flips with it). For empty
+   states, tips and the primary toast. The tail side is a modifier. */
+.bubble {
+  position: relative;
+  display: inline-block;
+  padding: 12px 16px;
+  border: 2px solid var(--panel-line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13.5px; line-height: 1.55;
+  box-shadow: var(--sticker-shadow);
+  max-width: 46ch;
+}
+.bubble::before, .bubble::after {
+  content: ""; position: absolute; width: 0; height: 0; border: 10px solid transparent;
+}
+/* Two triangles: the ink one behind, the surface one in front, offset by the
+   border width, which is how a CSS balloon gets an outlined tail. */
+.bubble--left::before  { left: -18px; top: 16px; border-right-color: var(--panel-line); border-left: 0; }
+.bubble--left::after   { left: -13px; top: 16px; border-right-color: var(--surface); border-left: 0; }
+.bubble--right::before { right: -18px; top: 16px; border-left-color: var(--panel-line); border-right: 0; }
+.bubble--right::after  { right: -13px; top: 16px; border-left-color: var(--surface); border-right: 0; }
+.bubble--bottom::before { bottom: -18px; left: 28px; border-top-color: var(--panel-line); border-bottom: 0; }
+.bubble--bottom::after  { bottom: -13px; left: 28px; border-top-color: var(--surface); border-bottom: 0; }
+.bubble--none::before, .bubble--none::after { content: none; }
+.bubble b { font-weight: 700; }
+/* Hand-lettered, for the balloon and nothing else. */
+.bubble--hand { font-family: var(--font-hand); font-weight: 700; font-size: 16px; line-height: 1.3; }
+
+/* ——— Empty state ———
+   Where the personality lives. The mascot and a balloon, side by side, with
+   the first action as a sticker beneath. The picture is content here (it has
+   alt text) but the words carry the meaning, so the block reads fine with the
+   image missing: the balloon simply has nothing to its left. */
+.empty-state {
+  display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  padding: 18px 6px 10px;
+}
+.empty-state__art { width: clamp(120px, 26%, 180px); flex-shrink: 0; }
+.empty-state__art .illo { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 10px rgba(0,0,0,.18)); }
+.empty-state__body { flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.empty-state__title { font-family: var(--font-display); font-size: 22px; letter-spacing: .01em; text-transform: uppercase; line-height: 1.05; }
+.empty-state .bubble { margin-left: 14px; }
+@media (max-width: 560px) {
+  .empty-state { justify-content: center; text-align: center; }
+  .empty-state__body { align-items: center; }
+  .empty-state .bubble { margin-left: 0; }
+  .empty-state .bubble--left::before, .empty-state .bubble--left::after { content: none; }
+}
+
+/* ——— Illustrations ———
+   Two <img>s per picture, one for each palette; the theme attribute shows one
+   and hides the other. A hidden lazy image is never fetched, so a visitor pays
+   for one file, and the swap on toggle is a single style change. A plain <img>
+   rather than next/image, for the reason in docs/adr/0003. */
+.illo { display: block; max-width: 100%; transition: transform .35s cubic-bezier(.16,1,.3,1); }
+.illo--dark { display: none; }
+html[data-theme="dark"] .illo--light { display: none; }
+html[data-theme="dark"] .illo--dark { display: block; }
+/* Anything laid over a picture sits on a scrim so the words never depend on
+   what the artist happened to paint underneath. */
+.scrim {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface) 70%, transparent) 60%, transparent);
+}
+
+/* ——— Auth ———
+   The drama piece. The workshop runs full bleed behind everything; the sign-in
+   card floats in the open space the illustration leaves on its left. On a
+   narrow screen the picture becomes a band across the top and the card sits
+   below it, because a card over a phone-width crop covers the whole picture
+   and gains nothing. */
+.auth {
+  position: relative; min-height: 100dvh;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: center;
+  padding: 24px clamp(16px, 5vw, 72px);
+  isolation: isolate;
+}
+.auth__art {
+  position: absolute; inset: 0; z-index: -1; overflow: hidden;
+  background: var(--bg-sunk);
+}
+.auth__art .illo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
+/* The scrim keeps the card's neighbourhood calm whatever the crop shows. */
+.auth__art::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--bg) 78%, transparent), color-mix(in srgb, var(--bg) 40%, transparent) 45%, transparent 75%);
+}
+.auth__top { position: absolute; top: 18px; right: 18px; z-index: 2; }
+.auth .sheet--auth { width: 440px; max-width: 100%; margin: 0; justify-self: start; }
+.auth .sheet--auth .brand { font-size: 32px; }
+.auth__tag { margin-top: 20px; align-self: end; }
+@media (max-width: 860px) {
+  .auth { grid-template-columns: 1fr; align-items: start; padding-top: 0; }
+  .auth__art { position: relative; inset: auto; height: clamp(180px, 42vw, 300px); z-index: 0; margin: 0 -16px; border-bottom: 2px solid var(--panel-line); }
+  .auth__art .illo { object-position: 60% 50%; }
+  .auth__art::after { background: linear-gradient(180deg, transparent 50%, color-mix(in srgb, var(--bg) 70%, transparent)); }
+  .auth .sheet--auth { justify-self: center; margin-top: -40px; }
+  .auth__tag { display: none; }
+}
+
+/* ——— Skeletons shimmer like film grain ——— */
+.skel {
+  display: block; height: 11px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--bg-sunk) 0%, var(--surface-2) 45%, var(--bg-sunk) 90%);
+  background-size: 220% 100%;
+  border: 1px solid var(--hairline);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .skel { animation: skel-shimmer 1.6s linear infinite; }
+}
+@keyframes skel-shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+
+/* ——— 404 and the error boundaries ——— */
+.lost { text-align: center; padding: 40px 12px 30px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.lost__art { width: clamp(160px, 40vw, 260px); }
+.lost__art .illo { width: 100%; height: auto; filter: drop-shadow(0 8px 14px rgba(0,0,0,.2)); }
+/* .lost p sets the body size below; the numeral needs the class to win. */
+.lost .lost__code { font-family: var(--font-display); font-size: clamp(56px, 12vw, 96px); line-height: .9; letter-spacing: .02em; color: var(--ink); max-width: none; }
+.lost__code span { color: var(--coral); }
+.lost p { color: var(--ink-soft); font-size: 14px; max-width: 46ch; line-height: 1.6; }
+.lost__actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+/* ——— Motion ———
+   A route lands with a 120ms fade and a 6px rise. Transform and opacity only,
+   below the interaction threshold, and off entirely under reduced motion. The
+   primary sticker breathes its lamp glow at night, slowly and shallowly. */
+@media (prefers-reduced-motion: no-preference) {
+  main { animation: page-in .16s cubic-bezier(.16,1,.3,1) both; }
+  html[data-theme="dark"] .btn:not(.ghost):not(.btn-danger):not(:disabled) { animation: lamp-breathe 4.5s ease-in-out infinite; }
+}
+@keyframes page-in { from { opacity: 0; transform: translateY(6px); } }
+@keyframes lamp-breathe {
+  0%, 100% { box-shadow: var(--sticker-shadow), 0 0 22px rgba(242,184,76,.18); }
+  50%      { box-shadow: var(--sticker-shadow), 0 0 34px rgba(242,184,76,.32); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .illo, .hub-tile, .card, .btn, .theme-toggle, .theme-toggle__knob, .topnav-link { transition: none; }
 }

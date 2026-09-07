@@ -13,6 +13,7 @@
 // operator who learns it once should not have to re-read it per screen.
 import Link from "next/link";
 import type { ReactNode } from "react";
+import EmptyState from "@/components/EmptyState";
 
 export type GithubSection = { href: string; label: string };
 
@@ -70,7 +71,7 @@ export function GithubEmpty({
       <h2 className="gh-card-title" id="gh-empty-title">
         {title}
       </h2>
-      <p className="gh-note">{children}</p>
+      <EmptyState>{children}</EmptyState>
       {configured ? (
         <p className="gh-note">
           A GitHub credential is configured, so nothing is stopping a sync. The likely cause is

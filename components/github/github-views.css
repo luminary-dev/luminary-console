@@ -12,7 +12,7 @@
 .gh-nav-list {
   list-style: none; margin: 0; padding: 0;
   display: flex; gap: 4px; flex-wrap: wrap;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--panel-line);
 }
 .gh-nav-link {
   display: inline-block;
@@ -26,7 +26,7 @@
    it does not depend on hue alone. aria-current carries it to a screen
    reader. */
 .gh-nav-link[aria-current="page"] {
-  color: var(--a-text); border-bottom-color: var(--accent); font-weight: 700;
+  color: var(--ink); border-bottom-color: var(--brand); font-weight: 700;
 }
 
 /* === metric tiles === */
@@ -38,13 +38,14 @@
   font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600;
   letter-spacing: .14em; text-transform: uppercase; color: var(--label);
 }
+/* Big numbers take the display face: a metric is a headline figure. */
 .gh-metric-v {
-  font-size: 19px; font-weight: 700; letter-spacing: -.02em; margin-top: 4px;
+  font-family: var(--font-display); font-size: 28px; font-weight: 400; letter-spacing: .01em; line-height: 1.05; margin-top: 4px;
   font-variant-numeric: tabular-nums; overflow-wrap: anywhere;
 }
 /* "not enough data" is a sentence, not a number, so it must not be typeset
    like one or it reads as a broken value. */
-.gh-metric-v.is-absent { font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.gh-metric-v.is-absent { font-family: var(--sans); font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
 .gh-metric-note { color: var(--muted); font-size: 12.5px; line-height: 1.6; margin-top: 4px; max-width: 40ch; }
 
 /* === tables === */
@@ -57,17 +58,19 @@
 /* === bars: a visual reading of a number that is already in the same cell,
    which is why the bar itself is hidden from assistive technology === */
 .gh-bar {
-  display: block; height: 6px; margin-top: 5px; width: 100%; min-width: 60px;
-  background: var(--off); border: 1px solid var(--border); border-radius: 100px; overflow: hidden;
+  display: block; height: 7px; margin-top: 5px; width: 100%; min-width: 60px;
+  background: var(--bg-sunk); border: 1px solid var(--panel-line); border-radius: 100px; overflow: hidden;
 }
-.gh-bar-fill { display: block; height: 100%; background: var(--accent); }
-.gh-bar-fill.is-bad { background: var(--danger); }
-.gh-bar-fill.is-warn { background: var(--label); }
+.gh-bar-fill { display: block; height: 100%; background: var(--brand); }
+.gh-bar-fill.is-bad { background: var(--coral); }
+.gh-bar-fill.is-warn { background: var(--amber); }
 
 /* === urgent callout: secret scanning, failed deployments === */
+/* The urgent callout is a coral-edged balloon: the one place a warning is
+   allowed to shout, and it does so with a border and a tint, not a red wall. */
 .gh-urgent {
   display: flex; align-items: flex-start; gap: 10px;
-  border: 1.5px solid var(--danger); border-radius: 12px;
+  border: 2px solid var(--coral); border-radius: 12px; background: var(--danger-dim);
   padding: 14px 16px; margin-top: 14px;
 }
 .gh-urgent svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: var(--danger); }
@@ -82,8 +85,8 @@
   border: 1px solid var(--border-hi); border-radius: 100px; padding: 3px 10px; color: var(--label);
   white-space: nowrap;
 }
-.gh-sev.is-bad { color: var(--danger); border-color: var(--danger); }
-.gh-sev.is-warn { color: var(--text); border-color: var(--border-hi); }
+.gh-sev.is-bad { color: var(--danger); border-color: var(--coral); background: var(--danger-dim); }
+.gh-sev.is-warn { color: var(--amber-text); border-color: var(--amber); background: var(--amber-dim); }
 .gh-sev svg { width: 11px; height: 11px; flex-shrink: 0; }
 
 /* === environment blocks on the deployments screen === */
@@ -106,7 +109,7 @@
 .gh-release-body {
   white-space: pre-wrap; overflow-wrap: anywhere;
   font-family: var(--font-mono), monospace; font-size: 12px; line-height: 1.65; color: var(--text);
-  background: var(--off); border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface-2); border: 1.5px solid var(--hairline-hi); border-radius: 10px;
   padding: 12px 14px; margin-top: 10px; max-height: 320px; overflow-y: auto;
 }
 
@@ -117,7 +120,7 @@
   font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600;
   letter-spacing: .14em; text-transform: uppercase; color: var(--label); display: block; margin-bottom: 6px;
 }
-.gh-chip[aria-current="true"] { color: var(--a-text); background: var(--a-dim); border-color: var(--a-border); }
+.gh-chip[aria-current="true"] { color: var(--brand-ink); background: var(--brand); border-color: var(--panel-line); box-shadow: var(--sticker-shadow); }
 .gh-stream { list-style: none; margin: 12px 0 0; padding: 0; }
 .gh-stream-item {
   display: grid; grid-template-columns: 72px 118px 1fr; gap: 12px;

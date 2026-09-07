@@ -29,17 +29,19 @@ export default function GlobalError({
     <html lang="en">
       <head>
         <style>{`
+          /* The console's two palettes, by hand: this page renders without
+             the stylesheet. Values are the tokens in app/globals.css. */
           :root { color-scheme: light dark; }
-          html { background: #f0f0ee; }
-          body { margin: 0; background: #f0f0ee; color: #0d0d0f; font-family: ${SANS}; }
-          .ge-card { background: #ffffff; border: 1px solid rgba(0,0,0,.09); }
-          .ge-btn { background: #84cc16; color: #0d0d0f; }
-          .ge-ref { color: #545965; }
+          html { background: #F3EEE2; }
+          body { margin: 0; background: #F3EEE2; color: #191612; font-family: ${SANS}; }
+          .ge-card { background: #FBF8F0; border: 2px solid #201C15; box-shadow: 3px 3px 0 0 rgba(32,28,21,.14); }
+          .ge-btn { background: #6FA80B; color: #12200A; border: 2px solid #201C15; box-shadow: 0 2px 0 0 #201C15; }
+          .ge-ref { color: #5B5648; }
           @media (prefers-color-scheme: dark) {
-            html, body { background: #050506; color: #f4f4f5; }
-            .ge-card { background: #0b0b0d; border-color: rgba(255,255,255,.09); }
-            .ge-btn { background: #a3e635; color: #0d0d0f; }
-            .ge-ref { color: #9a9aa3; }
+            html, body { background: #0F1518; color: #ECE5D6; }
+            .ge-card { background: #1A2126; border-color: #46545B; box-shadow: 3px 3px 0 0 rgba(0,0,0,.45); }
+            .ge-btn { background: #9AE027; color: #0E1407; border-color: #46545B; box-shadow: 0 2px 0 0 #0A0F11; }
+            .ge-ref { color: #A5AEA9; }
           }
         `}</style>
       </head>
@@ -68,7 +70,6 @@ export default function GlobalError({
                 className="ge-btn"
                 onClick={() => reset()}
                 style={{
-                  border: "none",
                   cursor: "pointer",
                   fontFamily: "inherit",
                   fontSize: 13.5,

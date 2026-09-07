@@ -11,9 +11,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { Eyebrow } from "@/components/PageHead";
 import { githubConfigured } from "@/lib/github/config";
 import { isFailingConclusion } from "@/lib/github/entities";
 import type {
@@ -38,6 +37,9 @@ import "@/components/github/github-views.css";
 
 export const metadata = { title: "Activity" };
 export const dynamic = "force-dynamic";
+
+/** The word after the section kicker in the page head. */
+const GH_SUB = "Activity";
 
 const KINDS = ["pull_request", "run", "deployment", "release", "alert"] as const;
 export type ActivityKind = (typeof KINDS)[number];
@@ -212,25 +214,14 @@ export default async function ActivityPage({ searchParams }: { searchParams: Sea
   const repo = readParam(params, "repo");
 
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Activity</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
+    <main className="wrap gh-page">
+      <ConsoleTopbar current="/github" subtitle="Activity" showNewClient={false} />
 
       <GithubNav current="/github/activity" />
 
       <div className="gh-head">
         <div>
+          <Eyebrow section="engineering" sub={GH_SUB} />
           <h1 className="gh-h1">Activity</h1>
           <p className="gh-lede">
             Pull requests, CI runs, deployments, releases and security alerts in one stream,

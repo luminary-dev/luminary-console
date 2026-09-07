@@ -6,9 +6,8 @@
 // never a live read, so opening a pull request costs no API budget.
 import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { Eyebrow } from "@/components/PageHead";
 import { getPullRequest } from "@/lib/github/projection";
 import { mergeReadiness, type PullRequestEntity } from "@/lib/github/entities";
 import CheckList, { checksLabel, tallyChecks } from "@/components/github/CheckList";
@@ -44,20 +43,8 @@ export default async function PullRequestPage({ params }: { params: Params }) {
   const pr = await readPr(owner, repo, number);
 
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Pull request</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/github">
-            <span aria-hidden="true">← </span>Pull requests
-          </Link>
-        </div>
-      </div>
+    <main className="wrap gh-page">
+      <ConsoleTopbar current="/github" subtitle="Pull request" showNewClient={false} />
 
       {pr ? <Loaded pr={pr} /> : <NotSynced full={full} number={number} />}
 
@@ -79,6 +66,7 @@ function Loaded({ pr }: { pr: PullRequestEntity }) {
     <>
       <div className="gh-head">
         <div>
+          <Eyebrow section="engineering" sub="Pull request" />
           <p className="gh-crumb">
             {pr.repo} #{pr.number}
           </p>
@@ -253,6 +241,7 @@ function NotSynced({ full, number }: { full: string; number: string }) {
     <>
       <div className="gh-head">
         <div>
+          <Eyebrow section="engineering" sub="Pull request" />
           <p className="gh-crumb">
             {full} #{number}
           </p>

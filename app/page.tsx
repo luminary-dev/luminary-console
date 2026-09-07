@@ -14,7 +14,10 @@ import AppTabBar from "@/components/AppTabBar";
 import ComicStrip from "@/components/ComicStrip";
 import CommandPalette from "@/components/CommandPalette";
 import ConsoleTopbar, { SECTIONS } from "@/components/ConsoleTopbar";
+import Illustration from "@/components/Illustration";
 import MarkAllRead from "@/components/MarkAllRead";
+import PageHead, { SECTION_NO } from "@/components/PageHead";
+import type { IllustrationId } from "@/lib/illustrations/assets";
 import RelativeTime from "@/components/RelativeTime";
 import { fmtLKR } from "@/lib/money";
 import { relTime } from "@/lib/time";
@@ -30,6 +33,22 @@ const SECTION_NOTE: Record<string, string> = {
   "/activity": "Everything that has happened, across clients and repositories.",
   "/publish": "Draft and publish articles and portfolio projects.",
 };
+
+/** Each tile's drawn header and its issue number. The pictures are decorative
+ *  (alt is empty) and the tile is complete without them; see .hub-tile in
+ *  app/globals.css. */
+const SECTION_ART: Record<string, { illo: IllustrationId; no: string }> = {
+  "/clients": { illo: "card-clients", no: SECTION_NO.clients },
+  "/github": { illo: "card-engineering", no: SECTION_NO.engineering },
+  "/activity": { illo: "card-activity", no: SECTION_NO.activity },
+  "/publish": { illo: "card-publish", no: SECTION_NO.publish },
+};
+
+/** The date stamp in the corner of the masthead, the way an issue carries
+ *  its cover date. Server-rendered on a dynamic page, so it is today's. */
+function stampDate(now: number): string {
+  return new Date(now).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+}
 
 export default async function Hub() {
   const [overview, activity] = await Promise.all([loadClientOverview(), loadUnreadActivity()]);
@@ -49,24 +68,48 @@ export default async function Hub() {
       <div className="wrap">
         <ConsoleTopbar unread={unread} />
 
+        {/* The masthead: the whole workshop in one wide shot, with the
+            issue's date in the corner. The title and lede are live text
+            beneath the picture, never on it. */}
+        <PageHead
+          section="console"
+          title="Studio console"
+          lede="What needs looking at today, across clients, engineering, activity and publishing."
+          illo="dashboard-hero"
+          stamp={stampDate(now)}
+        />
+
         <nav className="hub" aria-label="Console sections">
-        {SECTIONS.map((s) => (
+        {SECTIONS.map((s) => {
+          const art = SECTION_ART[s.href]!;
+          return (
           <Link className="hub-tile" key={s.href} href={s.href}>
-            <span className="hub-tile__name">
-              {s.label}
-              {s.href === "/clients" && total > 0 && <span className="hub-tile__n">{total}</span>}
-              {s.href === "/activity" && unread > 0 && (
-                <span className="hub-tile__n is-accent">{unread}</span>
-              )}
+            {/* The drawn header. aria-hidden because the picture says nothing
+                the words beneath it do not; the number is repeated for a
+                screen reader inside the name. */}
+            <span className="hub-tile__illo" aria-hidden="true">
+              <span className="hub-tile__no">{art.no}</span>
+              <Illustration id={art.illo} sizes="(max-width: 480px) 100vw, (max-width: 900px) 50vw, 270px" />
             </span>
-            <span className="hub-tile__note">{SECTION_NOTE[s.href]}</span>
+            <span className="hub-tile__body">
+              <span className="hub-tile__name">
+                <span className="sr-only">{art.no} </span>
+                {s.label}
+                {s.href === "/clients" && total > 0 && <span className="hub-tile__n">{total}</span>}
+                {s.href === "/activity" && unread > 0 && (
+                  <span className="hub-tile__n is-accent">{unread}</span>
+                )}
+              </span>
+              <span className="hub-tile__note">{SECTION_NOTE[s.href]}</span>
+            </span>
           </Link>
-        ))}
+          );
+        })}
       </nav>
 
       {/* Only when there is money to chase. */}
       {outstandingClients > 0 && (
-        <section className="card" aria-labelledby="hub-money">
+        <section className="card panel--hero" aria-labelledby="hub-money">
           <h3 id="hub-money">Outstanding</h3>
           <p style={{ marginTop: 8, fontSize: 13.5 }}>
             <b className="mono">{fmtLKR(outstandingTotal)}</b> across {outstandingClients} client
