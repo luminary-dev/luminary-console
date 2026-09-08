@@ -631,6 +631,37 @@ export async function updateClient(
     : new StoreConflictError(recordKey(slug), attempts, lastConflict);
 }
 
+/** Atomically claim a slug for creation, for the length of the stage-1
+ *  pipeline (AUDIT.md API-06). A create-only write (`If-None-Match: *`) fails
+ *  if the marker already exists, so a retried or concurrent `POST /api/clients`
+ *  for the same slug can't run Claude drafting, PDF rendering, DNS automation
+ *  and the studio email twice. Returns true if this caller won the claim.
+ *  Paired with releaseClientSlug in a finally, so the claim guards exactly the
+ *  in-flight window and post-creation dedup falls to the record's own existence. */
+export async function claimClientSlug(slug: string): Promise<boolean> {
+  try {
+    await putObject(
+      stateKey(`client-claims/${slug}.json`),
+      JSON.stringify({ at: new Date().toISOString() }),
+      "application/json",
+      { IfNoneMatch: "*" },
+    );
+    return true;
+  } catch (e) {
+    if (isConflict(e)) return false;
+    throw e;
+  }
+}
+
+/** Release a slug claim (best effort). */
+export async function releaseClientSlug(slug: string): Promise<void> {
+  try {
+    await r2().send(new DeleteObjectCommand({ Bucket: bucket(), Key: stateKey(`client-claims/${slug}.json`) }));
+  } catch {
+    /* best effort — a stale claim only blocks a re-create of the same slug */
+  }
+}
+
 /** Delete everything under the client's prefix (record, docs, billing,
  *  answers, attachments) plus its index entry. Returns the object count. */
 export async function deleteClient(slug: string): Promise<number> {
