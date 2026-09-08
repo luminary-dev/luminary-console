@@ -2,7 +2,7 @@
 
 // Two-step sign-in: email + password, then the 6-digit code emailed to that
 // address. The pending state lives in an HttpOnly cookie set by the API.
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -14,7 +14,14 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
-  const timedOut = typeof window !== "undefined" && window.location.search.includes("timedout");
+  // Read the query param AFTER mount, not during render: reading window during
+  // render makes the server HTML (no window) and the client tree diverge on
+  // /login?timedout=1 — the exact idle-timeout redirect target — a hydration
+  // mismatch (AUDIT.md UI-08). Starts false on both sides, then syncs.
+  const [timedOut, setTimedOut] = useState(false);
+  useEffect(() => {
+    setTimedOut(new URLSearchParams(window.location.search).has("timedout"));
+  }, []);
   const router = useRouter();
   // The code field carries a hint alongside its label, so it is associated
   // explicitly: an implicit label would fold the hint into the accessible name.

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ChangeOrder } from "@/lib/types";
 import { opsFetch } from "@/lib/ops-fetch";
+import { useConfirm } from "./ConfirmDialog";
 
 export default function ChangeOrders({
   slug,
@@ -15,6 +16,7 @@ export default function ChangeOrders({
   changeOrders: ChangeOrder[];
 }) {
   const router = useRouter();
+  const { confirm, dialog } = useConfirm();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [desc, setDesc] = useState("");
@@ -51,7 +53,11 @@ export default function ChangeOrders({
         <div style={{ marginTop: 12 }}>
           {changeOrders.map((co, i) => (
             <div
-              key={i}
+              // Keyed by a stable field, not the array index: the row is removed
+              // by index with an optimistic update, and index keys let React
+              // reuse a row's DOM/state for a different item after a delete
+              // (AUDIT.md UI-20).
+              key={`${co.at}-${co.desc}`}
               style={{
                 display: "flex", gap: 12, alignItems: "baseline", flexWrap: "wrap",
                 padding: "9px 0", borderTop: "1px solid var(--border)",
@@ -64,7 +70,21 @@ export default function ChangeOrders({
                 className="btn ghost small"
                 style={{ padding: "2px 10px", fontSize: 11 }}
                 disabled={busy}
-                onClick={() => call({ action: "remove", index: i })}
+                onClick={async () => {
+                  // Change orders are billable line items — confirm before
+                  // deleting, like every other destructive action (UI-21).
+                  const ok = await confirm({
+                    title: "Remove this change order?",
+                    message: (
+                      <>
+                        <b>{co.desc}</b> (LKR {co.amount}) will be removed from the final invoice.
+                      </>
+                    ),
+                    confirmLabel: "Remove",
+                    danger: true,
+                  });
+                  if (ok) call({ action: "remove", index: i });
+                }}
               >
                 Remove
               </button>
@@ -92,6 +112,7 @@ export default function ChangeOrders({
           <input className="q-line" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Leave blank to price automatically" aria-label="Amount in LKR" />
         </div>
       </div>
+      {dialog}
       <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 6 }}>
         Leave the amount blank to apply the aftercare default: the first 5 change requests are free,
         then LKR 6,000 each. Enter an amount to override (e.g. a larger change quoted first).

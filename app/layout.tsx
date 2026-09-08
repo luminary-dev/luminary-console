@@ -37,7 +37,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const theme = saved === "dark" || saved === "light" ? saved : undefined;
   // Per-request nonce from proxy.ts (LC-012). It is absent on the client
   // subdomains, which run the relaxed document policy instead: see lib/csp.ts.
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const hdrs = await headers();
+  const nonce = hdrs.get("x-nonce") ?? undefined;
+  // Client subdomains carry no operator session at all, so the idle-session
+  // guard's ping would 401 and spew console errors on every client-facing load
+  // (AUDIT.md UI-11). Detect the client host the same way proxy.ts does and
+  // disable the guard there.
+  const host = (hdrs.get("host") || "").split(":")[0]?.toLowerCase() ?? "";
+  const ROOT = process.env.ROOT_DOMAIN || "luminary-dev.xyz";
+  const CONSOLE_HOST = process.env.CONSOLE_HOST || `console.${ROOT}`;
+  const isClientHost = host.endsWith(`.${ROOT}`) && host !== CONSOLE_HOST && host !== ROOT;
   return (
     <html lang="en" suppressHydrationWarning data-theme={theme} className={`${outfit.variable} ${mono.variable}`}>
       <head>
@@ -49,7 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             through the topbar on every navigation. */}
         <SkipLink />
         {children}
-        <SessionGuard />
+        <SessionGuard enabled={!isClientHost} />
       </body>
     </html>
   );
