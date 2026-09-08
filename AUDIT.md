@@ -57,11 +57,15 @@ bearer, no cookie — and observe the 401, or watch `pending` deliveries accumul
 
 ## 1a. Remediation status (branch `audit/2026-09`)
 
-Fixed and verified (lint + typecheck + 762 unit/component tests green after each
-commit; new regression tests added for BUG-01, BUG-02, API-02). Commit messages
-carry the finding IDs — `git log --grep <ID>` finds each.
+Fixed and verified (lint + typecheck + 762 unit/component tests + `next build`
+green after each commit; new regression tests added for BUG-01, BUG-02, API-02).
+Commit messages carry the finding IDs — `git log --grep <ID>` finds each.
 
-**Fixed (46):**
+**Fixed (51):**
+- Backend/data: **+ API-03** (surface unreadable projection/inbox entities).
+- Frontend/UX/a11y: **+ UI-05** (page `<html lang>` + localised generic error), **+ UI-06** (mark-seen moved off the render path via `after()`), **+ UI-09** (route-level loading skeletons), **+ UI-19** (SessionsCard server-rendered).
+
+**Originally fixed (46):**
 - **Highs:** API-01, API-02, BUG-01, OPS-01 *(mechanism — see below)*, UI-01, UI-18.
 - **Security:** SEC-02, SEC-03, SEC-04, SEC-05 *(public-render rate limit; egress isolation deferred)*, SEC-06, SEC-07, SEC-08 *(delete step-up; full RBAC deferred)*.
 - **Correctness:** BUG-02, BUG-03, BUG-04, BUG-05, BUG-06, BUG-07, BUG-08, BUG-09.
@@ -69,18 +73,16 @@ carry the finding IDs — `git log --grep <ID>` finds each.
 - **CI/DevOps/observability:** OPS-02, OPS-05, OPS-07 *(log redaction; error-tracking/metrics/alerting deferred)*, OPS-08, OPS-10, OPS-11, OPS-12, OPS-13.
 - **Frontend/UX/a11y:** UI-07, UI-08, UI-10, UI-11, UI-14, UI-15, UI-16, UI-17, UI-20, UI-21, UI-22 — plus dead-code removal (`_gen.mjs`/`_poll.mjs`).
 
-**Deferred — needs your decision, infra access, data migration, or an in-browser pass (23):**
+**Deferred — needs your decision, infra access, data migration, or an in-browser pass (18):**
 | ID | Sev | Why deferred |
 | --- | --- | --- |
 | **SEC-01** | High | Changes live client-facing behaviour (portal capability token / emailed magic-link) and needs a migration for existing published links → **product sign-off**. Surrounding controls hardened in the meantime (SEC-02/04/06 + CSRF). |
-| **UI-02** | High | Console-shell landmark/`<h1>` restructure — layout-sensitive; recommend an **in-browser verification** pass before shipping. |
-| **UI-03 / API-11** | High/Low | Dashboard/`/clients` read-every-record — the fix is a denormalised aggregate/rollup maintained on write; a data-model change worth doing deliberately. |
-| **UI-04** | High | Render `ConsoleTopbar` on every page + delete hand-rolled bars — layout-sensitive; pair with UI-02 and verify in-browser. |
+| **UI-02 + UI-04** | High | Console-shell restructure — `<header>`/`<h1>`/landmark split and rendering `ConsoleTopbar` on every page (deleting the hand-rolled bars). Touches 7 pages' layout; best done as one change **with an in-browser verification pass** (offered). |
+| **UI-03 / API-11** | High/Low | Dashboard/`/clients` read-every-record — the fix is a denormalised aggregate/rollup maintained on write; a **data-model change** worth doing deliberately (and verifying the numbers). |
 | SEC-09 | Info | Double-submit CSRF token — deliberate defence-in-depth trade; Origin + `SameSite=Lax` already sound. |
 | SEC-10 | Info | `style-src 'unsafe-inline'` — needs migrating ~36 components' inline styles; documented trade. |
 | SEC-05 (egress) | Low | Chromium network isolation for semi-trusted design HTML — deployment-level; blocking egress can break designs that load remote assets. (DoS half fixed.) |
 | OPS-01 (SHA) | High | SHA-pinning needs live GitHub to resolve each `@vN` tag → commit SHA (offline here). Dependabot `github-actions` added to maintain pins once applied. |
-| API-03 | Med | Strict/surfaced projection reads (don't silently drop a corrupt entity) — low-risk, recommended next. |
 | API-05 | Med | Zod at every request + document boundary — larger; keep schemas in step with `types.ts`. |
 | API-06 | Med | Client-creation idempotency key + background queue — the queue is a Phase-4 change. |
 | API-10 | Low | Proxy gate stale-while-revalidate / low-latency shared store. |
@@ -91,12 +93,8 @@ carry the finding IDs — `git log --grep <ID>` finds each.
 | OPS-06 / OPS-09 | Med/Low | Raise the coverage floor, include `components/**`, add a Playwright a11y/perf CI job — runner-budget/infra. |
 | OPS-07 (tracking) | Med | Error tracking + metrics + alerting — **infra** (Sentry/metrics backend). Log redaction is done. |
 | OPS-14 | Info | Bind ops workflows to a protected GitHub Environment with required reviewers — **GitHub config**. |
-| UI-05 | Med | `<html lang>` switch to Sinhala + i18n the questionnaire error strings. |
-| UI-06 | Med | Move "mark seen" off GET render to an explicit action + make read-state per-operator. |
-| UI-09 | Med | `loading.tsx` skeletons per console segment. |
 | UI-12 | Low | Image dimensions / `next/image` — needs the real cover/thumbnail aspect ratios. |
-| UI-13 | Low | Relay-latency copy in busy labels. |
-| UI-19 | Med | Read SessionsCard data server-side instead of a client-effect fetch. |
+| UI-13 | Low | Relay-latency copy in busy labels — subjective; only inaccurate when Ops-via-Actions is on. |
 
 *(OPS-15 is informational — controls verified correct, no action.)*
 
@@ -758,10 +756,10 @@ render/upload objects (API-12).
 
 - [x] Architecture & Inventory writeup (Phase 1) — §4
 - [x] `AUDIT.md` with all findings, severity counts, fix order
-- [x] Fixes committed on `audit/2026-09` with verification per commit — 46 findings fixed across 22 commits, every one gate-verified; see §1a
+- [x] Fixes committed on `audit/2026-09` with verification per commit — 51 findings fixed across 29 commits, every one gate-verified (lint/typecheck/tests/build); see §1a
 - [x] Dependency audit output — `npm audit` clean; freshness noted (OPS-08)
 - [x] Prioritized improvements + new-feature roadmap — §6
-- [x] Final summary: fixed vs deferred — §1a (23 deferred, each with a reason)
+- [x] Final summary: fixed vs deferred — §1a (18 deferred, each with a reason)
 - [x] Nothing sensitive printed or committed; no committed secrets found (nothing to rotate)
 
 **Two items to confirm before fixing:** API-01 (runtime cron behaviour) and BUG-01 (live org
