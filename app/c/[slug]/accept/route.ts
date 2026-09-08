@@ -12,7 +12,7 @@ import { emailStudio } from "@/lib/email";
 import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
 import { logActivity } from "@/lib/activity";
-import { rateLimit } from "@/lib/ratelimit";
+import { rateLimitShared, clientIp } from "@/lib/ratelimit";
 import { advanceStage } from "@/lib/stage";
 import { esc } from "@/lib/templates/shell";
 import { clipText } from "@/lib/errors";
@@ -27,7 +27,7 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = rateLimit(req, "accept");
+  const limited = await rateLimitShared(req, "accept");
   if (limited) return limited;
 
   const { slug } = await params;
@@ -70,7 +70,8 @@ export async function POST(
     );
   }
 
-  const ip = ((req.headers.get("x-forwarded-for") || "").split(",")[0] ?? "").trim();
+  const rawIp = clientIp(req);
+  const ip = rawIp === "unknown" ? "" : rawIp;
   const acceptance = { name, at: new Date().toISOString(), ...(ip ? { ip } : {}) };
 
   // Re-render so the acceptance stamp shows everywhere the quotation renders.

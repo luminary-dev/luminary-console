@@ -12,7 +12,7 @@ import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { getClient, signedUploadUrl } from "@/lib/store";
 import { MAX_FILE_BYTES } from "@/lib/attachments";
-import { rateLimit } from "@/lib/ratelimit";
+import { rateLimitShared } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -31,7 +31,7 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = rateLimit(req, "upload");
+  const limited = await rateLimitShared(req, "upload");
   if (limited) return limited;
 
   const { slug } = await params;

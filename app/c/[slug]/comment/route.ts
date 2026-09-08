@@ -8,7 +8,7 @@ import { emailStudio } from "@/lib/email";
 import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
 import { logActivity } from "@/lib/activity";
-import { rateLimit } from "@/lib/ratelimit";
+import { rateLimitShared } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
 import { resolveDoc } from "@/lib/doclabels";
 import type { Comment } from "@/lib/types";
@@ -38,7 +38,7 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   // Rate-check before the record read so unknown-slug floods stay cheap.
-  const limited = rateLimit(req, "comment");
+  const limited = await rateLimitShared(req, "comment");
   if (limited) return limited;
 
   const { slug } = await params;

@@ -8,7 +8,7 @@ import { emailStudio } from "@/lib/email";
 import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
 import { logActivity } from "@/lib/activity";
-import { rateLimit } from "@/lib/ratelimit";
+import { rateLimitShared } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
 import type { Comment } from "@/lib/types";
 import { clipText } from "@/lib/errors";
@@ -32,7 +32,7 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = rateLimit(req, "comment");
+  const limited = await rateLimitShared(req, "comment");
   if (limited) return limited;
 
   const { slug } = await params;

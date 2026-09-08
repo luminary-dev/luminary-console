@@ -13,7 +13,7 @@ import { emailStudio } from "@/lib/email";
 import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
 import { logActivity } from "@/lib/activity";
-import { rateLimit } from "@/lib/ratelimit";
+import { rateLimitShared, clientIp } from "@/lib/ratelimit";
 import { advanceStage } from "@/lib/stage";
 import { esc } from "@/lib/templates/shell";
 import { clipText } from "@/lib/errors";
@@ -28,7 +28,7 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = rateLimit(req, "accept");
+  const limited = await rateLimitShared(req, "accept");
   if (limited) return limited;
 
   const { slug } = await params;
@@ -55,7 +55,8 @@ export async function POST(
   const name = typeof body.name === "string" ? clipText(body.name.trim(), 120) : "";
   if (!name) return NextResponse.json({ error: "Please type your full name to sign." }, { status: 400 });
 
-  const ip = ((req.headers.get("x-forwarded-for") || "").split(",")[0] ?? "").trim();
+  const rawIp = clientIp(req);
+  const ip = rawIp === "unknown" ? "" : rawIp;
   const signature = { name, at: new Date().toISOString(), ...(ip ? { ip } : {}) };
 
   // Re-render once (Chromium is expensive) so the signature stamp shows

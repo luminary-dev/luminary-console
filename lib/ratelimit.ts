@@ -50,18 +50,39 @@ export type Bucket = keyof typeof LIMITS;
  *  Written out per bucket rather than as a list so adding a bucket forces an
  *  explicit answer to "does this one need to be global?". */
 export const SHARED: Record<Bucket, boolean> = {
-  submit: false,
-  upload: false,
-  accept: false,
+  // The unauthenticated portal buckets are the only throughput control on the
+  // forgeable binding actions and the upload signer, so they count in the
+  // shared store, not just per-instance — otherwise the real ceiling is
+  // limit × concurrent instances and a cold start resets it (AUDIT.md SEC-02).
+  submit: true,
+  upload: true,
+  accept: true,
   auth: true,
-  comment: false,
+  comment: true,
+  // Operator-only, behind the session gate — a per-instance cost guard is fine.
   assist: false,
 };
 
-/** First hop of x-forwarded-for = the real client IP on Vercel. */
+/** The client IP, from a source the caller cannot spoof.
+ *
+ *  Prefer the platform-set headers (on Vercel `x-real-ip` / the first hop of
+ *  `x-vercel-forwarded-for` are the real client and are not client-writable).
+ *  The FIRST hop of the generic `x-forwarded-for` is attacker-controllable when
+ *  the edge appends rather than replaces it, which would let a caller mint
+ *  fresh per-IP rate-limit windows, poison another user's bucket, and write an
+ *  arbitrary "signature IP" into an acceptance/contract record (SEC-06). So XFF
+ *  is only a last resort, and then its LAST hop — the one the closest trusted
+ *  proxy appended — not its first. */
 export function clientIp(req: Request): string {
-  const xff = req.headers.get("x-forwarded-for") || "";
-  return xff.split(",")[0]?.trim() || "unknown";
+  const real = req.headers.get("x-real-ip")?.trim();
+  if (real) return real;
+  const vercel = req.headers.get("x-vercel-forwarded-for")?.split(",")[0]?.trim();
+  if (vercel) return vercel;
+  const hops = (req.headers.get("x-forwarded-for") || "")
+    .split(",")
+    .map((h) => h.trim())
+    .filter(Boolean);
+  return hops.length ? hops[hops.length - 1]! : "unknown";
 }
 
 /** The 429 every bucket returns: a friendly `error` string, because every
