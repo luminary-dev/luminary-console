@@ -24,6 +24,21 @@ async function sign(secret: string, value: string): Promise<string> {
   return toB64url(sig);
 }
 
+/** Constant-time comparison for HMAC/signature checks on the auth boundary.
+ *  The inputs are fixed-length (SHA-256 hex / base64url), so the length
+ *  short-circuit leaks nothing meaningful; the loop is the point — it does not
+ *  stop at the first differing byte, closing the timing side channel that `===`
+ *  opens (AUDIT.md SEC-04). Web-Crypto only, so it runs in the proxy and in
+ *  Node routes alike, matching the rest of this module. */
+export function timingSafeEqualStr(a: string, b: string): boolean {
+  const ea = new TextEncoder().encode(a);
+  const eb = new TextEncoder().encode(b);
+  if (ea.length !== eb.length) return false;
+  let diff = 0;
+  for (let i = 0; i < ea.length; i++) diff |= (ea[i] ?? 0) ^ (eb[i] ?? 0);
+  return diff === 0;
+}
+
 /** Session id embedded in every token — 8 random bytes as 16 hex chars.
  *  Identifies the login in the session registry so it can be revoked. */
 export function newSid(): string {
@@ -55,6 +70,6 @@ export async function verifySessionToken(
   const absN = Number(abs), idleN = Number(idle);
   if (!Number.isFinite(absN) || !Number.isFinite(idleN) || !SID_RE.test(sid)) return null;
   if (absN < Date.now() || idleN < Date.now()) return null;
-  if ((await sign(secret, `lum-admin.${abs}.${idle}.${sid}`)) !== sig) return null;
+  if (!timingSafeEqualStr(await sign(secret, `lum-admin.${abs}.${idle}.${sid}`), sig)) return null;
   return { absExp: absN, sid };
 }
