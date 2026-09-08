@@ -3,6 +3,7 @@
 // server-side so there is no loading state to design. Authed by the proxy
 // like every console route.
 import Link from "next/link";
+import { after } from "next/server";
 import { recentActivity, markNotificationsSeen, getNotificationsSeenAt } from "@/lib/activity";
 import { getIndex } from "@/lib/store";
 import ActivityList from "@/components/ActivityList";
@@ -25,8 +26,11 @@ export default async function ActivityPage() {
   // the Sessions card on the dashboard. Show client and document activity only.
   const entries = all.filter((e) => e.target !== "console");
   // Opening the log is the acknowledgement — clear the dashboard's client
-  // notification badge for the team. Best-effort; never blocks the render.
-  await markNotificationsSeen();
+  // notification badge for the team. Run AFTER the response, not during render:
+  // a write in the render body re-fires on any RSC prefetch/replay, safe today
+  // only because the page is force-dynamic (AUDIT.md UI-06). (The badge is
+  // still team-global, not per-operator — tracked separately in AUDIT.md.)
+  after(() => markNotificationsSeen());
   // Slugs that still exist get a link; deleted clients stay plain text rather
   // than 404-ing the operator.
   const clients = Object.fromEntries(index.map((e) => [e.slug, e.company]));

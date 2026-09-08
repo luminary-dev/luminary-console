@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import { getClient } from "@/lib/store";
 import { DOC_LABELS, type DocType } from "@/lib/types";
 import DocActions from "@/components/DocActions";
@@ -60,7 +61,10 @@ export default async function ClientPage({
     getClientSeenAt(slug),
     getDocViews(slug),
   ]);
-  await markClientSeen(slug);
+  // After the response, not in the render body (AUDIT.md UI-06). The reads
+  // above intentionally use the pre-mark seenAt so this load still shows the
+  // "new" badges; next load they are seen.
+  after(() => markClientSeen(slug));
   const now = Date.now();
   // The cards below declare `email?: string`, which under
   // exactOptionalPropertyTypes means "absent", not "present and undefined".
