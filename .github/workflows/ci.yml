@@ -188,3 +188,33 @@ jobs:
           # --redact so a finding never prints the secret into a public log.
           ./gitleaks git . --redact --verbose --exit-code 1
           rm -f "${ASSET}" "gitleaks_${GITLEAKS_VERSION}_checksums.txt" gitleaks
+
+  # One required status check that is green only when EVERY job above is green
+  # (AUDIT.md OPS-04). Point the branch ruleset's required check at this job
+  # ("All checks") instead of "Build": that makes the security scan and the
+  # workflow lint actually gate merges, and — because this job runs with
+  # if: always() and asserts each result explicitly — a skipped upstream job
+  # (e.g. build skipped because quality failed) fails the gate rather than
+  # being treated as passing.
+  gate:
+    name: All checks
+    if: always()
+    needs: [quality, build, security, workflows]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every job to have succeeded
+        # Results arrive through the environment, never interpolated into the
+        # script (the repo's script-injection rule); they are a fixed enum
+        # anyway, but the pattern stays consistent.
+        env:
+          RESULTS: "${{ needs.quality.result }} ${{ needs.build.result }} ${{ needs.security.result }} ${{ needs.workflows.result }}"
+        run: |
+          set -euo pipefail
+          echo "job results: ${RESULTS}"
+          for r in ${RESULTS}; do
+            if [ "$r" != "success" ]; then
+              echo "A required job did not succeed — blocking the merge." >&2
+              exit 1
+            fi
+          done
