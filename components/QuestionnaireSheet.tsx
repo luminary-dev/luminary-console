@@ -13,6 +13,7 @@
 import { useEffect, useState } from "react";
 import QuestionnaireForm from "./QuestionnaireForm";
 import ThemeToggle from "./ThemeToggle";
+import { MAIN_ID } from "@/components/SkipLink";
 import type { Section } from "@/lib/questions";
 import { LANG_KEY, strings, type Lang } from "@/lib/questions.i18n";
 
@@ -58,7 +59,7 @@ export default function QuestionnaireSheet({
   const t = strings(lang);
 
   return (
-    <main className="sheet" lang={lang === "si" ? "si" : "en"}>
+    <main id={MAIN_ID} tabIndex={-1} className="sheet" lang={lang === "si" ? "si" : "en"}>
       <div className="sheet-top">
         <div className="lang-switch" role="group" aria-label={t.langLabel}>
           <button

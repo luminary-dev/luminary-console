@@ -10,6 +10,7 @@ import { NextResponse } from "next/server";
 import { readState, clearState } from "@/lib/store";
 import { dispatchOps, opsDispatchConfigured } from "@/lib/ghops";
 import { currentOperator } from "@/lib/operator";
+import { logger } from "@/lib/logger";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -57,10 +58,13 @@ async function relay(req: Request): Promise<Response> {
       actor,
     });
   } catch (e) {
-    // A dispatch failure (revoked token, GitHub down) must reach the UI as a
-    // readable error, not an opaque 500.
+    // A dispatch failure (revoked token, GitHub down) reaches the UI as a
+    // readable but GENERIC error; the real cause — which can carry GitHub API
+    // detail/tokens — is logged through the redactor, not interpolated into the
+    // response body (AUDIT.md API-09, the LC-005/LC-017 pattern).
+    logger.error("ops relay dispatch failed", { err: e, path: target });
     return NextResponse.json(
-      { error: `Ops dispatch failed: ${e instanceof Error ? e.message : String(e)}` },
+      { error: "Couldn't start the operation on GitHub Actions. Please try again." },
       { status: 502 },
     );
   }

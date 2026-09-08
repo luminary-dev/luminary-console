@@ -5,6 +5,7 @@
 import { useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
+import { MAIN_ID } from "@/components/SkipLink";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -65,7 +66,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="sheet sheet--auth">
+    <main id={MAIN_ID} tabIndex={-1} className="sheet sheet--auth">
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
         <ThemeToggle />
       </div>
