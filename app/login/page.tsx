@@ -95,7 +95,7 @@ export default function LoginPage() {
               required
             />
           </label>
-          {error && <div className="form-error">{error}</div>}
+          {error && <div className="form-error" role="alert">{error}</div>}
           <button className="btn" style={{ marginTop: 22 }} disabled={busy}>
             {busy ? "Checking…" : "Continue"}
           </button>
@@ -120,7 +120,7 @@ export default function LoginPage() {
               style={{ fontSize: 22, letterSpacing: ".35em", fontFamily: "var(--mono)" }}
             />
           </div>
-          {error && <div className="form-error">{error}</div>}
+          {error && <div className="form-error" role="alert">{error}</div>}
           <button className="btn" style={{ marginTop: 22 }} disabled={busy || code.length !== 6}>
             {busy ? "Checking…" : "Sign in"}
           </button>

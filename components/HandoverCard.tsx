@@ -108,7 +108,7 @@ export default function HandoverCard({
         )}
       </div>
 
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
       {dialog}
     </div>
   );

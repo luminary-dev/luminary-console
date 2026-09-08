@@ -244,6 +244,7 @@ export default function BillingCard({
       {otherFor && (
         <div style={{ marginTop: 12 }}>
           <textarea
+            aria-label="Billing instructions"
             className="q-box"
             rows={2}
             placeholder={
@@ -412,6 +413,7 @@ export default function BillingCard({
                       <div style={{ marginTop: 10 }}>
                         <textarea
                           className="q-box"
+                          aria-label="Revision instructions"
                           rows={2}
                           placeholder="Revision instructions"
                           value={instructions}
@@ -510,7 +512,7 @@ export default function BillingCard({
         </div>
       )}
 
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
       {dialog}
     </div>
   );

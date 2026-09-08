@@ -165,6 +165,7 @@ export default function DocActions({
         <div style={{ marginTop: 10 }}>
           <textarea
             className="q-box"
+            aria-label={exists ? "Revision instructions" : "What to bill"}
             rows={2}
             placeholder={
               exists
@@ -209,7 +210,7 @@ export default function DocActions({
           </button>
         </div>
       )}
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
       {dialog}
     </div>
   );

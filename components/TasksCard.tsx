@@ -176,7 +176,7 @@ export default function TasksCard({ slug, tasks }: { slug: string; tasks: Task[]
           Add
         </button>
       </div>
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
     </div>
   );
 }

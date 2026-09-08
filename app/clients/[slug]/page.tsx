@@ -144,7 +144,7 @@ export default async function ClientPage({
           publishedCount={ORDER.filter((t) => client.docs[t]?.status === "published").length}
         />
         {client.dnsStatus !== "automated" && (
-          <div className="form-error" style={{ marginTop: 14 }}>
+          <div className="form-error" role="alert" style={{ marginTop: 14 }}>
             DNS is <b>{client.dnsStatus}</b>: the links above won&apos;t resolve until the CNAME
             &quot;{client.slug}&quot; → cname.vercel-dns.com exists in Cloudflare and the domain is
             attached to the Vercel project. Set CLOUDFLARE_API_TOKEN / VERCEL_TOKEN to automate this.

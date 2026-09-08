@@ -156,7 +156,7 @@ export default function PortalUploads({
               <span aria-hidden="true">✓</span> {justSent} file{justSent > 1 ? "s" : ""} sent to the studio.
             </p>
           )}
-          {error && <div className="form-error">{error}</div>}
+          {error && <div className="form-error" role="alert">{error}</div>}
         </div>
       )}
 

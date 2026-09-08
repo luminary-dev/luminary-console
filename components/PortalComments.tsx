@@ -126,7 +126,7 @@ export default function PortalComments({
               onChange={(e) => setText(e.target.value)}
             />
           </label>
-          {error && <div className="form-error">{error}</div>}
+          {error && <div className="form-error" role="alert">{error}</div>}
           <button className="btn" type="submit" disabled={status === "sending"}>
             {status === "sending" ? "Sending…" : "Send question"}
           </button>

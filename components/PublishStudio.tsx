@@ -157,7 +157,7 @@ function ArticleForm() {
             />
           </label>
         </div>
-        {draftError && <div className="form-error">{draftError}</div>}
+        {draftError && <div className="form-error" role="alert">{draftError}</div>}
         <button type="button" className="btn small" style={{ marginTop: 12 }} disabled={drafting || brief.trim().length < 12} onClick={draft}>
           {drafting ? "Drafting…" : "Draft article"}
         </button>
@@ -216,7 +216,7 @@ function ArticleForm() {
             </label>
           </div>
         </div>
-        {error && <div className="form-error">{error}</div>}
+        {error && <div className="form-error" role="alert">{error}</div>}
         {busy && (
           <div className="notice">
             Publishing: generating the cover with gpt-image-2 and opening the PR against dev. About a minute; don&apos;t close the tab.
@@ -294,7 +294,7 @@ function ProjectForm() {
             />
           </label>
         </div>
-        {draftError && <div className="form-error">{draftError}</div>}
+        {draftError && <div className="form-error" role="alert">{draftError}</div>}
         <button type="button" className="btn small" style={{ marginTop: 12 }} disabled={drafting || brief.trim().length < 12} onClick={draft}>
           {drafting ? "Drafting…" : "Draft case study"}
         </button>
@@ -325,7 +325,7 @@ function ProjectForm() {
             />
           </label>
         </div>
-        {error && <div className="form-error">{error}</div>}
+        {error && <div className="form-error" role="alert">{error}</div>}
         {busy && (
           <div className="notice">
             Publishing: generating the day & dusk thumbnails with gpt-image-2, updating lib/projects.ts and opening the PR against dev. One to two minutes; don&apos;t close the tab.

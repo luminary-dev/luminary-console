@@ -77,7 +77,7 @@ async function InboxData() {
           passed off as current. Reload to retry. If it keeps failing, the object store is the
           place to look: the console reads every GitHub entity from it.
         </p>
-        <p className="form-error">{detail}</p>
+        <p className="form-error" role="alert">{detail}</p>
       </section>
     );
   }

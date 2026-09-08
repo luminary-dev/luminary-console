@@ -118,7 +118,7 @@ export default function NewClientPage() {
           </div>
         </div>
 
-        {error && <div className="form-error">{error}</div>}
+        {error && <div className="form-error" role="alert">{error}</div>}
         {busy && (
           <div className="notice">
             Working: the estimate is being drafted, the questionnaire tailored, the documents

@@ -85,18 +85,18 @@ export default function ChangeOrders({
       <div className="q-fields" style={{ marginTop: 6 }}>
         <div className="q-field" style={{ gridColumn: "1 / span 1" }}>
           <span className="q-label">What changed</span>
-          <input className="q-line" value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="e.g. Added a second enquiry form for the Kandy branch" />
+          <input className="q-line" value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="e.g. Added a second enquiry form for the Kandy branch" aria-label="What changed" />
         </div>
         <div className="q-field half">
           <span className="q-label">Amount (LKR)</span>
-          <input className="q-line" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Leave blank to price automatically" />
+          <input className="q-line" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Leave blank to price automatically" aria-label="Amount in LKR" />
         </div>
       </div>
       <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 6 }}>
         Leave the amount blank to apply the aftercare default: the first 5 change requests are free,
         then LKR 6,000 each. Enter an amount to override (e.g. a larger change quoted first).
       </p>
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
       <button
         className="btn small"
         style={{ marginTop: 14 }}

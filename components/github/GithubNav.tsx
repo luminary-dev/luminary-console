@@ -118,7 +118,7 @@ export function GithubError({
         to look: the console reads every GitHub entity from it.
       </p>
       {children ? <p className="gh-note">{children}</p> : null}
-      <p className="form-error">{detail}</p>
+      <p className="form-error" role="alert">{detail}</p>
     </section>
   );
 }
