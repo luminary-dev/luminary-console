@@ -231,7 +231,19 @@ async function listAllUnder<T>(prefix: string): Promise<T[]> {
   const records = (await mapLimit(keys.slice(0, MAX_OBJECTS_SCANNED), READ_CONCURRENCY, (k) =>
     readStateByKey<T>(k),
   )) as Array<T | null>;
-  return records.filter((r): r is T => r !== null);
+  const kept = records.filter((r): r is T => r !== null);
+  // Surface unreadable entities rather than silently shrinking the list
+  // (AUDIT.md API-03). readState is lenient — a truncated/corrupt object reads
+  // as null — and these org-wide lists never re-derive from a second source, so
+  // a dropped PR/alert would make the inbox or security view quietly say
+  // "nothing failing" while an object it can't parse says otherwise (the LC-070
+  // class). We keep serving what parsed, but the gap is now observable, like
+  // the listing_truncated warning above.
+  const unreadable = records.length - kept.length;
+  if (unreadable > 0) {
+    logger.error("github.projection.unreadable_entities", { prefix, unreadable, total: records.length });
+  }
+  return kept;
 }
 
 /** Read a state object by its FULL bucket key (what listState returns),
