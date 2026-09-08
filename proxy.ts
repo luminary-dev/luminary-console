@@ -65,10 +65,21 @@ function loadGate(): Promise<void> {
 }
 
 async function sidAllowed(sid: string, absExp: number): Promise<boolean> {
-  if (Date.now() - gate.at > GATE_TTL_MS) await loadGate();
+  // Stale-while-revalidate (AUDIT.md API-10): a stale snapshot is served
+  // immediately and refreshed in the background, so a real user no longer pays
+  // the ~850ms R2 round trip inline once a minute. Only a COLD start (no
+  // snapshot yet) blocks on the first load. A revocation therefore propagates
+  // within one refresh cycle of the 60s TTL, which a 60s cache already tolerates.
+  if (Date.now() - gate.at > GATE_TTL_MS) {
+    if (gate.at === 0) await loadGate();
+    else void loadGate();
+  }
   if (gate.sids === null) return true;
   if (gate.sids.has(sid)) return true;
-  // absExp never moves, so this is the login's own creation time.
+  // absExp never moves, so this is the login's own creation time. A sid missing
+  // from the snapshot but ISSUED AFTER it is a session created since the last
+  // load; that one case still blocks on a fresh read so a just-signed-in
+  // operator is not bounced back to /login.
   const issuedAt = absExp - SESSION_ABS_MAX_AGE * 1000;
   if (issuedAt <= gate.at) return false;
   await loadGate();
