@@ -204,11 +204,25 @@ export type AlertEntity = {
 
 // ——— derivation ———
 
-const FAILING: CheckConclusion[] = ["failure", "timed_out", "startup_failure", "action_required"];
+/** The one definition of "a check that failed", shared by the merge verdict,
+ *  the grouped-failures view and the CI-failure notification, so those surfaces
+ *  can't disagree about the same check (AUDIT.md BUG-06). `action_required`
+ *  counts (a required manual gate blocks merge); `cancelled` deliberately does
+ *  NOT (a cancelled result is not a failing one — a cancelled *required* check
+ *  is caught via mergeableState instead); "neutral"/"skipped" are not failures
+ *  either — treating them as red is a classic misread that makes a healthy PR
+ *  look broken. */
+export const FAILING_CONCLUSIONS: readonly CheckConclusion[] = [
+  "failure",
+  "timed_out",
+  "startup_failure",
+  "action_required",
+];
 
-/** "neutral" and "skipped" are NOT failures. Treating them as red is a
- *  classic misread that makes a healthy PR look broken. */
-export const isFailingConclusion = (c: CheckConclusion): boolean => FAILING.includes(c);
+/** Accepts a raw payload string too (workflow_run.conclusion), so every
+ *  surface classifies failure identically. */
+export const isFailingConclusion = (c: string | null | undefined): boolean =>
+  c != null && (FAILING_CONCLUSIONS as readonly string[]).includes(c);
 
 export const isPendingCheck = (c: CheckSummary): boolean =>
   c.status !== "completed" && c.conclusion === null;

@@ -5,7 +5,7 @@
 // and the personal home page. A view is a pure predicate over an entity plus
 // the viewer, which keeps it testable and keeps "why is this PR in this list"
 // answerable.
-import { isStale, mergeReadiness, type PullRequestEntity } from "./entities";
+import { isFailingConclusion, isStale, mergeReadiness, type PullRequestEntity } from "./entities";
 
 export type ViewContext = {
   /** The viewer's GitHub login, so "mine" and "needs my review" mean
@@ -143,7 +143,7 @@ export function groupFailures(
   for (const pr of prs) {
     if (pr.state !== "open") continue;
     for (const check of pr.checks) {
-      if (!["failure", "timed_out", "startup_failure"].includes(check.conclusion ?? "")) continue;
+      if (!isFailingConclusion(check.conclusion)) continue;
       const byPr = groups.get(check.name) ?? new Map();
       byPr.set(`${pr.repo}#${pr.number}`, {
         repo: pr.repo,

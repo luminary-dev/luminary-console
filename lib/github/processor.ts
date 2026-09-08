@@ -20,6 +20,7 @@ import { parseEvent } from "./schema";
 import {
   MAX_ATTEMPTS,
   getDelivery,
+  getSyncState,
   listDeliveries,
   pendingDeliveries,
   setSyncState,
@@ -38,6 +39,12 @@ export type ProcessOutcome = {
   deliveryId: string;
   state: StoredDelivery["state"];
   summary: string;
+  /** True when the failure was transient (a GitHub outage), so the delivery
+   *  stays pending and the sweep should stop early. A structured flag, not a
+   *  "Deferred:" prefix match, so an unrelated handler error whose message
+   *  merely starts with "Deferred:" can't halt the whole queue (AUDIT.md
+   *  BUG-07). */
+  transient?: boolean;
 };
 
 /**
@@ -110,6 +117,7 @@ export async function processDelivery(deliveryId: string): Promise<ProcessOutcom
       deliveryId,
       state: transient ? "pending" : "failed",
       summary: transient ? `Deferred: ${message}` : message,
+      transient,
     };
   }
 }
@@ -129,8 +137,9 @@ export async function processPending(limit = 20): Promise<ProcessOutcome[]> {
     const outcome = await processDelivery(delivery.deliveryId);
     outcomes.push(outcome);
     // Stop early when GitHub is down rather than marching the whole queue
-    // into a deferred state one timeout at a time.
-    if (outcome.summary.startsWith("Deferred:")) break;
+    // into a deferred state one timeout at a time. Keyed on the structured
+    // transient flag, not the summary text (BUG-07).
+    if (outcome.transient) break;
   }
   return outcomes;
 }
@@ -238,6 +247,11 @@ export type DriftReport = {
   removed: number;
   startedAt: string;
   finishedAt: string;
+  /** Set when the reconcile could not run to completion (the live list fetch
+   *  failed). The timer is NOT advanced in that case, so the next sweep retries
+   *  rather than a total verification failure looking like a clean run
+   *  (AUDIT.md BUG-03). */
+  error?: string;
 };
 
 /**
@@ -256,6 +270,7 @@ export async function reconcile(limit = 50): Promise<DriftReport> {
   // The API's own list of what is open. Anything we think is open but is not
   // in this list has been closed or merged without us hearing about it.
   let liveOpen: Set<string> | null = null;
+  let liveError: string | null = null;
   try {
     const live = await fetchOpenPullRequests();
     liveOpen = new Set(live.map((p) => `${p.repo}#${p.number}`));
@@ -276,9 +291,33 @@ export async function reconcile(limit = 50): Promise<DriftReport> {
         });
       }
     }
-  } catch {
-    // Without the live list we can still check individually below.
+  } catch (e) {
+    liveError = e instanceof Error ? e.message : String(e);
     liveOpen = null;
+  }
+
+  // If the live list could not be fetched, NOTHING below was verified: the
+  // per-PR check is gated on it. Reporting checked=N, zero drift and stamping
+  // lastReconciledAt made a total outage look like a healthy reconcile and
+  // deferred the next real check by up to a full interval (BUG-03). Instead
+  // record the error, preserve the previous reconcile stamp so the sweep still
+  // sees itself as due, and return a report that says it failed.
+  if (liveOpen === null) {
+    const prev = await getSyncState("pull_requests").catch(() => null);
+    await setSyncState({
+      resource: "pull_requests",
+      ...(prev?.lastReconciledAt ? { lastReconciledAt: prev.lastReconciledAt } : {}),
+      ...(prev?.lastDrift !== undefined ? { lastDrift: prev.lastDrift } : {}),
+      lastError: liveError ?? "reconcile could not fetch the live pull-request list",
+    });
+    return {
+      checked: 0,
+      drifted,
+      removed,
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      error: liveError ?? "reconcile could not fetch the live pull-request list",
+    };
   }
 
   // Counted rather than taken from stored.length, which overstated the work:
@@ -288,7 +327,7 @@ export async function reconcile(limit = 50): Promise<DriftReport> {
     if (pr.state !== "open") continue;
     checked += 1;
     const key = `${pr.repo}#${pr.number}`;
-    if (liveOpen && !liveOpen.has(key)) {
+    if (!liveOpen.has(key)) {
       const fresh = await fetchPullRequest(pr.repo, pr.number).catch(() => null);
       if (!fresh) {
         // Actually remove it, matching what the handler does on a 404. It

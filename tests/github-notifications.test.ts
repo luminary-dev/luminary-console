@@ -11,6 +11,14 @@ vi.mock("@/lib/store", () => ({
   writeState: vi.fn(async (p: string, d: unknown) => {
     objects.set(p, structuredClone(d));
   }),
+  // Sequential read-modify-write is enough for these tests (they don't inject a
+  // race); the real updateState adds the If-Match retry that BUG-04 relies on.
+  updateState: vi.fn(async (p: string, mutate: (c: unknown) => unknown) => {
+    const current = objects.has(p) ? structuredClone(objects.get(p)) : null;
+    const next = mutate(current);
+    objects.set(p, structuredClone(next));
+    return next;
+  }),
   clearState: vi.fn(async (p: string) => {
     objects.delete(p);
   }),

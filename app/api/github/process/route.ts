@@ -95,7 +95,7 @@ export async function POST(req: Request) {
     const processed = outcomes.filter((o) => o.state === "processed").length;
     const failed = outcomes.filter((o) => o.state === "failed").length;
     const skipped = outcomes.filter((o) => o.state === "skipped").length;
-    const deferred = outcomes.filter((o) => o.summary.startsWith("Deferred:")).length;
+    const deferred = outcomes.filter((o) => o.transient).length;
 
     // Reconciliation is the scheduled drift check, and it costs a full org
     // read, so it does not run on every five-minute sweep. Rather than

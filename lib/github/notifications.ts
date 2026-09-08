@@ -10,7 +10,7 @@
 // one PR is one notification, updated in place, not ten". So a notification
 // has a stable GROUP KEY derived from the thing it is about, and delivery
 // collapses onto that key rather than appending.
-import { readState, writeState, listState } from "@/lib/store";
+import { readState, updateState, listState } from "@/lib/store";
 
 export type Urgency = "urgent" | "normal" | "low";
 export type Channel = "push" | "telegram" | "inapp" | "email";
@@ -235,39 +235,41 @@ export async function deliverInApp(
   urgency: Urgency,
 ): Promise<StoredNotification> {
   const path = notifPath(recipient, event.groupKey);
-  const existing = await readState<StoredNotification>(path).catch(() => null);
   const now = new Date().toISOString();
 
-  if (existing && !existing.readAt) {
-    const updated: StoredNotification = {
-      ...existing,
+  // Compare-and-swap, not read-modify-write: two deliveries collapsing onto the
+  // same group arrive as separate concurrent after() callbacks, and a plain
+  // read+write let both read count:1 and both write count:2 (one increment
+  // lost), or both take the "create fresh" branch and overwrite each other
+  // (AUDIT.md BUG-04). The mutate is pure — it derives the next state from what
+  // is actually stored right now, and re-runs against the winner on a conflict.
+  return updateState<StoredNotification>(path, (existing) => {
+    if (existing && !existing.readAt) {
+      return {
+        ...existing,
+        title: event.title,
+        ...(event.body ? { body: event.body } : {}),
+        url: event.url,
+        // Keep the highest urgency seen in the group: a failing check after ten
+        // pushes must not be softened by the pushes.
+        urgency: rank(urgency) > rank(existing.urgency) ? urgency : existing.urgency,
+        updatedAt: now,
+        count: existing.count + 1,
+      };
+    }
+    return {
+      id: `${safe(event.groupKey)}-${Date.now()}`,
+      groupKey: event.groupKey,
+      recipient,
       title: event.title,
       ...(event.body ? { body: event.body } : {}),
       url: event.url,
-      // Keep the highest urgency seen in the group: a failing check after ten
-      // pushes must not be softened by the pushes.
-      urgency: rank(urgency) > rank(existing.urgency) ? urgency : existing.urgency,
+      urgency,
+      createdAt: now,
       updatedAt: now,
-      count: existing.count + 1,
+      count: 1,
     };
-    await writeState(path, updated);
-    return updated;
-  }
-
-  const created: StoredNotification = {
-    id: `${safe(event.groupKey)}-${Date.now()}`,
-    groupKey: event.groupKey,
-    recipient,
-    title: event.title,
-    ...(event.body ? { body: event.body } : {}),
-    url: event.url,
-    urgency,
-    createdAt: now,
-    updatedAt: now,
-    count: 1,
-  };
-  await writeState(path, created);
-  return created;
+  });
 }
 
 const rank = (u: Urgency): number => ({ low: 0, normal: 1, urgent: 2 })[u];
@@ -291,11 +293,23 @@ export async function listNotifications(
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
+/** Marker to abort an updateState without writing (there is nothing to mark, or
+ *  it is already read). Thrown from the mutate and swallowed by the caller. */
+class NothingToMark {}
+
 /** Mark one group read. Reading it in the console marks it read everywhere,
- *  which is the mandate's requirement, because the store is the single copy. */
+ *  which is the mandate's requirement, because the store is the single copy.
+ *  Compare-and-swap so it can't revert a concurrent deliverInApp's count
+ *  increment (AUDIT.md BUG-04). */
 export async function markRead(recipient: string, groupKey: string): Promise<void> {
   const path = notifPath(recipient, groupKey);
-  const existing = await readState<StoredNotification>(path).catch(() => null);
-  if (!existing || existing.readAt) return;
-  await writeState(path, { ...existing, readAt: new Date().toISOString() });
+  try {
+    await updateState<StoredNotification>(path, (existing) => {
+      if (!existing || existing.readAt) throw new NothingToMark();
+      return { ...existing, readAt: new Date().toISOString() };
+    });
+  } catch (e) {
+    if (e instanceof NothingToMark) return;
+    throw e;
+  }
 }

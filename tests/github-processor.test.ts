@@ -653,18 +653,46 @@ describe("reconcile", () => {
     expect((await reconcile()).drifted).toEqual([]);
   });
 
-  it("reports nothing rather than guessing when the live list is unavailable", async () => {
-    // Without the live list every stored PR looks equally suspicious, and
-    // inventing drift would poison the signal the report exists to carry.
+  it("reports failure rather than a clean run when the live list is unavailable (BUG-03)", async () => {
+    // Without the live list NOTHING is verified: the per-PR check is gated on
+    // it. Reporting checked=N / zero drift and stamping lastReconciledAt made a
+    // total outage look healthy and deferred the next real check by an interval.
     await seedProjection([pullRequest({ number: 1 }), pullRequest({ number: 2 })]);
     api.openPullRequestsError = new Error("503 Service Unavailable");
 
     const report = await reconcile();
 
-    expect(report.checked).toBe(2);
-    expect(report.drifted).toEqual([]);
-    const sync = objects.get("github/sync/pull_requests.json") as { lastDrift?: number };
-    expect(sync?.lastDrift).toBe(0);
+    expect(report.checked).toBe(0); // nothing was actually compared
+    expect(report.drifted).toEqual([]); // no invented drift
+    expect(report.error).toBeTruthy(); // the outage is surfaced, not hidden
+    const sync = objects.get("github/sync/pull_requests.json") as {
+      lastReconciledAt?: string;
+      lastError?: string;
+    };
+    expect(sync?.lastError).toBeTruthy(); // recorded for the admin UI / alerting
+    expect(sync?.lastReconciledAt).toBeUndefined(); // timer NOT advanced → next sweep retries
+  });
+
+  it("preserves the previous reconcile stamp on a failed pass (BUG-03)", async () => {
+    await seedProjection([pullRequest({ number: 1 })]);
+    // A healthy reconcile ran an hour ago.
+    objects.set("github/sync/pull_requests.json", {
+      resource: "pull_requests",
+      lastReconciledAt: "2026-09-07T00:00:00Z",
+      lastDrift: 0,
+    });
+    api.openPullRequestsError = new Error("network down");
+
+    await reconcile();
+
+    const sync = objects.get("github/sync/pull_requests.json") as {
+      lastReconciledAt?: string;
+      lastError?: string;
+    };
+    // The stamp is preserved (not advanced), so reconcileIsDue still fires next
+    // sweep, and the error is recorded alongside it.
+    expect(sync?.lastReconciledAt).toBe("2026-09-07T00:00:00Z");
+    expect(sync?.lastError).toBeTruthy();
   });
 
   it("bounds how much of the projection one pass reads", async () => {
