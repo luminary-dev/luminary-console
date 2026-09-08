@@ -2,6 +2,7 @@
 // All money values are pre-formatted strings ("LKR 35,000" / "35,000") so the
 // model owns rounding/formatting and the templates stay dumb.
 import type { ClientRecord, DocType } from "../types";
+import { assertDocData } from "./schema";
 import { esc, paras, clientBlock, metaRow, policyBox, shell, type Mode } from "./shell";
 import { STUDIO_SIGNATURE, STUDIO_SIGNATURE_NAME } from "./signature";
 
@@ -521,6 +522,9 @@ export function renderDoc(
   data: unknown,
   ctx: Ctx,
 ): string {
+  // Validate the data shape at this boundary (AUDIT.md API-05): a malformed
+  // draft fails here with a typed error rather than crashing inside a renderer.
+  assertDocData(type, data);
   switch (type) {
     case "estimate":
       return renderEstimate(data as EstimateData, ctx);
