@@ -5,6 +5,7 @@
 // contract: guarded (no-ops without VAPID keys), best-effort, never throws,
 // so a failed notice can't break the action that triggered it.
 import webpush from "web-push";
+import { logger } from "@/lib/logger";
 import { readState, writeState } from "./store";
 
 export type StoredPushSubscription = {
@@ -92,7 +93,7 @@ export async function sendPush(
         } catch (e) {
           const code = (e as { statusCode?: number })?.statusCode;
           if (code === 404 || code === 410) dead.push(sub.endpoint);
-          else console.error("Push send failed:", code ?? e);
+          else logger.error("Push send failed", { err: code ?? e });
         }
       }),
     );
@@ -102,7 +103,7 @@ export async function sendPush(
     }
     return sent;
   } catch (e) {
-    console.error("Push send error:", e);
+    logger.error("Push send error", { err: e });
     return 0;
   }
 }

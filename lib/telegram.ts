@@ -3,6 +3,7 @@
 // TELEGRAM_CHAT_ID aren't set, and never throws, so a failed notice can't break
 // the portal action that triggered it. `text` may use Telegram HTML tags
 // (<b>, <a href>); escape dynamic values with tgEsc first.
+import { logger } from "@/lib/logger";
 const TG_API = "https://api.telegram.org";
 
 /** Escape the three characters Telegram's HTML parse mode is strict about. */
@@ -43,7 +44,7 @@ export async function sendTelegram(text: string): Promise<boolean> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) {
-    console.warn("TELEGRAM_BOT_TOKEN/CHAT_ID missing — telegram notice skipped");
+    logger.warn("TELEGRAM_BOT_TOKEN/CHAT_ID missing — telegram notice skipped");
     return false;
   }
   try {
@@ -58,12 +59,12 @@ export async function sendTelegram(text: string): Promise<boolean> {
       }),
     });
     if (!res.ok) {
-      console.error("Telegram send failed:", res.status, await res.text().catch(() => ""));
+      logger.error("Telegram send failed", { status: res.status, body: await res.text().catch(() => "") });
       return false;
     }
     return true;
   } catch (e) {
-    console.error("Telegram send error:", e);
+    logger.error("Telegram send error", { err: e });
     return false;
   }
 }

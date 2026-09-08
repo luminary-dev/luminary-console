@@ -26,6 +26,7 @@ import {
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { logger } from "@/lib/logger";
 import { bucket, r2 } from "./r2";
 import { assetKey, assetUrl, STORE_PREFIX } from "./assets";
 import type { ClientRecord, IndexEntry } from "./types";
@@ -290,7 +291,7 @@ export async function updateJson<T>(
       // S3 and R2 always return an ETag, so this is unreachable in practice.
       // Degrading to the old unconditional write beats bricking every mutation
       // if some proxy ever strips the header, but it must be visible.
-      console.warn(`updateJson: no ETag for ${key}, writing without a precondition.`);
+      logger.warn("updateJson: no ETag, writing without a precondition", { key });
       conditions = {};
     }
 

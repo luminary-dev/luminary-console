@@ -4,6 +4,7 @@
 // of the record. Best-effort; a failed stamp just means no receipt this time.
 import { readState, writeState } from "./store";
 
+import { logger } from "@/lib/logger";
 const PATH = "doc_views.json";
 const THROTTLE_MS = 15 * 60 * 1000; // don't rewrite more than once per 15 min
 
@@ -28,6 +29,6 @@ export async function markDocView(slug: string, docKey: string): Promise<void> {
     map[slug] = { ...(map[slug] ?? {}), [docKey]: new Date().toISOString() };
     await writeState(PATH, map);
   } catch (e) {
-    console.error("Doc view stamp failed:", e);
+    logger.error("Doc view stamp failed", { err: e });
   }
 }

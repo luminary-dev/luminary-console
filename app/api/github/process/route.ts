@@ -16,6 +16,7 @@
 // deploy mid-flight, or a GitHub outage leaves deliveries pending, and the
 // sweep is what guarantees they are eventually handled.
 import { timingSafeEqual } from "node:crypto";
+import { logger } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { processPending, reconcile } from "@/lib/github/processor";
 import { getSyncState } from "@/lib/github/inbox";
@@ -114,7 +115,7 @@ export async function POST(req: Request) {
       ...(drift ? { drift } : {}),
     });
   } catch (e) {
-    console.error("[github] processing sweep failed:", e);
+    logger.error("[github] processing sweep failed", { err: e });
     return NextResponse.json({ error: "The processing sweep failed." }, { status: 500 });
   }
 }

@@ -20,6 +20,7 @@
 // the internet and this handler. It is checked before anything else touches
 // the payload.
 import { NextResponse, after } from "next/server";
+import { logger } from "@/lib/logger";
 import { verifyDelivery } from "@/lib/github/webhooks";
 import { recordDelivery, isValidDeliveryId } from "@/lib/github/inbox";
 import { processDelivery } from "@/lib/github/processor";
@@ -39,9 +40,7 @@ export async function POST(req: Request) {
   if (!verified.ok) {
     // Deliberately terse: an attacker probing this endpoint learns only that
     // it refused, not which check failed.
-    console.warn(
-      `[github] rejected delivery: ${verified.reason} (${rawBody.length} bytes)`,
-    );
+    logger.warn("[github] rejected delivery", { reason: verified.reason, bytes: rawBody.length });
     return NextResponse.json({ error: "Rejected." }, { status: verified.status });
   }
 
@@ -80,7 +79,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, duplicate: true });
     }
   } catch (e) {
-    console.error("[github] could not store delivery:", e);
+    logger.error("[github] could not store delivery", { err: e });
     return NextResponse.json({ error: "Could not store the delivery." }, { status: 503 });
   }
 
@@ -92,7 +91,7 @@ export async function POST(req: Request) {
       try {
         await processDelivery(deliveryId);
       } catch (e) {
-        console.error(`[github] processing ${deliveryId} failed:`, e);
+        logger.error("[github] processing failed", { deliveryId, err: e });
       }
     });
   } catch {

@@ -4,6 +4,7 @@
 // server-side, and since the proxy treats the session registry as an
 // allowlist, revoking it kills every copy of that cookie everywhere.
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
 import { revokeSessions } from "@/lib/sessions";
 
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
       // and for anything that does check: the browser's copy of the cookie is
       // gone either way, but the session itself outlived the sign-out and
       // that is exactly the defect this route exists to close.
-      console.error("Sign-out could not revoke the session:", e);
+      logger.error("Sign-out could not revoke the session", { err: e });
       revoked = false;
     }
   }

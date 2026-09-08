@@ -3,6 +3,7 @@
 // client copy) — then kicks off stage-2 drafting AFTER the response, so the
 // client isn't kept waiting on Claude.
 import { NextResponse, after } from "next/server";
+import { logger } from "@/lib/logger";
 import { getClient, putAsset, saveClient, signedAssetUrl } from "@/lib/store";
 import { buildSections, validIds } from "@/lib/questions";
 import { renderAnswers } from "@/lib/templates/answers";
@@ -231,13 +232,13 @@ ${attachmentsHtml}<p>Full answers attached. ${
       try {
         after(draft);
       } catch {
-        void draft().catch((e) => console.error("Stage 2 (fallback) failed:", e));
+        void draft().catch((e) => logger.error("Stage 2 (fallback) failed", { err: e }));
       }
     }
 
     return NextResponse.json({ ok: true, copySent });
   } catch (e) {
-    console.error("Submit failed:", e);
+    logger.error("Submit failed", { err: e });
     return NextResponse.json(
       { error: "We couldn't process your answers just now. Please try again in a minute." },
       { status: 500 },

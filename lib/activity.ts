@@ -4,6 +4,7 @@
 // break the action being logged, so every write is wrapped and swallowed.
 import { readState, writeState } from "./store";
 
+import { logger } from "@/lib/logger";
 export type ActivityEntry = {
   /** ISO timestamp. */
   at: string;
@@ -38,7 +39,7 @@ export async function logActivity(
     });
     await writeState(PATH, entries.slice(-CAP));
   } catch (e) {
-    console.error("Activity log write failed:", e);
+    logger.error("Activity log write failed", { err: e });
   }
 }
 
@@ -112,7 +113,7 @@ export async function markEntryRead(key: string): Promise<void> {
     if (!read.includes(key)) read.push(key);
     await writeState(NOTIF_PATH, { ...s, read: read.slice(-READ_CAP) });
   } catch (e) {
-    console.error("Notification read write failed:", e);
+    logger.error("Notification read write failed", { err: e });
   }
 }
 
@@ -122,7 +123,7 @@ export async function markNotificationsSeen(): Promise<void> {
   try {
     await writeState(NOTIF_PATH, { seenAt: new Date().toISOString(), read: [] });
   } catch (e) {
-    console.error("Notifications seen write failed:", e);
+    logger.error("Notifications seen write failed", { err: e });
   }
 }
 
@@ -148,7 +149,7 @@ export async function markClientSeen(slug: string): Promise<void> {
     map[slug] = new Date().toISOString();
     await writeState(CLIENT_SEEN_PATH, map);
   } catch (e) {
-    console.error("Client seen write failed:", e);
+    logger.error("Client seen write failed", { err: e });
   }
 }
 
@@ -160,7 +161,7 @@ export async function recentActivity(limit = 100): Promise<ActivityEntry[]> {
     // log for a limit of zero, which reads as "show me nothing".
     return limit <= 0 ? [] : entries.slice(-limit).reverse();
   } catch (e) {
-    console.error("Activity log read failed:", e);
+    logger.error("Activity log read failed", { err: e });
     return [];
   }
 }
@@ -173,7 +174,7 @@ export async function activityFor(slug: string, limit = 100): Promise<ActivityEn
     if (limit <= 0) return [];
     return entries.filter((e) => e.target === slug).slice(-limit).reverse();
   } catch (e) {
-    console.error("Activity log read failed:", e);
+    logger.error("Activity log read failed", { err: e });
     return [];
   }
 }

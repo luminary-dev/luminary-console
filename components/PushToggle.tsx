@@ -108,8 +108,11 @@ export default function PushToggle() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ endpoint: sub.endpoint }),
       }).catch(() => {});
-    } catch (e) {
-      console.error("Push subscribe failed:", e);
+    } catch {
+      // Client-side: log a generic line only. The raw error object can carry
+      // the push endpoint / provider detail, and the server redactor doesn't
+      // run in the browser, so we don't echo it (AUDIT.md UI-17).
+      console.error("Push subscribe failed");
     } finally {
       setBusy(false);
     }

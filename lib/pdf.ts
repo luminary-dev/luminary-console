@@ -19,6 +19,7 @@
 // Chromium is launched at most once per serverless invocation, not once per
 // document (LC-032): see the browser lifecycle section below.
 import { existsSync } from "node:fs";
+import { logger } from "@/lib/logger";
 import type { Browser } from "puppeteer-core";
 
 /** Laptop viewport width the design is laid out at before capture. */
@@ -54,7 +55,7 @@ async function step(label: string, fn: () => Promise<unknown>): Promise<void> {
   try {
     await fn();
   } catch (e) {
-    console.warn(`[pdf] hydrate step "${label}" skipped:`, (e as Error)?.message ?? e);
+    logger.warn(`[pdf] hydrate step "${label}" skipped`, { err: e });
   }
 }
 
@@ -321,7 +322,7 @@ async function withBrowser<T>(fn: (browser: Browser) => Promise<T>): Promise<T> 
       // the caller's error and must surface unchanged; only a dead browser
       // earns the retry, and only one.
       if (!(discard && attempt === 0)) throw e;
-      console.warn("[pdf] browser handle was dead, relaunching once.");
+      logger.warn("[pdf] browser handle was dead, relaunching once.");
     } finally {
       await releaseBrowser(browser, discard);
     }

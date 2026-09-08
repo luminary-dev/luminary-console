@@ -6,6 +6,7 @@
 // is swallowed with a log, the same contract the rest of the console's
 // notification code follows.
 import { knownGithubLogins } from "./config";
+import { logger } from "@/lib/logger";
 import {
   DEFAULT_RULES,
   decide,
@@ -206,7 +207,7 @@ export async function notifyForDelivery(event: string, payload: unknown): Promis
       // is the record; the push and Telegram legs are the interruption.
       if (decision.channels.includes("inapp")) {
         await deliverInApp(notification, login, decision.urgency).catch((e) =>
-          console.error("[github] in-app notification failed:", e),
+          logger.error("[github] in-app notification failed", { err: e }),
         );
       }
       if (decision.channels.includes("push")) {
@@ -232,7 +233,7 @@ export async function notifyForDelivery(event: string, payload: unknown): Promis
     }
     return delivered;
   } catch (e) {
-    console.error("[github] notification dispatch failed:", e);
+    logger.error("[github] notification dispatch failed", { err: e });
     return 0;
   }
 }

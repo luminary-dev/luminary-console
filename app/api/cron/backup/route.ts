@@ -10,6 +10,7 @@
 // sends "Authorization: Bearer <CRON_SECRET>" when that env var exists, and
 // manual runs can send the same header.
 import { timingSafeEqual } from "node:crypto";
+import { logger } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getIndex, getClients, mapLimit } from "@/lib/store";
 import { buildZip, type ZipFile } from "@/lib/zip";
@@ -161,7 +162,7 @@ export async function GET(req: Request) {
     }
     return NextResponse.json({ ok: true, clients: index.length, zipBytes: zip.length, dnsIssues: issues.length });
   } catch (e) {
-    console.error("Cron backup failed:", e);
+    logger.error("Cron backup failed", { err: e });
     return NextResponse.json({ error: "Backup failed." }, { status: 500 });
   }
 }
