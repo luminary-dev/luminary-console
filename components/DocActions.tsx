@@ -180,6 +180,7 @@ export default function DocActions({
               style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 8, fontSize: 13, color: "var(--muted)", cursor: "pointer" }}
             >
               <input
+                className="check-24"
                 type="checkbox"
                 checked={cascade}
                 onChange={(e) => setCascade(e.target.checked)}

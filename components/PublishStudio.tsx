@@ -198,6 +198,7 @@ function ArticleForm() {
           <div className="q-field half">
             <label className="check-row">
               <input
+                className="check-24"
                 type="checkbox"
                 checked={inlineImages}
                 onChange={(e) => setInlineImages(e.target.checked)}
@@ -211,7 +212,7 @@ function ArticleForm() {
           </div>
           <div className="q-field half">
             <label className="check-row">
-              <input type="checkbox" checked={isDraftPost} onChange={(e) => setIsDraftPost(e.target.checked)} />
+              <input className="check-24" type="checkbox" checked={isDraftPost} onChange={(e) => setIsDraftPost(e.target.checked)} />
               <span className="q-label">Mark as draft (hidden until the flag is removed)</span>
             </label>
           </div>

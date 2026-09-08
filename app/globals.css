@@ -850,3 +850,7 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Operator checkboxes not wrapped in a .q-check label still must clear the
+   24x24 target-size floor, WCAG 2.5.8 (AUDIT.md UI-10). */
+.check-24 { width: 24px; height: 24px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
