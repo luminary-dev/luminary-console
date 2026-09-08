@@ -206,6 +206,9 @@ export async function proxy(request: NextRequest) {
     // the exemption. The route self-guards: cron via a constant-time bearer,
     // an operator via a session cookie the route now verifies itself.
     pathname === "/api/github/process" ||
+    // Public liveness/readiness probe for external uptime monitoring; returns
+    // no secrets and self-limits its dependency check (AUDIT.md OPS-12).
+    pathname === "/api/health" ||
     pathname.startsWith("/_next") ||
     pathname === "/icon.svg" ||
     pathname === "/favicon.ico" ||
