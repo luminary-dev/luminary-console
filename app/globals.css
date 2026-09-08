@@ -20,6 +20,10 @@
   --accent: #84cc16; --a-text: #3f7305; --a-dim: rgba(132,204,22,.09);
   --a-border: rgba(132,204,22,.28); --desk: #f0f0ee; --r: 18px;
   --danger: #dc2626;
+  /* Readable ink ON the accent fill. The accent is a light green in BOTH
+     themes, so this stays dark in both (same as .btn's colour) — AUDIT.md
+     UI-22, replacing hardcoded #0d0d0f on accent pills. */
+  --on-accent: #0d0d0f;
 }
 html[data-theme="dark"] {
   --bg: #0b0b0d; --off: #141416; --text: #f4f4f5; --muted: #8a8a92;
@@ -28,6 +32,7 @@ html[data-theme="dark"] {
   --accent: #a3e635; --a-text: #a3e635; --a-dim: rgba(163,230,53,.09);
   --a-border: rgba(163,230,53,.22); --desk: #050506;
   --danger: #f87171;
+  --on-accent: #0d0d0f;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html {
@@ -832,4 +837,16 @@ body {
 .q-foot a {
   /* No sizing. This rule exists to carry the comment. */
   overflow-wrap: anywhere;
+}
+
+/* Global reduced-motion safeguard (AUDIT.md UI-16). The theme wipe and modal
+   already honour this in their own code; this neutralises the remaining
+   non-essential hover/focus transforms and transitions for anyone who asks. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

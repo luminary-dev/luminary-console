@@ -65,7 +65,7 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
   const stateLabel = (s?: string) =>
     s === "READY" ? "Live build" : s === "ERROR" ? "Build failed" : s === "CANCELED" ? "Canceled" : s ? "Building…" : "—";
   const stateColor = (s?: string) =>
-    s === "READY" ? "var(--a-text)" : s === "ERROR" ? "var(--danger, #d33)" : "var(--muted)";
+    s === "READY" ? "var(--a-text)" : s === "ERROR" ? "var(--danger)" : "var(--muted)";
 
   const clientPath = `${slug}.${ROOT}/site`;
 

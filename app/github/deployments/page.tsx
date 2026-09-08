@@ -172,7 +172,7 @@ async function DeploymentsData() {
           <h2 className="gh-card-title" id="dep-broken">
             Failed deployments
           </h2>
-          <div className="gh-urgent">
+          <div className="gh-urgent" role="alert">
             <StatusIcon tone="bad" />
             <div>
               <p className="gh-urgent-title">
@@ -272,7 +272,7 @@ async function DeploymentsData() {
             )}
           </p>
           {deploymentFailed(group.latest) ? (
-            <div className="gh-urgent">
+            <div className="gh-urgent" role="alert">
               <StatusIcon tone="bad" />
               <div>
                 <p className="gh-urgent-title">

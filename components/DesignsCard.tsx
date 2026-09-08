@@ -121,7 +121,7 @@ export default function DesignsCard({
         here; publishing renders the PDF and makes both live.
       </p>
       {error && (
-        <p className="notice" style={{ marginTop: 10, color: "var(--danger, #d33)", fontSize: 13 }}>
+        <p className="notice" style={{ marginTop: 10, color: "var(--danger)", fontSize: 13 }}>
           {error}
         </p>
       )}
@@ -150,7 +150,7 @@ export default function DesignsCard({
                   <div style={{ fontSize: 13.5, fontWeight: 600, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                     {d.title}
                     {selectedId === d.id && (
-                      <span className="pill" style={{ background: "var(--accent)", color: "#0d0d0f", borderColor: "var(--accent)" }}>
+                      <span className="pill" style={{ background: "var(--accent)", color: "var(--on-accent)", borderColor: "var(--accent)" }}>
                         Client&apos;s choice
                       </span>
                     )}
