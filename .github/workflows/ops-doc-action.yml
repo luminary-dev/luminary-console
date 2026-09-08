@@ -4,6 +4,9 @@
 name: Ops · Document Action
 run-name: "Ops · Document Action · ${{ inputs.action }} ${{ inputs.doc }} · ${{ inputs.slug }}"
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:

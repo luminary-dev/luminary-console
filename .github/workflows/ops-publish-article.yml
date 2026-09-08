@@ -6,6 +6,9 @@
 name: Ops · Publish Article
 run-name: "Ops · Publish Article · ${{ inputs.title || inputs.brief }}"
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:

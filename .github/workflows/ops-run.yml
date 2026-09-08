@@ -11,6 +11,12 @@
 name: Ops · Console API
 run-name: "Ops · Console API · ${{ inputs.method }} ${{ inputs.path }}${{ inputs.actor && format(' · by {0}', inputs.actor) || '' }}"
 
+# The work runs through backend PATs (CONSOLE_REPO_TOKEN / LANDING_REPO_TOKEN)
+# and Actions secrets, never GITHUB_TOKEN, so scope the default token to read
+# only (AUDIT.md OPS-05).
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:
