@@ -22,6 +22,8 @@ import { processPending, reconcile } from "@/lib/github/processor";
 import { getSyncState } from "@/lib/github/inbox";
 import { githubConfigured } from "@/lib/github/config";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import { studioNotice } from "@/lib/notify";
+import { tgEsc } from "@/lib/telegram";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -104,6 +106,22 @@ export async function POST(req: Request) {
     // older than the interval, or when an operator explicitly asks.
     const forced = url.searchParams.get("reconcile") === "1";
     const drift = forced || (await reconcileIsDue()) ? await reconcile() : null;
+
+    // Alert on the reliability signals reconcile exists to produce (AUDIT.md
+    // OPS-07): a drift means webhooks were missed, an error means the check
+    // itself couldn't run. Reconcile is infrequent (hourly/daily), so this
+    // can't spam. Best-effort — never fails the sweep.
+    if (drift && (drift.error || drift.drifted.length > 0)) {
+      const host = process.env.CONSOLE_HOST || `console.${process.env.ROOT_DOMAIN || "luminary-dev.xyz"}`;
+      await studioNotice({
+        title: drift.error ? "GitHub reconcile could not run" : "Projection drift detected",
+        company: "Engineering",
+        lines: drift.error
+          ? [`The drift check failed: ${tgEsc(String(drift.error).slice(0, 200))}`]
+          : [`${drift.drifted.length} pull request(s) had drifted from GitHub and were corrected.`],
+        url: `https://${host}/github`,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({
       ok: true,
