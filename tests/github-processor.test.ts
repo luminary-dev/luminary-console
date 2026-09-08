@@ -16,6 +16,12 @@ import { atIndex } from "./helpers";
 const objects = new Map<string, unknown>();
 
 vi.mock("@/lib/store", () => ({
+  READ_CONCURRENCY: 8,
+  mapLimit: async <T, R>(items: readonly T[], _limit: number, fn: (x: T, i: number) => Promise<R>) => {
+    const out: R[] = [];
+    for (let i = 0; i < items.length; i++) out[i] = await fn(items[i] as T, i);
+    return out;
+  },
   readState: vi.fn(async (path: string) =>
     objects.has(path) ? structuredClone(objects.get(path)) : null,
   ),

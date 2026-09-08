@@ -13,7 +13,7 @@
 // status), so a shared array would lose deliveries to the exact concurrency
 // problem recorded as LC-002. One key per delivery has no such race, and the
 // delivery id GitHub assigns makes the key naturally idempotent.
-import { readState, writeState, clearState, listState } from "@/lib/store";
+import { readState, writeState, clearState, listState, mapLimit, READ_CONCURRENCY } from "@/lib/store";
 
 export type DeliveryState = "pending" | "processing" | "processed" | "failed" | "skipped";
 
@@ -143,7 +143,7 @@ export type DeliveryFilter = {
 /** Read deliveries, newest first. */
 export async function listDeliveries(filter: DeliveryFilter = {}): Promise<StoredDelivery[]> {
   const ids = await listDeliveryIds(1000);
-  const records = await Promise.all(ids.map((id) => getDelivery(id).catch(() => null)));
+  const records = await mapLimit(ids, READ_CONCURRENCY, (id) => getDelivery(id).catch(() => null));
   return records
     .filter((r): r is StoredDelivery => r !== null)
     .filter((r) => (filter.state ? r.state === filter.state : true))

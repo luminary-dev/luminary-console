@@ -22,6 +22,12 @@ const store = vi.hoisted(() => {
 });
 
 vi.mock("@/lib/store", () => ({
+  READ_CONCURRENCY: 8,
+  mapLimit: async <T, R>(items: readonly T[], _limit: number, fn: (x: T, i: number) => Promise<R>) => {
+    const out: R[] = [];
+    for (let i = 0; i < items.length; i++) out[i] = await fn(items[i] as T, i);
+    return out;
+  },
   updateState: async <T>(path: string, mutate: (current: T | null) => T): Promise<T> => {
     if (store.state.fail) throw new Error("R2 is unreachable");
     store.state.writes += 1;
