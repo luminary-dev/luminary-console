@@ -14,6 +14,7 @@ import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
 import { logActivity } from "@/lib/activity";
 import { rateLimitShared, clientIp } from "@/lib/ratelimit";
+import { requestPortalCode, verifyPortalCode } from "@/lib/portal-otp";
 import { advanceStage } from "@/lib/stage";
 import { esc } from "@/lib/templates/shell";
 import { clipText } from "@/lib/errors";
@@ -54,6 +55,31 @@ export async function POST(
 
   const name = typeof body.name === "string" ? clipText(body.name.trim(), 120) : "";
   if (!name) return NextResponse.json({ error: "Please type your full name to sign." }, { status: 400 });
+
+  // SEC-01: gate the e-signature behind a one-time code emailed to the client's
+  // on-file address (same two-phase flow as accept). Email-less clients fall
+  // through to name-only; an old published contract's one-step form gets
+  // { needsCode } with no `ok` and shows an error until republished.
+  const code = typeof body.code === "string" ? body.code.trim() : "";
+  if (client.email) {
+    if (!code) {
+      const sent = await requestPortalCode(slug, "sign", client.email, "agreement");
+      return NextResponse.json({
+        needsCode: true,
+        ...(sent === "throttled" ? { note: "A code was sent moments ago. Check your email." } : {}),
+      });
+    }
+    const result = await verifyPortalCode(slug, "sign", code);
+    if (result !== "ok") {
+      const error =
+        result === "expired"
+          ? "That code has expired. Request a new one."
+          : result === "locked"
+            ? "Too many attempts. Please request a new code shortly."
+            : "That code isn't right. Please check your email and try again.";
+      return NextResponse.json({ needsCode: true, error }, { status: 400 });
+    }
+  }
 
   const rawIp = clientIp(req);
   const ip = rawIp === "unknown" ? "" : rawIp;

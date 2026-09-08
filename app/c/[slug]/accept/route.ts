@@ -13,6 +13,7 @@ import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
 import { logActivity } from "@/lib/activity";
 import { rateLimitShared, clientIp } from "@/lib/ratelimit";
+import { requestPortalCode, verifyPortalCode } from "@/lib/portal-otp";
 import { advanceStage } from "@/lib/stage";
 import { esc } from "@/lib/templates/shell";
 import { clipText } from "@/lib/errors";
@@ -68,6 +69,34 @@ export async function POST(
       { error: "Please type your full name to accept." },
       { status: 400 },
     );
+  }
+
+  // SEC-01: gate this binding action behind a one-time code emailed to the
+  // client's on-file address. Phase 1 (no code): send a code and ask for it.
+  // Phase 2 (code present): verify before recording. A client with no email on
+  // file falls through to name-only (documented fallback). An OLD published
+  // quotation's one-step form sends no code and gets { needsCode } with no
+  // `ok`, so it shows an error rather than a false "accepted" — republish it to
+  // get the code field.
+  const code = typeof body.code === "string" ? body.code.trim() : "";
+  if (client.email) {
+    if (!code) {
+      const sent = await requestPortalCode(slug, "accept", client.email, "quotation");
+      return NextResponse.json({
+        needsCode: true,
+        ...(sent === "throttled" ? { note: "A code was sent moments ago. Check your email." } : {}),
+      });
+    }
+    const result = await verifyPortalCode(slug, "accept", code);
+    if (result !== "ok") {
+      const error =
+        result === "expired"
+          ? "That code has expired. Request a new one."
+          : result === "locked"
+            ? "Too many attempts. Please request a new code shortly."
+            : "That code isn't right. Please check your email and try again.";
+      return NextResponse.json({ needsCode: true, error }, { status: 400 });
+    }
   }
 
   const rawIp = clientIp(req);
