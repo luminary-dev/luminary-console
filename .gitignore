@@ -8,6 +8,8 @@ out/
 next-env.d.ts
 .DS_Store
 .env*
+# …but the committed, value-less template must be tracked (AUDIT.md OPS-11).
+!.env.example
 
 # Coverage output from `npm run test:coverage`.
 coverage/

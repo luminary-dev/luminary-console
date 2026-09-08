@@ -3,6 +3,9 @@
   "version": "1.1.0",
   "private": true,
   "description": "Luminary studio console — AI-drafted client documents (estimate, questionnaire, quotation, proposal, contract, invoice, receipt) on per-client subdomains, end to end",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
