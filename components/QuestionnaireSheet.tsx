@@ -47,6 +47,18 @@ export default function QuestionnaireSheet({
     }
   }, []);
 
+  // Declare the page's language on the document root, not just on <main>, so a
+  // fully-Sinhala page isn't announced as English (WCAG 3.1.1 — AUDIT.md UI-05).
+  // Done in an effect (never during render) so it can't cause a hydration
+  // mismatch, and reset on unmount so navigating away doesn't strand lang="si".
+  useEffect(() => {
+    const root = document.documentElement;
+    root.lang = lang === "si" ? "si" : "en";
+    return () => {
+      root.lang = "en";
+    };
+  }, [lang]);
+
   const pick = (next: Lang) => {
     setLang(next);
     try {

@@ -422,7 +422,10 @@ export default function QuestionnaireForm({
         body: JSON.stringify({ answers, company, sendCopy, copyEmails }),
       });
       const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.error || `Something went wrong (${res.status}).`);
+      // Localised generic when the server gave no message (AUDIT.md UI-05); a
+      // server-supplied `data.error` stays as sent. Upload-specific strings in
+      // FileField still need Sinhala translations authored by the team.
+      if (!res.ok) throw new Error(data?.error || t.errGeneric);
       setCopySent(data?.copySent === true);
       // The answers are with the studio now, so the local draft has done its
       // job. Cleared before the done screen renders so a reload cannot
