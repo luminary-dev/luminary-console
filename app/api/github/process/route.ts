@@ -103,7 +103,7 @@ export async function POST(req: Request) {
     // varies), the sweep decides for itself: reconcile when the last one is
     // older than the interval, or when an operator explicitly asks.
     const forced = url.searchParams.get("reconcile") === "1";
-    const drift = forced || (await reconcileIsDue()) ? await reconcile(50) : null;
+    const drift = forced || (await reconcileIsDue()) ? await reconcile() : null;
 
     return NextResponse.json({
       ok: true,

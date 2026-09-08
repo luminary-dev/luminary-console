@@ -261,8 +261,13 @@ export type DriftReport = {
  * the API means a delivery was lost, and that is a signal about the health of
  * the pipeline. The report is surfaced in the admin UI and alerted on.
  */
-export async function reconcile(limit = 50): Promise<DriftReport> {
+export async function reconcile(limit = 1000): Promise<DriftReport> {
   const startedAt = new Date().toISOString();
+  // Reconcile the FULL stored-open set, not just the 50 most-recently-updated
+  // (AUDIT.md API-12): older stored PRs — the ones least likely to get a fresh
+  // webhook — were never compared against the live list, so their drift
+  // (including a phantom "still open" PR) went undetected. Bounded by the
+  // projection's own MAX_OBJECTS_SCANNED; only open PRs are actually checked.
   const stored = await listAllPullRequests(limit);
   const drifted: DriftReport["drifted"] = [];
   let removed = 0;
