@@ -149,6 +149,22 @@ describe("LC-003: the existing consumers' expectations still hold", () => {
     expect(m.unattributed).toBe(0);
   });
 
+  it("API-13: float residue in a fully-paid invoice does not leave a sub-cent balance", () => {
+    // 33.33 + 33.33 + 33.34 sums to 100.00000000000001 in IEEE-754. Without
+    // cents rounding that residue surfaced as a spurious overpaid/outstanding
+    // fraction and could flip the handover's "settled" decision.
+    const m = summarizeMoney(
+      [invoice("invoice-1", "LUM-INV-0044-01", 100)],
+      [pay(33.33, "invoice-1"), pay(33.33, "invoice-1"), pay(33.34, "invoice-1")],
+    );
+
+    expect(m.outstanding).toBe(0);
+    expect(m.overpaid).toBe(0);
+    expect(m.paid).toBe(100);
+    // The condition lib/handover uses for "Account settled in full".
+    expect(m.invoiced > 0 && m.outstanding <= 0).toBe(true);
+  });
+
   it("keeps `paid` meaning every recorded payment, which the handover pack derives from", () => {
     // lib/handover.ts prints "Other payments received" as
     // money.paid - (payments attributed to published invoices).
