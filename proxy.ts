@@ -51,8 +51,12 @@ function loadGate(): Promise<void> {
     try {
       const { liveSids } = await import("@/lib/sessions");
       gate = { at: Date.now(), sids: new Set(await liveSids()) };
-    } catch {
+    } catch (e) {
       gate = { at: Date.now(), sids: null }; // fail open, see above
+      // Make the open window observable (AUDIT.md SEC-03): while sids is null
+      // the gate accepts any signature-valid unexpired token, including revoked
+      // or de-provisioned ones, so this is the line an alert should fire on.
+      logger.error("session allowlist gate is serving OPEN — session store unreachable", { err: e });
     } finally {
       gateLoad = null;
     }
