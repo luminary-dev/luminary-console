@@ -57,46 +57,33 @@ bearer, no cookie — and observe the 401, or watch `pending` deliveries accumul
 
 ## 1a. Remediation status (branch `audit/2026-09`)
 
-Fixed and verified (lint + typecheck + 762 unit/component tests + `next build`
-green after each commit; new regression tests added for BUG-01, BUG-02, API-02).
-Commit messages carry the finding IDs — `git log --grep <ID>` finds each.
+Fixed and verified — lint + typecheck + 763 unit/component tests + `next build`
+green after each commit; regression tests added for BUG-01, BUG-02, API-02,
+API-05, API-13. Commit messages carry the finding IDs (`git log --grep <ID>`).
 
-**Fixed (51):**
-- Backend/data: **+ API-03** (surface unreadable projection/inbox entities).
-- Frontend/UX/a11y: **+ UI-05** (page `<html lang>` + localised generic error), **+ UI-06** (mark-seen moved off the render path via `after()`), **+ UI-09** (route-level loading skeletons), **+ UI-19** (SessionsCard server-rendered).
+**Fixed (63):**
+- **Security (A0x):** SEC-01 (emailed one-time code on accept/e-sign), SEC-02, SEC-03, SEC-04, SEC-05 *(public-render rate limit; Chromium egress isolation is a deployment-level residual)*, SEC-06, SEC-07, SEC-08 *(delete step-up; full RBAC still open)*.
+- **Backend / data / API:** API-01, API-02, API-03, API-04, API-05 *(Zod on the document contracts; request-body Zod is the mechanical residual)*, API-06 *(idempotency key; the queue is Phase-4)*, API-09, API-10, API-12 *(reconcile full set; orphan GC still open)*, API-13 *(cents rounding; integer-minor-unit representation still open)*.
+- **Correctness (bug hunt):** BUG-01 … BUG-09 (all nine).
+- **Frontend / UX / a11y:** UI-01, UI-02, UI-04, UI-05, UI-06, UI-07, UI-08, UI-09, UI-10, UI-11, UI-12, UI-13, UI-14, UI-15, UI-16, UI-17, UI-18, UI-19, UI-20, UI-21, UI-22.
+- **CI / DevOps / observability:** OPS-02, OPS-04, OPS-05, OPS-06 *(components now measured; raising toward 80/95 is test-writing)*, OPS-07 *(log redaction + drift/reconcile alerting; error-tracking/metrics need a backend)*, OPS-08, OPS-10, OPS-11, OPS-12, OPS-13, OPS-14 *(trust model documented as ADR 0003; the protected-Environment setup is a GitHub config)*.
+- Plus dead-code removal (`_gen.mjs`/`_poll.mjs`). OPS-15 is informational (controls verified correct).
 
-**Originally fixed (46):**
-- **Highs:** API-01, API-02, BUG-01, OPS-01 *(mechanism — see below)*, UI-01, UI-18.
-- **Security:** SEC-02, SEC-03, SEC-04, SEC-05 *(public-render rate limit; egress isolation deferred)*, SEC-06, SEC-07, SEC-08 *(delete step-up; full RBAC deferred)*.
-- **Correctness:** BUG-02, BUG-03, BUG-04, BUG-05, BUG-06, BUG-07, BUG-08, BUG-09.
-- **Backend/data:** API-04, API-09 (+ the CAS foundation under API-02 covers payments/billing/tasks/notes/change-orders/stage and the portal binding writes).
-- **CI/DevOps/observability:** OPS-02, OPS-05, OPS-07 *(log redaction; error-tracking/metrics/alerting deferred)*, OPS-08, OPS-10, OPS-11, OPS-12, OPS-13.
-- **Frontend/UX/a11y:** UI-07, UI-08, UI-10, UI-11, UI-14, UI-15, UI-16, UI-17, UI-20, UI-21, UI-22 — plus dead-code removal (`_gen.mjs`/`_poll.mjs`).
-
-**Deferred — needs your decision, infra access, data migration, or an in-browser pass (18):**
-| ID | Sev | Why deferred |
+**Not executed — genuinely blocked, or a documented trade (6):**
+| ID | Sev | Why it is not in this branch |
 | --- | --- | --- |
-| **SEC-01** | High | Changes live client-facing behaviour (portal capability token / emailed magic-link) and needs a migration for existing published links → **product sign-off**. Surrounding controls hardened in the meantime (SEC-02/04/06 + CSRF). |
-| **UI-02 + UI-04** | High | Console-shell restructure — `<header>`/`<h1>`/landmark split and rendering `ConsoleTopbar` on every page (deleting the hand-rolled bars). Touches 7 pages' layout; best done as one change **with an in-browser verification pass** (offered). |
-| **UI-03 / API-11** | High/Low | Dashboard/`/clients` read-every-record — the fix is a denormalised aggregate/rollup maintained on write; a **data-model change** worth doing deliberately (and verifying the numbers). |
-| SEC-09 | Info | Double-submit CSRF token — deliberate defence-in-depth trade; Origin + `SameSite=Lax` already sound. |
-| SEC-10 | Info | `style-src 'unsafe-inline'` — needs migrating ~36 components' inline styles; documented trade. |
-| SEC-05 (egress) | Low | Chromium network isolation for semi-trusted design HTML — deployment-level; blocking egress can break designs that load remote assets. (DoS half fixed.) |
-| OPS-01 (SHA) | High | SHA-pinning needs live GitHub to resolve each `@vN` tag → commit SHA (offline here). Dependabot `github-actions` added to maintain pins once applied. |
-| API-05 | Med | Zod at every request + document boundary — larger; keep schemas in step with `types.ts`. |
-| API-06 | Med | Client-creation idempotency key + background queue — the queue is a Phase-4 change. |
-| API-10 | Low | Proxy gate stale-while-revalidate / low-latency shared store. |
-| API-12 | Low | Reconcile over the full stored-open set (paged) + a GC cron for orphaned render/upload objects. |
-| API-13 | Info | Integer-minor-unit money — needs a stored-amount migration; latent at whole-rupee scale. |
-| OPS-03 | Med | 3 crons vs the Hobby 2-cron cap — **verify the Vercel plan** (assumption); consolidate or upgrade. |
-| OPS-04 | Med | Make `security`/`workflows` required checks — a **GitHub branch-ruleset** change (assumption). |
-| OPS-06 / OPS-09 | Med/Low | Raise the coverage floor, include `components/**`, add a Playwright a11y/perf CI job — runner-budget/infra. |
-| OPS-07 (tracking) | Med | Error tracking + metrics + alerting — **infra** (Sentry/metrics backend). Log redaction is done. |
-| OPS-14 | Info | Bind ops workflows to a protected GitHub Environment with required reviewers — **GitHub config**. |
-| UI-12 | Low | Image dimensions / `next/image` — needs the real cover/thumbnail aspect ratios. |
-| UI-13 | Low | Relay-latency copy in busy labels — subjective; only inaccurate when Ops-via-Actions is on. |
+| **UI-03 / API-11** | High/Low | Deferred at your instruction. Correct O(N)-read behaviour left as-is (accurate, fine at current volume). **Design to implement later:** on every `saveClient`, denormalise the *time-invariant* inputs into the index entry — `outstanding` (from `clientMoney`), `deliveredAt`, the stored base `stage`, and the earliest-unpaid invoice `dueOn` + its amount — then in `loadClientOverview` derive `currentStage` (from base stage + `deliveredAt`) and `overdue` (dueOn vs now) at read WITHOUT reading each record. Do NOT cache `stage`/`overdue` themselves: both are clock-derived and would go stale. Backfill on read for un-migrated entries. Verify the dashboard totals against a login before relying on it. |
+| **SEC-10** | Info | **Not done, by engineering judgement — details in the summary.** Dropping `style-src 'unsafe-inline'` requires removing every inline style *attribute*, but React `style={{…}}` (incl. dynamic values) renders as attributes CSP can't nonce, so it can't be dropped without a nonce'd-`<style>` rearchitecture; migrating the static styles alone changes nothing security-wise and risks console-wide visual regressions I can't verify without a login. script-src is already strict (nonce + strict-dynamic). Kept as the documented trade. |
+| **SEC-09** | Info | Double-submit CSRF token. The primary defence (Origin/Referer allowlist + `SameSite=Lax`) is already sound; a correct token requires threading a header through every mutating fetch (invasive, breakage-prone, unverifiable here). Accepted trade. |
+| **OPS-01** (SHA) | High | Converting each `actions/*@vN` tag to a commit SHA needs live GitHub to resolve the tags (offline here). Dependabot `github-actions` is wired to maintain the pins once applied — run the one-time SHA resolution with `gh`/network. |
+| **OPS-03** | Med | 3 crons vs the Hobby 2-cron cap. Whether it is a problem depends on the current Vercel plan (not visible in-repo); it works on Pro. Confirm the plan, then consolidate to ≤2 or upgrade. |
+| **OPS-09** | Low | Playwright a11y/perf in CI. The harness (`npm run ix:a11y`) needs a **pre-seeded live session in R2** (global.setup reuses an existing sid) plus the full prod secret set and R2 access in the runner — infra I can't provision or verify green here. Wire it as a nightly job once those secrets exist. |
 
-*(OPS-15 is informational — controls verified correct, no action.)*
+**Two runtime confirmations still recommended:** API-01 (invoke the cron path as
+Vercel does — bearer, no cookie — and expect 200) and BUG-01 (against the live
+org's branch-protection config). SEC-01 also needs an operator end-to-end pass
+on a real client host, and active published quotations/contracts should be
+republished so their accept/sign forms carry the new code step.
 
 ## 2. Findings by severity
 
@@ -756,10 +743,10 @@ render/upload objects (API-12).
 
 - [x] Architecture & Inventory writeup (Phase 1) — §4
 - [x] `AUDIT.md` with all findings, severity counts, fix order
-- [x] Fixes committed on `audit/2026-09` with verification per commit — 51 findings fixed across 29 commits, every one gate-verified (lint/typecheck/tests/build); see §1a
+- [x] Fixes committed on `audit/2026-09` with verification per commit — 63 findings fixed, every one gate-verified (lint/typecheck/tests/build); see §1a
 - [x] Dependency audit output — `npm audit` clean; freshness noted (OPS-08)
 - [x] Prioritized improvements + new-feature roadmap — §6
-- [x] Final summary: fixed vs deferred — §1a (18 deferred, each with a reason)
+- [x] Final summary: fixed vs deferred — §1a (6 not executed, each with a reason)
 - [x] Nothing sensitive printed or committed; no committed secrets found (nothing to rotate)
 
 **Two items to confirm before fixing:** API-01 (runtime cron behaviour) and BUG-01 (live org
