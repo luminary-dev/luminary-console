@@ -11,7 +11,6 @@ import Link from "next/link";
 import SignOut from "@/components/SignOut";
 import ThemeToggle from "@/components/ThemeToggle";
 import PushToggle from "@/components/PushToggle";
-import { MAIN_ID } from "@/components/SkipLink";
 
 /** The four sections of the console. Order is the order on the bar. */
 export const SECTIONS = [
@@ -39,9 +38,13 @@ export default function ConsoleTopbar({
   showNewClient?: boolean;
 }) {
   return (
-    <>
-      <div className="topbar">
-        <div className="brand">
+    // A real <header>/banner landmark OUTSIDE <main>, so the section nav is no
+    // longer inside the page's main region (AUDIT.md UI-02). Pages render this,
+    // then their own <main id={MAIN_ID}> with a heading — the skip-link target
+    // moved onto that <main>. Kept inside the page's .wrap so the bar stays in
+    // the centred column exactly as before.
+    <header className="topbar">
+      <div className="brand">
           <Link href="/">
             Luminary<span>.</span>
           </Link>
@@ -79,13 +82,6 @@ export default function ConsoleTopbar({
             </Link>
           )}
         </div>
-      </div>
-
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id={MAIN_ID} tabIndex={-1} />
-    </>
+    </header>
   );
 }

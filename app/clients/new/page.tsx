@@ -2,9 +2,8 @@
 
 import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { MAIN_ID } from "@/components/SkipLink";
 import AppTabBar from "@/components/AppTabBar";
 import { opsFetch } from "@/lib/ops-fetch";
 
@@ -48,25 +47,10 @@ export default function NewClientPage() {
   };
 
   return (
-    <main className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>New client</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            ← Dashboard
-          </Link>
-        </div>
-      </div>
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id="main-content" tabIndex={-1} />
+    <div className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
+      <ConsoleTopbar current="/clients" subtitle="New client" showNewClient={false} />
+      <main id={MAIN_ID}>
+      <h1 className="sr-only">New client</h1>
 
 
       <form className="card" onSubmit={submit}>
@@ -130,7 +114,8 @@ export default function NewClientPage() {
           {busy ? "Generating…" : "Create client & generate documents"}
         </button>
       </form>
+      </main>
       <AppTabBar />
-    </main>
+    </div>
   );
 }

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { getClient } from "@/lib/store";
@@ -6,9 +5,9 @@ import { DOC_LABELS, type DocType } from "@/lib/types";
 import DocActions from "@/components/DocActions";
 import CopyLink from "@/components/CopyLink";
 import RetryStage2 from "@/components/RetryStage2";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
 import AppTabBar from "@/components/AppTabBar";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { MAIN_ID } from "@/components/SkipLink";
 import DeleteClient from "@/components/DeleteClient";
 import SendToClient from "@/components/SendToClient";
 import BillingCard from "@/components/BillingCard";
@@ -72,25 +71,10 @@ export default async function ClientPage({
   const emailProp = client.email !== undefined ? { email: client.email } : {};
 
   return (
-    <main className="wrap" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>{client.company}</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            ← Dashboard
-          </Link>
-        </div>
-      </div>
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id="main-content" tabIndex={-1} />
+    <div className="wrap" style={{ paddingBottom: 80 }}>
+      <ConsoleTopbar current="/clients" subtitle={client.company} />
+      <main id={MAIN_ID}>
+      <h1 className="sr-only">{client.company}</h1>
 
 
       <div className="card">
@@ -394,7 +378,8 @@ export default async function ClientPage({
       </div>
 
       <DeleteClient slug={slug} company={client.company} />
+      </main>
       <AppTabBar />
-    </main>
+    </div>
   );
 }

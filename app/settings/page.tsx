@@ -4,12 +4,10 @@
 // deliberately. On the dashboard they took a full card and a topbar slot each,
 // competing every day with the work you actually came to do. Here they cost
 // nothing until you go looking.
-import Link from "next/link";
 import { cookies } from "next/headers";
 import AppTabBar from "@/components/AppTabBar";
 import SessionsCard from "@/components/SessionsCard";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
 import { MAIN_ID } from "@/components/SkipLink";
 import { getIndex } from "@/lib/store";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
@@ -30,21 +28,10 @@ export default async function SettingsPage() {
   const sessions = (await listSessions()).map((s) => ({ ...s, current: s.sid === session?.sid }));
 
   return (
-    <main className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Settings</small>
-        </div>
-        <div className="topbar-actions">
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            Back to the dashboard
-          </Link>
-        </div>
-      </div>
-      <div id={MAIN_ID} tabIndex={-1} />
+    <div className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
+      <ConsoleTopbar subtitle="Settings" showNewClient={false} />
+      <main id={MAIN_ID}>
+      <h1 className="sr-only">Settings</h1>
 
       <SessionsCard initial={sessions} />
 
@@ -62,7 +49,8 @@ export default async function SettingsPage() {
         )}
       </section>
 
+      </main>
       <AppTabBar />
-    </main>
+    </div>
   );
 }

@@ -13,6 +13,7 @@ import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
 import CommandPalette from "@/components/CommandPalette";
 import ConsoleTopbar, { SECTIONS } from "@/components/ConsoleTopbar";
+import { MAIN_ID } from "@/components/SkipLink";
 import MarkAllRead from "@/components/MarkAllRead";
 import RelativeTime from "@/components/RelativeTime";
 import { fmtLKR } from "@/lib/money";
@@ -39,8 +40,10 @@ export default async function Hub() {
   const now = Date.now();
 
   return (
-    <main className="wrap" style={{ paddingBottom: 80 }}>
+    <div className="wrap" style={{ paddingBottom: 80 }}>
       <ConsoleTopbar unread={unread} />
+      <main id={MAIN_ID}>
+      <h1 className="sr-only">Dashboard</h1>
 
       <nav className="hub" aria-label="Console sections">
         {SECTIONS.map((s) => (
@@ -134,7 +137,8 @@ export default async function Hub() {
           docNoBase: r.docNoBase,
         }))}
       />
+      </main>
       <AppTabBar />
-    </main>
+    </div>
   );
 }

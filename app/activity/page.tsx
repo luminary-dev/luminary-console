@@ -2,13 +2,12 @@
 // through /api/activity — same data, one fewer round trip, and it renders
 // server-side so there is no loading state to design. Authed by the proxy
 // like every console route.
-import Link from "next/link";
 import { after } from "next/server";
 import { recentActivity, markNotificationsSeen, getNotificationsSeenAt } from "@/lib/activity";
 import { getIndex } from "@/lib/store";
 import ActivityList from "@/components/ActivityList";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { MAIN_ID } from "@/components/SkipLink";
 import AppTabBar from "@/components/AppTabBar";
 
 export const metadata = { title: "Activity" };
@@ -37,25 +36,10 @@ export default async function ActivityPage() {
   const now = Date.now();
 
   return (
-    <main className="wrap" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Activity</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            ← Dashboard
-          </Link>
-        </div>
-      </div>
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id="main-content" tabIndex={-1} />
+    <div className="wrap" style={{ paddingBottom: 80 }}>
+      <ConsoleTopbar current="/activity" subtitle="Activity" />
+      <main id={MAIN_ID}>
+      <h1 className="sr-only">Activity</h1>
 
 
       <div className="card">
@@ -67,7 +51,8 @@ export default async function ActivityPage() {
         </p>
         <ActivityList entries={entries} now={now} clients={clients} seenAt={seenAt} />
       </div>
+      </main>
       <AppTabBar />
-    </main>
+    </div>
   );
 }
