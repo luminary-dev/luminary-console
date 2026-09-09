@@ -206,7 +206,7 @@ export default function BillingCard({
         disabled={!!busy || !hasQuotation}
         onClick={() => call({ action: "generate", kind, stage }, label)}
       >
-        {busy === label ? "Working… ~20s" : label}
+        {busy === label ? "Working… (up to a minute)" : label}
       </button>
     );
   };
@@ -261,7 +261,7 @@ export default function BillingCard({
             disabled={!!busy || !otherText.trim()}
             onClick={() => call({ action: "generate", kind: otherFor, stage: "other", instructions: otherText }, `other-${otherFor}`)}
           >
-            {busy === `other-${otherFor}` ? "Working… ~20s" : `Generate additional ${otherFor}`}
+            {busy === `other-${otherFor}` ? "Working… (up to a minute)" : `Generate additional ${otherFor}`}
           </button>
         </div>
       )}
@@ -425,7 +425,7 @@ export default function BillingCard({
                           disabled={!!busy || !instructions.trim()}
                           onClick={() => call({ action: "regenerate", doc: b.slug, instructions }, `rev-${b.slug}`)}
                         >
-                          {busy === `rev-${b.slug}` ? "Working… ~20s" : "Regenerate"}
+                          {busy === `rev-${b.slug}` ? "Working… (up to a minute)" : "Regenerate"}
                         </button>
                       </div>
                     )}

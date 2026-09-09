@@ -201,8 +201,8 @@ export default function DocActions({
           >
             {busy
               ? cascade
-                ? "Working… (updating related docs, ~1 min)"
-                : "Working… (takes ~30s)"
+                ? "Working… (updating related docs, up to a couple of minutes)"
+                : "Working… (up to a minute)"
               : exists
                 ? cascade
                   ? "Regenerate + apply to related"
