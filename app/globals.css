@@ -119,7 +119,7 @@ summary:focus-visible,
    min-width: auto and will not shrink below its content without it. */
 .portal-link .no--actions { flex-shrink: 1; min-width: 0; }
 
-.topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0 4px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 26px 0 10px; margin-bottom: 6px; }
 
 /* ——— The console menu ———
    The dashboard topbar used to be seven identical ghost pills in one row:
@@ -169,6 +169,50 @@ summary:focus-visible,
 }
 .topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
+/* ——— Account menu ———
+   One disclosure holding the three rarely-touched controls (alerts, Settings,
+   Sign out), so the right of the bar is theme + primary action + this, instead
+   of five same-weight buttons that wrapped to a second row below ~950px.
+   Markup: components/AccountMenu.tsx. */
+.acct { position: relative; display: inline-flex; }
+.acct-trigger { display: inline-flex; align-items: center; gap: 6px; }
+.acct-caret { transition: transform .15s ease; }
+.acct-trigger[aria-expanded="true"] .acct-caret { transform: rotate(180deg); }
+.acct-panel {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 60;
+  min-width: 200px; display: flex; flex-direction: column; gap: 2px;
+  padding: 6px; background: var(--bg);
+  border: 1px solid var(--border-hi); border-radius: 14px;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, .18);
+}
+/* Every row reads the same, whichever component drew it: the Settings link and
+   the alerts / sign-out buttons all collapse to a left-aligned full-width row.
+   The `.btn.ghost` selector is listed explicitly so this beats the pill border
+   that rule sets later in the file (equal-specificity ties would otherwise go
+   to source order, i.e. to the pill). */
+.acct-panel .acct-item,
+.acct-panel .btn,
+.acct-panel .btn.ghost {
+  display: flex; align-items: center; justify-content: flex-start;
+  width: 100%; margin: 0; text-align: left;
+  padding: 10px 12px; border: none; border-radius: 10px;
+  background: none; color: var(--text);
+  font-size: 13.5px; font-weight: 600; line-height: 1.4;
+}
+/* The theme switch keeps its pill shape, so it sits in a labelled row rather
+   than collapsing to a text row like the others. */
+.acct-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 12px;
+}
+.acct-row__label { font-size: 13.5px; font-weight: 600; color: var(--text); }
+@media (prefers-reduced-motion: reduce) { .acct-caret { transition: none; } }
+@media (hover: hover) and (pointer: fine) {
+  .acct-panel .acct-item:hover,
+  .acct-panel .btn:hover,
+  .acct-panel .btn.ghost:hover { background: var(--off); color: var(--text); transform: none; }
+}
+
 /* ——— The hub ———
    Four tiles, the console's four sections, always in the same order and
    always present. The two cards below them are conditional, so the tiles are
@@ -178,15 +222,15 @@ summary:focus-visible,
 .hub {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-top: 22px;
+  gap: 18px;
+  margin-top: 30px;
 }
 .hub-tile {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  min-height: 112px;
-  padding: 20px;
+  gap: 9px;
+  min-height: 122px;
+  padding: 24px;
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--bg);
@@ -242,7 +286,7 @@ summary:focus-visible,
   align-items: baseline;
   gap: 14px;
   flex-wrap: wrap;
-  margin-top: 18px;
+  margin-top: 26px;
   padding: 0 22px;
 }
 .summary-strip__k {
@@ -265,7 +309,7 @@ summary:focus-visible,
   .topnav { border-right: none; padding-right: 0; margin-right: 0; margin-left: 0; }
 }
 
-.brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; }
+.brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; flex-shrink: 0; }
 /* The wordmark is the text colour, not the link colour.
    It became a link when the topbar was unified so clicking it returns you to
    the hub, and it silently inherited `a { color: var(--a-text) }`, which had
@@ -285,13 +329,25 @@ summary:focus-visible,
 .pill.grey { color: var(--muted); background: var(--off); border-color: var(--border-hi); }
 .pill.grey i { background: var(--subtle); }
 
-.card { background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-top: 16px; }
+.card { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; margin-top: 16px; }
 /* Console pages use .wrap (the portal uses .portal, left untouched): give their
    stacked cards a roomier rhythm — more gap between cards and more padding
-   inside — so dense pages like the client detail read less cluttered. */
-.wrap > .card { margin-top: 22px; padding: 26px 28px; }
+   inside — so dense pages like the client detail read less cluttered. The
+   client detail stacks ~11 always-present cards; a wide gutter between them and
+   generous inner padding is what turns that wall into distinct, calm sections
+   rather than one dense block. */
+.wrap > .card { margin-top: 30px; padding: 30px 32px; }
 .wrap > .card > h3 { font-size: 16px; }
-@media (max-width: 720px) { .wrap > .card { margin-top: 16px; padding: 18px 18px; } }
+/* Separate each card's heading from its body so the section it labels reads as
+   its own unit. Not applied when the heading is the flex .card-head row (title
+   + actions), which centres its children — a margin there would knock the
+   title out of alignment. */
+.wrap > .card > h3:first-child { margin-bottom: 14px; }
+/* Same separation for cards whose heading is the title+actions row, but only
+   when body content follows — a trailing gap under a header-only card would
+   just be dead space. */
+.wrap > .card > .card-head:not(:last-child) { margin-bottom: 16px; }
+@media (max-width: 720px) { .wrap > .card { margin-top: 20px; padding: 20px 18px; } }
 .card h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
 .k { font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--label); }
 
@@ -344,8 +400,8 @@ html[data-reveal] *, html[data-reveal] body { transition: none !important; }
 .table-scroll { position: relative; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 8px -22px 0; padding: 0 22px; }
 table.list { width: 100%; border-collapse: collapse; margin-top: 8px; min-width: 560px; }
 .table-scroll table.list { margin-top: 0; }
-table.list th { text-align: left; font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--label); font-weight: 600; padding: 8px 10px; border-bottom: 1.5px solid var(--border-hi); }
-table.list td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+table.list th { text-align: left; font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--label); font-weight: 600; padding: 10px 12px; border-bottom: 1.5px solid var(--border-hi); }
+table.list td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
 /* Sortable header: a real button inside the th so sorting is focusable and
    operable by keyboard (LC-041). It inherits the header's mono type, so the
    column reads identically whether or not it sorts. */
