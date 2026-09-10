@@ -21,6 +21,12 @@ const store = vi.hoisted(() => {
 });
 
 vi.mock("@/lib/store", () => ({
+  READ_CONCURRENCY: 8,
+  mapLimit: async <T, R>(items: readonly T[], _limit: number, fn: (x: T, i: number) => Promise<R>) => {
+    const out: R[] = [];
+    for (let i = 0; i < items.length; i++) out[i] = await fn(items[i] as T, i);
+    return out;
+  },
   readState: vi.fn(async (path: string) => {
     if (store.state.failRead) throw new Error("R2 is unreachable");
     return store.objects.has(path) ? structuredClone(store.objects.get(path)) : null;

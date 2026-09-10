@@ -5,6 +5,7 @@
 // Vercel token/GitHub integration isn't available, the operator can record a
 // manually-deployed URL with the "set" action instead.
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import { getClient, saveClient } from "@/lib/store";
 import { deployRepo, deploymentStatus, parseRepo } from "@/lib/deploy";
 import { ensureSubdomain, removeSubdomain } from "@/lib/domains";
@@ -145,7 +146,7 @@ export async function POST(
         "conflict",
         `This can't be deployed from here: ${reason}. Fix the credential, or use 'Set URL' to record a site you deployed manually.`,
       );
-      console.error(`[${body.requestId}] site action ${action} on ${slug}: ${reason}`);
+      logger.error("site action failed", { requestId: body.requestId, action, slug, reason });
       return NextResponse.json(body, { status: body.status });
     }
     const { body, status } = problemResponse(e, `site action ${action} on ${slug}`);

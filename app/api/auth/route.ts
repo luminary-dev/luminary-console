@@ -2,7 +2,7 @@
 // emailed to that address → session cookie. The step between them is a short
 // HMAC "pending" cookie so the code can only be redeemed by the same browser.
 import { NextResponse } from "next/server";
-import { makeSessionToken, newSid, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/auth";
+import { makeSessionToken, newSid, SESSION_COOKIE, SESSION_MAX_AGE, timingSafeEqualStr } from "@/lib/auth";
 import { verifyUser } from "@/lib/users";
 import { issueOtp, verifyOtp } from "@/lib/otp";
 import { emailAddresses, NO_REPLY } from "@/lib/email";
@@ -33,7 +33,7 @@ async function readPending(secret: string, token: string | undefined): Promise<s
   if (!token) return null;
   const [e, exp, sig] = token.split(".");
   if (!e || !exp || !sig || Number(exp) < Date.now()) return null;
-  if ((await hmac(secret, `otp.${e}.${exp}`)) !== sig) return null;
+  if (!timingSafeEqualStr(await hmac(secret, `otp.${e}.${exp}`), sig)) return null;
   return unb64(e);
 }
 

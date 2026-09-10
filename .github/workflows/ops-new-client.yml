@@ -4,6 +4,9 @@
 name: Ops · New Client
 run-name: "Ops · New Client · ${{ inputs.company }}"
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:

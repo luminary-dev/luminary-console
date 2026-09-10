@@ -107,6 +107,7 @@ export default function TasksCard({ slug, tasks }: { slug: string; tasks: Task[]
             return (
             <div className={`task-row${t.done ? " done" : ""}`} key={`${t.at}-${i}`}>
               <input
+                className="check-24"
                 type="checkbox"
                 checked={t.done}
                 disabled={busy}
@@ -176,7 +177,7 @@ export default function TasksCard({ slug, tasks }: { slug: string; tasks: Task[]
           Add
         </button>
       </div>
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
     </div>
   );
 }

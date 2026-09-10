@@ -6,6 +6,9 @@
 name: Ops · Add Project
 run-name: "Ops · Add Project · ${{ inputs.brief }}"
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:

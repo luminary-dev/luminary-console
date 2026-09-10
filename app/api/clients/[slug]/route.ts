@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { parseUsers, hashPassword } from "@/lib/users";
+import { verifyUser } from "@/lib/users";
 import { rateLimitShared } from "@/lib/ratelimit";
 import { getClient, deleteClient, fetchAsset, mapLimit } from "@/lib/store";
 import { removeClientDomain } from "@/lib/domains";
 import { emailStudio } from "@/lib/email";
-import { logOperatorActivity } from "@/lib/operator";
+import { currentOperator, logOperatorActivity } from "@/lib/operator";
 import { billingLabel } from "@/lib/doclabels";
 import { DOC_LABELS } from "@/lib/types";
 
@@ -35,8 +35,15 @@ export async function DELETE(
 
   const { slug } = await params;
   const body = await req.json().catch(() => ({}));
-  // Any operator's password confirms (see lib/users).
-  const confirmed = typeof body?.password === "string" && (await anyUserPassword(body.password));
+  // SEC-08: confirm the ACTING operator's OWN password, not just any operator's.
+  // A destructive, irreversible delete must be attributable to the person doing
+  // it — one operator can't authorise it with another's credential, and the
+  // activity trail (logged below via the same actor) can't be muddied.
+  const actor = await currentOperator();
+  const confirmed =
+    typeof body?.password === "string" &&
+    actor !== "operator" &&
+    (await verifyUser(actor, body.password)) !== null;
   if (!confirmed) {
     await new Promise((r) => setTimeout(r, 800));
     return NextResponse.json({ error: "Wrong password. Deletion cancelled." }, { status: 403 });
@@ -102,9 +109,3 @@ export async function DELETE(
   return NextResponse.json({ ok: true, objectsDeleted, domainNotes, archived: attachments.length });
 }
 
-async function anyUserPassword(password: string): Promise<boolean> {
-  for (const u of parseUsers()) {
-    if ((await hashPassword(u.salt, password)) === u.hash) return true;
-  }
-  return false;
-}

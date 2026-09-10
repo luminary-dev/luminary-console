@@ -4,6 +4,7 @@
 // Stage 2 (answers in): answers PDF + emails, then Claude drafts quotation /
 // proposal / contract for review.
 import type { Answers, BillingDoc, ClientRecord, DocMeta, DocType, DocVersion } from "./types";
+import { logger } from "@/lib/logger";
 import { BILLING_NO_PREFIX, DOC_NO_PREFIX } from "./types";
 import { fetchAsset, getClient, nextDocNoBase, putAsset, saveClient } from "./store";
 import { renderDoc, type Ctx, type EstimateData, type QuotationData } from "./templates/docs";
@@ -295,7 +296,7 @@ export async function runStage2(slug: string, answers: Answers, submittedAt: str
       attachments,
     );
   } catch (e) {
-    console.error("Stage 2 drafting failed:", e);
+    logger.error("Stage 2 drafting failed", { err: e });
     await emailStudio(
       `Draft generation failed — ${client.company}`,
       `<p>The questionnaire answers arrived (see previous email) but automatic drafting failed: ${String(e)}.</p><p>You can retry from the console.</p>`,

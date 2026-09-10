@@ -43,8 +43,12 @@ export class GitHubUnavailableError extends Error {
 
 // ——— circuit breaker ———
 // Consecutive hard failures open the breaker; while open every call fails
-// fast. One trial request is allowed through after the cooldown (half-open),
-// and a success closes it.
+// fast. A trial request is allowed through after the cooldown (half-open); a
+// success closes it and a failure re-opens it for another cooldown. Re-opening
+// is the fix for AUDIT.md BUG-02: keying the reset on `=== THRESHOLD` meant the
+// breaker armed once and then, past its first cooldown, stayed permanently
+// half-open for the rest of a sustained outage — every call paying the full
+// backoff instead of failing fast, which is exactly what it exists to prevent.
 const BREAKER_THRESHOLD = 5;
 const BREAKER_COOLDOWN_MS = 30_000;
 let consecutiveFailures = 0;
@@ -63,7 +67,9 @@ function recordSuccess(): void {
 
 function recordFailure(): void {
   consecutiveFailures += 1;
-  if (consecutiveFailures === BREAKER_THRESHOLD) breakerOpenedAt = Date.now();
+  // `>=`, not `===`: a failed half-open trial (failure 6, 7, …) must re-open
+  // the breaker, not leave it stuck open-but-elapsed. See the note above.
+  if (consecutiveFailures >= BREAKER_THRESHOLD) breakerOpenedAt = Date.now();
 }
 
 /** Test seam. */

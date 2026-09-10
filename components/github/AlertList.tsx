@@ -88,7 +88,7 @@ export default function AlertList({ alerts }: { alerts: AlertEntity[] }) {
   return (
     <>
       {counts.secrets > 0 ? (
-        <div className="gh-urgent">
+        <div className="gh-urgent" role="alert">
           <StatusIcon tone="bad" />
           <div>
             <p className="gh-urgent-title">

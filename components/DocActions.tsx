@@ -165,6 +165,7 @@ export default function DocActions({
         <div style={{ marginTop: 10 }}>
           <textarea
             className="q-box"
+            aria-label={exists ? "Revision instructions" : "What to bill"}
             rows={2}
             placeholder={
               exists
@@ -179,6 +180,7 @@ export default function DocActions({
               style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 8, fontSize: 13, color: "var(--muted)", cursor: "pointer" }}
             >
               <input
+                className="check-24"
                 type="checkbox"
                 checked={cascade}
                 onChange={(e) => setCascade(e.target.checked)}
@@ -199,8 +201,8 @@ export default function DocActions({
           >
             {busy
               ? cascade
-                ? "Working… (updating related docs, ~1 min)"
-                : "Working… (takes ~30s)"
+                ? "Working… (updating related docs, up to a couple of minutes)"
+                : "Working… (up to a minute)"
               : exists
                 ? cascade
                   ? "Regenerate + apply to related"
@@ -209,7 +211,7 @@ export default function DocActions({
           </button>
         </div>
       )}
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
       {dialog}
     </div>
   );

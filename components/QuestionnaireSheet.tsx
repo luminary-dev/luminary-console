@@ -13,6 +13,7 @@
 import { useEffect, useState } from "react";
 import QuestionnaireForm from "./QuestionnaireForm";
 import ThemeToggle from "./ThemeToggle";
+import { MAIN_ID } from "@/components/SkipLink";
 import type { Section } from "@/lib/questions";
 import { LANG_KEY, strings, type Lang } from "@/lib/questions.i18n";
 
@@ -46,6 +47,18 @@ export default function QuestionnaireSheet({
     }
   }, []);
 
+  // Declare the page's language on the document root, not just on <main>, so a
+  // fully-Sinhala page isn't announced as English (WCAG 3.1.1 — AUDIT.md UI-05).
+  // Done in an effect (never during render) so it can't cause a hydration
+  // mismatch, and reset on unmount so navigating away doesn't strand lang="si".
+  useEffect(() => {
+    const root = document.documentElement;
+    root.lang = lang === "si" ? "si" : "en";
+    return () => {
+      root.lang = "en";
+    };
+  }, [lang]);
+
   const pick = (next: Lang) => {
     setLang(next);
     try {
@@ -58,7 +71,7 @@ export default function QuestionnaireSheet({
   const t = strings(lang);
 
   return (
-    <main className="sheet" lang={lang === "si" ? "si" : "en"}>
+    <main id={MAIN_ID} tabIndex={-1} className="sheet" lang={lang === "si" ? "si" : "en"}>
       <div className="sheet-top">
         <div className="lang-switch" role="group" aria-label={t.langLabel}>
           <button

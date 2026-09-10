@@ -1,0 +1,34 @@
+# Automated dependency updates (AUDIT.md OPS-08).
+#
+# Two ecosystems:
+#   - npm            keeps the held minor/patch bumps and any new advisory from
+#                    drifting unmanaged; grouped so a week is one review, not
+#                    twenty PRs. Majors come as their own PRs (deliberately, so
+#                    eslint 10 / vitest 5 / typescript 7 are opted into, not
+#                    merged by reflex).
+#   - github-actions services the SHA pinning OPS-01 asks for: once each action
+#                    is pinned to a commit SHA, Dependabot bumps the pin and
+#                    keeps the human-readable tag in the trailing comment.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci(deps)"

@@ -144,6 +144,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
 
       <textarea
         className="q-box"
+        aria-label="Assistant prompt"
         rows={3}
         style={{ width: "100%", marginTop: 12 }}
         placeholder="e.g. Draft a short check-in email asking for the logo files they haven't sent."
@@ -167,7 +168,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
         </span>
       </div>
 
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
 
       {answer && (
         <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
@@ -219,10 +220,12 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Subject"
+                aria-label="Email subject"
                 style={{ width: "100%", marginTop: 8 }}
               />
               <textarea
                 className="q-box"
+                aria-label="Email body"
                 rows={6}
                 value={emailBody}
                 onChange={(e) => setEmailBody(e.target.value)}

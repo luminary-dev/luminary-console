@@ -1,22 +1,29 @@
 // The processing sweep.
 //
-// Two callers, one guard each:
-//   - Vercel Cron, which sends `Authorization: Bearer <CRON_SECRET>`. The
-//     proxy waves /api/cron/* past the session gate, but this route is not
-//     under that prefix, so a cron call must carry the bearer AND this route
-//     verifies it constant-time, exactly like the backup cron does.
-//   - A signed-in operator hitting "Process now" in the admin UI, which
-//     arrives with a session cookie and is authorised by the proxy.
+// The proxy waves this exact path past the session gate (AUDIT.md API-01),
+// because Vercel Cron sends `Authorization: Bearer <CRON_SECRET>` and no
+// session cookie — under the old gate a cron call was 401'd here before its
+// own bearer check could run, so the sweep never fired on schedule and the
+// webhook backstop was dead. Both callers are therefore authorised HERE:
+//   - Vercel Cron: the constant-time bearer check (`cronAuthorized`).
+//   - A signed-in operator hitting "Process now": the session cookie, which
+//     this route now verifies itself (`operatorRequest`) — HMAC + the same
+//     live-session allowlist the proxy applies — since the proxy no longer
+//     vouches for the cookie on this exempt path.
 //
 // Why a sweep at all when the webhook route schedules processing after each
 // response: because `after()` is best effort. A cold start that dies, a
 // deploy mid-flight, or a GitHub outage leaves deliveries pending, and the
 // sweep is what guarantees they are eventually handled.
 import { timingSafeEqual } from "node:crypto";
+import { logger } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { processPending, reconcile } from "@/lib/github/processor";
 import { getSyncState } from "@/lib/github/inbox";
 import { githubConfigured } from "@/lib/github/config";
+import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import { studioNotice } from "@/lib/notify";
+import { tgEsc } from "@/lib/telegram";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -48,15 +55,32 @@ function cronAuthorized(req: Request): boolean {
   return got.length === want.length && timingSafeEqual(got, want);
 }
 
-/** A session cookie means the proxy already authorised this request; the
- *  presence of the header is the signal, not its contents (the proxy has
- *  verified it). Cron calls carry no cookie, hence the bearer. */
-function operatorRequest(req: Request): boolean {
-  return (req.headers.get("cookie") || "").includes("lum_session=");
+/** An operator "Process now" arrives with a session cookie. This path is now
+ *  exempt from the proxy's session gate (API-01), so the route must verify the
+ *  token itself rather than trusting the cookie's mere presence: HMAC first,
+ *  then the live-session allowlist the proxy uses, so a revoked or forged
+ *  cookie is refused here just as it would be at the edge. Cron calls carry no
+ *  cookie and use the bearer instead. */
+async function operatorRequest(req: Request): Promise<boolean> {
+  const secret = process.env.SESSION_SECRET || "";
+  const cookie = req.headers.get("cookie") || "";
+  const prefix = `${SESSION_COOKIE}=`;
+  const raw = cookie.split(/;\s*/).find((c) => c.startsWith(prefix))?.slice(prefix.length);
+  const session = await verifySessionToken(secret, raw ? decodeURIComponent(raw) : undefined);
+  if (!session) return false;
+  try {
+    const { liveSids } = await import("@/lib/sessions");
+    return new Set(await liveSids()).has(session.sid);
+  } catch {
+    // Session store unreachable: accept a signature-valid, unexpired token,
+    // matching the proxy's documented fail-open (proxy.ts) rather than locking
+    // the operator out during an R2 outage. The bearer path is unaffected.
+    return true;
+  }
 }
 
 export async function POST(req: Request) {
-  if (!cronAuthorized(req) && !operatorRequest(req)) {
+  if (!cronAuthorized(req) && !(await operatorRequest(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!githubConfigured()) {
@@ -73,7 +97,7 @@ export async function POST(req: Request) {
     const processed = outcomes.filter((o) => o.state === "processed").length;
     const failed = outcomes.filter((o) => o.state === "failed").length;
     const skipped = outcomes.filter((o) => o.state === "skipped").length;
-    const deferred = outcomes.filter((o) => o.summary.startsWith("Deferred:")).length;
+    const deferred = outcomes.filter((o) => o.transient).length;
 
     // Reconciliation is the scheduled drift check, and it costs a full org
     // read, so it does not run on every five-minute sweep. Rather than
@@ -81,7 +105,23 @@ export async function POST(req: Request) {
     // varies), the sweep decides for itself: reconcile when the last one is
     // older than the interval, or when an operator explicitly asks.
     const forced = url.searchParams.get("reconcile") === "1";
-    const drift = forced || (await reconcileIsDue()) ? await reconcile(50) : null;
+    const drift = forced || (await reconcileIsDue()) ? await reconcile() : null;
+
+    // Alert on the reliability signals reconcile exists to produce (AUDIT.md
+    // OPS-07): a drift means webhooks were missed, an error means the check
+    // itself couldn't run. Reconcile is infrequent (hourly/daily), so this
+    // can't spam. Best-effort — never fails the sweep.
+    if (drift && (drift.error || drift.drifted.length > 0)) {
+      const host = process.env.CONSOLE_HOST || `console.${process.env.ROOT_DOMAIN || "luminary-dev.xyz"}`;
+      await studioNotice({
+        title: drift.error ? "GitHub reconcile could not run" : "Projection drift detected",
+        company: "Engineering",
+        lines: drift.error
+          ? [`The drift check failed: ${tgEsc(String(drift.error).slice(0, 200))}`]
+          : [`${drift.drifted.length} pull request(s) had drifted from GitHub and were corrected.`],
+        url: `https://${host}/github`,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({
       ok: true,
@@ -93,7 +133,7 @@ export async function POST(req: Request) {
       ...(drift ? { drift } : {}),
     });
   } catch (e) {
-    console.error("[github] processing sweep failed:", e);
+    logger.error("[github] processing sweep failed", { err: e });
     return NextResponse.json({ error: "The processing sweep failed." }, { status: 500 });
   }
 }

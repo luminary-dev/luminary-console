@@ -2,6 +2,7 @@
 // All money values are pre-formatted strings ("LKR 35,000" / "35,000") so the
 // model owns rounding/formatting and the templates stay dumb.
 import type { ClientRecord, DocType } from "../types";
+import { assertDocData } from "./schema";
 import { esc, paras, clientBlock, metaRow, policyBox, shell, type Mode } from "./shell";
 import { STUDIO_SIGNATURE, STUDIO_SIGNATURE_NAME } from "./signature";
 
@@ -193,10 +194,11 @@ function quotationAcceptBlock(ctx: Ctx): string {
   return `${note}
   <div class="box" id="acceptBox" style="break-inside:avoid;">
     <div class="sec-k">Accept online</div>
-    <div class="small">Type your full name and press accept: this records your acceptance of this quotation, including the payment terms above.</div>
+    <div class="small">Type your full name and press accept: this records your acceptance of this quotation, including the payment terms above. We email a 6-digit code to the address on file to confirm it is you.</div>
     <form id="acceptForm" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;">
       <input type="text" name="company" value="" style="position:absolute;left:-9999px;top:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true">
       <input id="acceptName" type="text" placeholder="Your full name" maxlength="120" autocomplete="name" style="${inputStyle}">
+      <input id="acceptCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="6-digit code" autocomplete="one-time-code" style="display:none;${inputStyle}">
       <button type="submit" id="acceptBtn" style="${btnStyle}">ACCEPT QUOTATION</button>
     </form>
     <div id="acceptMsg" class="small" style="display:none;margin-top:10px;"></div>
@@ -204,17 +206,23 @@ function quotationAcceptBlock(ctx: Ctx): string {
   <style>@media print{#acceptBox{display:none!important;}}</style>
   <script>(function(){
 var f=document.getElementById('acceptForm');if(!f)return;
-var btn=document.getElementById('acceptBtn'),msg=document.getElementById('acceptMsg'),inp=document.getElementById('acceptName');
+var btn=document.getElementById('acceptBtn'),msg=document.getElementById('acceptMsg'),inp=document.getElementById('acceptName'),codeEl=document.getElementById('acceptCode');
+var codeMode=false;
 function say(t){msg.style.display='block';msg.textContent=t;}
-function idle(){btn.disabled=false;btn.style.opacity='';btn.textContent='ACCEPT QUOTATION';}
+function label(){return codeMode?'CONFIRM CODE':'ACCEPT QUOTATION';}
+function idle(){btn.disabled=false;btn.style.opacity='';btn.textContent=label();}
 f.addEventListener('submit',function(e){
 e.preventDefault();
 var n=inp.value.trim();
 if(!n){say('Please type your full name first.');return;}
+if(codeMode&&!codeEl.value.trim()){say('Please enter the 6-digit code we emailed you.');return;}
 btn.disabled=true;btn.style.opacity='.6';btn.textContent='SENDING\\u2026';
-fetch('/accept',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,company:f.elements.company.value})})
+var payload={name:n,company:f.elements.company.value};
+if(codeMode)payload.code=codeEl.value.trim();
+fetch('/accept',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
 .then(function(r){return r.json().then(function(d){return{ok:r.ok,d:d}}).catch(function(){return{ok:r.ok,d:{}}})})
 .then(function(x){
+if(x.d&&x.d.needsCode){codeMode=true;inp.readOnly=true;codeEl.style.display='';codeEl.focus();say((x.d.error||x.d.note)||'We have emailed a 6-digit code to the address on file. Enter it above to confirm.');idle();return;}
 if(x.ok){f.style.display='none';msg.style.display='block';msg.innerHTML='<b>Thank you \\u2014 quotation accepted.</b> '+((x.d&&x.d.already)?'(It was already accepted earlier, so nothing changed.) ':'')+'We\\u2019ll be in touch to start the design stage.';}
 else{say((x.d&&x.d.error)||'Something went wrong \\u2014 please try again, or reply by email.');idle();}
 })
@@ -374,10 +382,11 @@ function contractSignBlock(ctx: Ctx): string {
     "border:none;cursor:pointer;background:var(--text);color:var(--bg);border-radius:100px;padding:11px 22px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;";
   return `<div class="box" id="signBox" style="break-inside:avoid;">
     <div class="sec-k">Sign online</div>
-    <div class="small">Type your full name and press sign: this records your acceptance of this Services Agreement and Statement of Work. Legally valid under the Electronic Transactions Act No. 19 of 2006.</div>
+    <div class="small">Type your full name and press sign: this records your acceptance of this Services Agreement and Statement of Work. We email a 6-digit code to the address on file to confirm it is you. Legally valid under the Electronic Transactions Act No. 19 of 2006.</div>
     <form id="signForm" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;">
       <input type="text" name="company" value="" style="position:absolute;left:-9999px;top:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true">
       <input id="signName" type="text" placeholder="Your full name" maxlength="120" autocomplete="name" style="${inputStyle}">
+      <input id="signCode" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="6-digit code" autocomplete="one-time-code" style="display:none;${inputStyle}">
       <button type="submit" id="signBtn" style="${btnStyle}">SIGN AGREEMENT</button>
     </form>
     <div id="signMsg" class="small" style="display:none;margin-top:10px;"></div>
@@ -385,17 +394,23 @@ function contractSignBlock(ctx: Ctx): string {
   <style>@media print{#signBox{display:none!important;}}</style>
   <script>(function(){
 var f=document.getElementById('signForm');if(!f)return;
-var btn=document.getElementById('signBtn'),msg=document.getElementById('signMsg'),inp=document.getElementById('signName');
+var btn=document.getElementById('signBtn'),msg=document.getElementById('signMsg'),inp=document.getElementById('signName'),codeEl=document.getElementById('signCode');
+var codeMode=false;
 function say(t){msg.style.display='block';msg.textContent=t;}
-function idle(){btn.disabled=false;btn.style.opacity='';btn.textContent='SIGN AGREEMENT';}
+function label(){return codeMode?'CONFIRM CODE':'SIGN AGREEMENT';}
+function idle(){btn.disabled=false;btn.style.opacity='';btn.textContent=label();}
 f.addEventListener('submit',function(e){
 e.preventDefault();
 var n=inp.value.trim();
 if(!n){say('Please type your full name first.');return;}
+if(codeMode&&!codeEl.value.trim()){say('Please enter the 6-digit code we emailed you.');return;}
 btn.disabled=true;btn.style.opacity='.6';btn.textContent='SIGNING\\u2026';
-fetch('/sign-contract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,company:f.elements.company.value})})
+var payload={name:n,company:f.elements.company.value};
+if(codeMode)payload.code=codeEl.value.trim();
+fetch('/sign-contract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
 .then(function(r){return r.json().then(function(d){return{ok:r.ok,d:d}}).catch(function(){return{ok:r.ok,d:{}}})})
 .then(function(x){
+if(x.d&&x.d.needsCode){codeMode=true;inp.readOnly=true;codeEl.style.display='';codeEl.focus();say((x.d.error||x.d.note)||'We have emailed a 6-digit code to the address on file. Enter it above to confirm.');idle();return;}
 if(x.ok){f.style.display='none';msg.style.display='block';msg.innerHTML='<b>Thank you \\u2014 agreement signed.</b> '+((x.d&&x.d.already)?'(It was already signed earlier.) ':'')+'We\\u2019ll be in touch with the next steps.';}
 else{say((x.d&&x.d.error)||'Something went wrong \\u2014 please try again, or reply by email.');idle();}
 })
@@ -521,6 +536,9 @@ export function renderDoc(
   data: unknown,
   ctx: Ctx,
 ): string {
+  // Validate the data shape at this boundary (AUDIT.md API-05): a malformed
+  // draft fails here with a typed error rather than crashing inside a renderer.
+  assertDocData(type, data);
   switch (type) {
     case "estimate":
       return renderEstimate(data as EstimateData, ctx);

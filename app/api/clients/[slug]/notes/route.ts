@@ -3,7 +3,7 @@
 // log entry (a keystroke-driven feed would drown everything else) and no
 // stage side-effects. Authed by the proxy like every /api route.
 import { NextResponse } from "next/server";
-import { getClient, saveClient } from "@/lib/store";
+import { updateClient, StoreConflictError } from "@/lib/store";
 
 export const runtime = "nodejs";
 
@@ -11,9 +11,6 @@ export const runtime = "nodejs";
 const MAX_NOTES = 20_000;
 
 async function save(req: Request, slug: string) {
-  const client = await getClient(slug);
-  if (!client) return NextResponse.json({ error: "Client not found" }, { status: 404 });
-
   const body = await req.json().catch(() => null);
   if (!body || typeof body.notes !== "string") {
     return NextResponse.json({ error: "notes must be a string." }, { status: 400 });
@@ -25,12 +22,26 @@ async function save(req: Request, slug: string) {
     );
   }
 
-  const notes = body.notes;
-  // Cleared notes drop the field entirely rather than storing "".
-  if (notes.trim()) client.notes = notes;
-  else delete client.notes;
-  await saveClient(client);
-  return NextResponse.json({ ok: true, at: new Date().toISOString() });
+  const notes: string = body.notes;
+  try {
+    // Compare-and-swap so an autosave can't clobber a concurrent edit of the
+    // same record (a stage change, a payment) with a stale full-record copy.
+    const updated = await updateClient(slug, (client) => {
+      // Cleared notes drop the field entirely rather than storing "".
+      if (notes.trim()) client.notes = notes;
+      else delete client.notes;
+    });
+    if (!updated) return NextResponse.json({ error: "Client not found" }, { status: 404 });
+    return NextResponse.json({ ok: true, at: new Date().toISOString() });
+  } catch (e) {
+    if (e instanceof StoreConflictError) {
+      return NextResponse.json(
+        { error: "That client was being edited at the same time. Please retry." },
+        { status: 409 },
+      );
+    }
+    throw e;
+  }
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {

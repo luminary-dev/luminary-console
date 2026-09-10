@@ -146,6 +146,21 @@ describe("merge readiness", () => {
     expect(verdict.summary).toBe("Merged");
   });
 
+  // BUG-01: a GraphQL-sourced entity carries mergeableState but no behindBy;
+  // "blocked" and "behind" must still register as blockers, or a
+  // protection-blocked / behind-base PR reads "Ready to merge".
+  it("blocks on branch protection from mergeableState alone (no behindBy)", () => {
+    const verdict = mergeReadiness(pr({ mergeableState: "blocked" }));
+    expect(verdict.ready).toBe(false);
+    expect(verdict.blockers).toContain("blocked_by_protection");
+  });
+
+  it("reports behind-base from mergeableState 'behind' when no behindBy count is present", () => {
+    const verdict = mergeReadiness(pr({ mergeableState: "behind" }));
+    expect(verdict.ready).toBe(false);
+    expect(verdict.blockers).toContain("behind_base");
+  });
+
   it("waits on pending checks rather than calling them ready", () => {
     const verdict = mergeReadiness(pr({ checks: [check("deploy", null, "in_progress")] }));
     expect(verdict.summary).toBe("Waiting on deploy");

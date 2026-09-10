@@ -51,8 +51,12 @@ function loadGate(): Promise<void> {
     try {
       const { liveSids } = await import("@/lib/sessions");
       gate = { at: Date.now(), sids: new Set(await liveSids()) };
-    } catch {
+    } catch (e) {
       gate = { at: Date.now(), sids: null }; // fail open, see above
+      // Make the open window observable (AUDIT.md SEC-03): while sids is null
+      // the gate accepts any signature-valid unexpired token, including revoked
+      // or de-provisioned ones, so this is the line an alert should fire on.
+      logger.error("session allowlist gate is serving OPEN — session store unreachable", { err: e });
     } finally {
       gateLoad = null;
     }
@@ -61,10 +65,21 @@ function loadGate(): Promise<void> {
 }
 
 async function sidAllowed(sid: string, absExp: number): Promise<boolean> {
-  if (Date.now() - gate.at > GATE_TTL_MS) await loadGate();
+  // Stale-while-revalidate (AUDIT.md API-10): a stale snapshot is served
+  // immediately and refreshed in the background, so a real user no longer pays
+  // the ~850ms R2 round trip inline once a minute. Only a COLD start (no
+  // snapshot yet) blocks on the first load. A revocation therefore propagates
+  // within one refresh cycle of the 60s TTL, which a 60s cache already tolerates.
+  if (Date.now() - gate.at > GATE_TTL_MS) {
+    if (gate.at === 0) await loadGate();
+    else void loadGate();
+  }
   if (gate.sids === null) return true;
   if (gate.sids.has(sid)) return true;
-  // absExp never moves, so this is the login's own creation time.
+  // absExp never moves, so this is the login's own creation time. A sid missing
+  // from the snapshot but ISSUED AFTER it is a session created since the last
+  // load; that one case still blocks on a fresh read so a just-signed-in
+  // operator is not bounced back to /login.
   const issuedAt = absExp - SESSION_ABS_MAX_AGE * 1000;
   if (issuedAt <= gate.at) return false;
   await loadGate();
@@ -197,6 +212,18 @@ export async function proxy(request: NextRequest) {
     // so nothing else under /api/github/ inherits the exemption: the delivery
     // inbox and the processing sweep stay behind the session gate.
     pathname === "/api/github/webhook" ||
+    // The processing sweep runs on Vercel Cron, which sends the CRON_SECRET
+    // bearer and NO session cookie, so — exactly like /api/cron/* — it must
+    // skip the session gate or the cron is 401'd here before its own bearer
+    // check runs, and the whole webhook durability backstop never fires
+    // (AUDIT.md API-01; lib/csrf.ts already treated this path as cron-bearer).
+    // Exact path, not a prefix, so nothing else under /api/github/ inherits
+    // the exemption. The route self-guards: cron via a constant-time bearer,
+    // an operator via a session cookie the route now verifies itself.
+    pathname === "/api/github/process" ||
+    // Public liveness/readiness probe for external uptime monitoring; returns
+    // no secrets and self-limits its dependency check (AUDIT.md OPS-12).
+    pathname === "/api/health" ||
     pathname.startsWith("/_next") ||
     pathname === "/icon.svg" ||
     pathname === "/favicon.ico" ||

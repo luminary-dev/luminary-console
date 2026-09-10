@@ -12,6 +12,7 @@
 // rejected one just means "request a new code", so keeping the brute-forcible
 // format alive for one TTL window would buy nothing.
 import { readState, writeState, clearState } from "./store";
+import { timingSafeEqualStr } from "./auth";
 
 const TTL_MS = 10 * 60 * 1000;
 const RESEND_MS = 60 * 1000;
@@ -114,7 +115,7 @@ export async function verifyOtp(email: string, code: string): Promise<OtpResult>
     const rec = await readState<OtpRec>(path);
     if (!rec || rec.exp < Date.now()) return "expired";
     if (rec.attempts >= MAX_ATTEMPTS) return "locked";
-    if (rec.codeHash !== (await hmacHex(`code:${email}:${code.trim()}`))) {
+    if (!timingSafeEqualStr(rec.codeHash, await hmacHex(`code:${email}:${code.trim()}`))) {
       const attempts = rec.attempts + 1;
       await writeState(path, { ...rec, attempts });
       return attempts >= MAX_ATTEMPTS ? "locked" : "wrong";

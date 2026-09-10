@@ -18,6 +18,12 @@ async function sha256Hex(s: string): Promise<string> {
 // at a time. That is what LC-015 is about.
 const state = new Map<string, unknown>();
 vi.mock("@/lib/store", () => ({
+  READ_CONCURRENCY: 8,
+  mapLimit: async <T, R>(items: readonly T[], _limit: number, fn: (x: T, i: number) => Promise<R>) => {
+    const out: R[] = [];
+    for (let i = 0; i < items.length; i++) out[i] = await fn(items[i] as T, i);
+    return out;
+  },
   readState: async (path: string) => {
     await Promise.resolve();
     return state.has(path) ? structuredClone(state.get(path)) : null;

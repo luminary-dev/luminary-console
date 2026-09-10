@@ -2,9 +2,10 @@
 
 // Two-step sign-in: email + password, then the 6-digit code emailed to that
 // address. The pending state lives in an HttpOnly cookie set by the API.
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/ThemeToggle";
+import { MAIN_ID } from "@/components/SkipLink";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,7 +15,14 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
-  const timedOut = typeof window !== "undefined" && window.location.search.includes("timedout");
+  // Read the query param AFTER mount, not during render: reading window during
+  // render makes the server HTML (no window) and the client tree diverge on
+  // /login?timedout=1 — the exact idle-timeout redirect target — a hydration
+  // mismatch (AUDIT.md UI-08). Starts false on both sides, then syncs.
+  const [timedOut, setTimedOut] = useState(false);
+  useEffect(() => {
+    setTimedOut(new URLSearchParams(window.location.search).has("timedout"));
+  }, []);
   const router = useRouter();
   // The code field carries a hint alongside its label, so it is associated
   // explicitly: an implicit label would fold the hint into the accessible name.
@@ -58,7 +66,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="sheet sheet--auth">
+    <main id={MAIN_ID} tabIndex={-1} className="sheet sheet--auth">
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
         <ThemeToggle />
       </div>
@@ -95,7 +103,7 @@ export default function LoginPage() {
               required
             />
           </label>
-          {error && <div className="form-error">{error}</div>}
+          {error && <div className="form-error" role="alert">{error}</div>}
           <button className="btn" style={{ marginTop: 22 }} disabled={busy}>
             {busy ? "Checking…" : "Continue"}
           </button>
@@ -120,7 +128,7 @@ export default function LoginPage() {
               style={{ fontSize: 22, letterSpacing: ".35em", fontFamily: "var(--mono)" }}
             />
           </div>
-          {error && <div className="form-error">{error}</div>}
+          {error && <div className="form-error" role="alert">{error}</div>}
           <button className="btn" style={{ marginTop: 22 }} disabled={busy || code.length !== 6}>
             {busy ? "Checking…" : "Sign in"}
           </button>

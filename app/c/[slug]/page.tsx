@@ -2,6 +2,7 @@
 // with a stage-driven progress stepper, "New" badges for anything published
 // since the client's last visit, and a question box wired to /c/<slug>/comment.
 import Link from "next/link";
+import { MAIN_ID } from "@/components/SkipLink";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getClient } from "@/lib/store";
@@ -77,7 +78,7 @@ export default async function ClientHome({
   const docCount = published.length + publishedBilling.length + 1; // + questionnaire
 
   return (
-    <main className="portal">
+    <main id={MAIN_ID} tabIndex={-1} className="portal">
       <header className="portal-hero">
         <div className="portal-hero__inner">
           <div className="portal-hero__top">

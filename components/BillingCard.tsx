@@ -206,7 +206,7 @@ export default function BillingCard({
         disabled={!!busy || !hasQuotation}
         onClick={() => call({ action: "generate", kind, stage }, label)}
       >
-        {busy === label ? "Working… ~20s" : label}
+        {busy === label ? "Working… (up to a minute)" : label}
       </button>
     );
   };
@@ -244,6 +244,7 @@ export default function BillingCard({
       {otherFor && (
         <div style={{ marginTop: 12 }}>
           <textarea
+            aria-label="Billing instructions"
             className="q-box"
             rows={2}
             placeholder={
@@ -260,7 +261,7 @@ export default function BillingCard({
             disabled={!!busy || !otherText.trim()}
             onClick={() => call({ action: "generate", kind: otherFor, stage: "other", instructions: otherText }, `other-${otherFor}`)}
           >
-            {busy === `other-${otherFor}` ? "Working… ~20s" : `Generate additional ${otherFor}`}
+            {busy === `other-${otherFor}` ? "Working… (up to a minute)" : `Generate additional ${otherFor}`}
           </button>
         </div>
       )}
@@ -412,6 +413,7 @@ export default function BillingCard({
                       <div style={{ marginTop: 10 }}>
                         <textarea
                           className="q-box"
+                          aria-label="Revision instructions"
                           rows={2}
                           placeholder="Revision instructions"
                           value={instructions}
@@ -423,7 +425,7 @@ export default function BillingCard({
                           disabled={!!busy || !instructions.trim()}
                           onClick={() => call({ action: "regenerate", doc: b.slug, instructions }, `rev-${b.slug}`)}
                         >
-                          {busy === `rev-${b.slug}` ? "Working… ~20s" : "Regenerate"}
+                          {busy === `rev-${b.slug}` ? "Working… (up to a minute)" : "Regenerate"}
                         </button>
                       </div>
                     )}
@@ -510,7 +512,7 @@ export default function BillingCard({
         </div>
       )}
 
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
       {dialog}
     </div>
   );

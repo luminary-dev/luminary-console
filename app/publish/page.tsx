@@ -1,5 +1,6 @@
 import PublishStudio from "@/components/PublishStudio";
 import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { MAIN_ID } from "@/components/SkipLink";
 import AppTabBar from "@/components/AppTabBar";
 
 export const metadata = { title: "Publish" };
@@ -11,14 +12,16 @@ export const metadata = { title: "Publish" };
 // desk it's written at.
 export default function PublishPage() {
   return (
-    <main className="wrap" style={{ paddingBottom: 80 }}>
+    <div className="wrap" style={{ paddingBottom: 80 }}>
       {/* showNewClient is off: this page is a form you may be part-way
           through, and a primary button that navigates away from unsaved input
           does not belong beside it. */}
       <ConsoleTopbar current="/publish" subtitle="Publish" showNewClient={false} />
-
+      <main id={MAIN_ID}>
+      <h1 className="sr-only">Publish studio</h1>
       <PublishStudio />
+      </main>
       <AppTabBar />
-    </main>
+    </div>
   );
 }

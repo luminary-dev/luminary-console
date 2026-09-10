@@ -66,6 +66,7 @@ export default function NotesCard({ slug, notes }: { slug: string; notes?: strin
         Private to the console: never shown to the client, never sent anywhere.
       </p>
       <textarea
+        aria-label="Client notes"
         className="q-box"
         rows={5}
         style={{ width: "100%", marginTop: 12 }}
@@ -75,7 +76,7 @@ export default function NotesCard({ slug, notes }: { slug: string; notes?: strin
         onBlur={flush}
       />
       {state === "error" && (
-        <div className="form-error">
+        <div className="form-error" role="alert">
           That didn&apos;t save. Keep the text here, check your connection and click away from the
           box to try again.
         </div>

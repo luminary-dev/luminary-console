@@ -728,3 +728,46 @@ describe("ghGraphQL", () => {
     expect(atIndex(sent, 0)).toEqual({ query: "query($n:Int!){ x }", variables: { n: 5 } });
   });
 });
+
+describe("circuit breaker re-arms during a sustained outage (BUG-02)", () => {
+  it("re-opens after a failed half-open trial instead of staying permanently elapsed", async () => {
+    vi.resetModules();
+    let fetchCalls = 0;
+    globalThis.fetch = vi.fn(async () => {
+      fetchCalls += 1;
+      throw new TypeError("fetch failed");
+    }) as unknown as typeof fetch;
+
+    process.env.GH_TOKEN = "test-token";
+    const { gh, __resetBreaker } = await import("@/lib/github/client");
+    __resetBreaker();
+    vi.useFakeTimers();
+    try {
+      // Five hard failures (one attempt each, no retry) open the breaker.
+      for (let i = 0; i < 5; i++) {
+        await expect(gh("/repos/o/r", { attempts: 1 })).rejects.toThrow(/fetch failed/);
+      }
+      expect(fetchCalls).toBe(5);
+
+      // While open, a call fast-fails without touching the network.
+      const openErr = await gh("/repos/o/r", { attempts: 1 }).catch((e: unknown) => e);
+      expect((openErr as Error).name).toBe("GitHubUnavailableError");
+      expect(fetchCalls).toBe(5);
+
+      // After the cooldown a half-open trial is allowed through — and it fails.
+      vi.advanceTimersByTime(31_000);
+      await expect(gh("/repos/o/r", { attempts: 1 })).rejects.toThrow(/fetch failed/);
+      expect(fetchCalls).toBe(6);
+
+      // The fix: that failed trial re-opens the breaker, so the next call
+      // fast-fails again. Before the fix the breaker stayed elapsed-open and
+      // this call would have reached the network (fetchCalls === 7).
+      const reopenErr = await gh("/repos/o/r", { attempts: 1 }).catch((e: unknown) => e);
+      expect((reopenErr as Error).name).toBe("GitHubUnavailableError");
+      expect(fetchCalls).toBe(6);
+    } finally {
+      vi.useRealTimers();
+      delete process.env.GH_TOKEN;
+    }
+  });
+});

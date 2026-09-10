@@ -13,7 +13,8 @@
 // status), so a shared array would lose deliveries to the exact concurrency
 // problem recorded as LC-002. One key per delivery has no such race, and the
 // delivery id GitHub assigns makes the key naturally idempotent.
-import { readState, writeState, clearState, listState } from "@/lib/store";
+import { readState, writeState, clearState, listState, mapLimit, READ_CONCURRENCY } from "@/lib/store";
+import { logger } from "@/lib/logger";
 
 export type DeliveryState = "pending" | "processing" | "processed" | "failed" | "skipped";
 
@@ -143,7 +144,15 @@ export type DeliveryFilter = {
 /** Read deliveries, newest first. */
 export async function listDeliveries(filter: DeliveryFilter = {}): Promise<StoredDelivery[]> {
   const ids = await listDeliveryIds(1000);
-  const records = await Promise.all(ids.map((id) => getDelivery(id).catch(() => null)));
+  const records = await mapLimit(ids, READ_CONCURRENCY, (id) => getDelivery(id).catch(() => null));
+  // A delivery id that lists but won't read back is either an unparseable
+  // object or a read error — either way an unprocessed delivery vanishing from
+  // the inbox unnoticed, so surface it rather than silently dropping it
+  // (AUDIT.md API-03).
+  const unreadable = records.filter((r) => r === null).length;
+  if (unreadable > 0) {
+    logger.error("github.inbox.unreadable_deliveries", { unreadable, total: records.length });
+  }
   return records
     .filter((r): r is StoredDelivery => r !== null)
     .filter((r) => (filter.state ? r.state === filter.state : true))

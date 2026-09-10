@@ -6,6 +6,7 @@
 // Auth: identical bearer scheme to the backup cron — the proxy waves
 // /api/cron/* past the session gate, so this CRON_SECRET check is the guard.
 import { timingSafeEqual } from "node:crypto";
+import { logger } from "@/lib/logger";
 import { NextResponse } from "next/server";
 import { getIndex, getClients } from "@/lib/store";
 import { emailStudio } from "@/lib/email";
@@ -143,7 +144,7 @@ ${flagged
     await logActivity("system", "ran daily digest", "console", `${flagged.length} client(s), ${totalItems} item(s)`);
     return NextResponse.json({ ok: true, flagged: flagged.length, items: totalItems });
   } catch (e) {
-    console.error("Digest cron failed:", e);
+    logger.error("Digest cron failed", { err: e });
     return NextResponse.json({ error: "Digest failed." }, { status: 500 });
   }
 }

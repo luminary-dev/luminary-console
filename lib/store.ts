@@ -26,6 +26,7 @@ import {
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { logger } from "@/lib/logger";
 import { bucket, r2 } from "./r2";
 import { assetKey, assetUrl, STORE_PREFIX } from "./assets";
 import type { ClientRecord, IndexEntry } from "./types";
@@ -290,7 +291,7 @@ export async function updateJson<T>(
       // S3 and R2 always return an ETag, so this is unreachable in practice.
       // Degrading to the old unconditional write beats bricking every mutation
       // if some proxy ever strips the header, but it must be visible.
-      console.warn(`updateJson: no ETag for ${key}, writing without a precondition.`);
+      logger.warn("updateJson: no ETag, writing without a precondition", { key });
       conditions = {};
     }
 
@@ -588,6 +589,77 @@ export async function saveClient(record: ClientRecord, opts: SaveClientOptions =
     if (i >= 0) return index.map((e, n) => (n === i ? entry : e));
     return [...index, entry];
   });
+}
+
+/** Compare-and-swap for a whole client record. Reads the record FRESH with its
+ *  ETag, applies `mutate`, and writes with If-Match through saveClient, so a
+ *  concurrent edit is retried against the newer record rather than silently
+ *  overwritten. This is the fix for AUDIT.md API-02: every mutating route did
+ *  getClient → mutate → saveClient with no ETag, so two near-simultaneous
+ *  writes (two payments, an operator edit racing a portal action) kept only the
+ *  last, dropping the other — worst on money.
+ *
+ *  `mutate` must be PURE / replayable: it runs against a fresh clone each
+ *  attempt and only the last run is kept, so it must not perform side effects
+ *  (send email, write other objects) — do those after this returns. It may
+ *  return a replacement record or mutate the clone in place. Returns null when
+ *  the record does not exist (callers answer 404). Throws StoreConflictError
+ *  when the record keeps changing past the retry budget (callers answer 409). */
+export async function updateClient(
+  slug: string,
+  mutate: (record: ClientRecord) => ClientRecord | void,
+  opts: { attempts?: number } = {},
+): Promise<ClientRecord | null> {
+  const attempts = Math.max(1, opts.attempts ?? CAS_ATTEMPTS);
+  let lastConflict: unknown = null;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    const { record, etag } = await getClientWithEtag(slug);
+    if (!record) return null;
+    const draft = structuredClone(record);
+    const next = mutate(draft) ?? draft;
+    try {
+      await saveClient(next, etag !== undefined ? { expectedEtag: etag } : {});
+      return next;
+    } catch (e) {
+      if (!(e instanceof StoreConflictError)) throw e;
+      lastConflict = e;
+      if (attempt < attempts - 1) await sleep(backoffMs(attempt));
+    }
+  }
+  throw lastConflict instanceof StoreConflictError
+    ? lastConflict
+    : new StoreConflictError(recordKey(slug), attempts, lastConflict);
+}
+
+/** Atomically claim a slug for creation, for the length of the stage-1
+ *  pipeline (AUDIT.md API-06). A create-only write (`If-None-Match: *`) fails
+ *  if the marker already exists, so a retried or concurrent `POST /api/clients`
+ *  for the same slug can't run Claude drafting, PDF rendering, DNS automation
+ *  and the studio email twice. Returns true if this caller won the claim.
+ *  Paired with releaseClientSlug in a finally, so the claim guards exactly the
+ *  in-flight window and post-creation dedup falls to the record's own existence. */
+export async function claimClientSlug(slug: string): Promise<boolean> {
+  try {
+    await putObject(
+      stateKey(`client-claims/${slug}.json`),
+      JSON.stringify({ at: new Date().toISOString() }),
+      "application/json",
+      { IfNoneMatch: "*" },
+    );
+    return true;
+  } catch (e) {
+    if (isConflict(e)) return false;
+    throw e;
+  }
+}
+
+/** Release a slug claim (best effort). */
+export async function releaseClientSlug(slug: string): Promise<void> {
+  try {
+    await r2().send(new DeleteObjectCommand({ Bucket: bucket(), Key: stateKey(`client-claims/${slug}.json`) }));
+  } catch {
+    /* best effort — a stale claim only blocks a re-create of the same slug */
+  }
 }
 
 /** Delete everything under the client's prefix (record, docs, billing,

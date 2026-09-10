@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getIndex, getClient } from "@/lib/store";
+import { getIndex, getClient, claimClientSlug, releaseClientSlug } from "@/lib/store";
 import { runStage1 } from "@/lib/pipeline";
 import { logOperatorActivity } from "@/lib/operator";
 import { problemResponse } from "@/lib/errors";
@@ -54,6 +54,16 @@ export async function POST(req: Request) {
   if (await getClient(slug)) {
     return NextResponse.json({ error: `Client "${slug}" already exists.` }, { status: 409 });
   }
+  // Atomically claim the slug for the duration of stage 1 (AUDIT.md API-06).
+  // The check above is racy (LC-002 class), and stage 1 is expensive and
+  // partly irreversible (Claude drafting, PDF render, DNS, a studio email), so
+  // a fast double-submit or a retry-on-slow-response must not run it twice.
+  if (!(await claimClientSlug(slug))) {
+    return NextResponse.json(
+      { error: `Client "${slug}" is already being created. Check the dashboard in a moment.` },
+      { status: 409 },
+    );
+  }
 
   // Reg no left blank? Pull it out of the brief automatically if it's there
   // (operators often paste the client's letterhead details into the brief).
@@ -97,6 +107,11 @@ export async function POST(req: Request) {
       "Creating the client did not complete. Check the dashboard before retrying, and quote the reference below if you report it.";
     const { body, status } = problemResponse(e, `client creation for ${slug}`);
     return NextResponse.json({ ...body, detail, error: detail }, { status });
+  } finally {
+    // Release the claim once stage 1 finishes either way: a successful create
+    // is now guarded by the record's own existence (the getClient check), and
+    // a failed one should be retryable after the operator checks/cleans up.
+    await releaseClientSlug(slug);
   }
 }
 

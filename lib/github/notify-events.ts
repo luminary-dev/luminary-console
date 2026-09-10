@@ -6,6 +6,8 @@
 // is swallowed with a log, the same contract the rest of the console's
 // notification code follows.
 import { knownGithubLogins } from "./config";
+import { isFailingConclusion } from "./entities";
+import { logger } from "@/lib/logger";
 import {
   DEFAULT_RULES,
   decide,
@@ -88,9 +90,10 @@ export function toNotificationEvent(event: string, payload: unknown): Notificati
       if (!run || !repo) return null;
       const conclusion = typeof run.conclusion === "string" ? run.conclusion : null;
       // Only a real failure is worth an interruption. neutral and skipped are
-      // not failures, and a success is not news.
-      const failed = ["failure", "timed_out", "startup_failure"].includes(conclusion ?? "");
-      if (!failed) return null;
+      // not failures, and a success is not news. Uses the one shared classifier
+      // so this notification agrees with the merge verdict and the grouped-
+      // failures view (AUDIT.md BUG-06).
+      if (!isFailingConclusion(conclusion)) return null;
       const prs = (run.pull_requests as { number: number }[] | undefined) ?? [];
       const number = prs[0]?.number;
       const name = typeof run.name === "string" ? run.name : "A check";
@@ -170,7 +173,9 @@ export function toNotificationEvent(event: string, payload: unknown): Notificati
         ...(comment.user?.login ? { author: comment.user.login } : {}),
         involves,
         title: `Comment on ${shortRepo(repo)}#${issue?.number ?? ""}`,
-        ...(comment.body ? { body: comment.body.slice(0, 200) } : {}),
+        // Code-point-aware clip so a 200th UTF-16 unit landing mid-surrogate
+        // can't emit a lone surrogate into the Telegram/push payload (BUG-09).
+        ...(comment.body ? { body: [...comment.body].slice(0, 200).join("") } : {}),
         url: comment.html_url ?? ghUrl(repo, issue?.number ?? 0),
         groupKey: `pr:${repo}#${issue?.number ?? 0}`,
       };
@@ -206,7 +211,7 @@ export async function notifyForDelivery(event: string, payload: unknown): Promis
       // is the record; the push and Telegram legs are the interruption.
       if (decision.channels.includes("inapp")) {
         await deliverInApp(notification, login, decision.urgency).catch((e) =>
-          console.error("[github] in-app notification failed:", e),
+          logger.error("[github] in-app notification failed", { err: e }),
         );
       }
       if (decision.channels.includes("push")) {
@@ -232,7 +237,7 @@ export async function notifyForDelivery(event: string, payload: unknown): Promis
     }
     return delivered;
   } catch (e) {
-    console.error("[github] notification dispatch failed:", e);
+    logger.error("[github] notification dispatch failed", { err: e });
     return 0;
   }
 }

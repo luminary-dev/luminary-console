@@ -41,6 +41,7 @@ import {
   putWorkflowRun,
 } from "./projection";
 import { toActor, toWorkflowRunEntity } from "./entities";
+import { mapLimit, READ_CONCURRENCY } from "@/lib/store";
 import {
   CheckRunEvent,
   CheckSuiteEvent,
@@ -543,7 +544,8 @@ export async function handleEvent(ctx: HandlerContext): Promise<HandlerResult> {
  *  cheaper than storing every job event. */
 export async function syncWorkflowRuns(repo: string, limit = 50): Promise<number> {
   const runs = await fetchWorkflowRuns(repo, limit);
-  await Promise.all(runs.map((r) => putWorkflowRun(r)));
+  // Bounded fan-out over up to `limit` R2 writes (AUDIT.md API-04).
+  await mapLimit(runs, READ_CONCURRENCY, (r) => putWorkflowRun(r));
   return runs.length;
 }
 

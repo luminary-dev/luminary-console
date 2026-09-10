@@ -65,7 +65,7 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
   const stateLabel = (s?: string) =>
     s === "READY" ? "Live build" : s === "ERROR" ? "Build failed" : s === "CANCELED" ? "Canceled" : s ? "Building…" : "—";
   const stateColor = (s?: string) =>
-    s === "READY" ? "var(--a-text)" : s === "ERROR" ? "var(--danger, #d33)" : "var(--muted)";
+    s === "READY" ? "var(--a-text)" : s === "ERROR" ? "var(--danger)" : "var(--muted)";
 
   const clientPath = `${slug}.${ROOT}/site`;
 
@@ -84,8 +84,8 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
       {!site ? (
         <div style={{ marginTop: 16 }}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <input className="q-line" style={{ flex: "1 1 280px" }} placeholder="github.com/luminary-dev/eco-mech-site" value={repo} onChange={(e) => setRepo(e.target.value)} />
-            <input className="q-line" style={{ width: 110 }} placeholder="branch" value={ref} onChange={(e) => setRef(e.target.value)} />
+            <input className="q-line" style={{ flex: "1 1 280px" }} aria-label="Repository" placeholder="github.com/luminary-dev/eco-mech-site" value={repo} onChange={(e) => setRepo(e.target.value)} />
+            <input className="q-line" style={{ width: 110 }} aria-label="Branch" placeholder="branch" value={ref} onChange={(e) => setRef(e.target.value)} />
             <button className="btn small" disabled={!!busy || !repo.trim()} onClick={() => call({ action: "deploy", repo, ref }, "deploy")}>
               {busy === "deploy" ? "Deploying…" : "Deploy"}
             </button>
@@ -95,7 +95,7 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
           </button>
           {showManual && (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
-              <input className="q-line" style={{ flex: "1 1 280px" }} placeholder="https://the-live-site.example" value={manualUrl} onChange={(e) => setManualUrl(e.target.value)} />
+              <input className="q-line" style={{ flex: "1 1 280px" }} aria-label="Live site URL" placeholder="https://the-live-site.example" value={manualUrl} onChange={(e) => setManualUrl(e.target.value)} />
               <button className="btn small" disabled={!!busy || !manualUrl.trim()} onClick={() => call({ action: "set", repo, ref, url: manualUrl }, "set")}>
                 {busy === "set" ? "Saving…" : "Save site"}
               </button>
@@ -149,7 +149,7 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
           )}
         </div>
       )}
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
     </div>
   );
 }

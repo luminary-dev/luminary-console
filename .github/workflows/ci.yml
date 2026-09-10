@@ -15,10 +15,18 @@ on:
     branches: [main]
   pull_request:
 
+# Least privilege by default: nothing here writes to the repo. The one job
+# that needs the token only reads it, and the notify step uses its own
+# secrets, not GITHUB_TOKEN. Elevate per-job if a future job needs more.
+# (AUDIT.md OPS-05)
+permissions:
+  contents: read
+
 jobs:
   quality:
     name: 1 · Lint, typecheck & test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out
         uses: actions/checkout@v7
@@ -47,6 +55,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: quality
+    timeout-minutes: 15
     steps:
       - name: Check out
         uses: actions/checkout@v7
@@ -84,6 +93,7 @@ jobs:
   workflows:
     name: 3 · Workflow lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out
         uses: actions/checkout@v7
@@ -100,15 +110,19 @@ jobs:
       # had already succeeded: shellcheck returns clean on that pattern,
       # verified directly. Static analysis of shell is a floor, not a
       # guarantee, and pipeline bugs still need a real run to find.
-      - name: Install shellcheck
-        env:
-          SHELLCHECK_VERSION: 0.11.0
+      # Use the ShellCheck that ships in the ubuntu-latest runner image (its
+      # integrity comes from the image), rather than curling a release tarball
+      # with no checksum. The old manual download verified nothing — unlike the
+      # actionlint and gitleaks steps below, which do check a sha256 — so a
+      # tampered asset or a MITM would have run an attacker binary in CI
+      # (AUDIT.md OPS-02). actionlint runs whatever shellcheck is on PATH.
+      - name: Verify shellcheck is available
         run: |
           set -euo pipefail
-          ASSET="shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
-          curl -sSfL -O "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/${ASSET}"
-          tar -xJf "${ASSET}"
-          sudo install "shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
+          if ! command -v shellcheck >/dev/null 2>&1; then
+            echo "shellcheck is not on PATH on this runner image." >&2
+            exit 1
+          fi
           shellcheck --version
       - name: Install actionlint
         env:
@@ -129,6 +143,7 @@ jobs:
   security:
     name: 2 · Security scan
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out
         uses: actions/checkout@v7
@@ -173,3 +188,33 @@ jobs:
           # --redact so a finding never prints the secret into a public log.
           ./gitleaks git . --redact --verbose --exit-code 1
           rm -f "${ASSET}" "gitleaks_${GITLEAKS_VERSION}_checksums.txt" gitleaks
+
+  # One required status check that is green only when EVERY job above is green
+  # (AUDIT.md OPS-04). Point the branch ruleset's required check at this job
+  # ("All checks") instead of "Build": that makes the security scan and the
+  # workflow lint actually gate merges, and — because this job runs with
+  # if: always() and asserts each result explicitly — a skipped upstream job
+  # (e.g. build skipped because quality failed) fails the gate rather than
+  # being treated as passing.
+  gate:
+    name: All checks
+    if: always()
+    needs: [quality, build, security, workflows]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every job to have succeeded
+        # Results arrive through the environment, never interpolated into the
+        # script (the repo's script-injection rule); they are a fixed enum
+        # anyway, but the pattern stays consistent.
+        env:
+          RESULTS: "${{ needs.quality.result }} ${{ needs.build.result }} ${{ needs.security.result }} ${{ needs.workflows.result }}"
+        run: |
+          set -euo pipefail
+          echo "job results: ${RESULTS}"
+          for r in ${RESULTS}; do
+            if [ "$r" != "success" ]; then
+              echo "A required job did not succeed — blocking the merge." >&2
+              exit 1
+            fi
+          done

@@ -849,6 +849,16 @@ describe("the GraphQL mapping's own quirks", () => {
     expect(map({ mergeable: "UNKNOWN" }).mergeable).toBeNull();
   });
 
+  it("maps mergeStateStatus into REST's lowercase mergeableState (BUG-01)", () => {
+    // Without this the GraphQL entity had no mergeableState, so a blocked or
+    // behind PR read "ready to merge" once reconcile overwrote the REST entity.
+    expect(map({ mergeStateStatus: "BLOCKED" }).mergeableState).toBe("blocked");
+    expect(map({ mergeStateStatus: "BEHIND" }).mergeableState).toBe("behind");
+    expect(map({ mergeStateStatus: "CLEAN" }).mergeableState).toBe("clean");
+    // UNKNOWN ("still computing") must not masquerade as a real state.
+    expect(map({ mergeStateStatus: "UNKNOWN" }).mergeableState).toBeUndefined();
+  });
+
   it("lowercases SCREAMING_CASE conclusions into the REST vocabulary", () => {
     // Every consumer of CheckSummary expects REST's spelling; normalising here
     // means the merge readiness rules never ask which transport produced them.

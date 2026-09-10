@@ -14,38 +14,39 @@ const PING_MS = 5 * 60 * 1000;
  *  (UX-21). Skipping the ping outright is both quieter and one fewer request. */
 const NO_SESSION_PATHS = new Set(["/login"]);
 
-export default function SessionGuard() {
+export default function SessionGuard({ enabled = true }: { enabled?: boolean }) {
   const last = useRef(Date.now());
   useEffect(() => {
-    // The client subdomains are handled by the ping's own 401 (there is no
-    // session concept there at all), but the console's own login page is
-    // known statically, so do not even ask.
+    // Disabled on client subdomains (no session there at all), so the ping
+    // can't 401 and spew console errors on client-facing pages (UI-11); the
+    // console's own login page is skipped statically too.
+    if (!enabled) return;
     if (NO_SESSION_PATHS.has(window.location.pathname)) return;
 
-    let enabled = true;
+    let active = true;
     const mark = () => { last.current = Date.now(); };
     const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"] as const;
     const ping = async () => {
       const r = await fetch("/api/ping", { cache: "no-store" }).catch(() => null);
-      if (!r || !r.ok) enabled = false;
-      return enabled;
+      if (!r || !r.ok) active = false;
+      return active;
     };
     ping();
     events.forEach((e) => window.addEventListener(e, mark, { passive: true }));
     const tick = setInterval(async () => {
-      if (!enabled) return;
+      if (!active) return;
       if (Date.now() - last.current >= IDLE_MS) {
         await fetch("/api/logout", { method: "POST" }).catch(() => {});
         window.location.href = "/login?timedout=1";
       }
     }, 30_000);
     const slide = setInterval(() => {
-      if (enabled && Date.now() - last.current < PING_MS) ping();
+      if (active && Date.now() - last.current < PING_MS) ping();
     }, PING_MS);
     return () => {
       events.forEach((e) => window.removeEventListener(e, mark));
       clearInterval(tick); clearInterval(slide);
     };
-  }, []);
+  }, [enabled]);
   return null;
 }

@@ -204,11 +204,25 @@ export type AlertEntity = {
 
 // ——— derivation ———
 
-const FAILING: CheckConclusion[] = ["failure", "timed_out", "startup_failure", "action_required"];
+/** The one definition of "a check that failed", shared by the merge verdict,
+ *  the grouped-failures view and the CI-failure notification, so those surfaces
+ *  can't disagree about the same check (AUDIT.md BUG-06). `action_required`
+ *  counts (a required manual gate blocks merge); `cancelled` deliberately does
+ *  NOT (a cancelled result is not a failing one — a cancelled *required* check
+ *  is caught via mergeableState instead); "neutral"/"skipped" are not failures
+ *  either — treating them as red is a classic misread that makes a healthy PR
+ *  look broken. */
+export const FAILING_CONCLUSIONS: readonly CheckConclusion[] = [
+  "failure",
+  "timed_out",
+  "startup_failure",
+  "action_required",
+];
 
-/** "neutral" and "skipped" are NOT failures. Treating them as red is a
- *  classic misread that makes a healthy PR look broken. */
-export const isFailingConclusion = (c: CheckConclusion): boolean => FAILING.includes(c);
+/** Accepts a raw payload string too (workflow_run.conclusion), so every
+ *  surface classifies failure identically. */
+export const isFailingConclusion = (c: string | null | undefined): boolean =>
+  c != null && (FAILING_CONCLUSIONS as readonly string[]).includes(c);
 
 export const isPendingCheck = (c: CheckSummary): boolean =>
   c.status !== "completed" && c.conclusion === null;
@@ -343,7 +357,10 @@ export function mergeReadiness(pr: PullRequestEntity): MergeReadiness {
   }
 
   if ((pr.unresolvedThreads ?? 0) > 0) blockers.push("unresolved_conversations");
-  if ((pr.behindBy ?? 0) > 0) blockers.push("behind_base");
+  // behindBy is the REST count; mergeableState "behind" is the same fact from
+  // GraphQL, which carries no count. Either means the head is behind its base
+  // (AUDIT.md BUG-01 — GraphQL entities had no behindBy, so this never fired).
+  if ((pr.behindBy ?? 0) > 0 || pr.mergeableState === "behind") blockers.push("behind_base");
   if (pr.mergeableState === "blocked") blockers.push("blocked_by_protection");
 
   // No blockers is its own answer, and keeping it out of the switch leaves the

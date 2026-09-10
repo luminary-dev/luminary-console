@@ -7,9 +7,23 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const objects = new Map<string, unknown>();
 
 vi.mock("@/lib/store", () => ({
+  READ_CONCURRENCY: 8,
+  mapLimit: async <T, R>(items: readonly T[], _limit: number, fn: (x: T, i: number) => Promise<R>) => {
+    const out: R[] = [];
+    for (let i = 0; i < items.length; i++) out[i] = await fn(items[i] as T, i);
+    return out;
+  },
   readState: vi.fn(async (p: string) => (objects.has(p) ? structuredClone(objects.get(p)) : null)),
   writeState: vi.fn(async (p: string, d: unknown) => {
     objects.set(p, structuredClone(d));
+  }),
+  // Sequential read-modify-write is enough for these tests (they don't inject a
+  // race); the real updateState adds the If-Match retry that BUG-04 relies on.
+  updateState: vi.fn(async (p: string, mutate: (c: unknown) => unknown) => {
+    const current = objects.has(p) ? structuredClone(objects.get(p)) : null;
+    const next = mutate(current);
+    objects.set(p, structuredClone(next));
+    return next;
   }),
   clearState: vi.fn(async (p: string) => {
     objects.delete(p);

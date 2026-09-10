@@ -6,6 +6,7 @@
 // so guessing a path never renders unpublished work.
 import { fetchAsset, getClient } from "@/lib/store";
 import { renderPdf } from "@/lib/pdf";
+import { rateLimitShared } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 // The fallback render launches headless Chromium — match the doc PDF routes.
@@ -32,7 +33,7 @@ p{margin:0;color:#9aa096;font-size:.95rem;line-height:1.6}</style></head>
 }
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ slug: string; id: string }> },
 ) {
   const { slug, id } = await params;
@@ -57,7 +58,12 @@ export async function GET(
   }
 
   // Fallback: no cached PDF (published before caching, or the file went
-  // missing) — render from the HTML at laptop width on the fly.
+  // missing) — render from the HTML at laptop width on the fly. This spawns
+  // headless Chromium (maxDuration 300) on a PUBLIC route, so rate-limit it so
+  // it can't be driven repeatedly to burn compute (AUDIT.md SEC-05). The cached
+  // fast path above stays unrated.
+  const limited = await rateLimitShared(req, "upload");
+  if (limited) return limited;
   const res = await fetchAsset(design.htmlUrl);
   if (!res.ok) return holding();
   const pdf = await renderPdf(await res.text(), { laptop: true });

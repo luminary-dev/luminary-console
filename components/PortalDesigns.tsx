@@ -115,7 +115,7 @@ export default function PortalDesigns({
               <div className="portal-link" style={{ borderTop: "none" }}>
                 <span>
                   {d.title}
-                  {chosen && <span className="new-pill" style={{ background: "var(--accent)", color: "#0d0d0f" }}>Selected</span>}
+                  {chosen && <span className="new-pill" style={{ background: "var(--accent)", color: "var(--on-accent)" }}>Selected</span>}
                   {!chosen && d.isNew && <span className="new-pill">New</span>}
                 </span>
                 <span className="no no--actions" style={{ display: "inline-flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
@@ -146,6 +146,7 @@ export default function PortalDesigns({
                 <div style={{ margin: "0 0 12px" }}>
                   <textarea
                     className="q-box"
+                    aria-label={`Change request for ${d.title}`}
                     rows={3}
                     maxLength={2000}
                     placeholder={`What would you like changed on ${d.title}?`}
@@ -164,7 +165,7 @@ export default function PortalDesigns({
           );
         })}
       </div>
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
     </div>
   );
 }

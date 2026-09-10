@@ -15,6 +15,12 @@ const objects = new Map<string, unknown>();
 const store = { rawKeys: false };
 
 vi.mock("@/lib/store", () => ({
+  READ_CONCURRENCY: 8,
+  mapLimit: async <T, R>(items: readonly T[], _limit: number, fn: (x: T, i: number) => Promise<R>) => {
+    const out: R[] = [];
+    for (let i = 0; i < items.length; i++) out[i] = await fn(items[i] as T, i);
+    return out;
+  },
   readState: vi.fn(async (p: string) => (objects.has(p) ? structuredClone(objects.get(p)) : null)),
   writeState: vi.fn(async (p: string, d: unknown) => {
     objects.set(p, structuredClone(d));

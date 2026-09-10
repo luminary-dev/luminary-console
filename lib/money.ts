@@ -19,6 +19,13 @@ export function parseAmount(v: unknown): number | null {
 
 export const fmtLKR = (n: number): string => `LKR ${n.toLocaleString("en-US")}`;
 
+/** Round to 2 dp (cents). Money is carried as floating-point rupees, so summing
+ *  and subtracting amounts leaves IEEE-754 residue — enough to make an equal
+ *  balance read as a sub-cent "outstanding" and flip the "settled" decision on
+ *  a signed handover (AUDIT.md API-13). Rounding at each balance and comparison
+ *  removes the drift without a stored-data migration. */
+export const roundMoney = (n: number): number => Math.round(n * 100) / 100;
+
 /** The invoice's grand total as a number, or null when unparsable. */
 export function invoiceTotal(b: BillingDoc): number | null {
   const data = b.data as { total?: unknown } | null;
@@ -100,21 +107,23 @@ export function summarizeMoney(
       continue;
     }
     invoiced += total;
-    const owed = Math.max(0, total - paidHere);
-    const over = Math.max(0, paidHere - total);
-    outstanding += owed;
-    overpaid += over;
+    // Round each per-invoice balance to cents so float residue can't leave a
+    // fully-paid invoice showing a fraction owed (API-13).
+    const owed = Math.max(0, roundMoney(total - paidHere));
+    const over = Math.max(0, roundMoney(paidHere - total));
+    outstanding = roundMoney(outstanding + owed);
+    overpaid = roundMoney(overpaid + over);
     invoices.push({ no: b.no, slug: b.slug, total, paid: paidHere, outstanding: owed, overpaid: over });
   }
 
-  const paid = (payments ?? []).reduce((s, p) => s + (Number.isFinite(p.amount) ? p.amount : 0), 0);
+  const paid = roundMoney((payments ?? []).reduce((s, p) => s + (Number.isFinite(p.amount) ? p.amount : 0), 0));
   return {
-    invoiced,
+    invoiced: roundMoney(invoiced),
     paid,
     outstanding,
     unparsable,
-    attributed,
-    unattributed: Math.max(0, paid - attributed),
+    attributed: roundMoney(attributed),
+    unattributed: Math.max(0, roundMoney(paid - attributed)),
     overpaid,
     invoices,
   };

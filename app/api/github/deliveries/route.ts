@@ -12,6 +12,7 @@
 // the retry cap: a delivery that failed five times usually needs a code fix
 // first, and silently retrying it forever hides that.
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import { listDeliveries, type DeliveryState } from "@/lib/github/inbox";
 import { backfill, deadLetters, reconcile, replayDelivery, replayRange } from "@/lib/github/processor";
 import { logOperatorActivity } from "@/lib/operator";
@@ -112,7 +113,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unknown action." }, { status: 400 });
   } catch (e) {
     const message = e instanceof Error ? e.message : "That did not work.";
-    console.error(`[github] deliveries action ${action} failed:`, e);
+    logger.error("[github] deliveries action failed", { action, err: e });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

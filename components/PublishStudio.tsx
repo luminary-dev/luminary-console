@@ -82,12 +82,12 @@ function ResultCard({ r, kind }: { r: PublishResult; kind: Tab }) {
         </small>
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        {r.cover && <img src={r.cover} alt="Generated cover" style={{ width: "100%", maxWidth: 320, height: "auto", borderRadius: 10 }} />}
+        {r.cover && <img src={r.cover} alt="Generated cover" loading="lazy" style={{ width: "100%", maxWidth: 320, aspectRatio: "3 / 4", objectFit: "contain", borderRadius: 10 }} />}
         {(r.inline ?? []).map((src, i) => (
-          <img key={i} src={src} alt={`Inline illustration ${i + 1}`} style={{ width: "100%", maxWidth: 320, height: "auto", borderRadius: 10 }} />
+          <img key={i} src={src} alt={`Inline illustration ${i + 1}`} loading="lazy" style={{ width: "100%", maxWidth: 320, aspectRatio: "4 / 3", objectFit: "contain", borderRadius: 10 }} />
         ))}
-        {r.thumbLight && <img src={r.thumbLight} alt="Light thumbnail" style={{ width: "100%", maxWidth: 320, height: "auto", borderRadius: 10 }} />}
-        {r.thumbDark && <img src={r.thumbDark} alt="Dark thumbnail" style={{ width: "100%", maxWidth: 320, height: "auto", borderRadius: 10 }} />}
+        {r.thumbLight && <img src={r.thumbLight} alt="Light thumbnail" loading="lazy" style={{ width: "100%", maxWidth: 320, aspectRatio: "16 / 10", objectFit: "contain", borderRadius: 10 }} />}
+        {r.thumbDark && <img src={r.thumbDark} alt="Dark thumbnail" loading="lazy" style={{ width: "100%", maxWidth: 320, aspectRatio: "16 / 10", objectFit: "contain", borderRadius: 10 }} />}
       </div>
     </div>
   );
@@ -157,7 +157,7 @@ function ArticleForm() {
             />
           </label>
         </div>
-        {draftError && <div className="form-error">{draftError}</div>}
+        {draftError && <div className="form-error" role="alert">{draftError}</div>}
         <button type="button" className="btn small" style={{ marginTop: 12 }} disabled={drafting || brief.trim().length < 12} onClick={draft}>
           {drafting ? "Drafting…" : "Draft article"}
         </button>
@@ -198,6 +198,7 @@ function ArticleForm() {
           <div className="q-field half">
             <label className="check-row">
               <input
+                className="check-24"
                 type="checkbox"
                 checked={inlineImages}
                 onChange={(e) => setInlineImages(e.target.checked)}
@@ -211,12 +212,12 @@ function ArticleForm() {
           </div>
           <div className="q-field half">
             <label className="check-row">
-              <input type="checkbox" checked={isDraftPost} onChange={(e) => setIsDraftPost(e.target.checked)} />
+              <input className="check-24" type="checkbox" checked={isDraftPost} onChange={(e) => setIsDraftPost(e.target.checked)} />
               <span className="q-label">Mark as draft (hidden until the flag is removed)</span>
             </label>
           </div>
         </div>
-        {error && <div className="form-error">{error}</div>}
+        {error && <div className="form-error" role="alert">{error}</div>}
         {busy && (
           <div className="notice">
             Publishing: generating the cover with gpt-image-2 and opening the PR against dev. About a minute; don&apos;t close the tab.
@@ -294,7 +295,7 @@ function ProjectForm() {
             />
           </label>
         </div>
-        {draftError && <div className="form-error">{draftError}</div>}
+        {draftError && <div className="form-error" role="alert">{draftError}</div>}
         <button type="button" className="btn small" style={{ marginTop: 12 }} disabled={drafting || brief.trim().length < 12} onClick={draft}>
           {drafting ? "Drafting…" : "Draft case study"}
         </button>
@@ -325,7 +326,7 @@ function ProjectForm() {
             />
           </label>
         </div>
-        {error && <div className="form-error">{error}</div>}
+        {error && <div className="form-error" role="alert">{error}</div>}
         {busy && (
           <div className="notice">
             Publishing: generating the day & dusk thumbnails with gpt-image-2, updating lib/projects.ts and opening the PR against dev. One to two minutes; don&apos;t close the tab.

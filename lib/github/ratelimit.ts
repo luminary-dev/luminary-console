@@ -27,7 +27,13 @@ export type RateLimitSnapshot = {
   observedAt: number;
 };
 
-let latest: RateLimitSnapshot | null = null;
+// One reading per bucket, plus the most recent of any bucket. Keeping them
+// separate is AUDIT.md BUG-05: the old "only advance" guard compared
+// `observedAt`, which is always Date.now() and so always newer, so a later
+// graphql/search reading unconditionally overwrote the core reading and
+// `currentRateLimit()` then returned the wrong bucket's budget.
+const byResource = new Map<string, RateLimitSnapshot>();
+let latestAny: RateLimitSnapshot | null = null;
 
 const num = (v: string | null): number | null => {
   if (v === null) return null;
@@ -45,18 +51,23 @@ export function recordRateLimit(headers: Headers): RateLimitSnapshot {
     resource: headers.get("x-ratelimit-resource"),
     observedAt: Date.now(),
   };
-  // Only advance the snapshot: a 304 or a response from another resource
-  // bucket should not overwrite a fresher core reading with staler numbers.
-  if (!latest || snapshot.observedAt >= latest.observedAt) latest = snapshot;
+  latestAny = snapshot;
+  // Only a labelled reading updates its bucket; an unlabelled response (e.g. a
+  // 304 without rate headers) must not clobber the last good per-bucket number.
+  if (snapshot.resource) byResource.set(snapshot.resource, snapshot);
   return snapshot;
 }
 
-/** The last observed budget, for the UI's rate limit indicator. */
-export const currentRateLimit = (): RateLimitSnapshot | null => latest;
+/** The last observed budget for a bucket, for the UI's rate limit indicator.
+ *  Defaults to `core`, which is what "remaining" means to a reader; falls back
+ *  to the most recent reading of any bucket when that bucket hasn't been seen. */
+export const currentRateLimit = (resource = "core"): RateLimitSnapshot | null =>
+  byResource.get(resource) ?? latestAny;
 
 /** Reset the module cache. Test seam. */
 export const __resetRateLimit = (): void => {
-  latest = null;
+  byResource.clear();
+  latestAny = null;
 };
 
 export type LimitKind = "primary" | "secondary" | null;
@@ -80,8 +91,11 @@ export function classifyLimit(status: number, headers: Headers, bodyMessage?: st
 export function backoffMs(kind: LimitKind, attempt: number, headers: Headers): number {
   const retryAfter = num(headers.get("retry-after"));
   if (retryAfter !== null) {
-    // Retry-After is authoritative when GitHub sends it, in seconds.
-    return Math.min(retryAfter * 1000, MAX_WAIT_MS);
+    // Retry-After is authoritative when GitHub sends it, in seconds — but a
+    // secondary limit can answer `Retry-After: 0`, and retrying at zero delay
+    // re-trips it instantly. Floor it at MIN_WAIT_MS, same as the primary
+    // branch below (AUDIT.md BUG-08).
+    return Math.min(Math.max(retryAfter * 1000, MIN_WAIT_MS), MAX_WAIT_MS);
   }
   if (kind === "primary") {
     const resetSeconds = num(headers.get("x-ratelimit-reset"));

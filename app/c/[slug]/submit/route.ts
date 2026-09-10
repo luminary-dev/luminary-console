@@ -3,6 +3,7 @@
 // client copy) — then kicks off stage-2 drafting AFTER the response, so the
 // client isn't kept waiting on Claude.
 import { NextResponse, after } from "next/server";
+import { logger } from "@/lib/logger";
 import { getClient, putAsset, saveClient, signedAssetUrl } from "@/lib/store";
 import { buildSections, validIds } from "@/lib/questions";
 import { renderAnswers } from "@/lib/templates/answers";
@@ -12,7 +13,7 @@ import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
 import { nowLabel, runStage2 } from "@/lib/pipeline";
 import { logActivity } from "@/lib/activity";
-import { rateLimit } from "@/lib/ratelimit";
+import { rateLimitShared } from "@/lib/ratelimit";
 import { esc } from "@/lib/templates/shell";
 import {
   MAX_FILES_PER_FIELD,
@@ -36,7 +37,7 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   // Rate limit before any storage work, so unknown-slug floods are cheap too.
-  const limited = rateLimit(req, "submit");
+  const limited = await rateLimitShared(req, "submit");
   if (limited) return limited;
 
   const { slug } = await params;
@@ -231,13 +232,13 @@ ${attachmentsHtml}<p>Full answers attached. ${
       try {
         after(draft);
       } catch {
-        void draft().catch((e) => console.error("Stage 2 (fallback) failed:", e));
+        void draft().catch((e) => logger.error("Stage 2 (fallback) failed", { err: e }));
       }
     }
 
     return NextResponse.json({ ok: true, copySent });
   } catch (e) {
-    console.error("Submit failed:", e);
+    logger.error("Submit failed", { err: e });
     return NextResponse.json(
       { error: "We couldn't process your answers just now. Please try again in a minute." },
       { status: 500 },

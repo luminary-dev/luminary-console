@@ -5,6 +5,7 @@
 // mandate's access model requires that every mutating action be auditable and
 // because "who merged that" is a question worth being able to answer.
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import {
   closePullRequest,
   commentOnPullRequest,
@@ -233,6 +234,6 @@ function errorResponse(e: unknown): NextResponse {
         : e.message;
     return NextResponse.json({ error: detail }, { status: e.status === 404 ? 404 : 502 });
   }
-  console.error("[github] pull request action failed:", e);
+  logger.error("[github] pull request action failed", { err: e });
   return NextResponse.json({ error: "That did not work." }, { status: 500 });
 }

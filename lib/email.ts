@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { logger } from "@/lib/logger";
 
 const TO = process.env.STUDIO_EMAIL || "support@luminary-dev.xyz";
 const FROM = process.env.SENDER || "Luminary <questionnaire@luminary-dev.xyz>";
@@ -16,7 +17,7 @@ export async function emailStudio(
 ): Promise<boolean> {
   const key = process.env.RESEND_API_KEY;
   if (!key) {
-    console.warn("RESEND_API_KEY missing — studio email skipped:", subject);
+    logger.warn("RESEND_API_KEY missing — studio email skipped", { subject });
     return false;
   }
   const resend = new Resend(key);
@@ -28,7 +29,7 @@ export async function emailStudio(
     html,
     ...(attachments.length ? { attachments } : {}),
   });
-  if (error) console.error("Studio email failed:", error);
+  if (error) logger.error("Studio email failed", { err: error });
   return !error;
 }
 
@@ -50,7 +51,7 @@ export async function emailAddresses(
     html,
     ...(attachments.length ? { attachments } : {}),
   });
-  if (error) console.error("Copy email failed:", error);
+  if (error) logger.error("Copy email failed", { err: error });
   return !error;
 }
 

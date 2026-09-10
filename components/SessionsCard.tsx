@@ -5,11 +5,11 @@
 // action. Revocation propagates through the proxy's revoked-sid cache within
 // ~a minute; revoking your own session also clears the cookie and returns
 // you to /login immediately.
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useConfirm } from "./ConfirmDialog";
 import { shortWhenLabel } from "@/lib/time";
 
-type Session = { sid: string; email: string; ua: string; at: string; current: boolean };
+export type Session = { sid: string; email: string; ua: string; at: string; current: boolean };
 
 /** Compact "Chrome · macOS" style label from a user-agent string. */
 function device(ua: string): string {
@@ -38,8 +38,11 @@ function device(ua: string): string {
   return `${browser} · ${os}`;
 }
 
-export default function SessionsCard() {
-  const [sessions, setSessions] = useState<Session[] | null>(null);
+export default function SessionsCard({ initial }: { initial: Session[] }) {
+  // Seeded from the server render (AUDIT.md UI-19), so there's no client-effect
+  // round trip and no "Loading…" flash on Settings. The fetch stays only for
+  // refreshing after a revoke.
+  const [sessions, setSessions] = useState<Session[] | null>(initial);
   const [busy, setBusy] = useState(false);
   const { confirm, dialog } = useConfirm();
 
@@ -48,10 +51,6 @@ export default function SessionsCard() {
     if (res?.ok) setSessions(await res.json().catch(() => []));
     else setSessions([]);
   }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
 
   const post = async (body: Record<string, string>) => {
     setBusy(true);

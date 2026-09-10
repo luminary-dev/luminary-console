@@ -13,6 +13,7 @@
 // Writes are sequential per the store's contract (no concurrency control);
 // registry updates are best-effort — a store hiccup must never block a login.
 import { readState, writeState } from "./store";
+import { logger } from "@/lib/logger";
 import { SESSION_ABS_MAX_AGE } from "./auth";
 import { operatorEmails } from "./users";
 
@@ -33,7 +34,7 @@ export async function listSessions(): Promise<SessionEntry[]> {
       .filter((s) => Date.parse(s.at) > liveSince()) // expired tokens are dead weight
       .sort((a, b) => b.at.localeCompare(a.at));
   } catch (e) {
-    console.error("Session registry read failed:", e);
+    logger.error("Session registry read failed", { err: e });
     return [];
   }
 }
@@ -56,7 +57,7 @@ export async function registerSession(sid: string, email: string, ua: string): P
     kept.push({ sid, email, ua: cleanUa, at: new Date().toISOString() });
     await writeState(SESSIONS_PATH, kept.slice(-CAP));
   } catch (e) {
-    console.error("Session registry write failed:", e);
+    logger.error("Session registry write failed", { err: e });
   }
 }
 

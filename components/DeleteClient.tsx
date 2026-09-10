@@ -51,7 +51,7 @@ export default function DeleteClient({ slug, company }: { slug: string; company:
         When a project is finished, delete the client to remove all documents, the questionnaire
         answers, the subdomain and its DNS record.
       </p>
-      {error && <div className="form-error">{error}</div>}
+      {error && <div className="form-error" role="alert">{error}</div>}
       <button
         className="btn ghost small"
         style={{ marginTop: 12, borderColor: "color-mix(in srgb, var(--danger) 50%, transparent)", color: "var(--danger)" }}

@@ -4,13 +4,14 @@
 // deliberately. On the dashboard they took a full card and a topbar slot each,
 // competing every day with the work you actually came to do. Here they cost
 // nothing until you go looking.
-import Link from "next/link";
+import { cookies } from "next/headers";
 import AppTabBar from "@/components/AppTabBar";
 import SessionsCard from "@/components/SessionsCard";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
+import ConsoleTopbar from "@/components/ConsoleTopbar";
 import { MAIN_ID } from "@/components/SkipLink";
 import { getIndex } from "@/lib/store";
+import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import { listSessions } from "@/lib/sessions";
 
 export const metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
@@ -18,24 +19,21 @@ export const dynamic = "force-dynamic";
 export default async function SettingsPage() {
   const index = await getIndex();
 
-  return (
-    <main className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Settings</small>
-        </div>
-        <div className="topbar-actions">
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            Back to the dashboard
-          </Link>
-        </div>
-      </div>
-      <div id={MAIN_ID} tabIndex={-1} />
+  // Read the signed-in devices server-side and hand them to the card as its
+  // initial state, so Settings paints the list immediately with no client
+  // fetch/flash (AUDIT.md UI-19). "current" is derived from the caller's own
+  // sid, the same way GET /api/sessions does.
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  const session = await verifySessionToken(process.env.SESSION_SECRET || "", token);
+  const sessions = (await listSessions()).map((s) => ({ ...s, current: s.sid === session?.sid }));
 
-      <SessionsCard />
+  return (
+    <div className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
+      <ConsoleTopbar subtitle="Settings" showNewClient={false} />
+      <main id={MAIN_ID}>
+      <h1 className="sr-only">Settings</h1>
+
+      <SessionsCard initial={sessions} />
 
       <section className="card" aria-labelledby="settings-data">
         <h3 id="settings-data">Data</h3>
@@ -51,7 +49,8 @@ export default async function SettingsPage() {
         )}
       </section>
 
+      </main>
       <AppTabBar />
-    </main>
+    </div>
   );
 }

@@ -22,6 +22,12 @@ const store = vi.hoisted(() => {
 });
 
 vi.mock("@/lib/store", () => ({
+  READ_CONCURRENCY: 8,
+  mapLimit: async <T, R>(items: readonly T[], _limit: number, fn: (x: T, i: number) => Promise<R>) => {
+    const out: R[] = [];
+    for (let i = 0; i < items.length; i++) out[i] = await fn(items[i] as T, i);
+    return out;
+  },
   updateState: async <T>(path: string, mutate: (current: T | null) => T): Promise<T> => {
     if (store.state.fail) throw new Error("R2 is unreachable");
     store.state.writes += 1;
@@ -39,10 +45,12 @@ async function coldStart(): Promise<Limiter> {
   return (await import("@/lib/ratelimit")) as Limiter;
 }
 
+// The platform sets x-real-ip to the real client (SEC-06); the trailing XFF
+// hop is a downstream proxy. clientIp must key on the platform value.
 const req = (ip = "203.0.113.5") =>
   new Request("https://console.example.test/api/auth", {
     method: "POST",
-    headers: { "x-forwarded-for": `${ip}, 10.0.0.1` },
+    headers: { "x-real-ip": ip, "x-forwarded-for": `${ip}, 10.0.0.1` },
   });
 
 beforeEach(() => {
@@ -97,21 +105,22 @@ describe("LC-013 the shared window survives an instance restart", () => {
 });
 
 describe("LC-013 only the buckets that need it pay for the store", () => {
-  it("marks auth as shared and the per-IP web-form buckets as in-memory", async () => {
+  it("marks auth and the unauthenticated portal buckets as shared, operator assist as in-memory", async () => {
     const lim = await coldStart();
+    // SEC-02: the portal buckets are the only throughput control on the
+    // forgeable binding actions and the upload signer, so they count globally.
     expect(lim.SHARED.auth).toBe(true);
-    // An upload fires once per attached file; a store round trip each time is
-    // a bad trade for a limit that exists to stop a careless script.
-    expect(lim.SHARED.upload).toBe(false);
-    expect(lim.SHARED.submit).toBe(false);
-    expect(lim.SHARED.accept).toBe(false);
-    expect(lim.SHARED.comment).toBe(false);
+    expect(lim.SHARED.upload).toBe(true);
+    expect(lim.SHARED.submit).toBe(true);
+    expect(lim.SHARED.accept).toBe(true);
+    expect(lim.SHARED.comment).toBe(true);
+    // Operator-only, behind the session gate — a per-instance guard is enough.
     expect(lim.SHARED.assist).toBe(false);
   });
 
   it("never touches the store for an in-memory bucket", async () => {
     const lim = await coldStart();
-    for (let i = 0; i < 5; i++) await lim.rateLimitShared(req(), "upload");
+    for (let i = 0; i < 5; i++) await lim.rateLimitShared(req(), "assist");
     expect(store.state.writes).toBe(0);
     expect(store.objects.size).toBe(0);
   });
@@ -173,9 +182,25 @@ describe("LC-013 the synchronous API the existing call sites use is unchanged", 
     expect(blocked?.status).toBe(429);
   });
 
-  it("takes the first hop of x-forwarded-for as the client", async () => {
+  it("keys on the non-spoofable platform IP, not the x-forwarded-for first hop (SEC-06)", async () => {
     const lim = await coldStart();
-    expect(lim.clientIp(req("203.0.113.7"))).toBe("203.0.113.7");
+    // x-real-ip wins over a client-supplied XFF first hop.
+    expect(
+      lim.clientIp(
+        new Request("https://console.example.test/", {
+          headers: { "x-real-ip": "203.0.113.7", "x-forwarded-for": "1.2.3.4, 203.0.113.7" },
+        }),
+      ),
+    ).toBe("203.0.113.7");
+    // With only XFF, take the LAST (proxy-appended) hop, not the first the
+    // client can set.
+    expect(
+      lim.clientIp(
+        new Request("https://console.example.test/", {
+          headers: { "x-forwarded-for": "1.2.3.4, 10.0.0.9" },
+        }),
+      ),
+    ).toBe("10.0.0.9");
     expect(lim.clientIp(new Request("https://console.example.test/"))).toBe("unknown");
   });
 });

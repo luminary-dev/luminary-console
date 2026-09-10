@@ -7,6 +7,7 @@
 // (each call is a full-context model request, so a runaway retry loop is a
 // cost problem even from a logged-in browser).
 import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import Anthropic from "@anthropic-ai/sdk";
 import { fetchAsset, getClient } from "@/lib/store";
 import { logOperatorActivity } from "@/lib/operator";
@@ -191,7 +192,7 @@ async function answersBlock(client: ClientRecord): Promise<string> {
     if (blocks.length === 0) return "";
     return `\n\n## LATEST QUESTIONNAIRE ANSWERS (the client's own words)\n${blocks.join("\n\n")}`;
   } catch (e) {
-    console.error("Assist: reading answers failed:", e);
+    logger.error("Assist: reading answers failed", { err: e });
     return "";
   }
 }
@@ -263,7 +264,7 @@ export async function POST(
     await logOperatorActivity("asked the studio assistant", slug, clip(prompt, 120));
     return NextResponse.json({ text });
   } catch (e) {
-    console.error("Assist failed:", e);
+    logger.error("Assist failed", { err: e });
     return NextResponse.json({ error: "The assistant is unavailable right now. Try again." }, { status: 502 });
   }
 }

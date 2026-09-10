@@ -5,7 +5,7 @@
 // (View Transitions API; instant fallback). Position + icon are driven by CSS
 // off [data-theme], so there's nothing to mismatch on hydration. The console
 // additionally persists to a cookie so the server renders the right theme.
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { elementCenter, paletteReveal } from "@/lib/theme-reveal";
 
 const MOON = (
@@ -29,8 +29,15 @@ const SUN = (
 );
 
 export default function ThemeToggle() {
+  // Programmatic current-state for assistive tech (AUDIT.md UI-15). Read after
+  // mount from [data-theme] — never during render — so it can't cause the
+  // hydration mismatch the pre-paint theme script exists to avoid. Starts false
+  // on both server and first client render, then syncs.
+  const [dark, setDark] = useState(false);
+
   // Follow the OS theme live while the visitor hasn't made an explicit choice.
   useEffect(() => {
+    setDark(document.documentElement.dataset.theme === "dark");
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const onChange = (e: MediaQueryListEvent) => {
       try {
@@ -39,6 +46,7 @@ export default function ThemeToggle() {
         // Blocked storage (private mode): fall through and follow the OS.
       }
       document.documentElement.setAttribute("data-theme", e.matches ? "dark" : "light");
+      setDark(e.matches);
     };
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
@@ -46,6 +54,7 @@ export default function ThemeToggle() {
 
   const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    setDark(next === "dark");
     paletteReveal(elementCenter(e.currentTarget), () => {
       document.documentElement.setAttribute("data-theme", next);
       try {
@@ -58,7 +67,12 @@ export default function ThemeToggle() {
   };
 
   return (
-    <button className="theme-toggle" onClick={handleToggle} aria-label="Toggle light and dark theme">
+    <button
+      className="theme-toggle"
+      onClick={handleToggle}
+      aria-label="Toggle light and dark theme"
+      aria-pressed={dark}
+    >
       <span className="theme-toggle__knob">
         <span className="theme-toggle__ico theme-toggle__sun">{SUN}</span>
         <span className="theme-toggle__ico theme-toggle__moon">{MOON}</span>

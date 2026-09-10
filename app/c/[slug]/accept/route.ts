@@ -5,13 +5,15 @@
 // stage, emails the studio, and logs activity. Idempotent: a second accept
 // answers ok/already instead of erroring.
 import { NextResponse } from "next/server";
-import { getClient, saveClient } from "@/lib/store";
+import { getClient, updateClient, StoreConflictError } from "@/lib/store";
 import { saveDoc } from "@/lib/pipeline";
+import { logger } from "@/lib/logger";
 import { emailStudio } from "@/lib/email";
 import { tgEsc } from "@/lib/telegram";
 import { studioNotice } from "@/lib/notify";
 import { logActivity } from "@/lib/activity";
-import { rateLimit } from "@/lib/ratelimit";
+import { rateLimitShared, clientIp } from "@/lib/ratelimit";
+import { requestPortalCode, verifyPortalCode } from "@/lib/portal-otp";
 import { advanceStage } from "@/lib/stage";
 import { esc } from "@/lib/templates/shell";
 import { clipText } from "@/lib/errors";
@@ -26,7 +28,7 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  const limited = rateLimit(req, "accept");
+  const limited = await rateLimitShared(req, "accept");
   if (limited) return limited;
 
   const { slug } = await params;
@@ -69,25 +71,80 @@ export async function POST(
     );
   }
 
-  const ip = ((req.headers.get("x-forwarded-for") || "").split(",")[0] ?? "").trim();
-  client.acceptance = { name, at: new Date().toISOString(), ...(ip ? { ip } : {}) };
-  advanceStage(client, "accepted");
+  // SEC-01: gate this binding action behind a one-time code emailed to the
+  // client's on-file address. Phase 1 (no code): send a code and ask for it.
+  // Phase 2 (code present): verify before recording. A client with no email on
+  // file falls through to name-only (documented fallback). An OLD published
+  // quotation's one-step form sends no code and gets { needsCode } with no
+  // `ok`, so it shows an error rather than a false "accepted" — republish it to
+  // get the code field.
+  const code = typeof body.code === "string" ? body.code.trim() : "";
+  if (client.email) {
+    if (!code) {
+      const sent = await requestPortalCode(slug, "accept", client.email, "quotation");
+      return NextResponse.json({
+        needsCode: true,
+        ...(sent === "throttled" ? { note: "A code was sent moments ago. Check your email." } : {}),
+      });
+    }
+    const result = await verifyPortalCode(slug, "accept", code);
+    if (result !== "ok") {
+      const error =
+        result === "expired"
+          ? "That code has expired. Request a new one."
+          : result === "locked"
+            ? "Too many attempts. Please request a new code shortly."
+            : "That code isn't right. Please check your email and try again.";
+      return NextResponse.json({ needsCode: true, error }, { status: 400 });
+    }
+  }
+
+  const rawIp = clientIp(req);
+  const ip = rawIp === "unknown" ? "" : rawIp;
+  const acceptance = { name, at: new Date().toISOString(), ...(ip ? { ip } : {}) };
 
   // Re-render so the acceptance stamp shows everywhere the quotation renders.
-  // Keep the original issue date (the last render/publish time) — acceptance
-  // must not re-date the document.
+  // Done ONCE here (Chromium is expensive) rather than inside the CAS retry;
+  // it writes to the quotation's fixed asset keys and returns the stamped meta,
+  // which the compare-and-swap below applies. Keep the original issue date (the
+  // last render/publish time) — acceptance must not re-date the document.
+  let rendered: Awaited<ReturnType<typeof saveDoc>> | null = null;
   try {
     const issuedMs = Date.parse(quotation.updatedAt);
     const issued = Number.isFinite(issuedMs)
       ? new Date(issuedMs).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Colombo" })
       : undefined;
-    await saveDoc(client, "quotation", quotation.data, "published", issued);
+    rendered = await saveDoc(client, "quotation", quotation.data, "published", issued);
   } catch (e) {
     // The acceptance itself must survive a render hiccup — the stamp appears
     // on the next re-render instead.
-    console.error("Quotation re-render after acceptance failed:", e);
+    logger.error("Quotation re-render after acceptance failed", { err: e });
   }
-  await saveClient(client);
+
+  // Compare-and-swap the binding write so a portal accept can't clobber a
+  // concurrent operator edit of the same record, and two racing accepts can't
+  // both win (AUDIT.md API-02; the missing capability check is SEC-01).
+  let raced: { name: string; at: string } | null = null;
+  let updated;
+  try {
+    updated = await updateClient(slug, (c) => {
+      if (c.acceptance) {
+        raced = { name: c.acceptance.name, at: c.acceptance.at };
+        return;
+      }
+      c.acceptance = acceptance;
+      advanceStage(c, "accepted");
+      if (rendered) c.docs.quotation = rendered;
+    });
+  } catch (e) {
+    if (e instanceof StoreConflictError) {
+      return NextResponse.json({ error: "Please try again in a moment." }, { status: 409 });
+    }
+    throw e;
+  }
+  if (!updated) return NextResponse.json({ error: "Unknown client." }, { status: 404 });
+  if (raced) return NextResponse.json({ ok: true, already: true, ...(raced as { name: string; at: string }) });
+
   await logActivity(name, "accepted quotation", slug, quotation.no);
 
   await emailStudio(
@@ -105,5 +162,5 @@ export async function POST(
     url: `https://${CONSOLE_HOST}/clients/${client.slug}`,
   });
 
-  return NextResponse.json({ ok: true, name, at: client.acceptance.at });
+  return NextResponse.json({ ok: true, name, at: acceptance.at });
 }

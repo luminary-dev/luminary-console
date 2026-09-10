@@ -10,7 +10,7 @@
 // not have to enumerate the bucket. That index IS a shared array, so it is
 // written with an idempotent merge (add-if-absent) rather than a replace, and
 // a lost update there costs a list-view refresh, never a lost entity.
-import { readState, writeState, clearState, listState } from "@/lib/store";
+import { readState, writeState, clearState, listState, mapLimit, READ_CONCURRENCY } from "@/lib/store";
 import { logger } from "@/lib/logger";
 import type {
   AlertEntity,
@@ -76,9 +76,7 @@ export const deletePullRequest = (repo: string, number: number): Promise<void> =
 /** Every stored PR for one repo. */
 export async function listPullRequests(repo: string, max = 500): Promise<PullRequestEntity[]> {
   const keys = await listState(`github/prs/${repoKey(repo)}/`);
-  const records = await Promise.all(
-    keys.slice(0, max).map((k) => readStateByKey<PullRequestEntity>(k)),
-  );
+  const records = await mapLimit(keys.slice(0, max), READ_CONCURRENCY, (k) => readStateByKey<PullRequestEntity>(k));
   return records.filter((r): r is PullRequestEntity => r !== null);
 }
 
@@ -102,7 +100,7 @@ export const deleteRepo = (repo: string): Promise<void> => clearState(repoPath(r
 
 export async function listRepos(): Promise<RepoEntity[]> {
   const keys = await listState("github/repos/");
-  const records = await Promise.all(keys.map((k) => readStateByKey<RepoEntity>(k)));
+  const records = await mapLimit(keys, READ_CONCURRENCY, (k) => readStateByKey<RepoEntity>(k));
   return records
     .filter((r): r is RepoEntity => r !== null)
     .sort((a, b) => a.fullName.localeCompare(b.fullName));
@@ -116,9 +114,7 @@ export async function putWorkflowRun(run: WorkflowRunEntity): Promise<void> {
 
 export async function listWorkflowRuns(repo: string, max = 200): Promise<WorkflowRunEntity[]> {
   const keys = await listState(`github/runs/${repoKey(repo)}/`);
-  const records = await Promise.all(
-    keys.slice(0, max).map((k) => readStateByKey<WorkflowRunEntity>(k)),
-  );
+  const records = await mapLimit(keys.slice(0, max), READ_CONCURRENCY, (k) => readStateByKey<WorkflowRunEntity>(k));
   return records
     .filter((r): r is WorkflowRunEntity => r !== null)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -137,9 +133,7 @@ export async function putDeployment(d: DeploymentEntity): Promise<void> {
 
 export async function listDeployments(repo: string, max = 100): Promise<DeploymentEntity[]> {
   const keys = await listState(`github/deployments/${repoKey(repo)}/`);
-  const records = await Promise.all(
-    keys.slice(0, max).map((k) => readStateByKey<DeploymentEntity>(k)),
-  );
+  const records = await mapLimit(keys.slice(0, max), READ_CONCURRENCY, (k) => readStateByKey<DeploymentEntity>(k));
   return records
     .filter((r): r is DeploymentEntity => r !== null)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -156,9 +150,7 @@ export async function putRelease(r: ReleaseEntity): Promise<void> {
 
 export async function listReleases(repo: string, max = 100): Promise<ReleaseEntity[]> {
   const keys = await listState(`github/releases/${repoKey(repo)}/`);
-  const records = await Promise.all(
-    keys.slice(0, max).map((k) => readStateByKey<ReleaseEntity>(k)),
-  );
+  const records = await mapLimit(keys.slice(0, max), READ_CONCURRENCY, (k) => readStateByKey<ReleaseEntity>(k));
   return records
     .filter((r): r is ReleaseEntity => r !== null)
     .sort((a, b) => (b.publishedAt ?? "").localeCompare(a.publishedAt ?? ""));
@@ -177,9 +169,7 @@ export async function putAlert(a: AlertEntity): Promise<void> {
 
 export async function listAlerts(repo: string, max = 200): Promise<AlertEntity[]> {
   const keys = await listState(`github/alerts/${repoKey(repo)}/`);
-  const records = await Promise.all(
-    keys.slice(0, max).map((k) => readStateByKey<AlertEntity>(k)),
-  );
+  const records = await mapLimit(keys.slice(0, max), READ_CONCURRENCY, (k) => readStateByKey<AlertEntity>(k));
   return records.filter((r): r is AlertEntity => r !== null);
 }
 
@@ -233,14 +223,27 @@ async function listAllUnder<T>(prefix: string): Promise<T[]> {
       scanned: MAX_OBJECTS_SCANNED,
     });
   }
-  // Promise.all widens to Awaited<T>, and T is unconstrained here, so the
-  // compiler cannot know T is not itself a thenable. Every caller passes a
-  // plain entity interface, so this narrows once, in one place, rather than
-  // pushing the assertion out to all five callers.
-  const records = (await Promise.all(
-    keys.slice(0, MAX_OBJECTS_SCANNED).map((k) => readStateByKey<T>(k)),
+  // Bounded fan-out (AUDIT.md API-04): reading up to MAX_OBJECTS_SCANNED keys
+  // with a raw Promise.all opened thousands of concurrent R2 connections per
+  // render on the inbox hot path — the connection storm mapLimit exists to
+  // prevent. mapLimit's R is unconstrained here, so the compiler cannot know T
+  // is not itself a thenable; the cast narrows once, in one place.
+  const records = (await mapLimit(keys.slice(0, MAX_OBJECTS_SCANNED), READ_CONCURRENCY, (k) =>
+    readStateByKey<T>(k),
   )) as Array<T | null>;
-  return records.filter((r): r is T => r !== null);
+  const kept = records.filter((r): r is T => r !== null);
+  // Surface unreadable entities rather than silently shrinking the list
+  // (AUDIT.md API-03). readState is lenient — a truncated/corrupt object reads
+  // as null — and these org-wide lists never re-derive from a second source, so
+  // a dropped PR/alert would make the inbox or security view quietly say
+  // "nothing failing" while an object it can't parse says otherwise (the LC-070
+  // class). We keep serving what parsed, but the gap is now observable, like
+  // the listing_truncated warning above.
+  const unreadable = records.length - kept.length;
+  if (unreadable > 0) {
+    logger.error("github.projection.unreadable_entities", { prefix, unreadable, total: records.length });
+  }
+  return kept;
 }
 
 /** Read a state object by its FULL bucket key (what listState returns),

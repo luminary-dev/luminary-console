@@ -8,6 +8,7 @@ import AppTabBar from "@/components/AppTabBar";
 import ClientTable from "@/components/ClientTable";
 import CommandPalette from "@/components/CommandPalette";
 import ConsoleTopbar from "@/components/ConsoleTopbar";
+import { MAIN_ID } from "@/components/SkipLink";
 import { loadClientOverview, loadUnreadActivity } from "@/lib/console-overview";
 
 export const metadata = { title: "Clients" };
@@ -17,8 +18,10 @@ export default async function ClientsPage() {
   const [{ rows }, { unread }] = await Promise.all([loadClientOverview(), loadUnreadActivity()]);
 
   return (
-    <main className="wrap" style={{ paddingBottom: 80 }}>
+    <div className="wrap" style={{ paddingBottom: 80 }}>
       <ConsoleTopbar current="/clients" unread={unread} />
+      <main id={MAIN_ID}>
+      <h1 className="sr-only">Clients</h1>
 
       {rows.length === 0 ? (
         <div className="card">
@@ -38,7 +41,8 @@ export default async function ClientsPage() {
       <CommandPalette
         items={rows.map((r) => ({ slug: r.slug, company: r.company, docNoBase: r.docNoBase }))}
       />
+      </main>
       <AppTabBar />
-    </main>
+    </div>
   );
 }
