@@ -169,6 +169,50 @@ summary:focus-visible,
 }
 .topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
+/* ——— Account menu ———
+   One disclosure holding the three rarely-touched controls (alerts, Settings,
+   Sign out), so the right of the bar is theme + primary action + this, instead
+   of five same-weight buttons that wrapped to a second row below ~950px.
+   Markup: components/AccountMenu.tsx. */
+.acct { position: relative; display: inline-flex; }
+.acct-trigger { display: inline-flex; align-items: center; gap: 6px; }
+.acct-caret { transition: transform .15s ease; }
+.acct-trigger[aria-expanded="true"] .acct-caret { transform: rotate(180deg); }
+.acct-panel {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: 60;
+  min-width: 200px; display: flex; flex-direction: column; gap: 2px;
+  padding: 6px; background: var(--bg);
+  border: 1px solid var(--border-hi); border-radius: 14px;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, .18);
+}
+/* Every row reads the same, whichever component drew it: the Settings link and
+   the alerts / sign-out buttons all collapse to a left-aligned full-width row.
+   The `.btn.ghost` selector is listed explicitly so this beats the pill border
+   that rule sets later in the file (equal-specificity ties would otherwise go
+   to source order, i.e. to the pill). */
+.acct-panel .acct-item,
+.acct-panel .btn,
+.acct-panel .btn.ghost {
+  display: flex; align-items: center; justify-content: flex-start;
+  width: 100%; margin: 0; text-align: left;
+  padding: 10px 12px; border: none; border-radius: 10px;
+  background: none; color: var(--text);
+  font-size: 13.5px; font-weight: 600; line-height: 1.4;
+}
+/* The theme switch keeps its pill shape, so it sits in a labelled row rather
+   than collapsing to a text row like the others. */
+.acct-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 12px;
+}
+.acct-row__label { font-size: 13.5px; font-weight: 600; color: var(--text); }
+@media (prefers-reduced-motion: reduce) { .acct-caret { transition: none; } }
+@media (hover: hover) and (pointer: fine) {
+  .acct-panel .acct-item:hover,
+  .acct-panel .btn:hover,
+  .acct-panel .btn.ghost:hover { background: var(--off); color: var(--text); transform: none; }
+}
+
 /* ——— The hub ———
    Four tiles, the console's four sections, always in the same order and
    always present. The two cards below them are conditional, so the tiles are
@@ -265,7 +309,7 @@ summary:focus-visible,
   .topnav { border-right: none; padding-right: 0; margin-right: 0; margin-left: 0; }
 }
 
-.brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; }
+.brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; flex-shrink: 0; }
 /* The wordmark is the text colour, not the link colour.
    It became a link when the topbar was unified so clicking it returns you to
    the hub, and it silently inherited `a { color: var(--a-text) }`, which had
