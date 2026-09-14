@@ -8,9 +8,7 @@
 // Three groups, deliberately: where you GO, what you CONTROL, and the one
 // thing you DO. See the .topnav rules in app/globals.css.
 import Link from "next/link";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import PushToggle from "@/components/PushToggle";
+import AccountMenu from "@/components/AccountMenu";
 
 /** The four sections of the console. Order is the order on the bar. */
 export const SECTIONS = [
@@ -70,17 +68,15 @@ export default function ConsoleTopbar({
         </nav>
 
         <div className="topbar-actions">
-          <ThemeToggle />
-          <PushToggle />
-          <Link className="btn ghost small app-hide" href="/settings">
-            Settings
-          </Link>
-          <SignOut />
           {showNewClient && (
             <Link className="btn app-hide" href="/clients/new">
               + New client
             </Link>
           )}
+          {/* Theme, alerts, Settings and Sign out, grouped so the bar carries
+              one account control instead of a row of stray buttons that wrapped
+              onto a second line (AUDIT.md UI-04 follow-up). */}
+          <AccountMenu />
         </div>
     </header>
   );
