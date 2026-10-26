@@ -16,7 +16,7 @@ setup("mint an operator session", async ({ page, context }) => {
   const secret = process.env.SESSION_SECRET;
   expect(
     secret,
-    "SESSION_SECRET must be set. Run the harness with: npx dotenv -e .env.local -- npx playwright test, " +
+    "SESSION_SECRET must be set. Run the harness with: npx dotenv run -f .env.local -- npx playwright test, " +
       "or export it first. The audit signs in as a real operator because most of the console is behind the gate.",
   ).toBeTruthy();
 
