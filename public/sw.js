@@ -14,7 +14,7 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("push", (event) => {
   if (!event.data) return;
-  let data = {};
+  let data;
   try {
     data = event.data.json();
   } catch {
