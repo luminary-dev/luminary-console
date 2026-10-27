@@ -274,7 +274,7 @@ export async function reconcile(limit = 1000): Promise<DriftReport> {
 
   // The API's own list of what is open. Anything we think is open but is not
   // in this list has been closed or merged without us hearing about it.
-  let liveOpen: Set<string> | null = null;
+  let liveOpen: Set<string> | null;
   let liveError: string | null = null;
   try {
     const live = await fetchOpenPullRequests();
