@@ -145,7 +145,7 @@ export default function QuestionnaireSheet({
         <div className="foot-links">
           <a href="mailto:support@luminary-dev.xyz">support@luminary-dev.xyz</a>
           <i />
-          <a href="tel:+94771618093">+94 77 16 18 093</a>
+          <a href="tel:+94707294885">+94 70 72 94 885</a>
           <i />
           <a href="https://luminary-dev.xyz">luminary-dev.xyz</a>
         </div>

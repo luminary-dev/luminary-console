@@ -238,7 +238,7 @@ ${toolbar}
     <div class="meta-rows">${opts.metaRightRows.join("")}</div>
   </div>
   ${opts.body}
-  <div class="foot">support@luminary-dev.xyz · +94 77 16 18 093 · luminary-dev.xyz</div>
+  <div class="foot">support@luminary-dev.xyz · +94 70 72 94 885 · luminary-dev.xyz</div>
 </div>
 ${toolbarScript}
 </body>

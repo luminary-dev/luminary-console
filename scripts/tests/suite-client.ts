@@ -67,7 +67,7 @@ async function main() {
         "TEST FIXTURE — a single landing page for a small Colombo bakery, fixed budget LKR 65,000. This is dummy data created by the automated QA suite; documents are never sent to a real client.",
       contactName: "QA Tester",
       email: "support@luminary-dev.xyz",
-      phone: "+94 77 16 18 093",
+      phone: "+94 70 72 94 885",
       address: "1 Test Lane, Colombo",
     });
     expect(r.status === 200, `got ${r.status}: ${r.text.slice(0, 200)}`);
