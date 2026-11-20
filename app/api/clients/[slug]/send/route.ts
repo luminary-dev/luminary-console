@@ -113,7 +113,7 @@ export async function POST(
     `<p>${greeting}</p>
 ${intro}
 <p>Questions any time: just reply to this email.</p>
-<p>Luminary Studio<br>support@luminary-dev.xyz · +94 77 16 18 093 · <a href="https://luminary-dev.xyz">luminary-dev.xyz</a></p>`,
+<p>Luminary Studio<br>support@luminary-dev.xyz · +94 70 72 94 885 · <a href="https://luminary-dev.xyz">luminary-dev.xyz</a></p>`,
     attachments,
   );
 

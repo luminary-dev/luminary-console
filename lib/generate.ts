@@ -15,7 +15,7 @@ import { PRICING_REFERENCE, fmtLKR, paymentSchedule } from "./pricing";
 
 const MODEL = "claude-opus-5";
 
-const SYSTEM = `You are the document-drafting engine for Luminary Studio, a full-service digital studio in Colombo, Sri Lanka (luminary-dev.xyz · support@luminary-dev.xyz · +94 77 16 18 093).
+const SYSTEM = `You are the document-drafting engine for Luminary Studio, a full-service digital studio in Colombo, Sri Lanka (luminary-dev.xyz · support@luminary-dev.xyz · +94 70 72 94 885).
 
 Services: web design & development (Next.js/React), brand & graphic design, video & motion graphics, cloud & DevOps engineering, SEO & performance. Process: discovery → design → build → launch → ongoing care. Small senior team, weekly delivery with live staging links, transparent itemised pricing, no hidden fees.
 

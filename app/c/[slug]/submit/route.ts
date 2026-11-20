@@ -200,7 +200,7 @@ ${attachmentsHtml}<p>Full answers attached. ${
         `<p>Hi ${esc(contactName)},</p>
 <p>Thanks for completing the project questionnaire. Your answers are attached as a PDF for your records.</p>
 <p>Our studio has the same document and will come back within one business day with the confirmed scope and fixed quotation. If you have logos, photos or inspiration screenshots to share, just reply to this email.</p>
-<p>Luminary Studio<br>support@luminary-dev.xyz · +94 77 16 18 093 · <a href="https://luminary-dev.xyz">luminary-dev.xyz</a></p>`,
+<p>Luminary Studio<br>support@luminary-dev.xyz · +94 70 72 94 885 · <a href="https://luminary-dev.xyz">luminary-dev.xyz</a></p>`,
         [{ filename, content: pdf }],
       );
     }
