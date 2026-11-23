@@ -126,6 +126,11 @@ changes, emails sent, design and site actions, push subscription changes,
 session revocations, and every GitHub mutation (approve, merge, close, label,
 re-run, and the webhook replay and backfill actions).
 
+The sales board logs imports of the shop list and every status change
+(replied, keen, paid, no). It does not log each message sent or each social
+post ticked: those are attributed on the record itself (who, when), and a
+dozen "messaged" lines a day would crowd a log that keeps 500 entries.
+
 Known limits, recorded honestly:
 
 - It is **append-only by convention, not tamper-evident**. Anyone who can

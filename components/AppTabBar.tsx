@@ -87,6 +87,17 @@ const TABS: {
     isActive: (p) => p === "/publish",
   },
   {
+    href: "/sales",
+    label: "Sales",
+    icon: (
+      // A speech bubble: the section is a queue of messages to send.
+      <svg viewBox="0 0 24 24" {...stroke}>
+        <path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z" />
+      </svg>
+    ),
+    isActive: (p) => p === "/sales" || p.startsWith("/sales/"),
+  },
+  {
     href: "/clients/new",
     label: "New",
     icon: (

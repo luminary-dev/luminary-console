@@ -10,12 +10,13 @@
 import Link from "next/link";
 import AccountMenu from "@/components/AccountMenu";
 
-/** The four sections of the console. Order is the order on the bar. */
+/** The sections of the console. Order is the order on the bar. */
 export const SECTIONS = [
   { href: "/clients", label: "Clients" },
   { href: "/github", label: "Engineering" },
   { href: "/activity", label: "Activity" },
   { href: "/publish", label: "Publish" },
+  { href: "/sales", label: "Sales" },
 ] as const;
 
 export type Section = (typeof SECTIONS)[number]["href"];
