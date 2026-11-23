@@ -1,6 +1,6 @@
 // The hub: the first screen after signing in.
 //
-// It answers one question, "what should I look at", and nothing else. The four
+// It answers one question, "what should I look at", and nothing else. The
 // sections are always here so the console has a stable shape; the two things
 // below them appear only when there is something to say. A card that always
 // reads "nothing outstanding" trains you to stop looking at it, which is the
@@ -29,6 +29,7 @@ const SECTION_NOTE: Record<string, string> = {
   "/github": "Pull requests, CI, deployments, releases and security.",
   "/activity": "Everything that has happened, across clients and repositories.",
   "/publish": "Draft and publish articles and portfolio projects.",
+  "/sales": "The send queue, every shop, reply scripts and the social kit.",
 };
 
 export default async function Hub() {

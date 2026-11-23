@@ -216,7 +216,17 @@ console/
       runs/<repo>/<id>.json
       notifications/<login>/<group>.json
       sync/<resource>.json
+    sales/
+      leads.json                 the shop list, replaced whole by an import
+      progress.json              one record per shop id, compare-and-swap
+      posted.json                which social posts are up, per platform
 ```
+
+The sales records are single objects rather than one object per shop because
+they are read whole on every page and written a few times a minute at most.
+The shop list is imported at runtime and is deliberately absent from this
+public repository. The social kit itself is not stored at all: it is read
+from the kit site named by `KIT_ORIGIN`.
 
 ## What this architecture does not do
 

@@ -1,11 +1,13 @@
 # luminary-console
 
-Luminary Studio's internal console. Two halves, one application:
+Luminary Studio's internal console. Three parts, one application:
 
 - **Client work**: the client-document platform, described below.
 - **Engineering**: the GitHub operations console at `/github`, where the three
   of us run pull requests, CI, deployments, releases and security across the
   `luminary-dev` organisation.
+- **Sales**: the outreach board at `/sales`, where we work through a list of
+  researched shops together and track what is posted on social media.
 
 Documentation index: [`ARCHITECTURE.md`](ARCHITECTURE.md),
 [`SECURITY.md`](SECURITY.md), [`docs/GITHUB-APP.md`](docs/GITHUB-APP.md),
@@ -50,6 +52,35 @@ drift rather than hiding it. See [`docs/WEBHOOKS.md`](docs/WEBHOOKS.md).
 Set it up with [`docs/GITHUB-APP.md`](docs/GITHUB-APP.md). Without an App the
 console falls back to `GH_TOKEN` for reads, with no webhooks, so the
 projection is only as fresh as the last backfill.
+
+## Sales
+
+`/sales` is the Shopfront outreach board. It replaces a stand-alone page that
+kept its progress in each browser, so two of us could message the same shop
+without knowing. Here the record is shared, attributed and behind the login.
+
+| Screen | What it answers |
+| --- | --- |
+| `/sales` | Who is next. One shop at a time with its message written: follow-ups that are due first, then new shops, up to 15 first messages per operator per day. "I sent it" is what the rest of the team sees |
+| `/sales/shops` | Every shop, where it stands and who last touched it. Status, a note, the shop's preview link, and the import |
+| `/sales/scripts` | Replies to what shops say back, with the offer's numbers filled in |
+| `/sales/kit` | Every social post in posting order with its caption and pictures, and a shared tick per platform for what is already up |
+
+**The shop list is not in this repository, and must not be.** This repository
+is public, and the list holds other businesses' names and phone numbers with
+our notes on them. It lives in the private Shopfront repository
+(`sales/leads-checked.json`) and is imported through `/sales/shops`, which
+stores it in the bucket. Importing a newer list replaces the list and keeps
+everything recorded against each shop.
+
+If a teammate records a first message while you are looking at the same shop,
+your "I sent it" is refused with their name instead of counting the shop twice
+(`lib/sales.ts`, `applyAction`). Days are counted in Sri Lanka time.
+
+The social kit is drawn in the Shopfront repository and published as a small
+site with a manifest (`kit.json`). The console reads that manifest and hands
+the pictures through its own origin; it stores only the ticks. See
+`lib/kit.ts`.
 
 ## Client work
 
@@ -101,6 +132,8 @@ The client-document platform, end to end:
 | `GITHUB_OPERATORS` | `email:login` pairs, so "needs my review" and per-person notification rules mean something |
 | `GITHUB_QUIET_HOURS` / `GITHUB_QUIET_TZ` | Optional per-operator quiet hours, e.g. `dhanikaa:22-8` |
 | `GH_TOKEN` | Read-only fallback when the App is not configured. REST only, no webhooks |
+| `KIT_ORIGIN` | Where the social kit site lives. Defaults to `https://kit.shopfront.luminary-dev.xyz` |
+| `KIT_BYPASS_SECRET` | Only if the kit site is put behind Vercel's deployment protection: that project's Protection Bypass for Automation secret, so the console can still read it |
 
 Missing DNS tokens degrade gracefully: everything still generates, and the
 client record shows the manual CNAME to add.

@@ -25,7 +25,12 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
-const SHEETS = ["app/globals.css", "components/github/github.css", "components/github/github-views.css"];
+const SHEETS = [
+  "app/globals.css",
+  "components/github/github.css",
+  "components/github/github-views.css",
+  "components/sales/sales.css",
+];
 
 /** Every `selector { ... }` rule in `css`, media-query wrappers stripped. */
 function rules(css: string): Array<{ selector: string; body: string }> {

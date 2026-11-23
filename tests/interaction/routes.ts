@@ -90,6 +90,42 @@ export const ROUTES: Route[] = [
   },
 
   {
+    path: "/sales",
+    pattern: "app/sales/page.tsx",
+    name: "Sales, send queue",
+    surface: "console",
+    auth: "operator",
+    purpose: "The next shop to message, with the message written and the team's shared progress.",
+    needs: "an imported shop list",
+  },
+  {
+    path: "/sales/shops",
+    pattern: "app/sales/shops/page.tsx",
+    name: "Sales, shops",
+    surface: "console",
+    auth: "operator",
+    purpose: "Every shop with its status, note and preview link, and the list import.",
+    needs: "an imported shop list",
+  },
+  {
+    path: "/sales/scripts",
+    pattern: "app/sales/scripts/page.tsx",
+    name: "Sales, scripts",
+    surface: "console",
+    auth: "operator",
+    purpose: "Replies to what shops say back, with the offer's numbers filled in.",
+  },
+  {
+    path: "/sales/kit",
+    pattern: "app/sales/kit/page.tsx",
+    name: "Sales, social kit",
+    surface: "console",
+    auth: "operator",
+    purpose: "Every social post with its caption and pictures, and shared ticks for what is posted.",
+    needs: "the kit site's kit.json to be reachable",
+  },
+
+  {
     path: "/settings",
     pattern: "app/settings/page.tsx",
     name: "Settings",
