@@ -32,6 +32,7 @@ import { getDocViews } from "@/lib/receipts";
 import { relTime } from "@/lib/time";
 import ActivityList from "@/components/ActivityList";
 import RelativeTime from "@/components/RelativeTime";
+import ClientTabs, { clientTabFrom, type ClientTab } from "@/components/ClientTabs";
 
 export const dynamic = "force-dynamic";
 
@@ -46,10 +47,17 @@ const ORDER: DocType[] = [...CORE, "invoice", "receipt"]; // legacy single-slot 
 
 export default async function ClientPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ tab?: string | string[] }>;
 }) {
   const { slug } = await params;
+  // The page used to be every card in one 5,000px column. It is now one tab at
+  // a time, and the tab is in the URL so a link to "this client's billing" can
+  // be pasted to a teammate. Anything that is not a known tab is the overview.
+  const { tab: rawTab } = await searchParams;
+  const tab = clientTabFrom(rawTab);
   const client = await getClient(slug);
   if (!client) notFound();
   const base = `https://${client.domain}`;
@@ -63,12 +71,20 @@ export default async function ClientPage({
   // After the response, not in the render body (AUDIT.md UI-06). The reads
   // above intentionally use the pre-mark seenAt so this load still shows the
   // "new" badges; next load they are seen.
-  after(() => markClientSeen(slug));
+  // Only the overview shows the activity, so only the overview counts as
+  // having seen it: opening Billing must not clear the "new" marks unread.
+  if (tab === "overview") after(() => markClientSeen(slug));
   const now = Date.now();
   // The cards below declare `email?: string`, which under
   // exactOptionalPropertyTypes means "absent", not "present and undefined".
   // Spread the prop in only when the record actually carries an address.
   const emailProp = client.email !== undefined ? { email: client.email } : {};
+  // What is waiting behind each tab, shown on the tab itself so nothing has to
+  // be opened to find out.
+  const tabCounts: Partial<Record<ClientTab, number>> = {
+    overview: (client.tasks ?? []).filter((t) => !t.done).length,
+    messages: (client.comments ?? []).length,
+  };
 
   return (
     <div className="wrap" style={{ paddingBottom: 80 }}>
@@ -114,6 +130,43 @@ export default async function ClientPage({
             </span>
           )}
         </div>
+        {client.dnsStatus !== "automated" && (
+          <div className="form-error" role="alert" style={{ marginTop: 14 }}>
+            DNS is <b>{client.dnsStatus}</b>: this client&apos;s links won&apos;t resolve until the CNAME
+            &quot;{client.slug}&quot; → cname.vercel-dns.com exists in Cloudflare and the domain is
+            attached to the Vercel project. Set CLOUDFLARE_API_TOKEN / VERCEL_TOKEN to automate this.
+          </div>
+        )}
+      </div>
+
+      <ClientTabs slug={slug} current={tab} counts={tabCounts} />
+
+      {tab === "overview" && (
+        <>
+      <TasksCard slug={slug} tasks={client.tasks ?? []} />
+
+      <NotesCard slug={slug} {...(client.notes !== undefined ? { notes: client.notes } : {})} />
+
+      {activity.length > 0 && (
+        <div className="card">
+          <h3>Activity</h3>
+          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
+            This project&apos;s history: client actions and operator work. New since your last visit
+            by default; use <b>See more</b> for the rest.
+          </p>
+          <ActivityList entries={activity} now={now} seenAt={activitySeenAt} />
+        </div>
+      )}
+        </>
+      )}
+
+      {tab === "documents" && (
+        <>
+      <div className="card">
+        <h3>Client links</h3>
+        <p className="empty-note" style={{ marginTop: 4 }}>
+          What the client opens. Copy a link, or email the published documents in one go.
+        </p>
         <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 6 }}>
           <div>
             <span className="k" style={{ marginRight: 10 }}>Questionnaire</span>
@@ -131,13 +184,6 @@ export default async function ClientPage({
           {...emailProp}
           publishedCount={ORDER.filter((t) => client.docs[t]?.status === "published").length}
         />
-        {client.dnsStatus !== "automated" && (
-          <div className="form-error" role="alert" style={{ marginTop: 14 }}>
-            DNS is <b>{client.dnsStatus}</b>: the links above won&apos;t resolve until the CNAME
-            &quot;{client.slug}&quot; → cname.vercel-dns.com exists in Cloudflare and the domain is
-            attached to the Vercel project. Set CLOUDFLARE_API_TOKEN / VERCEL_TOKEN to automate this.
-          </div>
-        )}
         {(client.submissions?.length ?? (client.answersAt ? 1 : 0)) > 0 && (
           <div className="notice">
             <b>Questionnaire submissions</b>
@@ -285,7 +331,11 @@ export default async function ClientPage({
           </div>
         )}
       </div>
+        </>
+      )}
 
+      {tab === "design" && (
+        <>
       <DesignsCard
         slug={slug}
         domain={client.domain}
@@ -294,15 +344,6 @@ export default async function ClientPage({
       />
 
       <SiteCard slug={slug} {...(client.site ? { initial: client.site } : {})} />
-
-      <BillingCard
-        slug={slug}
-        billing={client.billing ?? []}
-        payments={client.payments ?? []}
-        hasQuotation={!!client.docs.quotation}
-        {...emailProp}
-        views={docViews}
-      />
 
       {(() => {
         const h = (client.billing ?? []).find((b) => b.kind === "handover");
@@ -316,11 +357,26 @@ export default async function ClientPage({
           />
         );
       })()}
+        </>
+      )}
+
+      {tab === "billing" && (
+        <>
+      <BillingCard
+        slug={slug}
+        billing={client.billing ?? []}
+        payments={client.payments ?? []}
+        hasQuotation={!!client.docs.quotation}
+        {...emailProp}
+        views={docViews}
+      />
 
       <ChangeOrders slug={slug} changeOrders={client.changeOrders ?? []} />
+        </>
+      )}
 
-      <AssistantCard slug={slug} {...emailProp} />
-
+      {tab === "messages" && (
+        <>
       <CommentsCard client={client} />
 
       {(client.uploads?.length ?? 0) > 0 && (
@@ -353,23 +409,14 @@ export default async function ClientPage({
         </div>
       )}
 
-      <NotesCard slug={slug} {...(client.notes !== undefined ? { notes: client.notes } : {})} />
-
-      <TasksCard slug={slug} tasks={client.tasks ?? []} />
-
       <EmailHistoryCard client={client} />
 
-      {activity.length > 0 && (
-        <div className="card">
-          <h3>Activity</h3>
-          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            This project&apos;s history: client actions and operator work. New since your last visit
-            by default; use <b>See more</b> for the rest.
-          </p>
-          <ActivityList entries={activity} now={now} seenAt={activitySeenAt} />
-        </div>
+      <AssistantCard slug={slug} {...emailProp} />
+        </>
       )}
 
+      {tab === "details" && (
+        <>
       <div className="card">
         <h3>Brief</h3>
         <p style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 8, whiteSpace: "pre-wrap" }}>
@@ -378,6 +425,9 @@ export default async function ClientPage({
       </div>
 
       <DeleteClient slug={slug} company={client.company} />
+        </>
+      )}
+
       </main>
       <AppTabBar />
     </div>
