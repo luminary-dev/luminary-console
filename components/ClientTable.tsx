@@ -204,7 +204,7 @@ export default function ClientTable({ rows }: { rows: ClientRow[] }) {
           {/* aria-rowcount is the full filtered list, not the DOM: with a
               window rendered, this is what tells assistive tech there are
               1,000 rows and which one it is on (LC-030). */}
-          <table className="list" aria-rowcount={shown.length + 1}>
+          <table className="list list--wide" aria-rowcount={shown.length + 1}>
             <thead>
               <tr aria-rowindex={1}>
                 {sortHead("company")}

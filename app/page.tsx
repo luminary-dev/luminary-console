@@ -11,12 +11,12 @@
 // they want different shapes.
 import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
-import CommandPalette from "@/components/CommandPalette";
 import ConsoleTopbar, { SECTIONS } from "@/components/ConsoleTopbar";
 import { MAIN_ID } from "@/components/SkipLink";
 import MarkAllRead from "@/components/MarkAllRead";
 import RelativeTime from "@/components/RelativeTime";
 import { fmtLKR } from "@/lib/money";
+import { displayName } from "@/lib/admins";
 import { relTime } from "@/lib/time";
 import { loadClientOverview, loadUnreadActivity } from "@/lib/console-overview";
 
@@ -101,7 +101,7 @@ export default async function Hub() {
               return (
                 <li className="hub-feed__row" key={`${e.at}-${i}`}>
                   <span className="hub-feed__what">
-                    <b>{e.actor}</b> {e.action}{" "}
+                    <b>{displayName(e.actor)}</b> {e.action}{" "}
                     {e.detail ? <span className="mono">{e.detail}</span> : null}
                   </span>
                   <RelativeTime at={e.at} initial={relTime(e.at, now)} className="rel-time" />
@@ -131,13 +131,6 @@ export default async function Hub() {
         </section>
       )}
 
-      <CommandPalette
-        items={overview.rows.map((r) => ({
-          slug: r.slug,
-          company: r.company,
-          docNoBase: r.docNoBase,
-        }))}
-      />
       </main>
       <AppTabBar />
     </div>

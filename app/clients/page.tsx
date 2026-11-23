@@ -6,7 +6,6 @@
 import Link from "next/link";
 import AppTabBar from "@/components/AppTabBar";
 import ClientTable from "@/components/ClientTable";
-import CommandPalette from "@/components/CommandPalette";
 import ConsoleTopbar from "@/components/ConsoleTopbar";
 import { MAIN_ID } from "@/components/SkipLink";
 import { loadClientOverview, loadUnreadActivity } from "@/lib/console-overview";
@@ -37,10 +36,6 @@ export default async function ClientsPage() {
       ) : (
         <ClientTable rows={rows} />
       )}
-
-      <CommandPalette
-        items={rows.map((r) => ({ slug: r.slug, company: r.company, docNoBase: r.docNoBase }))}
-      />
       </main>
       <AppTabBar />
     </div>

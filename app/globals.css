@@ -169,6 +169,28 @@ summary:focus-visible,
 }
 .topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
+/* The "find anything" control (components/QuickFind.tsx). It is a quiet
+   outlined pill on purpose: it sits beside the one filled button on the bar
+   and must not compete with it, but it has to be findable, which the bare ⌘K
+   shortcut never was. The key hint is real <kbd> and is dropped on touch
+   screens, where there is no such key. */
+.topbar-search {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 1px solid var(--border-hi); background: transparent; color: var(--muted);
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  border-radius: 100px; padding: 7px 9px 7px 14px; cursor: pointer;
+  transition: color .15s ease, border-color .15s ease;
+}
+.topbar-search kbd {
+  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600;
+  color: var(--label); border: 1px solid var(--border-hi); border-radius: 6px; padding: 2px 6px;
+}
+@media (hover: hover) { .topbar-search:hover { color: var(--text); border-color: var(--a-border); } }
+@media (pointer: coarse) {
+  .topbar-search { min-height: 44px; padding: 7px 16px; }
+  .topbar-search kbd { display: none; }
+}
+
 /* ——— Account menu ———
    One disclosure holding the three rarely-touched controls (alerts, Settings,
    Sign out), so the right of the bar is theme + primary action + this, instead
@@ -219,6 +241,55 @@ summary:focus-visible,
    the only fixed thing on the first screen: the shape does not change with
    how much work is outstanding, which is what makes it navigable by muscle
    memory. */
+/* Sub-navigation inside one page (the client page's tabs). Same shape as
+   the section navs under Engineering and Sales, so all three read alike:
+   small mono labels on a hairline, the current one marked by weight, colour
+   and an underline rule, never by hue alone. */
+.subnav { margin-top: 18px; }
+.subnav-list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; gap: 4px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.subnav-link {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono), monospace; font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--label); padding: 9px 12px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s ease, border-color .15s ease;
+}
+.subnav-link[aria-current="page"] {
+  color: var(--a-text); border-bottom-color: var(--accent); font-weight: 700;
+}
+.subnav-count {
+  font-size: 10px; font-weight: 700; letter-spacing: 0;
+  min-width: 18px; padding: 1px 5px; border-radius: 100px; text-align: center;
+  color: var(--text); background: var(--off); border: 1px solid var(--border-hi);
+}
+/* The tab that was just clicked, while its cards are still on the way
+   (components/LinkPending.tsx). It takes the look of the current tab at half
+   strength straight away, so the click is answered before the server is. */
+.link-pending { display: contents; }
+.subnav-link:has([data-pending]) { color: var(--text); border-bottom-color: var(--a-border); }
+@media (hover: hover) { .subnav-link:hover { color: var(--text); } }
+@media (pointer: coarse) { .subnav-link { min-height: 44px; } }
+/* Six tabs do not fit a phone on one line. An underlined row that wraps
+   leaves the underline of the first row hanging over the second, and a row
+   that scrolls hides half the tabs, so on a phone they become the same chips
+   the client list filters with: they wrap cleanly and all six stay in view. */
+@media (max-width: 640px) {
+  .subnav-list { gap: 6px; border-bottom: none; }
+  .subnav-link {
+    padding: 7px 12px; margin-bottom: 0; font-size: 10.5px;
+    border: 1px solid var(--border-hi); border-radius: 100px;
+  }
+  .subnav-link[aria-current="page"] {
+    background: var(--a-dim); border-color: var(--a-border);
+  }
+  .subnav-link:has([data-pending]) { border-color: var(--a-border); }
+}
+
 .hub {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -309,6 +380,45 @@ summary:focus-visible,
      stray line rather than a separator. margin-left: auto goes too: once the
      bar wraps, pushing the group right just strands it. */
   .topnav { border-right: none; padding-right: 0; margin-right: 0; margin-left: 0; }
+  /* Five sections no longer fit a phone on one line, and wrapping left one
+     link alone on a second row. They stay on one row and scroll sideways
+     instead, which costs one line of height instead of two. position:
+     relative makes the scroller the containing block for anything absolutely
+     placed inside it (tests/css-layout.test.ts). */
+  .topnav {
+    position: relative; flex-wrap: nowrap; overflow-x: auto; width: 100%;
+    /* Last in the bar, so the wordmark and the controls share the first row
+       and the sections get the whole second one. */
+    order: 3;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .topnav::-webkit-scrollbar { display: none; }
+}
+/* A phone, as opposed to a narrow window: the bar gets two rows and no more.
+   Row one is the wordmark, Search, "+" and Account; row two is the sections,
+   set a little tighter so all five fit a 390px screen without scrolling. */
+@media (max-width: 480px) {
+  .topnav { gap: 0; }
+  .topnav-link { padding: 7px 9px; font-size: 13px; }
+  /* The small line under the wordmark is the client's name on a client page,
+     and a long one used to claim the whole row and push the controls down.
+     It is cut short here instead: the full name is the heading just below. */
+  .topbar .brand { flex: 1 1 0; min-width: 0; }
+  .topbar .brand small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar-actions { flex-wrap: nowrap; gap: 8px; }
+  /* .btn.topbar-new, not .topbar-new: the .btn rule comes later in this file
+     and would otherwise win on padding and display. */
+  .btn.topbar-new {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; min-height: 44px; padding: 0;
+    font-size: 21px; line-height: 1; flex-shrink: 0;
+  }
+  /* Hidden to the eye only (the same clip as .sr-only), so the link is still
+     called "+ New client" by a screen reader. */
+  .topbar-new-label {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
 }
 
 .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; flex-shrink: 0; }
@@ -401,6 +511,12 @@ html[data-reveal] *, html[data-reveal] body { transition: none !important; }
    the scroller the containing block clips them with everything else. */
 .table-scroll { position: relative; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 8px -22px 0; padding: 0 22px; }
 table.list { width: 100%; border-collapse: collapse; margin-top: 8px; min-width: 560px; }
+/* The client list has seven columns. At 560px they are squeezed until a
+   three-word company name stands four lines tall and the status pills break
+   in half, so on a phone each row took a third of the screen. Wide enough for
+   one line per row; the scroller around it already handles the rest. */
+table.list--wide { min-width: 800px; }
+table.list--wide td { white-space: nowrap; }
 .table-scroll table.list { margin-top: 0; }
 table.list th { text-align: left; font-family: var(--font-mono), monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--label); font-weight: 600; padding: 10px 12px; border-bottom: 1.5px solid var(--border-hi); }
 table.list td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }

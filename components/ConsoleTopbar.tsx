@@ -9,6 +9,7 @@
 // thing you DO. See the .topnav rules in app/globals.css.
 import Link from "next/link";
 import AccountMenu from "@/components/AccountMenu";
+import QuickFind from "@/components/QuickFind";
 
 /** The sections of the console. Order is the order on the bar. */
 export const SECTIONS = [
@@ -69,9 +70,15 @@ export default function ConsoleTopbar({
         </nav>
 
         <div className="topbar-actions">
+          {/* Find anything, from anywhere: every screen and every client.
+              Also ⌘K. It owns the palette, so no page mounts its own. */}
+          <QuickFind />
           {showNewClient && (
-            <Link className="btn app-hide" href="/clients/new">
-              + New client
+            // On a narrow phone only the "+" shows (.topbar-new in
+            // globals.css), so the wordmark, Search, this and Account share one
+            // row. The words stay in the markup, so the link keeps its name.
+            <Link className="btn app-hide topbar-new" href="/clients/new">
+              +<span className="topbar-new-label"> New client</span>
             </Link>
           )}
           {/* Theme, alerts, Settings and Sign out, grouped so the bar carries

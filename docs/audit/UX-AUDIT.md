@@ -27,6 +27,9 @@ columns; sessions are visible on the front page, which is unusual and good.
   lives inside the Clients card and the palette is discoverable only if you know
   `⌘K` (the input's placeholder is the only hint). Fix: global search in the top
   bar, `/` and `⌘K`, scoped sub-commands.
+  *Resolved in v1.3.0:* a Search button in the top bar of every page, also on
+  `/` and `⌘K`, that finds every screen and every client
+  (`components/QuickFind.tsx`). Scoped sub-commands are not built.
 - **UX-03 (Medium) — The dashboard is not "what needs you today".** It leads with
   Pipeline (counts) rather than with the work: unread updates, open tasks,
   overdue money. The pieces exist but are ordered by feature, not by urgency.
@@ -54,6 +57,10 @@ needs the rebuild. The screenshot is ~4,900px tall.
   Emails sent, Activity, Brief, Danger zone. Finding anything means scrolling
   past everything. Fix: tabs or a two-pane layout (list left, detail right) with
   the URL carrying the active pane (section 7.1/7.3).
+  *Resolved in v1.3.0:* six tabs under a summary that stays put (Overview,
+  Documents, Design and site, Billing, Messages, Details), with the tab in the
+  address as `?tab=` (`components/ClientTabs.tsx`). With the same made-up
+  client the page went from 5,183px and 16 cards to about 1,100px and 4.
 - **UX-11 (High) — No way to see two clients at once, and no back-to-list
   context.** Triaging N clients is N full page loads.
 - **UX-12 (Medium) — Action buttons repeat per row with no grouping.** A document

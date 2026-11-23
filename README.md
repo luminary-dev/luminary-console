@@ -24,6 +24,21 @@ Documentation index: [`ARCHITECTURE.md`](ARCHITECTURE.md),
 [`docs/adr/`](docs/adr), [`docs/runbooks/`](docs/runbooks), and the audit in
 [`docs/audit/`](docs/audit).
 
+## Finding your way around
+
+- **Search** sits in the top bar of every page, and opens on `⌘K`, `Ctrl+K`
+  or `/`. It lists every screen (by name, or by a word for what is on it:
+  "invoice", "posts", "deploy") and every client, and searches inside
+  documents and notes. Screens are listed in `components/QuickFind.tsx`.
+- **A client page is six tabs**, not one long column: Overview (tasks, notes,
+  activity), Documents, Design and site, Billing, Messages, Details. The
+  summary above them stays put. The tab is in the address
+  (`/clients/<slug>?tab=billing`), so a link to one tab can be sent to a
+  teammate and the back button works. A number on a tab is what is waiting
+  behind it.
+- On a phone the top bar is two rows: the wordmark, Search, `+` (new client)
+  and Account, then the sections.
+
 ## Engineering console
 
 `/github` reads a local projection of the organisation rather than calling
