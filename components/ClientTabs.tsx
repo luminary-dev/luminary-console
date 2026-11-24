@@ -13,16 +13,25 @@
 import Link from "next/link";
 import LinkPending from "./LinkPending";
 
+// The ids are what the address carries (?tab=billing) and have not changed, so
+// links sent before the tabs were renamed still open the right one. The labels
+// are the plain words: "Money", not "Billing"; "Settings", not "Details".
+// `what` is the one sentence Help prints for the tab.
 export const CLIENT_TABS = [
-  { id: "overview", label: "Overview" },
-  { id: "documents", label: "Documents" },
-  { id: "design", label: "Design and site" },
-  { id: "billing", label: "Billing" },
-  { id: "messages", label: "Messages" },
-  { id: "details", label: "Details" },
+  { id: "overview", label: "Summary", what: "Where the project stands and what to do next, your tasks, your private notes and this client's history." },
+  { id: "documents", label: "Documents", what: "The links the client opens, their answers to the questions form, and every document: estimate, quotation, proposal and contract." },
+  { id: "design", label: "Design & website", what: "The design ideas the client picks from, the finished website, and the handover pack that closes the project." },
+  { id: "billing", label: "Money", what: "Invoices, receipts, payments received, what is still owed, and changes the client asked for after agreeing the price." },
+  { id: "messages", label: "Client messages", what: "Questions the client asked, files they sent, emails we sent them, and the assistant that can draft a reply." },
+  { id: "details", label: "Settings", what: "The original brief, and the button that deletes the client." },
 ] as const;
 
 export type ClientTab = (typeof CLIENT_TABS)[number]["id"];
+
+/** What a tab is called on screen. */
+export function tabLabel(id: ClientTab): string {
+  return CLIENT_TABS.find((t) => t.id === id)?.label ?? "";
+}
 
 /** The tab a `?tab=` value asks for. Anything that is not a known tab (a typo,
  *  an old link, a repeated parameter's second value) is the overview, so a bad

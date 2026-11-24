@@ -107,7 +107,7 @@ export default function SessionsCard({ initial }: { initial: Session[] }) {
     <div className="card">
       {dialog}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <h3>Sessions</h3>
+        <h3>Signed-in devices</h3>
         {sessions && sessions.length > 0 && (
           <button className="btn ghost small" onClick={revokeAll} disabled={busy}>
             Sign out everywhere

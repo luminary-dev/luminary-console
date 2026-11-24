@@ -26,18 +26,47 @@ Documentation index: [`ARCHITECTURE.md`](ARCHITECTURE.md),
 
 ## Finding your way around
 
-- **Search** sits in the top bar of every page, and opens on `⌘K`, `Ctrl+K`
-  or `/`. It lists every screen (by name, or by a word for what is on it:
-  "invoice", "posts", "deploy") and every client, and searches inside
-  documents and notes. Screens are listed in `components/QuickFind.tsx`.
-- **A client page is six tabs**, not one long column: Overview (tasks, notes,
-  activity), Documents, Design and site, Billing, Messages, Details. The
-  summary above them stays put. The tab is in the address
-  (`/clients/<slug>?tab=billing`), so a link to one tab can be sent to a
-  teammate and the back button works. A number on a tab is what is waiting
-  behind it.
-- On a phone the top bar is two rows: the wordmark, Search, `+` (new client)
-  and Account, then the sections.
+The console has one menu, the same on every screen: down the left on a
+computer, and behind **Menu** in the bottom bar on a phone. It is grouped by
+what you are trying to do, and named in plain words.
+
+| In the menu | Screens | Address |
+|---|---|---|
+| **Today** | What is waiting on you, three ways to start something, what happened | `/` |
+| **Clients** | All clients, Add a client | `/clients`, `/clients/new` |
+| **Find customers** | Message shops, Shop list, Ready replies, Social posts | `/sales`, `/sales/shops`, `/sales/scripts`, `/sales/kit` |
+| **Our website** | Blog posts, Portfolio projects | `/publish`, `/publish/project` |
+| **Code** (folded until opened) | Pull requests, Builds, Live versions, Releases, Security alerts, Repositories, Team stats | `/github`, `/github/ci`, `/github/deployments`, `/github/releases`, `/github/security`, `/github/repos`, `/github/insights` |
+| **History** | Clients and customers, Code | `/activity`, `/github/activity` |
+| At the foot | Search, Help, Account (theme, alerts, Devices and export, Sign out) | `/help`, `/settings` |
+
+- **The names changed, the addresses did not.** "Sales" is Find customers,
+  "Engineering" is Code, "Publish" is Our website, "Activity" is History, "CI"
+  is Builds, "Deployments" is Live versions. Old bookmarks, emails and
+  notifications still open the right screen, and Search still finds a screen
+  by its old name.
+- **The menu is one file, `lib/menu.ts`.** The side menu, Search, the trail
+  above each page title, the sentence under it and the Help page are all read
+  from it, so a screen is called the same thing everywhere. To add a screen,
+  add it there and give its page `<ConsoleShell current="…">`.
+- **Every page has the same header**: a trail (`Clients › Harbour Lane Cafe ›
+  Money`), the title, and one sentence saying what the screen is for. The
+  longer explanation is folded under **How this works**.
+- **Today** lists what is waiting: overdue invoices, documents drafted and not
+  sent, a client's recent question, tasks due, shops to message, the next
+  post, pull requests to check. The rules are `lib/today.ts`.
+- **A client's page** opens with where the project stands and the one next
+  thing to do (`lib/next-step.ts`, which follows the same order
+  `lib/stage.ts` moves a project through). Under it are six tabs: Summary,
+  Documents, Design & website, Money, Client messages, Settings. The tab is in
+  the address (`/clients/<slug>?tab=billing`).
+- **A row shows one main action** (publish it, email it, mark it paid). The
+  rest is behind **More** on that row.
+- **Search** opens from the menu, or with `⌘K`, `Ctrl+K` or `/`. It finds any
+  screen or client, and searches inside documents and notes.
+- **Help** (`/help`) says what every screen is for and what the studio's
+  words mean. A first-time visitor gets a short welcome on Today that points
+  to it.
 
 ## Engineering console
 
@@ -163,7 +192,7 @@ notifications (iOS 16.4+), no App Store build to maintain.
 screen with the Luminary icon.
 
 **Enable notifications**: inside the installed app (or any desktop browser),
-tap **Alerts: off** in the dashboard topbar and accept the permission prompt.
+open **Account** at the foot of the menu, tap **Alerts: off** and accept the permission prompt.
 A test notification confirms delivery end to end. Every studio notice that
 pings Telegram — payments, acceptances, questionnaire submissions, questions,
 uploads, design picks/feedback, signed agreements, site deploys, publishes,

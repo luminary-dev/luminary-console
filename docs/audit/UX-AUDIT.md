@@ -23,17 +23,25 @@ columns; sessions are visible on the front page, which is unusual and good.
   to two rows and push content down. Fix: persistent left nav + a top bar
   carrying search, connection/freshness state, and the notification bell
   (section 7.1); demote sign-out and theme into a user menu.
+  *Resolved in v2.0.0:* one menu down the left of every screen, grouped by job
+  (Clients, Find customers, Our website, Code), with Search, Help and Account
+  at its foot; a five-button bottom bar on a phone. The nine GitHub screens,
+  which had their own header and no menu, are in it too. See ADR 0004.
 - **UX-02 (High) — There is no global search affordance on the page.** Search
   lives inside the Clients card and the palette is discoverable only if you know
   `⌘K` (the input's placeholder is the only hint). Fix: global search in the top
   bar, `/` and `⌘K`, scoped sub-commands.
-  *Resolved in v1.3.0:* a Search button in the top bar of every page, also on
-  `/` and `⌘K`, that finds every screen and every client
-  (`components/QuickFind.tsx`). Scoped sub-commands are not built.
+  *Resolved in v1.3.0, moved in v2.0.0:* Search is at the foot of the menu on
+  every screen, also on `/` and `⌘K`. It finds every screen (read from
+  `lib/menu.ts`) and every client. Scoped sub-commands are not built.
 - **UX-03 (Medium) — The dashboard is not "what needs you today".** It leads with
   Pipeline (counts) rather than with the work: unread updates, open tasks,
   overdue money. The pieces exist but are ordered by feature, not by urgency.
   Fix: personal home as the landing view (section 6.3).
+  *Resolved in v2.0.0:* the landing page is Today: what is waiting on the
+  signed-in operator (overdue money, unsent drafts, a client's question, tasks
+  due, shops to message, the next post, pull requests to check), late things
+  first. Rules in `lib/today.ts`.
 - **UX-04 (Medium) — Recent updates and Open tasks are capped at 8/12 rows with
   no "see all"** on the dashboard; the only way to the rest is `/activity` (for
   updates) or opening each client (for tasks). Dead end.
@@ -57,10 +65,12 @@ needs the rebuild. The screenshot is ~4,900px tall.
   Emails sent, Activity, Brief, Danger zone. Finding anything means scrolling
   past everything. Fix: tabs or a two-pane layout (list left, detail right) with
   the URL carrying the active pane (section 7.1/7.3).
-  *Resolved in v1.3.0:* six tabs under a summary that stays put (Overview,
-  Documents, Design and site, Billing, Messages, Details), with the tab in the
-  address as `?tab=` (`components/ClientTabs.tsx`). With the same made-up
-  client the page went from 5,183px and 16 cards to about 1,100px and 4.
+  *Resolved in v1.3.0:* six tabs with the tab in the address as `?tab=`
+  (`components/ClientTabs.tsx`). With the same made-up client the page went
+  from 5,183px and 16 cards to about 1,100px and 4. *In v2.0.0* the tabs were
+  renamed (Summary, Documents, Design & website, Money, Client messages,
+  Settings) and the card above them says where the project stands and the one
+  next thing to do (`lib/next-step.ts`).
 - **UX-11 (High) — No way to see two clients at once, and no back-to-list
   context.** Triaging N clients is N full page loads.
 - **UX-12 (Medium) — Action buttons repeat per row with no grouping.** A document

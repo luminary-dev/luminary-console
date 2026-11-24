@@ -30,6 +30,7 @@ const SHEETS = [
   "components/github/github.css",
   "components/github/github-views.css",
   "components/sales/sales.css",
+  "components/shell/shell.css",
 ];
 
 /** Every `selector { ... }` rule in `css`, media-query wrappers stripped. */

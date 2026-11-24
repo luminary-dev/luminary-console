@@ -40,16 +40,16 @@ describe("AccountMenu", () => {
   it("is collapsed on first render, with the panel absent", () => {
     render(<AccountMenu />);
     expect(trigger().getAttribute("aria-expanded")).toBe("false");
-    expect(screen.queryByRole("link", { name: "Settings" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Devices and export" })).toBeNull();
   });
 
-  it("opens on click and reveals Settings and Sign out", async () => {
+  it("opens on click and reveals Devices and export, and Sign out", async () => {
     const user = userEvent.setup();
     render(<AccountMenu />);
     await user.click(trigger());
 
     expect(trigger().getAttribute("aria-expanded")).toBe("true");
-    expect(screen.getByRole("link", { name: "Settings" }).getAttribute("href")).toBe("/settings");
+    expect(screen.getByRole("link", { name: "Devices and export" }).getAttribute("href")).toBe("/settings");
     expect(screen.getByRole("button", { name: "Sign out" })).toBeTruthy();
   });
 
@@ -58,7 +58,7 @@ describe("AccountMenu", () => {
     render(<AccountMenu showSettings={false} />);
     await user.click(trigger());
 
-    expect(screen.queryByRole("link", { name: "Settings" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Devices and export" })).toBeNull();
     expect(screen.getByRole("button", { name: "Sign out" })).toBeTruthy();
   });
 

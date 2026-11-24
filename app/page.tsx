@@ -1,97 +1,164 @@
-// The hub: the first screen after signing in.
+// Today: the first screen after signing in.
 //
-// It answers one question, "what should I look at", and nothing else. The
-// sections are always here so the console has a stable shape; the two things
-// below them appear only when there is something to say. A card that always
-// reads "nothing outstanding" trains you to stop looking at it, which is the
-// opposite of what a landing screen is for.
+// It answers one question, "what needs me now", and offers the three things
+// most visits start with. It used to repeat the menu as five tiles, which told
+// you where things were (the menu already does) and nothing about what to do.
+//
+// What is waiting is worked out in lib/today.ts from records the console
+// already holds: this file only gathers them. Each source is read on its own
+// and allowed to fail on its own, so a GitHub outage or an unreachable kit
+// site costs one line of the list and never the page.
 //
 // The client table used to live here as well. It moved to /clients: telling
 // you what needs attention and listing every client are different jobs and
 // they want different shapes.
 import Link from "next/link";
-import AppTabBar from "@/components/AppTabBar";
-import ConsoleTopbar, { SECTIONS } from "@/components/ConsoleTopbar";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
+import FirstVisit from "@/components/FirstVisit";
 import MarkAllRead from "@/components/MarkAllRead";
 import RelativeTime from "@/components/RelativeTime";
-import { fmtLKR } from "@/lib/money";
-import { displayName } from "@/lib/admins";
-import { relTime } from "@/lib/time";
+import { ADMIN_NAMES, displayName } from "@/lib/admins";
 import { loadClientOverview, loadUnreadActivity } from "@/lib/console-overview";
+import { githubLoginFor } from "@/lib/github/config";
+import { listAllPullRequests } from "@/lib/github/projection";
+import { viewCounts } from "@/lib/github/views";
+import { fetchKit, getPosted } from "@/lib/kit";
+import { MENU } from "@/lib/menu";
+import { fmtLKR } from "@/lib/money";
+import { currentOperator } from "@/lib/operator";
+import { buildQueue } from "@/lib/sales";
+import { getSalesState } from "@/lib/sales-store";
+import { relTime } from "@/lib/time";
+import { buildToday } from "@/lib/today";
 
-export const metadata = { title: "Console" };
+export const metadata = { title: "Today" };
 export const dynamic = "force-dynamic";
 
-/** One line of context per section, so the tiles say what they are for. */
-const SECTION_NOTE: Record<string, string> = {
-  "/clients": "Documents, billing, designs and handover for every client.",
-  "/github": "Pull requests, CI, deployments, releases and security.",
-  "/activity": "Everything that has happened, across clients and repositories.",
-  "/publish": "Draft and publish articles and portfolio projects.",
-  "/sales": "The send queue, every shop, reply scripts and the social kit.",
-};
+/** The three things most visits start with. Read from the menu, so they are
+ *  called here what they are called there. */
+const STARTS = ["/clients/new", "/sales", "/publish"].flatMap((href) =>
+  MENU.flatMap((g) => g.items).filter((i) => i.href === href),
+);
 
-export default async function Hub() {
-  const [overview, activity] = await Promise.all([loadClientOverview(), loadUnreadActivity()]);
-  const { outstandingTotal, outstandingClients, overdueTotal, overdueClients, total } = overview;
+/** A source that fails or hangs gives up its line, not the page. */
+async function soft<T>(work: Promise<T>, ms = 4000): Promise<T | null> {
+  try {
+    return await Promise.race([
+      work,
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), ms)),
+    ]);
+  } catch {
+    return null;
+  }
+}
+
+async function shopsFor(operator: string, now: number) {
+  const state = await getSalesState();
+  if (state.leads.length === 0) return null;
+  const queue = buildQueue(state.leads, state.progress, now, operator);
+  return { due: queue.due, fresh: Math.min(queue.fresh, queue.room) };
+}
+
+/** The first post, in posting order, that nobody has ticked for Instagram. */
+async function nextPost() {
+  const [kit, posted] = await Promise.all([fetchKit(), getPosted()]);
+  if (!kit.ok) return null;
+  const post = kit.kit.posts.find((p) => !posted[p.id]?.instagram);
+  return post ? { id: post.id, title: post.title, day: post.day } : null;
+}
+
+async function codeFor(operator: string, now: number) {
+  const login = githubLoginFor(operator);
+  const counts = viewCounts(await listAllPullRequests(), { ...(login ? { viewerLogin: login } : {}), now });
+  return { reviews: counts["needs-my-review"] ?? 0, ready: counts["ready-to-merge"] ?? 0 };
+}
+
+export default async function Today() {
+  const now = Date.now();
+  const operator = await currentOperator();
+  const [overview, activity, shops, post, code] = await Promise.all([
+    loadClientOverview(),
+    loadUnreadActivity(),
+    soft(shopsFor(operator, now)),
+    // The kit is read from another site, so it gets less patience.
+    soft(nextPost(), 1500),
+    soft(codeFor(operator, now)),
+  ]);
+  const { outstandingTotal, outstandingClients } = overview;
   const { events, unread } = activity;
   // Only clients that still exist get an "Open" link; see the feed below.
   const companyOf = new Map(overview.rows.map((r) => [r.slug, r.company]));
-  const now = Date.now();
+  const name = ADMIN_NAMES[operator.toLowerCase()];
+
+  const items = buildToday({
+    now,
+    operator,
+    clients: overview.records,
+    shops,
+    nextPost: post,
+    reviews: code?.reviews ?? 0,
+    ready: code?.ready ?? 0,
+  });
 
   return (
-    <div className="wrap" style={{ paddingBottom: 80 }}>
-      <ConsoleTopbar unread={unread} />
-      <main id={MAIN_ID}>
-      <h1 className="sr-only">Dashboard</h1>
+    <ConsoleShell current="/" title={name ? `Today, ${name}` : "Today"}>
+      <FirstVisit />
 
-      <nav className="hub" aria-label="Console sections">
-        {SECTIONS.map((s) => (
+      <section className="card" aria-labelledby="today-needs">
+        <div className="card-head">
+          <h3 id="today-needs">
+            Waiting on you{" "}
+            {items.length > 0 && <span className="side-count">{items.length}</span>}
+          </h3>
+        </div>
+        {items.length === 0 ? (
+          <p className="empty-note">
+            Nothing is waiting. No money is overdue, no document is sitting unsent and nobody has
+            asked for anything. Start something below, or have a look through the menu.
+          </p>
+        ) : (
+          <ul className="today-list">
+            {items.map((item) => (
+              <li className={`today-row${item.urgent ? " is-urgent" : ""}`} key={item.id}>
+                <div className="today-what">
+                  <span className="k">
+                    {item.area}
+                    {item.urgent ? " · late" : ""}
+                  </span>
+                  <b>{item.title}</b>
+                  <span className="today-detail">{item.detail}</span>
+                </div>
+                <Link className="btn ghost small" href={item.href}>
+                  {item.action}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+        {outstandingClients > 0 && (
+          <p className="today-foot">
+            Clients owe us <b className="mono">{fmtLKR(outstandingTotal)}</b> in all, across{" "}
+            {outstandingClients} client{outstandingClients > 1 ? "s" : ""}.{" "}
+            <Link href="/clients">See who</Link>
+          </p>
+        )}
+      </section>
+
+      <nav className="hub" aria-label="Start something">
+        {STARTS.map((s) => (
           <Link className="hub-tile" key={s.href} href={s.href}>
-            <span className="hub-tile__name">
-              {s.label}
-              {s.href === "/clients" && total > 0 && <span className="hub-tile__n">{total}</span>}
-              {s.href === "/activity" && unread > 0 && (
-                <span className="hub-tile__n is-accent">{unread}</span>
-              )}
-            </span>
-            <span className="hub-tile__note">{SECTION_NOTE[s.href]}</span>
+            <span className="hub-tile__name">{s.label}</span>
+            <span className="hub-tile__note">{s.what}</span>
           </Link>
         ))}
       </nav>
-
-      {/* Only when there is money to chase. */}
-      {outstandingClients > 0 && (
-        <section className="card" aria-labelledby="hub-money">
-          <h3 id="hub-money">Outstanding</h3>
-          <p style={{ marginTop: 8, fontSize: 13.5 }}>
-            <b className="mono">{fmtLKR(outstandingTotal)}</b> across {outstandingClients} client
-            {outstandingClients > 1 ? "s" : ""}.
-            {overdueClients > 0 && (
-              <>
-                {" "}
-                <b className="mono" style={{ color: "var(--danger)" }}>
-                  {fmtLKR(overdueTotal)}
-                </b>{" "}
-                <span style={{ color: "var(--danger)" }}>
-                  overdue across {overdueClients} client{overdueClients > 1 ? "s" : ""}.
-                </span>
-              </>
-            )}
-          </p>
-          <Link className="btn ghost small" href="/clients" style={{ marginTop: 14 }}>
-            Open clients
-          </Link>
-        </section>
-      )}
 
       {/* Only when something is genuinely unread. */}
       {events.length > 0 && (
         <section className="card" aria-labelledby="hub-updates">
           <div className="card-head">
             <h3 id="hub-updates">
-              Recent updates <span className="pill">{unread} new</span>
+              What happened <span className="pill">{unread} new</span>
             </h3>
             <MarkAllRead />
           </div>
@@ -126,13 +193,10 @@ export default async function Hub() {
             })}
           </ul>
           <Link className="btn ghost small" href="/activity" style={{ marginTop: 14 }}>
-            All activity
+            All history
           </Link>
         </section>
       )}
-
-      </main>
-      <AppTabBar />
-    </div>
+    </ConsoleShell>
   );
 }

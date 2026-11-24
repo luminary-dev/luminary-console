@@ -10,6 +10,7 @@
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 
 export default function ClientError({
   error,
@@ -26,25 +27,14 @@ export default function ClientError({
   }, [error]);
 
   return (
-    <main className="wrap" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Console</small>
-        </div>
-        <Link className="btn ghost small" href="/">
-          Dashboard
-        </Link>
-      </div>
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id="main-content" tabIndex={-1} />
-
-
+    <ConsoleShell
+      current="/clients"
+      title="This client could not be loaded"
+      purpose={null}
+      trail={[{ label: "Clients", href: "/clients" }]}
+    >
       <div className="card">
-        <h3>This client could not be loaded</h3>
+        <h3>Their record is safe</h3>
         <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 6, lineHeight: 1.65 }}>
           {slug ? (
             <>
@@ -60,8 +50,8 @@ export default function ClientError({
           <button className="btn" onClick={() => reset()}>
             Try again
           </button>
-          <Link className="btn ghost" href="/">
-            Back to the dashboard
+          <Link className="btn ghost" href="/clients">
+            Back to all clients
           </Link>
         </div>
         {error.digest && (
@@ -70,6 +60,6 @@ export default function ClientError({
           </p>
         )}
       </div>
-    </main>
+    </ConsoleShell>
   );
 }

@@ -135,13 +135,13 @@ export default function ClientTable({ rows }: { rows: ClientRow[] }) {
   return (
     <div className="card">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <h3>Clients</h3>
-        <label className="sr-only" htmlFor={searchId}>Search clients by name, document number, or stage</label>
+        <h3 className="sr-only">The list</h3>
+        <label className="sr-only" htmlFor={searchId}>Find a client by name, document number, or stage</label>
         <input
           id={searchId}
           className="q-line"
           type="search"
-          placeholder="Search clients…  (or press ⌘K)"
+          placeholder="Find a client by name or number"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           style={{ maxWidth: 280, width: "100%" }}

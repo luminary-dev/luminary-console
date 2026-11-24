@@ -3,17 +3,15 @@
 //
 // Reads lib/sales-store directly (same data as /api/sales, one fewer round
 // trip) and renders server-side. Authed by the proxy like every console route.
-import AppTabBar from "@/components/AppTabBar";
-import ConsoleTopbar from "@/components/ConsoleTopbar";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 import ImportShops from "@/components/sales/ImportShops";
-import SalesNav from "@/components/sales/SalesNav";
 import SalesQueue from "@/components/sales/SalesQueue";
 import { ADMIN_NAMES } from "@/lib/admins";
 import { currentOperator } from "@/lib/operator";
 import { STATUS_LABEL, tally } from "@/lib/sales";
 import { getSalesState } from "@/lib/sales-store";
 import "@/components/sales/sales.css";
+import HowItWorks from "@/components/HowItWorks";
 
 export const metadata = { title: "Sales" };
 export const dynamic = "force-dynamic";
@@ -26,20 +24,22 @@ export default async function SalesPage() {
   const me = ADMIN_NAMES[operator.toLowerCase()] ?? "";
 
   return (
-    <div className="wrap" style={{ paddingBottom: 80 }}>
-      <ConsoleTopbar current="/sales" subtitle="Sales" showNewClient={false} />
-      <main id={MAIN_ID}>
-        <h1 className="sr-only">Sales</h1>
-        <SalesNav current="/sales" />
+    <ConsoleShell current="/sales">
 
         {state.leads.length === 0 ? (
           <section className="card" aria-labelledby="sales-empty">
             <h3 id="sales-empty">No shops yet</h3>
             <p className="empty-note">
-              The board works from a list of researched shops. Import{" "}
-              <span className="mono">sales/leads-checked.json</span> from the Shopfront repository to begin. The
-              list is stored in the console&apos;s bucket, not in this repository.
+              This screen works through a list of shops we have looked into. Bring the list in to
+              begin.
             </p>
+            <HowItWorks label="Where the list comes from">
+              <p>
+                It is the file <span className="mono">sales/leads-checked.json</span> in the Shopfront
+                repository. Once brought in, it is kept in the console&apos;s private storage, not in
+                the console&apos;s own code.
+              </p>
+            </HowItWorks>
             <div style={{ marginTop: 14 }}>
               <ImportShops count={0} />
             </div>
@@ -81,8 +81,6 @@ export default async function SalesPage() {
             />
           </>
         )}
-      </main>
-      <AppTabBar />
-    </div>
+    </ConsoleShell>
   );
 }

@@ -5,10 +5,7 @@
 // review console feel like a liar. Everything here is the stored projection,
 // never a live read, so opening a pull request costs no API budget.
 import Link from "next/link";
-import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 import { getPullRequest } from "@/lib/github/projection";
 import { mergeReadiness, type PullRequestEntity } from "@/lib/github/entities";
 import CheckList, { checksLabel, tallyChecks } from "@/components/github/CheckList";
@@ -43,26 +40,40 @@ export default async function PullRequestPage({ params }: { params: Params }) {
   const full = `${owner}/${repo}`;
   const pr = await readPr(owner, repo, number);
 
+  // The heading is the pull request's own title, and the trail says where it
+  // sits, so the way back is the same as on every other screen.
+  const now = Date.now();
+  const stateLabel = !pr
+    ? ""
+    : pr.state === "merged" ? "merged" : pr.state === "closed" ? "closed" : pr.draft ? "draft" : "open";
+  const stateIsQuiet = !!pr && (pr.state !== "open" || pr.draft);
+
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Pull request</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/github">
-            <span aria-hidden="true">← </span>Pull requests
-          </Link>
-        </div>
-      </div>
-
+    <ConsoleShell
+      current="/github"
+      className="gh-page"
+      trail={[
+        { label: "Code" },
+        { label: "Pull requests", href: "/github" },
+        { label: `${full} #${number}` },
+      ]}
+      title={pr ? pr.title : "Not synced yet"}
+      purpose={
+        pr
+          ? `Opened by ${pr.author?.login ?? "ghost"}, ${shortAge(pr.createdAt, now)} old, last updated ${shortAge(pr.updatedAt, now)} ago.`
+          : null
+      }
+      action={
+        pr ? (
+          <span className={`pill${stateIsQuiet ? " grey" : ""}`}>
+            <i />
+            {stateLabel}
+          </span>
+        ) : undefined
+      }
+    >
       {pr ? <Loaded pr={pr} /> : <NotSynced full={full} number={number} />}
-
-      <AppTabBar />
-    </main>
+    </ConsoleShell>
   );
 }
 
@@ -70,32 +81,8 @@ function Loaded({ pr }: { pr: PullRequestEntity }) {
   const verdict = mergeReadiness(pr);
   const checks = tallyChecks(pr.checks);
   const reviews = tallyReviews(pr.reviews);
-  const now = Date.now();
-  const stateLabel =
-    pr.state === "merged" ? "merged" : pr.state === "closed" ? "closed" : pr.draft ? "draft" : "open";
-  const stateIsQuiet = pr.state !== "open" || pr.draft;
-
   return (
     <>
-      <div className="gh-head">
-        <div>
-          <p className="gh-crumb">
-            {pr.repo} #{pr.number}
-          </p>
-          <h1 className="gh-h1" style={{ marginTop: 4 }}>
-            {pr.title}
-          </h1>
-          <p className="gh-lede">
-            Opened by {pr.author?.login ?? "ghost"}, {shortAge(pr.createdAt, now)} old, last updated{" "}
-            {shortAge(pr.updatedAt, now)} ago.
-          </p>
-        </div>
-        <span className={`pill${stateIsQuiet ? " grey" : ""}`}>
-          <i />
-          {stateLabel}
-        </span>
-      </div>
-
       <section className="card" aria-labelledby="pr-verdict">
         <h2 className="gh-card-title" id="pr-verdict">
           Merge readiness
@@ -251,16 +238,6 @@ function Fact({ k, v, mono }: { k: string; v: string; mono?: boolean }) {
 function NotSynced({ full, number }: { full: string; number: string }) {
   return (
     <>
-      <div className="gh-head">
-        <div>
-          <p className="gh-crumb">
-            {full} #{number}
-          </p>
-          <h1 className="gh-h1" style={{ marginTop: 4 }}>
-            Not synced yet
-          </h1>
-        </div>
-      </div>
       <section className="card" aria-labelledby="pr-missing">
         <h2 className="gh-card-title" id="pr-missing">
           This pull request is not in the projection

@@ -1,0 +1,314 @@
+/* The console's frame: the menu down the left, the page beside it, and on a
+   phone a bottom bar with the menu behind its last button.
+   Markup: components/shell/. Tokens: app/globals.css. */
+
+.shell {
+  display: grid;
+  grid-template-columns: 252px minmax(0, 1fr);
+  align-items: start;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ——— the menu ——— */
+
+/* Sticky, and as tall as the window, so the menu stays put while a long page
+   scrolls beside it. It scrolls on its own if the window is very short. */
+.side {
+  position: sticky; top: 0;
+  height: 100vh; height: 100dvh;
+  display: flex; flex-direction: column;
+  padding: 26px 14px 14px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.side-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 10px 22px; }
+.shell-brand { font-size: 21px; font-weight: 800; letter-spacing: -0.04em; color: var(--text); line-height: 1.2; }
+.shell-brand span { color: var(--accent); }
+.side-close { display: none; }
+
+.side-nav { display: flex; flex-direction: column; gap: 20px; }
+.side-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+/* History stands apart from the groups above it: it is not a place where work
+   is done, it is the record of the work. */
+.side-list--apart { padding-top: 14px; border-top: 1px solid var(--border); }
+
+/* A group's name is a label, not a link: the same small mono capitals as a
+   table header, so it reads as "these belong together" and not as one more
+   thing to click. */
+.side-heading {
+  font-family: var(--font-mono), monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--label);
+  padding: 0 10px 7px; line-height: 1.6;
+}
+/* The folded group's name is its own open and close control. */
+summary.side-heading {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  list-style: none; cursor: pointer; padding: 7px 10px; margin-bottom: 2px; border-radius: 9px;
+}
+summary.side-heading::-webkit-details-marker { display: none; }
+.side-fold {
+  width: 6px; height: 6px; flex-shrink: 0; margin-right: 3px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg); transition: transform .15s ease;
+}
+details[open] > summary .side-fold { transform: rotate(45deg); }
+
+.side-link {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; padding: 7px 10px; border: none; border-radius: 9px;
+  background: none; color: var(--muted); cursor: pointer;
+  font-family: inherit; font-size: 13.5px; font-weight: 600; line-height: 1.4; text-align: left;
+  transition: color .12s ease, background-color .12s ease;
+}
+/* Where you are. The accent tint is the same one a selected filter chip
+   wears, so "this one is on" looks the same across the console. */
+.side-link[aria-current="page"] { color: var(--a-text); background: var(--a-dim); font-weight: 700; }
+@media (hover: hover) {
+  .side-link:hover, summary.side-heading:hover { color: var(--text); background: var(--off); }
+  .side-link[aria-current="page"]:hover { color: var(--a-text); background: var(--a-dim); }
+}
+.side-count {
+  font-family: var(--font-mono), monospace; font-variant-numeric: tabular-nums;
+  font-size: 11px; font-weight: 700; color: var(--a-text); background: var(--a-dim);
+  border-radius: 100px; padding: 1px 7px;
+}
+
+/* Search, Help and Account sit at the foot: always in the same corner, and
+   out of the way of the places you go. */
+.side-foot {
+  margin-top: auto; padding-top: 12px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.side-nav + .side-foot { border-top: 1px solid var(--border); margin-top: auto; }
+.side-nav { padding-bottom: 16px; }
+.side-search kbd {
+  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600;
+  color: var(--label); border: 1px solid var(--border-hi); border-radius: 6px; padding: 1px 6px;
+}
+/* The Account control is the shared disclosure (components/AccountMenu.tsx).
+   Here it is one more row of the menu, and its panel opens upward because the
+   row sits at the bottom of the window. `.btn` is in the selector so this
+   beats the pill rules later in globals.css. */
+.side-foot .acct { display: flex; }
+.side-foot .btn.acct-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; border: none; border-radius: 9px;
+  padding: 7px 10px; background: none; color: var(--muted);
+  font-size: 13.5px; font-weight: 600; line-height: 1.4;
+}
+@media (hover: hover) { .side-foot .btn.acct-trigger:hover { color: var(--text); background: var(--off); transform: none; } }
+.side-foot .acct-panel { top: auto; bottom: calc(100% + 8px); left: 0; right: auto; min-width: 100%; }
+
+/* ——— the page ——— */
+
+.shell-main {
+  min-width: 0; width: 100%; max-width: 1144px;
+  margin: 0 auto; padding: 30px 32px 96px;
+}
+/* The skip link lands here. It is a region, not a control, so it takes focus
+   without drawing a ring around the whole page. */
+.shell-main:focus { outline: none; }
+/* A form reads better in a narrow column. The heading stays where it is on
+   every other page, so the title does not jump sideways as you move around. */
+.shell-main--narrow > :not(.pagehead) { max-width: 760px; }
+
+.pagehead { margin-bottom: 4px; }
+.trail ol {
+  list-style: none; display: flex; flex-wrap: wrap; align-items: center;
+  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--label); line-height: 1.7;
+}
+.trail li + li::before { content: "›"; margin: 0 9px; color: var(--label); opacity: .6; }
+.trail a { color: var(--a-text); }
+@media (hover: hover) { .trail a:hover { text-decoration: underline; text-underline-offset: 3px; } }
+.pagehead-row {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 14px 24px; flex-wrap: wrap; margin-top: 6px;
+}
+.pagehead-text { min-width: 0; flex: 1 1 320px; }
+.pagehead h1 {
+  font-size: 27px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.15;
+  text-wrap: balance; overflow-wrap: anywhere;
+}
+/* What this screen is for, in one sentence. Kept to a reading width. */
+.purpose { margin-top: 7px; color: var(--muted); font-size: 14px; line-height: 1.55; max-width: 66ch; }
+.pagehead-action { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+
+/* "How this works": the longer explanation, closed until asked for
+   (components/HowItWorks.tsx). The summary looks like the quiet link it is. */
+.how { margin-top: 8px; max-width: 74ch; }
+.how > summary {
+  display: inline-flex; align-items: center; gap: 7px; list-style: none; cursor: pointer;
+  color: var(--label); font-size: 12.5px; font-weight: 600; border-radius: 6px;
+}
+.how > summary::-webkit-details-marker { display: none; }
+.how > summary::before {
+  content: ""; width: 5px; height: 5px; flex-shrink: 0;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg); transition: transform .15s ease;
+}
+.how[open] > summary::before { transform: rotate(45deg); }
+@media (hover: hover) { .how > summary:hover { color: var(--text); } }
+@media (pointer: coarse) { .how > summary { min-height: 44px; } }
+.how-body { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.how-body p + p { margin-top: 8px; }
+.how-body code { font-family: var(--font-mono), monospace; font-size: 12px; }
+.card .how { margin-top: 10px; }
+
+/* A row's actions: the main one, then "More" (components/MoreActions.tsx).
+   The hidden ones open on their own line under the row, so nothing moves
+   under the pointer and nothing floats over a table that scrolls. */
+.row-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.more-toggle { display: inline-flex; align-items: center; gap: 6px; }
+.more-caret { transition: transform .15s ease; }
+.more-toggle[aria-expanded="true"] .more-caret { transform: rotate(180deg); }
+.more-items { flex-basis: 100%; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.more-items[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .more-caret { transition: none; } }
+.btn.ghost.is-danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
+
+/* The top of a client's page (components/NextStepCard.tsx): the path a
+   project travels, then the next step. The path is a row of words joined by a
+   line; the stage the project is in wears the accent, the ones behind it are
+   plain and the ones ahead are faint. Never colour alone: the current one is
+   also bold and marked aria-current. */
+.next-path {
+  list-style: none; display: flex; flex-wrap: wrap; gap: 6px 0; align-items: center;
+  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--label);
+}
+.next-path li { display: inline-flex; align-items: center; color: color-mix(in srgb, var(--label) 62%, transparent); }
+/* The line joining one stage to the next is drawn after each stage, which
+   leaves ::before free for the dot that marks the current one. */
+.next-path li:not(:last-child)::after {
+  content: ""; width: 18px; height: 1px; margin: 0 9px; background: var(--border-hi);
+}
+.next-path li.is-done { color: var(--label); }
+.next-path li.is-now { color: var(--a-text); font-weight: 700; }
+.next-path li.is-now::before {
+  content: ""; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--accent);
+}
+.next-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px 24px; flex-wrap: wrap;
+  margin-top: 18px;
+}
+.next-text { flex: 1 1 340px; min-width: 0; }
+.next-text h3 { font-size: 18px; letter-spacing: -0.02em; line-height: 1.3; margin-top: 5px; text-wrap: balance; }
+.next-text p { margin-top: 5px; color: var(--muted); font-size: 13.5px; line-height: 1.55; max-width: 66ch; }
+.next-who.is-us { color: var(--a-text); }
+.next-facts {
+  margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border);
+  display: flex; gap: 10px 22px; align-items: center; flex-wrap: wrap; font-size: 13px;
+}
+.shell-main > .card.next > h3:first-child { margin-bottom: 0; }
+
+/* One rhythm for the cards of every page. (The roomier spacing in globals.css
+   was written for `.wrap > .card` and had stopped applying to most pages once
+   their cards moved inside <main>.) */
+.shell-main > .card { margin-top: 18px; padding: 26px 28px; }
+.shell-main > .card > h3 { font-size: 16px; }
+.shell-main > .card > h3:first-child { margin-bottom: 12px; }
+.shell-main > .card > .card-head:not(:last-child) { margin-bottom: 14px; }
+
+/* The welcome on Today (components/FirstVisit.tsx) and the lists on Help
+   (app/help/page.tsx) share one shape: a name, then what it means. */
+.welcome { border-color: var(--a-border); }
+.welcome-list, .help-list { margin-top: 4px; }
+.welcome-list > div, .help-list > div {
+  display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 4px 20px;
+  padding: 10px 0; border-top: 1px solid var(--border);
+}
+.welcome-list > div:first-child, .help-list > div:first-child { border-top: none; }
+.welcome-list dt, .help-list dt { font-size: 13.5px; font-weight: 700; }
+.welcome-list dd, .help-list dd { font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+.help-list dt a { color: var(--text); text-decoration: underline; text-decoration-color: var(--a-border); text-underline-offset: 3px; }
+@media (hover: hover) { .help-list dt a:hover { color: var(--a-text); } }
+.welcome-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.help-group { margin-top: 22px; }
+.help-group h4 {
+  font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--label);
+}
+.help-group > p { margin-top: 4px; font-size: 13px; color: var(--muted); }
+@media (max-width: 640px) {
+  .welcome-list > div, .help-list > div { grid-template-columns: 1fr; }
+}
+
+/* ——— phone ——— */
+
+.phone-top, .phonebar, .side-scrim { display: none; }
+
+@media (max-width: 900px) {
+  .shell { display: block; }
+
+  .phone-top {
+    display: flex; align-items: center;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 0;
+  }
+  .phone-top .shell-brand { font-size: 19px; }
+
+  .shell-main { padding: 14px 16px calc(104px + env(safe-area-inset-bottom, 0px)); }
+  .pagehead h1 { font-size: 23px; }
+  .purpose { font-size: 13.5px; }
+  .shell-main > .card { margin-top: 14px; padding: 20px 18px; }
+
+  /* Closed, the menu is not on the page at all. Open, it is a sheet from the
+     right edge, under the thumb that pressed Menu. */
+  .side { display: none; }
+  .side[data-open] {
+    display: flex; position: fixed; inset: 0 0 0 auto; z-index: 95;
+    width: min(320px, 88vw); height: auto;
+    padding: calc(20px + env(safe-area-inset-top, 0px)) 14px calc(16px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg); border-right: none; border-left: 1px solid var(--border-hi);
+    box-shadow: -18px 0 50px rgba(0, 0, 0, .28);
+    animation: side-in .18s ease both;
+  }
+  .side-scrim {
+    display: block; position: fixed; inset: 0; z-index: 94;
+    border: none; padding: 0; background: rgba(0, 0, 0, .5); cursor: default;
+  }
+  .side-close {
+    display: inline-flex; align-items: center; min-height: 36px; padding: 6px 14px;
+    border: 1px solid var(--border-hi); border-radius: 100px; background: none; color: var(--text);
+    font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  }
+  .side-link, summary.side-heading, .side-foot .btn.acct-trigger { min-height: 44px; font-size: 15px; }
+  summary.side-heading { font-size: 10.5px; }
+  .side-search kbd { display: none; }
+
+  /* Five buttons, always in the same place: the three places a phone goes
+     most, Search, and Menu for everything else. */
+  .phonebar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    display: flex; align-items: stretch;
+    padding: 6px max(8px, env(safe-area-inset-left, 0px))
+             calc(8px + env(safe-area-inset-bottom, 0px))
+             max(8px, env(safe-area-inset-right, 0px));
+    background: color-mix(in srgb, var(--desk) 88%, transparent);
+    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+  }
+  .phonebar-item {
+    flex: 1; min-width: 0; min-height: 48px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    padding: 6px 0 3px; border: none; border-radius: 12px; background: none; cursor: pointer;
+    color: var(--muted); font-family: inherit; -webkit-tap-highlight-color: transparent;
+  }
+  .phonebar-item svg { width: 22px; height: 22px; flex-shrink: 0; }
+  .phonebar-item span {
+    font-family: var(--font-mono), monospace; font-size: 9.5px; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .phonebar-item[aria-current="page"] { color: var(--a-text); }
+}
+
+@keyframes side-in {
+  from { transform: translateX(18px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .side[data-open] { animation: none; }
+  .side-fold, .side-link { transition: none; }
+}

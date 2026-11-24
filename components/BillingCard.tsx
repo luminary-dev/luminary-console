@@ -13,6 +13,8 @@ import { fmtLKR, invoiceStatus, invoiceTotal, paidAgainst, parseAmount, summariz
 import { billingLabel } from "@/lib/doclabels";
 
 import EmailDocButton from "./EmailDocButton";
+import HowItWorks from "./HowItWorks";
+import MoreActions from "./MoreActions";
 import DocHistory from "./DocHistory";
 import RelativeTime from "./RelativeTime";
 import { useConfirm } from "./ConfirmDialog";
@@ -213,33 +215,41 @@ export default function BillingCard({
 
   return (
     <div className="card">
-      <h3>Billing</h3>
-      <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-        The 30/70 payment arc: the 30% design-approval invoice once the client approves the design
-        and development begins, then the 70% delivery invoice at delivery, each with its receipt when
-        paid. There is no upfront signing payment. Post-delivery changes requested{" "}
-        <i>after</i> the account is settled get their own additional invoice/receipt once completed.
-        {!hasQuotation && " Available once a quotation exists."}
+      <h3>Invoices and receipts</h3>
+      <p className="empty-note" style={{ marginTop: 4 }}>
+        A project is paid in two parts: 30% when the client approves the design, and 70% on
+        delivery. Each part gets an invoice, then a receipt once the money arrives.
+        {!hasQuotation && " You can make the first invoice once there is a quotation."}
       </p>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
-        {gen("invoice", "progress", "Design-approval invoice (30%)")}
-        {gen("receipt", "progress", "Design-approval receipt")}
-        {gen("invoice", "final", "Delivery invoice (70%)")}
-        {gen("receipt", "final", "Delivery receipt")}
-        <button
-          className="btn ghost small"
-          disabled={!!busy || !hasQuotation}
-          onClick={() => setOtherFor(otherFor === "invoice" ? null : "invoice")}
-        >
-          Additional invoice
-        </button>
-        <button
-          className="btn ghost small"
-          disabled={!!busy || !hasQuotation}
-          onClick={() => setOtherFor(otherFor === "receipt" ? null : "receipt")}
-        >
-          Additional receipt
-        </button>
+      <HowItWorks>
+        <p>
+          There is no payment on signing. Work on the site starts when the 30% invoice is paid.
+          Changes the client asks for after everything is settled get their own extra invoice and
+          receipt once that work is done: use &quot;Something extra&quot; below.
+        </p>
+      </HowItWorks>
+      <div className="row-actions" style={{ marginTop: 12 }}>
+        <span className="k">Make</span>
+        {gen("invoice", "progress", "30% invoice (design approved)")}
+        {gen("receipt", "progress", "Receipt for the 30%")}
+        {gen("invoice", "final", "70% invoice (on delivery)")}
+        {gen("receipt", "final", "Receipt for the 70%")}
+        <MoreActions label="Something extra">
+          <button
+            className="btn ghost small"
+            disabled={!!busy || !hasQuotation}
+            onClick={() => setOtherFor(otherFor === "invoice" ? null : "invoice")}
+          >
+            Extra invoice
+          </button>
+          <button
+            className="btn ghost small"
+            disabled={!!busy || !hasQuotation}
+            onClick={() => setOtherFor(otherFor === "receipt" ? null : "receipt")}
+          >
+            Extra receipt
+          </button>
+        </MoreActions>
       </div>
       {otherFor && (
         <div style={{ marginTop: 12 }}>
@@ -268,7 +278,7 @@ export default function BillingCard({
 
       {billing.length > 0 && (
         <div className="table-scroll">
-          <table className="list">
+          <table className="list list--wide">
             <thead>
               <tr>
                 <th>Document</th>
@@ -343,42 +353,39 @@ export default function BillingCard({
                     </a>
                   </td>
                   <td style={{ minWidth: 220 }}>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      {b.status === "draft" ? (
-                        <>
-                          <button className="btn small" disabled={!!busy} onClick={() => call({ action: "publish", doc: b.slug }, `pub-${b.slug}`)}>
-                            {busy === `pub-${b.slug}` ? "…" : "Publish"}
-                          </button>
-                          {email && (
-                            <button
-                              className="btn ghost small"
-                              disabled={!!busy}
-                              onClick={async () => {
-                                setBusy(`pubemail-${b.slug}`);
-                                setError(null);
-                                const p = await opsFetch(`/api/clients/${slug}/billing`, {
-                                  method: "POST",
-                                  headers: { "Content-Type": "application/json" },
-                                  body: JSON.stringify({ action: "publish", doc: b.slug }),
-                                });
-                                if (!p.ok) { setBusy(null); setError("Publish failed."); return; }
-                                const s = await opsFetch(`/api/clients/${slug}/send`, {
-                                  method: "POST",
-                                  headers: { "Content-Type": "application/json" },
-                                  body: JSON.stringify({ docs: [b.slug] }),
-                                });
-                                setBusy(null);
-                                if (!s.ok) setError("Published, but the email failed. Use Email to retry.");
-                                router.refresh();
-                              }}
-                            >
-                              {busy === `pubemail-${b.slug}` ? "Working…" : "Publish & email"}
-                            </button>
-                          )}
-                        </>
-                      ) : (
-                        <button className="btn ghost small" disabled={!!busy} onClick={() => call({ action: "unpublish", doc: b.slug }, `unpub-${b.slug}`)}>
-                          {busy === `unpub-${b.slug}` ? "…" : "Unpublish"}
+                    {/* One main action per row, the rest behind More. A draft is
+                        sent; an unpaid invoice is marked paid; anything
+                        published can be emailed again. */}
+                    <div className="row-actions">
+                      {b.status === "draft" && email && (
+                        <button
+                          className="btn small"
+                          disabled={!!busy}
+                          onClick={async () => {
+                            setBusy(`pubemail-${b.slug}`);
+                            setError(null);
+                            const p = await opsFetch(`/api/clients/${slug}/billing`, {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ action: "publish", doc: b.slug }),
+                            });
+                            if (!p.ok) { setBusy(null); setError("Publish failed."); return; }
+                            const s = await opsFetch(`/api/clients/${slug}/send`, {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ docs: [b.slug] }),
+                            });
+                            setBusy(null);
+                            if (!s.ok) setError("Published, but the email failed. Use Email to retry.");
+                            router.refresh();
+                          }}
+                        >
+                          {busy === `pubemail-${b.slug}` ? "Working…" : "Publish and email"}
+                        </button>
+                      )}
+                      {b.status === "draft" && !email && (
+                        <button className="btn small" disabled={!!busy} onClick={() => call({ action: "publish", doc: b.slug }, `pub-${b.slug}`)}>
+                          {busy === `pub-${b.slug}` ? "…" : "Publish"}
                         </button>
                       )}
                       {isInvoice && b.status === "published" && !fullyPaid && (
@@ -386,27 +393,44 @@ export default function BillingCard({
                           {busy === `pay-${b.slug}` ? "…" : "Mark paid"}
                         </button>
                       )}
-                      {/* The handover pack has no drafted data to revise — it
-                          is rebuilt from the record by its own card. */}
-                      {b.kind !== "handover" && (
-                        <button className="btn ghost small" disabled={!!busy} onClick={() => setReviseFor(reviseFor === b.slug ? null : b.slug)}>
-                          Revise
-                        </button>
+                      {b.status === "published" && (
+                        <EmailDocButton
+                          slug={slug}
+                          docKey={b.slug}
+                          label={billingLabel(b).toLowerCase()}
+                          {...(email !== undefined ? { email } : {})}
+                        />
                       )}
-                      <EmailDocButton
-                        slug={slug}
-                        docKey={b.slug}
-                        label={billingLabel(b).toLowerCase()}
-                        {...(email !== undefined ? { email } : {})}
-                      />
-                      <button
-                        className="btn ghost small"
-                        style={{ color: "var(--danger)", borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)" }}
-                        disabled={!!busy}
-                        onClick={() => remove(b)}
-                      >
-                        {busy === `del-${b.slug}` ? "…" : "Delete"}
-                      </button>
+                      <MoreActions>
+                        {b.status === "draft" && email && (
+                          <button className="btn ghost small" disabled={!!busy} onClick={() => call({ action: "publish", doc: b.slug }, `pub-${b.slug}`)}>
+                            {busy === `pub-${b.slug}` ? "…" : "Publish without emailing"}
+                          </button>
+                        )}
+                        {b.status === "draft" && (
+                          <EmailDocButton
+                            slug={slug}
+                            docKey={b.slug}
+                            label={billingLabel(b).toLowerCase()}
+                            {...(email !== undefined ? { email } : {})}
+                          />
+                        )}
+                        {b.status === "published" && (
+                          <button className="btn ghost small" disabled={!!busy} onClick={() => call({ action: "unpublish", doc: b.slug }, `unpub-${b.slug}`)}>
+                            {busy === `unpub-${b.slug}` ? "…" : "Unpublish"}
+                          </button>
+                        )}
+                        {/* The handover pack has no drafted data to change — it
+                            is rebuilt from the record by its own card. */}
+                        {b.kind !== "handover" && (
+                          <button className="btn ghost small" disabled={!!busy} onClick={() => setReviseFor(reviseFor === b.slug ? null : b.slug)}>
+                            Make changes
+                          </button>
+                        )}
+                        <button className="btn ghost small is-danger" disabled={!!busy} onClick={() => remove(b)}>
+                          {busy === `del-${b.slug}` ? "…" : "Delete"}
+                        </button>
+                      </MoreActions>
                     </div>
                     <DocHistory {...(b.history ? { history: b.history } : {})} />
                     {reviseFor === b.slug && (

@@ -6,16 +6,17 @@ here does not exist yet, and the gaps are named at the bottom rather than
 implied.
 
 Every shortcut below is verified by a test in `tests/a11y.test.tsx`,
-`tests/quick-find.test.tsx` or `tests/github-ui.test.tsx`.
+`tests/quick-find.test.tsx`, `tests/shell.test.tsx` or
+`tests/github-ui.test.tsx`.
 
 ## Anywhere in the console
 
 | Keys | Action |
 | --- | --- |
-| `Cmd+K` / `Ctrl+K` | Open search (the command palette). The **Search** button in the top bar does the same |
+| `Cmd+K` / `Ctrl+K` | Open search (the command palette). **Search** at the foot of the menu does the same |
 | `/` | Open search, unless you are typing in a field |
 | `Escape` | Close the palette, or close an open dialog |
-| `Tab` (first press on a page) | Reveals "Skip to content", which jumps past the topbar |
+| `Tab` (first press on a page) | Reveals "Skip to content", which jumps past the menu to the page |
 
 ## Command palette
 
@@ -31,8 +32,20 @@ screen reader announces the highlighted option as you move.
 
 Before anything is typed it lists the main screens, then the clients. Once
 there is a query, clients whose name matches come first. The screens it knows
-are listed in `components/QuickFind.tsx`; a test fails if a section's
-navigation offers a page that is missing from that list.
+are the menu itself (`lib/menu.ts`), so a screen added to the menu is findable
+without anyone adding it here too. Each one also matches on what it used to be
+called ("sales", "engineering", "CI").
+
+## The menu on a phone
+
+| Keys | Action |
+| --- | --- |
+| `Enter` or `Space` on **Menu** | Opens the menu as a dialog. Focus stays inside it |
+| `Escape` | Closes it and returns focus to **Menu** |
+| `Enter` on a link | Goes there and closes it |
+
+On a computer the menu is always on screen and is ordinary links: `Tab` moves
+through it, and the Code group opens and closes with `Enter` or `Space`.
 
 ## Pull request inbox (`/github`)
 

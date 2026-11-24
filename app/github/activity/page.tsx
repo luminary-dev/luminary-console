@@ -10,10 +10,9 @@
 // the address means the link carries what the sender was looking at.
 import { Suspense } from "react";
 import Link from "next/link";
-import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
+import HistorySwitch from "@/components/shell/HistorySwitch";
+import { CODE_HISTORY } from "@/lib/menu";
 import { githubConfigured } from "@/lib/github/config";
 import { isFailingConclusion } from "@/lib/github/entities";
 import type {
@@ -30,7 +29,7 @@ import {
   listAllReleases,
   listAllWorkflowRuns,
 } from "@/lib/github/projection";
-import GithubNav, { GithubEmpty, GithubError } from "@/components/github/GithubNav";
+import { GithubEmpty, GithubError } from "@/components/github/GithubNav";
 import { StatusIcon, type StatusTone } from "@/components/github/MergeVerdict";
 import { shortAge } from "@/components/github/PrRow";
 import "@/components/github/github.css";
@@ -212,34 +211,20 @@ export default async function ActivityPage({ searchParams }: { searchParams: Sea
   const repo = readParam(params, "repo");
 
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Activity</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
-
-      <GithubNav current="/github/activity" />
-
-      <div className="gh-head">
-        <div>
-          <h1 className="gh-h1">Activity</h1>
-          <p className="gh-lede">
+    <ConsoleShell
+      current="/activity"
+      title="History"
+      purpose={CODE_HISTORY.what}
+      className="gh-page"
+      how={
+        <p>
             Pull requests, CI runs, deployments, releases and security alerts in one stream,
             newest first. Filter by kind or repository; the filters live in the address, so the
             link you copy shows what you were looking at.
-          </p>
-        </div>
-      </div>
-
+        </p>
+      }
+    >
+      <HistorySwitch current="code" />
       <Suspense fallback={<ActivitySkeleton />}>
         <ActivityData
           {...(kind !== undefined ? { kind } : {})}
@@ -247,8 +232,7 @@ export default async function ActivityPage({ searchParams }: { searchParams: Sea
         />
       </Suspense>
 
-      <AppTabBar />
-    </main>
+    </ConsoleShell>
   );
 }
 

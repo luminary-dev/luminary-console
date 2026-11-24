@@ -2,27 +2,8 @@
    social kit. Imported by the pages under /sales, the same way the GitHub
    console carries its own sheet.
 
-   Tokens only (see app/globals.css). The accent means one of three things
-   here: the action to take next, the current sub-page, and a shop that paid. */
-
-/* === section sub-navigation (mirrors .gh-nav so the two sections read alike) === */
-.sales-nav { margin-top: 14px; }
-.sales-nav-list {
-  list-style: none; margin: 0; padding: 0;
-  display: flex; gap: 4px; flex-wrap: wrap;
-  border-bottom: 1px solid var(--border);
-}
-.sales-nav-link {
-  display: inline-block;
-  font-family: var(--font-mono), monospace; font-size: 11px; font-weight: 600;
-  letter-spacing: .08em; text-transform: uppercase;
-  color: var(--label); padding: 8px 12px;
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
-  transition: color .15s ease, border-color .15s ease;
-}
-.sales-nav-link[aria-current="page"] {
-  color: var(--a-text); border-bottom-color: var(--accent); font-weight: 700;
-}
+   Tokens only (see app/globals.css). The accent means one of two things
+   here: the action to take next, and a shop that paid. */
 
 /* === counts === */
 .sales-tally {
@@ -128,12 +109,4 @@
 @media (max-width: 640px) {
   .sales-fields { grid-template-columns: 1fr; }
   .kit-post { grid-template-columns: 1fr; }
-  .sales-nav-list { gap: 0; }
-  .sales-nav-link { padding: 8px 10px; }
-}
-@media (hover: hover) {
-  .sales-nav-link:hover { color: var(--text); }
-}
-@media (pointer: coarse) {
-  .sales-nav-link { min-height: 44px; display: inline-flex; align-items: center; }
 }

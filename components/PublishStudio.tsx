@@ -20,26 +20,10 @@ type PublishResult = {
   thumbDark?: string;
 };
 
-export default function PublishStudio() {
-  const [tab, setTab] = useState<Tab>("article");
-
-  return (
-    <>
-      <div style={{ display: "flex", gap: 8, margin: "18px 0" }}>
-        {(["article", "project"] as const).map((t) => (
-          <button
-            key={t}
-            type="button"
-            className={`btn small${tab === t ? "" : " ghost"}`}
-            onClick={() => setTab(t)}
-          >
-            {t === "article" ? "New article" : "New project"}
-          </button>
-        ))}
-      </div>
-      {tab === "article" ? <ArticleForm /> : <ProjectForm />}
-    </>
-  );
+export default function PublishStudio({ kind = "article" }: { kind?: Tab }) {
+  // Which form shows is decided by the address (see app/publish/page.tsx), so
+  // the menu's two entries each open their own.
+  return kind === "article" ? <ArticleForm /> : <ProjectForm />;
 }
 
 function useDraft<T>(kind: Tab) {
@@ -70,15 +54,16 @@ function useDraft<T>(kind: Tab) {
 function ResultCard({ r, kind }: { r: PublishResult; kind: Tab }) {
   return (
     <div className="card" style={{ marginTop: 16 }}>
-      <h3>PR opened ✓</h3>
+      <h3>Sent for approval ✓</h3>
       <p style={{ margin: "8px 0 14px" }}>
         <a href={r.prUrl} target="_blank" rel="noreferrer">
           {r.prUrl}
         </a>
         <br />
         <small>
-          Merging it publishes {kind === "article" ? `/blog/${r.slug}` : `/work/${r.slug}`} to
-          dev.luminary-dev.xyz; promote dev → prod to go live.
+          This is the pull request a teammate checks. Adding it puts{" "}
+          {kind === "article" ? `/blog/${r.slug}` : `/work/${r.slug}`} on the test site,
+          dev.luminary-dev.xyz. It reaches the public site when dev is promoted to prod.
         </small>
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -144,7 +129,7 @@ function ArticleForm() {
   return (
     <>
       <div className="card">
-        <h3>Draft with AI (optional)</h3>
+        <h3>Have a first draft written (optional)</h3>
         <div className="q-fields">
           <label className="q-field">
             <span className="q-label">Brief</span>
@@ -164,14 +149,14 @@ function ArticleForm() {
       </div>
 
       <form className="card" style={{ marginTop: 16 }} onSubmit={publish}>
-        <h3>Article</h3>
+        <h3>The post</h3>
         <div className="q-fields">
           <label className="q-field half">
             <span className="q-label">Title <span className="req">*</span></span>
             <input className="q-line" value={f.title} onChange={set("title")} required />
           </label>
           <label className="q-field half">
-            <span className="q-label">Slug</span>
+            <span className="q-label">Short name for its address</span>
             <input className="q-line" value={f.slug} onChange={set("slug")} placeholder="auto from title" />
           </label>
           <label className="q-field half">
@@ -179,11 +164,11 @@ function ArticleForm() {
             <input className="q-line" value={f.tags} onChange={set("tags")} placeholder="nextjs, devops" />
           </label>
           <label className="q-field half">
-            <span className="q-label">Excerpt</span>
+            <span className="q-label">One-line summary</span>
             <input className="q-line" value={f.excerpt} onChange={set("excerpt")} />
           </label>
           <label className="q-field">
-            <span className="q-label">Cover image scene</span>
+            <span className="q-label">What the cover picture should show</span>
             <input
               className="q-line"
               value={f.imageBrief}
@@ -192,7 +177,7 @@ function ArticleForm() {
             />
           </label>
           <label className="q-field">
-            <span className="q-label">Body (markdown) <span className="req">*</span></span>
+            <span className="q-label">The post itself (markdown) <span className="req">*</span></span>
             <textarea className="q-box" rows={16} value={f.body} onChange={set("body")} required />
           </label>
           <div className="q-field half">
@@ -213,18 +198,18 @@ function ArticleForm() {
           <div className="q-field half">
             <label className="check-row">
               <input className="check-24" type="checkbox" checked={isDraftPost} onChange={(e) => setIsDraftPost(e.target.checked)} />
-              <span className="q-label">Mark as draft (hidden until the flag is removed)</span>
+              <span className="q-label">Keep it hidden for now (a draft)</span>
             </label>
           </div>
         </div>
         {error && <div className="form-error" role="alert">{error}</div>}
         {busy && (
           <div className="notice">
-            Publishing: generating the cover with gpt-image-2 and opening the PR against dev. About a minute; don&apos;t close the tab.
+            Working: the cover picture is being made and the post sent for approval. About a minute. Keep this tab open.
           </div>
         )}
         <button className="btn" style={{ marginTop: 18 }} disabled={busy}>
-          {busy ? "Publishing…" : "Generate cover & open PR"}
+          {busy ? "Working…" : "Make the cover and send for approval"}
         </button>
       </form>
 
@@ -282,7 +267,7 @@ function ProjectForm() {
   return (
     <>
       <div className="card">
-        <h3>Draft with AI</h3>
+        <h3>Have a first draft written</h3>
         <div className="q-fields">
           <label className="q-field">
             <span className="q-label">Brief</span>
@@ -302,10 +287,10 @@ function ProjectForm() {
       </div>
 
       <form className="card" style={{ marginTop: 16 }} onSubmit={publish}>
-        <h3>Project entry</h3>
+        <h3>The project</h3>
         <div className="q-fields">
           <label className="q-field">
-            <span className="q-label">Thumbnail scene <span className="req">*</span></span>
+            <span className="q-label">What the picture should show <span className="req">*</span></span>
             <input
               className="q-line"
               value={imageBrief}
@@ -315,7 +300,7 @@ function ProjectForm() {
             />
           </label>
           <label className="q-field">
-            <span className="q-label">Entry (JSON, review before publishing) <span className="req">*</span></span>
+            <span className="q-label">The entry (JSON: read it over before sending) <span className="req">*</span></span>
             <textarea
               className="q-box"
               rows={22}
@@ -329,11 +314,11 @@ function ProjectForm() {
         {error && <div className="form-error" role="alert">{error}</div>}
         {busy && (
           <div className="notice">
-            Publishing: generating the day & dusk thumbnails with gpt-image-2, updating lib/projects.ts and opening the PR against dev. One to two minutes; don&apos;t close the tab.
+            Working: the day and dusk pictures are being made and the project sent for approval. One to two minutes. Keep this tab open.
           </div>
         )}
         <button className="btn" style={{ marginTop: 18 }} disabled={busy}>
-          {busy ? "Publishing…" : "Generate thumbnails & open PR"}
+          {busy ? "Working…" : "Make the pictures and send for approval"}
         </button>
       </form>
 

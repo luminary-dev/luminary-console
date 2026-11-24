@@ -8,7 +8,7 @@ import { getClients, getIndex } from "@/lib/store";
 import { STAGES, currentStage } from "@/lib/stage";
 import { clientMoney, overdueSummary } from "@/lib/money";
 import type { ClientRow } from "@/components/ClientTable";
-import type { ClientStage } from "@/lib/types";
+import type { ClientRecord, ClientStage } from "@/lib/types";
 
 const STATUS_LABEL: Record<string, string> = {
   created: "Estimate sent",
@@ -18,6 +18,9 @@ const STATUS_LABEL: Record<string, string> = {
 
 export type ClientOverview = {
   rows: ClientRow[];
+  /** The full records behind the rows, in the same order. Today reads tasks,
+   *  drafts and questions from them, and they were read here anyway. */
+  records: ClientRecord[];
   /** How many clients exist at all, before any filter. */
   total: number;
   countsByStage: Record<ClientStage, number>;
@@ -43,6 +46,7 @@ export async function loadClientOverview(): Promise<ClientOverview> {
 
   const countsByStage = Object.fromEntries(STAGES.map((s) => [s, 0])) as Record<ClientStage, number>;
   const rows: ClientRow[] = [];
+  const kept: ClientRecord[] = [];
   let outstandingTotal = 0;
   let outstandingClients = 0;
   let overdueTotal = 0;
@@ -51,6 +55,7 @@ export async function loadClientOverview(): Promise<ClientOverview> {
   index.forEach((e, i) => {
     const rec = records[i];
     if (!rec) return;
+    kept.push(rec);
     const stage = currentStage(rec);
     countsByStage[stage]++;
 
@@ -80,6 +85,7 @@ export async function loadClientOverview(): Promise<ClientOverview> {
 
   return {
     rows,
+    records: kept,
     total: rows.length,
     countsByStage,
     outstandingTotal,

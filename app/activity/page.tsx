@@ -6,9 +6,8 @@ import { after } from "next/server";
 import { recentActivity, markNotificationsSeen, getNotificationsSeenAt } from "@/lib/activity";
 import { getIndex } from "@/lib/store";
 import ActivityList from "@/components/ActivityList";
-import ConsoleTopbar from "@/components/ConsoleTopbar";
-import { MAIN_ID } from "@/components/SkipLink";
-import AppTabBar from "@/components/AppTabBar";
+import ConsoleShell from "@/components/shell/ConsoleShell";
+import HistorySwitch from "@/components/shell/HistorySwitch";
 
 export const metadata = { title: "Activity" };
 export const dynamic = "force-dynamic";
@@ -36,23 +35,19 @@ export default async function ActivityPage() {
   const now = Date.now();
 
   return (
-    <div className="wrap" style={{ paddingBottom: 80 }}>
-      <ConsoleTopbar current="/activity" subtitle="Activity" />
-      <main id={MAIN_ID}>
-      <h1 className="sr-only">Activity</h1>
+    <ConsoleShell current="/activity">
+      <HistorySwitch current="clients" />
 
 
       <div className="card">
-        <h3>Recent activity</h3>
-        <p className="app-hide" style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-          What&apos;s new since your last visit: document actions, payments, portal acceptances,
-          questions and uploads. Use <b>See more</b> for everything already seen; the log keeps the
-          most recent 500.
+        <h3>Clients and customers</h3>
+        <p className="empty-note" style={{ marginTop: 4 }}>
+          What is new since you last looked: documents sent, payments, quotations accepted,
+          questions, files and shops messaged. Press <b>See more</b> for what you have already
+          seen. The last 500 are kept.
         </p>
         <ActivityList entries={entries} now={now} clients={clients} seenAt={seenAt} />
       </div>
-      </main>
-      <AppTabBar />
-    </div>
+    </ConsoleShell>
   );
 }
