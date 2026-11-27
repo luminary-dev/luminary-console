@@ -102,7 +102,7 @@ export default function NewClientForm() {
             and their web address set up. This takes about a minute. Keep this tab open.
           </div>
         )}
-        <button className="btn" style={{ marginTop: 22 }} disabled={busy}>
+        <button className="btn" style={{ marginTop: 24 }} disabled={busy}>
           {busy ? "Writing the documents…" : "Add the client and write the documents"}
         </button>
       </form>

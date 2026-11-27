@@ -20,7 +20,7 @@ export default function SalesScriptsPage() {
               const text = scriptText(s);
               return (
                 <article className="sales-script" key={s.id} aria-labelledby={`script-${s.id}`}>
-                  <h4 id={`script-${s.id}`} style={{ fontSize: 14, fontWeight: 700 }}>
+                  <h4 id={`script-${s.id}`} style={{ fontSize: 14, fontWeight: 600 }}>
                     {s.title}
                   </h4>
                   <p>{s.why}</p>

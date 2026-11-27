@@ -54,8 +54,8 @@ function useDraft<T>(kind: Tab) {
 function ResultCard({ r, kind }: { r: PublishResult; kind: Tab }) {
   return (
     <div className="card" style={{ marginTop: 16 }}>
-      <h3>Sent for approval ✓</h3>
-      <p style={{ margin: "8px 0 14px" }}>
+      <h3>Sent for approval</h3>
+      <p style={{ margin: "8px 0 16px" }}>
         <a href={r.prUrl} target="_blank" rel="noreferrer">
           {r.prUrl}
         </a>
@@ -66,7 +66,7 @@ function ResultCard({ r, kind }: { r: PublishResult; kind: Tab }) {
           dev.luminary-dev.xyz. It reaches the public site when dev is promoted to prod.
         </small>
       </p>
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
         {r.cover && <img src={r.cover} alt="Generated cover" loading="lazy" style={{ width: "100%", maxWidth: 320, aspectRatio: "3 / 4", objectFit: "contain", borderRadius: 10 }} />}
         {(r.inline ?? []).map((src, i) => (
           <img key={i} src={src} alt={`Inline illustration ${i + 1}`} loading="lazy" style={{ width: "100%", maxWidth: 320, aspectRatio: "4 / 3", objectFit: "contain", borderRadius: 10 }} />
@@ -208,7 +208,7 @@ function ArticleForm() {
             Working: the cover picture is being made and the post sent for approval. About a minute. Keep this tab open.
           </div>
         )}
-        <button className="btn" style={{ marginTop: 18 }} disabled={busy}>
+        <button className="btn" style={{ marginTop: 20 }} disabled={busy}>
           {busy ? "Working…" : "Make the cover and send for approval"}
         </button>
       </form>
@@ -306,7 +306,7 @@ function ProjectForm() {
               rows={22}
               value={json}
               onChange={(e) => setJson(e.target.value)}
-              style={{ fontFamily: "ui-monospace, monospace", fontSize: 12.5 }}
+              style={{ fontFamily: "ui-monospace, monospace", fontSize: 13 }}
               required
             />
           </label>
@@ -317,7 +317,7 @@ function ProjectForm() {
             Working: the day and dusk pictures are being made and the project sent for approval. One to two minutes. Keep this tab open.
           </div>
         )}
-        <button className="btn" style={{ marginTop: 18 }} disabled={busy}>
+        <button className="btn" style={{ marginTop: 20 }} disabled={busy}>
           {busy ? "Working…" : "Make the pictures and send for approval"}
         </button>
       </form>

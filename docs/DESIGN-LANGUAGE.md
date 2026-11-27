@@ -78,25 +78,34 @@ at AA contrast on both `--bg` values.
 
 ## 3. Typography
 
-- Sans: **Outfit** (`--font-outfit`, next/font, swap). Weights in use: 500, 700, 800.
-  Tight tracking at display sizes (`-.03em` to `-.05em`).
+- Sans: **Outfit** (`--font-outfit`, next/font, swap). Console weights: 400 for
+  body, 500 for labels, buttons and table emphasis, 600 for titles, the brand
+  and the current item in a menu or tab. Nothing heavier: hierarchy comes from
+  size and colour, not from weight (unslop pass, v2.1.0).
   - Client-facing documents (`lib/templates/shell.ts`: estimate, quotation, proposal,
     contract, invoice, receipt, handover) are the exception: their sans is **Poppins**
     (Google Fonts, 400–800), chosen for the printed documents. The console UI stays Outfit.
-- Mono: **JetBrains Mono** (`--font-jetbrains-mono`) for code, document numbers,
-  timestamps, table headers, meta rows, kbd hints. Mono at small sizes carries
-  letterspacing (`.02em` to `.14em`) and frequently uppercase.
-- Landing display scale (for reference): hero `clamp(3rem, 6.5vw, 6.25rem)/800`,
-  section `clamp(2rem, 4vw, 3.25rem)/700`, card titles `1.1–1.2rem/700`, body
-  `.875–1.05rem`, meta `.66–.82rem` mono.
-- Console scale (adaptation): page title 1.25rem/800, card title 1rem/700, body
-  .875rem, table cells .82rem, meta and labels .68–.72rem mono uppercase. Nothing in
-  the console shell exceeds 1.5rem; density comes from the type scale first.
+- Mono: **JetBrains Mono** (`--font-mono`) for code, document numbers, timestamps,
+  table headers, meta rows, kbd hints. Mono labels are **sentence case with no
+  added letter spacing**: no `text-transform: uppercase`, no `.08em` tracking.
+- Letter spacing: none under 16px. Titles from 16px may use `-0.01em`; only
+  display text from 40px (the portal headline) goes to `-0.02em`. The login code
+  field keeps its wide spacing because it separates digits.
+- Console type scale, in px: 11, 12, 13, 14, 15, 16, 18, 20, 22, 24, 28. No half
+  pixels and nothing below 11. Page title 28, card title 15, body 14, table
+  cells 13, meta and labels 11 to 12 mono.
+- Landing display scale (for reference only): hero `clamp(3rem, 6.5vw, 6.25rem)/800`,
+  section `clamp(2rem, 4vw, 3.25rem)/700`. The landing page is marketing; the
+  console does not borrow its weights.
 
 ## 4. Shape, depth, glass
 
 - Radius: landing `--r: 1.5rem` on cards; console `--r: 18px`. Controls and chips are
-  full pills (`border-radius: 100px`). Inputs and small controls 5 to 9px.
+  full pills (`border-radius: 100px`), kept on purpose as part of the brand.
+  Inputs and small controls 5 to 9px.
+- Spacing: every padding, margin and gap sits on a 4px grid (4, 8, 12, 16, 20,
+  24, 28, 32, 40, 48…). 1px and 2px are allowed only as nudges inside small
+  controls (a count chip, a keycap). Inline styles in TSX follow the same grid.
 - Borders do the separating; shadows are a light-mode-only whisper:
   `--sh: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04)`,
   `--sh-md: 0 4px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04)`. Dark mode sets
@@ -153,11 +162,12 @@ at AA contrast on both `--bg` values.
 
 ## 7. Voice
 
-Sentence case everywhere, including buttons and table headers rendered small-caps via
-CSS rather than typed uppercase. Copy is direct and specific: "Publish to
+Sentence case everywhere, including buttons, table headers and mono labels, on
+screen as well as in the source. Copy is direct and specific: "Publish to
 eco-mech.luminary-dev.xyz", not "Are you sure?". Empty states name the first action.
 Errors say what happened and what to do next. No exclamation marks, no emojis, no em
-dashes; commas, colons, and full stops.
+dashes, and no typed symbols as icons (a tick is `components/CheckIcon.tsx`,
+never a ✓ character); commas, colons, and full stops.
 
 ## 8. Current console deltas to reconcile (feeds the findings register)
 

@@ -61,15 +61,15 @@ export default function ChangeOrders({
               key={`${co.at}-${co.desc}`}
               style={{
                 display: "flex", gap: 12, alignItems: "baseline", flexWrap: "wrap",
-                padding: "9px 0", borderTop: "1px solid var(--border)",
+                padding: "8px 0", borderTop: "1px solid var(--border)",
               }}
             >
-              <span style={{ flex: "1 1 260px", fontSize: 13.5 }}>{co.desc}</span>
-              <span className="mono" style={{ fontWeight: 600, fontSize: 12.5 }}>LKR {co.amount}</span>
-              <span style={{ fontSize: 11.5, color: "var(--muted)" }}>{co.at}</span>
+              <span style={{ flex: "1 1 260px", fontSize: 14 }}>{co.desc}</span>
+              <span className="mono" style={{ fontWeight: 500, fontSize: 13 }}>LKR {co.amount}</span>
+              <span style={{ fontSize: 12, color: "var(--muted)" }}>{co.at}</span>
               <button
                 className="btn ghost small"
-                style={{ padding: "2px 10px", fontSize: 11 }}
+                style={{ padding: "2px 12px", fontSize: 11 }}
                 disabled={busy}
                 onClick={async () => {
                   // Change orders are billable line items — confirm before
@@ -91,7 +91,7 @@ export default function ChangeOrders({
               </button>
             </div>
           ))}
-          <div style={{ marginTop: 8, fontSize: 12.5, color: "var(--muted)" }}>
+          <div style={{ marginTop: 8, fontSize: 13, color: "var(--muted)" }}>
             Total change orders:{" "}
             <b className="mono">
               LKR{" "}
@@ -103,7 +103,7 @@ export default function ChangeOrders({
         </div>
       )}
 
-      <div className="q-fields" style={{ marginTop: 6 }}>
+      <div className="q-fields" style={{ marginTop: 8 }}>
         <div className="q-field" style={{ gridColumn: "1 / span 1" }}>
           <span className="q-label">What changed</span>
           <input className="q-line" value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="e.g. Added a second enquiry form for the Kandy branch" aria-label="What changed" />
@@ -114,14 +114,14 @@ export default function ChangeOrders({
         </div>
       </div>
       {dialog}
-      <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 6 }}>
+      <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 8 }}>
         Leave the amount empty and the usual rule applies: the first {FREE_CHANGE_REQUESTS} changes are
         free, then {fmtLKR(CHANGE_REQUEST_FEE)} each. Type an amount for a bigger change you have already priced.
       </p>
       {error && <div className="form-error" role="alert">{error}</div>}
       <button
         className="btn small"
-        style={{ marginTop: 14 }}
+        style={{ marginTop: 16 }}
         disabled={busy || !desc.trim()}
         onClick={() => call({ action: "add", desc, amount })}
       >

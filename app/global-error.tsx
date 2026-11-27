@@ -53,17 +53,17 @@ export default function GlobalError({
         >
           <div
             className="ge-card"
-            style={{ borderRadius: 14, padding: "26px 28px", boxSizing: "border-box" }}
+            style={{ borderRadius: 14, padding: "28px 28px", boxSizing: "border-box" }}
           >
-            <h1 style={{ fontSize: 17, fontWeight: 700, letterSpacing: "-0.01em", margin: 0 }}>
+            <h1 style={{ fontSize: 18, fontWeight: 600, letterSpacing: "-0.01em", margin: 0 }}>
               The console could not start
             </h1>
-            <p style={{ fontSize: 13.5, lineHeight: 1.65, marginTop: 10, opacity: 0.75 }}>
+            <p style={{ fontSize: 14, lineHeight: 1.65, marginTop: 12, opacity: 0.75 }}>
               Something failed before any page could be drawn. Nothing has been changed or lost. Try
               again, and if it keeps happening, the reference below identifies this exact failure in
               the logs.
             </p>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 20 }}>
               <button
                 className="ge-btn"
                 onClick={() => reset()}
@@ -71,10 +71,10 @@ export default function GlobalError({
                   border: "none",
                   cursor: "pointer",
                   fontFamily: "inherit",
-                  fontSize: 13.5,
-                  fontWeight: 700,
+                  fontSize: 14,
+                  fontWeight: 600,
                   borderRadius: 100,
-                  padding: "10px 22px",
+                  padding: "12px 24px",
                 }}
               >
                 Try again
@@ -85,10 +85,10 @@ export default function GlobalError({
                   border: "1px solid rgba(128,128,128,.4)",
                   color: "inherit",
                   textDecoration: "none",
-                  fontSize: 13.5,
-                  fontWeight: 600,
+                  fontSize: 14,
+                  fontWeight: 500,
                   borderRadius: 100,
-                  padding: "10px 22px",
+                  padding: "12px 24px",
                 }}
               >
                 Back to the dashboard
@@ -98,11 +98,9 @@ export default function GlobalError({
               <p
                 className="ge-ref"
                 style={{
-                  fontSize: 10,
-                  fontWeight: 600,
-                  letterSpacing: ".14em",
-                  textTransform: "uppercase",
-                  marginTop: 18,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  marginTop: 20,
                 }}
               >
                 Reference {error.digest}

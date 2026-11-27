@@ -92,7 +92,7 @@ export default function SalesQueue({
               : "Follow-ups appear here two and five days after each first message. Import more shops when the list runs dry."}
         </p>
         {summary}
-        <button type="button" className="btn ghost small" style={{ marginTop: 14 }} onClick={() => void refresh()}>
+        <button type="button" className="btn ghost small" style={{ marginTop: 16 }} onClick={() => void refresh()}>
           Check for updates
         </button>
       </section>

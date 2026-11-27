@@ -97,16 +97,16 @@ export default function QuestionnaireSheet({
 
       <div className="doc-head">
         <div>
-          <div className="brand" style={{ fontSize: 26 }}>
+          <div className="brand" style={{ fontSize: 28 }}>
             Luminary<span>.</span>
           </div>
-          <div className="k" style={{ marginTop: 8, letterSpacing: ".16em" }}>
+          <div className="k" style={{ marginTop: 8 }}>
             {t.tagline}
           </div>
         </div>
         <div style={{ textAlign: "right" }}>
           <div className="doc-title">{t.docTitle}</div>
-          <div style={{ marginTop: 10 }}>
+          <div style={{ marginTop: 12 }}>
             <span className="pill">
               <i />
               {t.pill}
@@ -117,7 +117,7 @@ export default function QuestionnaireSheet({
 
       <div className="meta-grid">
         <div>
-          <div className="k" style={{ marginBottom: 10 }}>{t.preparedFor}</div>
+          <div className="k" style={{ marginBottom: 12 }}>{t.preparedFor}</div>
           <div className="meta-name">{client.company}</div>
           <div className="meta-detail">
             {client.reg && <>{t.regNo}: {client.reg}<br /></>}

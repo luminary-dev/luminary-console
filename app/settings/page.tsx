@@ -32,13 +32,13 @@ export default async function SettingsPage() {
 
       <section className="card" aria-labelledby="settings-data">
         <h3 id="settings-data">A spreadsheet of every client</h3>
-        <p style={{ color: "var(--muted)", marginTop: 8, fontSize: 13.5 }}>
+        <p style={{ color: "var(--muted)", marginTop: 8, fontSize: 14 }}>
           {index.length > 0
             ? `One file with all ${index.length} client${index.length === 1 ? "" : "s"}: document numbers, stage and what each still owes. It opens in Excel or Google Sheets.`
             : "There are no clients to put in it yet."}
         </p>
         {index.length > 0 && (
-          <a className="btn ghost small" href="/api/clients/export" style={{ marginTop: 14 }}>
+          <a className="btn ghost small" href="/api/clients/export" style={{ marginTop: 16 }}>
             Download the spreadsheet
           </a>
         )}

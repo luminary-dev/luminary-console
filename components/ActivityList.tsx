@@ -71,7 +71,7 @@ export default function ActivityList({
                     <RelativeTime at={e.at} initial={relTime(e.at, now)} />
                   </td>
                   <td style={{ overflowWrap: "anywhere" }} title={e.actor}>{displayName(e.actor)}</td>
-                  <td style={{ fontWeight: 600 }}>{e.action}</td>
+                  <td style={{ fontWeight: 500 }}>{e.action}</td>
                   {showWhere && (
                     <td>
                       {clients![e.target] ? (

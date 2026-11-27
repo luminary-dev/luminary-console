@@ -28,12 +28,12 @@ export default function ConsoleError({
     <ConsoleShell title="This page could not load" purpose={null}>
       <div className="card">
         <h3>Nothing has been lost</h3>
-        <p className="empty-note" style={{ marginTop: 6 }}>
+        <p className="empty-note" style={{ marginTop: 8 }}>
           Something the console needed to read did not come back. This is almost always the record
           store being briefly unreachable, and it usually clears on a retry. Nothing has been changed
           or lost: loading a page only reads.
         </p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 16 }}>
           <button className="btn" onClick={() => reset()}>
             Try again
           </button>

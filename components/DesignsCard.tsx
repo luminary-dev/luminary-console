@@ -110,13 +110,13 @@ export default function DesignsCard({
         onChange={onFile}
         style={{ display: "none" }}
       />
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <h3>Design ideas</h3>
         <button className="btn ghost small" onClick={() => openPicker()} disabled={busy || full}>
           {busy ? "Working…" : "Add a design"}
         </button>
       </div>
-      <p className="empty-note" style={{ marginTop: 6 }}>
+      <p className="empty-note" style={{ marginTop: 8 }}>
         Up to {MAX_DESIGNS} designs for the client to choose from. Publish one and it appears on
         their page, where they can look at it and pick the one they want.
       </p>
@@ -129,7 +129,7 @@ export default function DesignsCard({
         </p>
       </HowItWorks>
       {error && (
-        <p className="notice" style={{ marginTop: 10, color: "var(--danger)", fontSize: 13 }}>
+        <p className="notice" style={{ marginTop: 12, color: "var(--danger)", fontSize: 13 }}>
           {error}
         </p>
       )}
@@ -139,7 +139,7 @@ export default function DesignsCard({
           No designs yet. Add the first one, then publish it so the client can see it.
         </p>
       ) : (
-        <div style={{ marginTop: 6 }}>
+        <div style={{ marginTop: 8 }}>
           {designs.map((d) => {
             const url = designUrl(domain, d.id);
             return (
@@ -148,14 +148,14 @@ export default function DesignsCard({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 10,
+                  gap: 12,
                   flexWrap: "wrap",
                   padding: "12px 0",
                   borderTop: "1px solid var(--border)",
                 }}
               >
                 <div style={{ minWidth: 0, flex: "1 1 240px" }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 600, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <div style={{ fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                     {d.title}
                     {selectedId === d.id && (
                       <span className="pill" style={{ background: "var(--accent)", color: "var(--on-accent)", borderColor: "var(--accent)" }}>
@@ -165,7 +165,7 @@ export default function DesignsCard({
                     {d.status === "published" ? (
                       <span className="pill"><i />Published</span>
                     ) : (
-                      <span style={{ fontSize: 11.5, color: "var(--muted)", border: "1px solid var(--border)", borderRadius: 999, padding: "1px 8px" }}>
+                      <span style={{ fontSize: 12, color: "var(--muted)", border: "1px solid var(--border)", borderRadius: 999, padding: "1px 8px" }}>
                         Draft
                       </span>
                     )}

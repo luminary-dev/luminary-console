@@ -6,6 +6,7 @@
 // passed in (`base` + "/comment") rather than resolved relatively: from the
 // console preview path /c/<slug> — no trailing slash — a relative "comment"
 // resolves to /c/comment and 404s.
+import CheckIcon from "./CheckIcon";
 import { useState } from "react";
 
 export type PortalDoc = { key: string; label: string; no: string };
@@ -65,7 +66,7 @@ export default function PortalComments({
       </div>
       {status === "sent" ? (
         <p className="ask-sent">
-          <span aria-hidden="true">✓</span> Thanks. Your question is with the studio. We reply
+          <CheckIcon /> Thanks. Your question is with the studio. We reply
           within one business day.{" "}
           <button
             type="button"

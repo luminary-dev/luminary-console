@@ -7,6 +7,7 @@
 // 4.5 MB); the ref is then recorded on the record via "files". Mirrors the
 // question box: `base` is "" on the client subdomain and "/c/<slug>" in the
 // console preview, so a relative path never resolves wrong.
+import CheckIcon from "./CheckIcon";
 import { useRef, useState } from "react";
 import { assetUrl } from "@/lib/assets";
 import { fmtSize, MAX_FILE_BYTES, MAX_FILES_PER_FIELD, type AttachmentRef } from "@/lib/attachments";
@@ -152,8 +153,8 @@ export default function PortalUploads({
             {busy > 0 ? `Uploading… (${busy} left)` : "Choose files"}
           </button>
           {justSent > 0 && busy === 0 && (
-            <p className="ask-sent" style={{ marginTop: 10 }}>
-              <span aria-hidden="true">✓</span> {justSent} file{justSent > 1 ? "s" : ""} sent to the studio.
+            <p className="ask-sent" style={{ marginTop: 12 }}>
+              <CheckIcon /> {justSent} file{justSent > 1 ? "s" : ""} sent to the studio.
             </p>
           )}
           {error && <div className="form-error" role="alert">{error}</div>}
@@ -161,12 +162,12 @@ export default function PortalUploads({
       )}
 
       {files.length > 0 && (
-        <ul className="q-file-list" style={{ marginTop: 14 }}>
+        <ul className="q-file-list" style={{ marginTop: 16 }}>
           {files.map((f, i) => (
             <li key={`${f.name}-${f.at}-${i}`}>
               <span className="q-file-name">{f.name}</span>
               <span className="q-file-size">{fmtSize(f.size)}</span>
-              <span className="q-file-size" aria-hidden="true">✓ received</span>
+              <span className="q-file-size">Received</span>
             </li>
           ))}
         </ul>

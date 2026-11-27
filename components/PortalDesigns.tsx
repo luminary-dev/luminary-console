@@ -4,6 +4,7 @@
 // as a laptop-width PDF, and CHOSEN. Selecting one records the client's choice
 // and notifies the studio (email + Telegram) via /c/<slug>/select-design.
 // `base` is "" on the client subdomain and "/c/<slug>" in the console preview.
+import CheckIcon from "./CheckIcon";
 import { useState } from "react";
 
 export type PortalDesign = { id: string; title: string; isNew?: boolean };
@@ -98,12 +99,12 @@ export default function PortalDesigns({
         aria-hidden="true"
         style={{ position: "absolute", left: "-9999px", height: 0, width: 0, opacity: 0 }}
       />
-      <label className="ask-field" style={{ marginTop: 6 }}>
+      <label className="ask-field" style={{ marginTop: 8 }}>
         <span className="q-label">Your name (optional)</span>
         <input className="q-line" type="text" value={by} onChange={(e) => setBy(e.target.value)} />
       </label>
 
-      <div className="portal-links" style={{ marginTop: 6 }}>
+      <div className="portal-links" style={{ marginTop: 8 }}>
         {designs.map((d) => {
           const chosen = selectedId === d.id;
           const linkBtn = {
@@ -118,7 +119,7 @@ export default function PortalDesigns({
                   {chosen && <span className="new-pill" style={{ background: "var(--accent)", color: "var(--on-accent)" }}>Selected</span>}
                   {!chosen && d.isNew && <span className="new-pill">New</span>}
                 </span>
-                <span className="no no--actions" style={{ display: "inline-flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+                <span className="no no--actions" style={{ display: "inline-flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
                   <a href={`${base}/design/${d.id}`} target="_blank" rel="noopener noreferrer">Preview →</a>
                   <a href={`${base}/design/${d.id}/pdf`}>Download PDF ↓</a>
                   <button
@@ -129,17 +130,17 @@ export default function PortalDesigns({
                     Request changes
                   </button>
                   {chosen ? (
-                    <span style={{ color: "var(--a-text)", fontWeight: 700 }}>✓ Selected</span>
+                    <span style={{ color: "var(--a-text)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}><CheckIcon /> Selected</span>
                   ) : (
-                    <button type="button" onClick={() => select(d)} disabled={!!busy} style={{ ...linkBtn, color: "var(--a-text)", fontWeight: 700 }}>
-                      {busy === d.id ? "Selecting…" : "Select this ✓"}
+                    <button type="button" onClick={() => select(d)} disabled={!!busy} style={{ ...linkBtn, color: "var(--a-text)", fontWeight: 600 }}>
+                      {busy === d.id ? "Selecting…" : "Select this"}
                     </button>
                   )}
                 </span>
               </div>
               {feedbackSent === d.id && (
-                <p className="ask-sent" style={{ margin: "0 0 10px" }}>
-                  <span aria-hidden="true">✓</span> Thanks. Your change request is with the studio.
+                <p className="ask-sent" style={{ margin: "0 0 12px" }}>
+                  <CheckIcon /> Thanks. Your change request is with the studio.
                 </p>
               )}
               {feedbackFor === d.id && (
@@ -153,7 +154,7 @@ export default function PortalDesigns({
                     value={feedbackText}
                     onChange={(e) => setFeedbackText(e.target.value)}
                   />
-                  <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                  <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
                     <button className="btn small" type="button" disabled={busy === `fb-${d.id}` || !feedbackText.trim()} onClick={() => sendFeedback(d)}>
                       {busy === `fb-${d.id}` ? "Sending…" : "Send request"}
                     </button>

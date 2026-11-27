@@ -174,7 +174,7 @@ export default function PushToggle() {
             }}
           >
             <b>Install Luminary on this iPhone</b>
-            <span style={{ display: "block", color: "var(--muted)", marginTop: 6 }}>
+            <span style={{ display: "block", color: "var(--muted)", marginTop: 8 }}>
               In Safari: tap <b>Share</b>, then <b>Add to Home Screen</b>. Open the app from the
               home screen and this button becomes a notifications toggle.
             </span>

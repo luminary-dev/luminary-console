@@ -26,7 +26,7 @@ export default function EmailHistoryCard({ client }: { client: ClientRecord }) {
         <div style={{ marginTop: 8 }}>
           {log.map((e, i) => (
             <div className="log-row" key={`${e.at}-${i}`}>
-              <div style={{ fontWeight: 600 }}>{e.subject}</div>
+              <div style={{ fontWeight: 500 }}>{e.subject}</div>
               <div className="log-meta">
                 {whenLabel(e.at)} · to {e.to}
                 {e.docs?.length ? (

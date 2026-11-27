@@ -4,6 +4,7 @@
 // Billing card's table (it is stored as a billing document so it inherits
 // preview / publish / email / delete), so this card is only the trigger and
 // the explanation of when it applies.
+import { sentenceCase } from "@/lib/sentence-case";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useConfirm } from "./ConfirmDialog";
@@ -93,11 +94,11 @@ export default function HandoverCard({
           </button>
         </span>
         {existing ? (
-          <span style={{ fontSize: 12.5, color: "var(--muted)" }}>
+          <span style={{ fontSize: 13, color: "var(--muted)" }}>
             <b className="mono" style={{ color: "var(--text)" }}>{existing.no}</b> ·{" "}
             <span className={`pill${existing.status === "draft" ? " grey" : ""}`}>
               <i />
-              {existing.status}
+              {sentenceCase(existing.status)}
             </span>{" "}
             ·{" "}
             <a href={`/preview/${slug}/${existing.slug}`} target="_blank" rel="noopener noreferrer">
@@ -106,7 +107,7 @@ export default function HandoverCard({
           </span>
         ) : (
           !eligible && (
-            <span style={{ fontSize: 12.5, color: "var(--muted)" }}>
+            <span style={{ fontSize: 13, color: "var(--muted)" }}>
               You can make this once the project is delivered: publish the receipt for the 70%, or
               set the stage to <b>Delivered</b>.
             </span>

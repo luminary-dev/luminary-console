@@ -5,6 +5,7 @@
 // shows an under-maintenance page until published). Publish/unpublish/redeploy
 // like the other deliverables. A manual "Set URL" path covers the case where
 // Vercel/GitHub automation isn't wired up.
+import { sentenceCase } from "@/lib/sentence-case";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { SiteEntry } from "@/lib/types";
@@ -17,9 +18,9 @@ const ROOT = "luminary-dev.xyz";
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 12, padding: "7px 0", borderTop: "1px solid var(--border)" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 12, padding: "8px 0", borderTop: "1px solid var(--border)" }}>
       <span className="k" style={{ alignSelf: "center" }}>{label}</span>
-      <span style={{ fontSize: 13.5, overflowWrap: "anywhere" }}>{children}</span>
+      <span style={{ fontSize: 14, overflowWrap: "anywhere" }}>{children}</span>
     </div>
   );
 }
@@ -76,9 +77,9 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
       {dialog}
       <div className="ask-head">
         <h3>The finished website</h3>
-        {site && <span className={`pill${site.status === "draft" ? " grey" : ""}`}><i />{site.status}</span>}
+        {site && <span className={`pill${site.status === "draft" ? " grey" : ""}`}><i />{sentenceCase(site.status)}</span>}
       </div>
-      <p className="empty-note" style={{ marginTop: 6 }}>
+      <p className="empty-note" style={{ marginTop: 8 }}>
         Connect the site once it is built. The client opens it at{" "}
         <span className="mono">{clientPath}</span> and sees a holding page until you publish.
       </p>
@@ -103,7 +104,7 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
             {showManual ? "Cancel" : "It is already online: give its address"}
           </button>
           {showManual && (
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
               <input className="q-line" style={{ flex: "1 1 280px" }} aria-label="Live site URL" placeholder="https://the-live-site.example" value={manualUrl} onChange={(e) => setManualUrl(e.target.value)} />
               <button className="btn small" disabled={!!busy || !manualUrl.trim()} onClick={() => call({ action: "set", repo, ref, url: manualUrl }, "set")}>
                 {busy === "set" ? "Saving…" : "Save site"}
@@ -131,7 +132,7 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
             )}
           </div>
 
-          <div className="row-actions" style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
+          <div className="row-actions" style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
             {site.status === "draft" && (
               <button className="btn small" disabled={!!busy || site.state !== "READY"} onClick={() => call({ action: "publish" }, "publish")}>
                 {busy === "publish" ? "…" : "Publish"}
@@ -155,7 +156,7 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
             </MoreActions>
           </div>
           {site.status === "draft" && site.state === "READY" && (
-            <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 10 }}>
+            <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 12 }}>
               Build is live. <b>Publish</b> to switch <span className="mono">{clientPath}</span> from the maintenance page to the site.
             </p>
           )}

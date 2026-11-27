@@ -173,7 +173,7 @@ export default function MergeVerdict({
         </p>
       ) : (
         <>
-          <p className="k" style={{ marginTop: 14 }}>
+          <p className="k" style={{ marginTop: 16 }}>
             {verdict.blockers.length === 1
               ? "The one thing blocking this merge"
               : `Everything blocking this merge (${verdict.blockers.length})`}

@@ -122,7 +122,7 @@ export default async function ClientHome({
             <div className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
               <div>
                 <h3>Your website</h3>
-                <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 4 }}>
+                <p style={{ color: "var(--muted)", fontSize: 14, marginTop: 4 }}>
                   {live
                     ? "Your finished website is deployed and ready to visit."
                     : "Your new website is being prepared. Check its progress here."}

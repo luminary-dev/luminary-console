@@ -89,7 +89,7 @@ export default function ClientTable({ rows }: { rows: ClientRow[] }) {
   // marker onto this <tr>.
   const renderRow = (r: ClientRow) => (
     <tr key={r.slug}>
-      <td style={{ fontWeight: 600 }}>{r.company}</td>
+      <td style={{ fontWeight: 500 }}>{r.company}</td>
       <td className="mono">{r.docNoBase}</td>
       <td>
         <span className={`pill${r.status === "created" ? " grey" : ""}`}><i />{r.statusLabel}</span>
@@ -106,7 +106,7 @@ export default function ClientTable({ rows }: { rows: ClientRow[] }) {
       </td>
       <td className="mono">
         {r.outstanding > 0 ? (
-          <span style={r.overdue ? { color: "var(--danger, #d33)", fontWeight: 700 } : undefined}>
+          <span style={r.overdue ? { color: "var(--danger, #d33)", fontWeight: 600 } : undefined}>
             {fmtLKR(r.outstanding)}{r.overdue ? " · overdue" : ""}
           </span>
         ) : (
@@ -148,7 +148,7 @@ export default function ClientTable({ rows }: { rows: ClientRow[] }) {
         />
       </div>
 
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 12 }} role="group" aria-label="Filter by stage">
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }} role="group" aria-label="Filter by stage">
         <button
           className={`pill${stage === null ? "" : " grey"}`}
           onClick={() => setStage(null)}
@@ -185,7 +185,7 @@ export default function ClientTable({ rows }: { rows: ClientRow[] }) {
       )}
 
       {shown.length === 0 ? (
-        <p style={{ color: "var(--muted)", marginTop: 14, fontSize: 14 }}>
+        <p style={{ color: "var(--muted)", marginTop: 16, fontSize: 14 }}>
           {rows.length === 0 ? "No clients yet. Create the first one." : "No clients match that filter."}
         </p>
       ) : (

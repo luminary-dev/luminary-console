@@ -6,6 +6,7 @@
 // already in someone else's hands, so it outranks a critical dependency
 // advisory that still needs an exploit written for it. sortAlerts below puts
 // open secret scanning alerts at the top unconditionally.
+import { sentenceCase } from "@/lib/sentence-case";
 import type { AlertEntity } from "@/lib/github/entities";
 import { StatusIcon, type StatusTone } from "./MergeVerdict";
 
@@ -158,7 +159,7 @@ export default function AlertList({ alerts }: { alerts: AlertEntity[] }) {
                       <StatusIcon tone={tone} />
                       <span>
                         <span className="sr-only">Severity: </span>
-                        {severityLabel(alert)}
+                        {sentenceCase(severityLabel(alert))}
                       </span>
                     </span>
                   </td>

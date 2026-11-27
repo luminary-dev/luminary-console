@@ -16,7 +16,7 @@ export default function StageSelect({ slug, stage }: { slug: string; stage: Clie
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
       <span className="k">Stage</span>
       <select
         className="q-line"

@@ -47,7 +47,7 @@ export default function DeleteClient({ slug, company }: { slug: string; company:
   return (
     <div className="card" style={{ borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)" }}>
       <h3 style={{ color: "var(--danger)" }}>Delete this client</h3>
-      <p className="empty-note" style={{ marginTop: 6 }}>
+      <p className="empty-note" style={{ marginTop: 8 }}>
         This removes everything for good: every document, their answers to the questions form and
         their web address. It cannot be undone. Use it only when a project is finished and you no
         longer need the record.
