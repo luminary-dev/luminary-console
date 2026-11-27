@@ -70,13 +70,13 @@ export default function LoginPage() {
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
         <ThemeToggle />
       </div>
-      <div className="brand" style={{ fontSize: 26 }}>
+      <div className="brand" style={{ fontSize: 28 }}>
         Luminary<span>.</span>
       </div>
-      <div className="k" style={{ marginTop: 8, letterSpacing: ".16em" }}>Studio console</div>
+      <div className="k" style={{ marginTop: 8 }}>Studio console</div>
 
       {timedOut && step === "creds" && (
-        <div className="notice" style={{ marginTop: 18 }}>You were signed out after 30 minutes of inactivity.</div>
+        <div className="notice" style={{ marginTop: 20 }}>You were signed out after 30 minutes of inactivity.</div>
       )}
       {step === "creds" ? (
         <form onSubmit={submitCreds} style={{ marginTop: 28 }}>
@@ -104,7 +104,7 @@ export default function LoginPage() {
             />
           </label>
           {error && <div className="form-error" role="alert">{error}</div>}
-          <button className="btn" style={{ marginTop: 22 }} disabled={busy}>
+          <button className="btn" style={{ marginTop: 24 }} disabled={busy}>
             {busy ? "Checking…" : "Continue"}
           </button>
         </form>
@@ -129,13 +129,13 @@ export default function LoginPage() {
             />
           </div>
           {error && <div className="form-error" role="alert">{error}</div>}
-          <button className="btn" style={{ marginTop: 22 }} disabled={busy || code.length !== 6}>
+          <button className="btn" style={{ marginTop: 24 }} disabled={busy || code.length !== 6}>
             {busy ? "Checking…" : "Sign in"}
           </button>
           <button
             type="button"
             className="btn ghost small"
-            style={{ marginTop: 12, marginLeft: 10 }}
+            style={{ marginTop: 12, marginLeft: 12 }}
             disabled={busy}
             onClick={() => { setStep("creds"); setError(null); }}
           >

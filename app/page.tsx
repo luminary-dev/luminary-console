@@ -192,7 +192,7 @@ export default async function Today() {
               );
             })}
           </ul>
-          <Link className="btn ghost small" href="/activity" style={{ marginTop: 14 }}>
+          <Link className="btn ghost small" href="/activity" style={{ marginTop: 16 }}>
             All history
           </Link>
         </section>

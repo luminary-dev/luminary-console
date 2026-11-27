@@ -10,6 +10,7 @@
 // ANSWERS never change — they're keyed by field id and checkbox values stay
 // English — so switching language mid-form is lossless and the generation
 // pipeline sees identical data either way.
+import CheckIcon from "./CheckIcon";
 import { useEffect, useId, useRef, useState } from "react";
 import { assetUrl } from "@/lib/assets";
 import type { Field, Section } from "@/lib/questions";
@@ -443,7 +444,7 @@ export default function QuestionnaireForm({
   if (status === "done") {
     return (
       <div className="done">
-        <div className="done-mark">✓</div>
+        <div className="done-mark"><CheckIcon size={28} /></div>
         <h2>{t.doneTitle}</h2>
         <p>
           {t.doneBody}
@@ -555,7 +556,7 @@ export default function QuestionnaireForm({
           {t.copyLabel}
         </label>
         {sendCopy && (
-          <div className="q-field" style={{ marginTop: 14 }}>
+          <div className="q-field" style={{ marginTop: 16 }}>
             <div>
               <label className="q-label" htmlFor={`${uid}-copy`}>{t.copyTo}</label>
               <div className="q-hint" id={`${uid}-copy-hint`}>{t.copyHint}</div>

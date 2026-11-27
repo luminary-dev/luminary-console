@@ -73,7 +73,7 @@ export default function ImportShops({ count }: { count: number }) {
         <div className="form-error" role="alert">
           {result.text}
           {result.problems.length > 0 && (
-            <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
+            <ul style={{ margin: "8px 0 0", paddingLeft: 20 }}>
               {result.problems.map((p) => (
                 <li key={p}>{p}</li>
               ))}

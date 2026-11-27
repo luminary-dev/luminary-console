@@ -323,14 +323,14 @@ export default function CommandPalette({
           placeholder={labelled ? "Jump to a screen or a client…" : "Jump to a client…"}
           onChange={(e) => { setQ(e.target.value); setActive(0); }}
           onKeyDown={onInputKey}
-          style={{ width: "100%", border: "none", borderBottom: "1px solid var(--border)", padding: "16px 18px", fontSize: 15, background: "transparent", color: "var(--text)", outline: "none" }}
+          style={{ width: "100%", border: "none", borderBottom: "1px solid var(--border)", padding: "16px 20px", fontSize: 15, background: "transparent", color: "var(--text)", outline: "none" }}
         />
         <div className="sr-only" aria-live="polite">
           {options.length === 0 ? "No matches." : `${options.length} result${options.length === 1 ? "" : "s"}.`}
         </div>
         <div style={{ maxHeight: "50vh", overflowY: "auto" }}>
           {options.length === 0 ? (
-            <div style={{ padding: "16px 18px", color: "var(--muted)", fontSize: 14 }}>No matches.</div>
+            <div style={{ padding: "16px 20px", color: "var(--muted)", fontSize: 14 }}>No matches.</div>
           ) : (
             <ul ref={listRef} id={listId} role="listbox" aria-label="Results" style={{ listStyle: "none", margin: 0, padding: 0 }}>
               {options.map((o, i) => (
@@ -340,7 +340,7 @@ export default function CommandPalette({
                 // from the input, which never loses focus.
                 <li key={o.kind === "page" ? `page-${o.href}` : `${o.kind}-${o.slug}`} role="presentation">
                   {startsGroup(i) && (
-                    <div style={{ padding: "8px 18px 4px", fontSize: 10.5, letterSpacing: ".12em", textTransform: "uppercase", color: "var(--label)", borderTop: i ? "1px solid var(--border)" : "none" }}>
+                    <div style={{ padding: "8px 20px 4px", fontSize: 11, color: "var(--label)", borderTop: i ? "1px solid var(--border)" : "none" }}>
                       {HEADING[o.kind]}
                     </div>
                   )}
@@ -360,19 +360,19 @@ export default function CommandPalette({
                     }}
                   >
                     {o.kind === "page" ? (
-                      <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-                        <span style={{ fontWeight: 600 }}>{o.label}</span>
+                      <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                        <span style={{ fontWeight: 500 }}>{o.label}</span>
                         <span style={{ fontSize: 11, color: "var(--muted)" }}>{o.group}</span>
                       </span>
                     ) : o.kind === "name" ? (
-                      <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-                        <span style={{ fontWeight: 600 }}>{o.company}</span>
+                      <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                        <span style={{ fontWeight: 500 }}>{o.company}</span>
                         <span className="mono" style={{ fontSize: 12, color: "var(--muted)" }}>{o.docNoBase}</span>
                       </span>
                     ) : (
                       <>
-                        <span style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                          <span style={{ fontWeight: 600 }}>{o.company}</span>
+                        <span style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                          <span style={{ fontWeight: 500 }}>{o.company}</span>
                           <span style={{ fontSize: 11, color: "var(--muted)" }}>{o.where}</span>
                         </span>
                         <span style={{ display: "block", fontSize: 12, color: "var(--muted)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{o.snippet}</span>

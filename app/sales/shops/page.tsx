@@ -45,7 +45,7 @@ export default async function SalesShopsPage() {
               repository.
             </p>
           </HowItWorks>
-          <div style={{ marginTop: 14 }}>
+          <div style={{ marginTop: 16 }}>
             <ImportShops count={state.leads.length} />
           </div>
         </section>

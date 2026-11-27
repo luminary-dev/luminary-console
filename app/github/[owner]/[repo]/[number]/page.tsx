@@ -45,7 +45,7 @@ export default async function PullRequestPage({ params }: { params: Params }) {
   const now = Date.now();
   const stateLabel = !pr
     ? ""
-    : pr.state === "merged" ? "merged" : pr.state === "closed" ? "closed" : pr.draft ? "draft" : "open";
+    : pr.state === "merged" ? "Merged" : pr.state === "closed" ? "Closed" : pr.draft ? "Draft" : "Open";
   const stateIsQuiet = !!pr && (pr.state !== "open" || pr.draft);
 
   return (
@@ -87,7 +87,7 @@ function Loaded({ pr }: { pr: PullRequestEntity }) {
         <h2 className="gh-card-title" id="pr-verdict">
           Merge readiness
         </h2>
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 12 }}>
           <MergeVerdict pr={pr} detailed />
         </div>
         {pr.mergeable === null && pr.state === "open" ? (
@@ -156,7 +156,7 @@ function Loaded({ pr }: { pr: PullRequestEntity }) {
           {pr.mergedAt ? <Fact k="Merged" v={pr.mergedAt.slice(0, 10)} mono /> : null}
         </dl>
 
-        <p className="k" style={{ marginTop: 18 }}>
+        <p className="k" style={{ marginTop: 20 }}>
           Labels
         </p>
         {pr.labels.length === 0 ? (
@@ -173,7 +173,7 @@ function Loaded({ pr }: { pr: PullRequestEntity }) {
           </div>
         )}
 
-        <p className="k" style={{ marginTop: 18 }}>
+        <p className="k" style={{ marginTop: 20 }}>
           Reviewers requested
         </p>
         {pr.requestedReviewers.length === 0 ? (
@@ -192,7 +192,7 @@ function Loaded({ pr }: { pr: PullRequestEntity }) {
 
         {pr.assignees.length > 0 ? (
           <>
-            <p className="k" style={{ marginTop: 18 }}>
+            <p className="k" style={{ marginTop: 20 }}>
               Assignees
             </p>
             <div className="gh-tags">

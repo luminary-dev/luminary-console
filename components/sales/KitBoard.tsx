@@ -190,7 +190,7 @@ export default function KitBoard({
 
       <section className="card" aria-labelledby="kit-profile">
         <h3 id="kit-profile">Profile and covers</h3>
-        <dl className="sales-facts" style={{ marginTop: 10 }}>
+        <dl className="sales-facts" style={{ marginTop: 12 }}>
           <div>
             <dt>Instagram</dt>
             <dd>

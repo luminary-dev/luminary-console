@@ -350,7 +350,7 @@ describe("secret scanning sorts to the top", () => {
 
   it("labels a secret alert's missing severity rather than leaving the cell blank", () => {
     render(<AlertList alerts={[leaked]} />);
-    expect(screen.getByText("leaked secret")).toBeTruthy();
+    expect(screen.getByText("Leaked secret")).toBeTruthy();
   });
 
   it("does not shout when no secret is open", () => {

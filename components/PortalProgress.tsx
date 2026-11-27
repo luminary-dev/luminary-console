@@ -1,6 +1,7 @@
 // Where the project has got to, for the client's eyes: the lifecycle stage
 // (lib/stage) mapped onto the six things a client actually experiences.
 // Server component — pure markup, no JS.
+import CheckIcon from "./CheckIcon";
 import type { ClientStage } from "@/lib/types";
 import { stageRank } from "@/lib/stage";
 
@@ -84,7 +85,7 @@ export default function PortalProgress({ stage, deliveredAt }: { stage: ClientSt
           return (
             <li className={`pstep ${state}`} key={s.label} aria-current={state === "is-now" ? "step" : undefined}>
               <span className="pstep-dot" aria-hidden="true">
-                {state === "is-done" ? "✓" : i + 1}
+                {state === "is-done" ? <CheckIcon size={12} /> : i + 1}
               </span>
               <span className="pstep-label">
                 <span className="pstep-long">{s.label}</span>
@@ -104,7 +105,7 @@ export default function PortalProgress({ stage, deliveredAt }: { stage: ClientSt
         const delivered = fmtDate(deliveredAt);
         const warrantyUntil = fmtDate(new Date(t + 30 * 86_400_000).toISOString());
         return (
-          <p className="pstep-note" style={{ marginTop: 6 }}>
+          <p className="pstep-note" style={{ marginTop: 8 }}>
             Delivered {delivered} · Warranty until {warrantyUntil}
           </p>
         );

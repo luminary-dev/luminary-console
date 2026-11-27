@@ -171,7 +171,7 @@ export default function DocActions({
         )}
       </div>
       {showRevise && (
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 12 }}>
           <textarea
             className="q-box"
             aria-label={exists ? "Revision instructions" : "What to bill"}

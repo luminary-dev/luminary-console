@@ -35,7 +35,7 @@ export default function ClientError({
     >
       <div className="card">
         <h3>Their record is safe</h3>
-        <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 6, lineHeight: 1.65 }}>
+        <p style={{ color: "var(--muted)", fontSize: 14, marginTop: 8, lineHeight: 1.65 }}>
           {slug ? (
             <>
               The record for <b className="mono">{slug}</b> did not come back from the store.
@@ -46,7 +46,7 @@ export default function ClientError({
           The record has not been changed: opening a client only reads it. A retry is usually enough,
           and the client&apos;s documents and portal stay live either way.
         </p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 16 }}>
           <button className="btn" onClick={() => reset()}>
             Try again
           </button>

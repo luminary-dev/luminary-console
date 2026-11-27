@@ -40,7 +40,7 @@ export default async function SalesPage() {
                 the console&apos;s own code.
               </p>
             </HowItWorks>
-            <div style={{ marginTop: 14 }}>
+            <div style={{ marginTop: 16 }}>
               <ImportShops count={0} />
             </div>
           </section>

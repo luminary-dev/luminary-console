@@ -5,6 +5,7 @@
 // and nothing here ever contacts the client. A drafted email comes back for
 // the operator to copy into their mail client and send themselves, which is
 // why the only action on the answer is Copy.
+import CheckIcon from "./CheckIcon";
 import { useState } from "react";
 import { opsFetch } from "@/lib/ops-fetch";
 
@@ -134,7 +135,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
         copy and send yourself.
       </p>
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
         {PRESETS.map((p) => (
           <button key={p} className="btn ghost small" disabled={busy} onClick={() => runPreset(p)}>
             {p}
@@ -157,7 +158,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
         }}
       />
 
-      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 10 }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 12 }}>
         <button className="btn small" disabled={busy || !prompt.trim() || tooLong} onClick={() => ask(prompt)}>
           {busy ? "Working… ~20s" : "Ask"}
         </button>
@@ -171,32 +172,32 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
       {error && <div className="form-error" role="alert">{error}</div>}
 
       {answer && (
-        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
+        <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <div className="ask-head">
             <span className="k">Answer</span>
-            <span style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <span style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {email && (
-                <button className="btn ghost small" style={{ padding: "2px 10px", fontSize: 11 }} disabled={busy} onClick={startCompose}>
+                <button className="btn ghost small" style={{ padding: "2px 12px", fontSize: 11 }} disabled={busy} onClick={startCompose}>
                   Use as email
                 </button>
               )}
-              <button className="btn ghost small" style={{ padding: "2px 10px", fontSize: 11 }} disabled={busy} onClick={addAsTask}>
+              <button className="btn ghost small" style={{ padding: "2px 12px", fontSize: 11 }} disabled={busy} onClick={addAsTask}>
                 Add as task
               </button>
-              <button className="btn ghost small" style={{ padding: "2px 10px", fontSize: 11 }} onClick={copy}>
-                {copied ? "Copied ✓" : "Copy"}
+              <button className="btn ghost small" style={{ padding: "2px 12px", fontSize: 11 }} onClick={copy}>
+                {copied ? "Copied" : "Copy"}
               </button>
             </span>
           </div>
           {asked && (
-            <div className="log-meta" style={{ marginTop: 6 }}>
+            <div className="log-meta" style={{ marginTop: 8 }}>
               You asked: {asked}
             </div>
           )}
           <div
             style={{
-              marginTop: 10,
-              fontSize: 13.5,
+              marginTop: 12,
+              fontSize: 14,
               lineHeight: 1.7,
               whiteSpace: "pre-wrap",
               overflowWrap: "anywhere",
@@ -206,8 +207,8 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
           </div>
 
           {handoff && (
-            <p className="ask-sent" style={{ marginTop: 10 }}>
-              <span aria-hidden="true">✓</span> {handoff}
+            <p className="ask-sent" style={{ marginTop: 12 }}>
+              <CheckIcon /> {handoff}
             </p>
           )}
 
@@ -231,7 +232,7 @@ export default function AssistantCard({ slug, email }: { slug: string; email?: s
                 onChange={(e) => setEmailBody(e.target.value)}
                 style={{ width: "100%", marginTop: 8 }}
               />
-              <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 8 }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 8 }}>
                 <button className="btn small" disabled={busy || !subject.trim() || !emailBody.trim()} onClick={sendEmail}>
                   {busy ? "Sending…" : "Send to client"}
                 </button>

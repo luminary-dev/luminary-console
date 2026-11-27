@@ -4,6 +4,7 @@
 // receipt → final delivery invoice (70%) → final receipt. Post-delivery change
 // orders are billed as their own additional invoices once completed. Each doc
 // can be previewed, revised, published.
+import { sentenceCase } from "@/lib/sentence-case";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { BillingDoc, Payment } from "@/lib/types";
@@ -300,37 +301,37 @@ export default function BillingCard({
                 const viewedAt = views[b.slug];
                 return (
                 <tr key={b.slug}>
-                  <td style={{ fontWeight: 600 }}>{billingLabel(b)}</td>
+                  <td style={{ fontWeight: 500 }}>{billingLabel(b)}</td>
                   <td className="mono">{b.no}</td>
                   <td>
                     <span className={`pill${b.status === "draft" ? " grey" : ""}`}>
                       <i />
-                      {b.status}
+                      {sentenceCase(b.status)}
                     </span>
                     {b.status === "published" && viewedAt && (
-                      <div style={{ marginTop: 5, fontSize: 11, color: "var(--a-text)" }}>
+                      <div style={{ marginTop: 4, fontSize: 11, color: "var(--a-text)" }}>
                         opened <RelativeTime at={viewedAt} />
                       </div>
                     )}
                     {isInvoice && (dueDate || paid > 0) && (
-                      <div style={{ marginTop: 6, fontSize: 11.5, color: "var(--muted)", whiteSpace: "nowrap" }}>
+                      <div style={{ marginTop: 8, fontSize: 12, color: "var(--muted)", whiteSpace: "nowrap" }}>
                         {fullyPaid ? (
                           <span className="pill">
                             <i />
-                            paid
+                            Paid
                           </span>
                         ) : (
                           <>
                             {dueDate && <div>Due {dueDate}</div>}
                             {st?.overdue && (
-                              <div style={{ marginTop: 3 }}>
+                              <div style={{ marginTop: 4 }}>
                                 <span className="pill" style={{ background: "var(--danger, #d33)", color: "#fff", borderColor: "transparent" }}>
                                   Overdue by {st.overdueDays} day{st.overdueDays === 1 ? "" : "s"}
                                 </span>
                               </div>
                             )}
                             {st?.dueSoon && (
-                              <div style={{ marginTop: 3 }}>
+                              <div style={{ marginTop: 4 }}>
                                 <span className="pill" style={{ background: "#b45309", color: "#fff", borderColor: "transparent" }}>Due soon</span>
                               </div>
                             )}
@@ -435,7 +436,7 @@ export default function BillingCard({
                     </div>
                     <DocHistory {...(b.history ? { history: b.history } : {})} />
                     {reviseFor === b.slug && (
-                      <div style={{ marginTop: 10 }}>
+                      <div style={{ marginTop: 12 }}>
                         <textarea
                           className="q-box"
                           aria-label="Revision instructions"
@@ -464,7 +465,7 @@ export default function BillingCard({
       )}
 
       {(payments.length > 0 || hasPublishedInvoice) && (
-        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
+        <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
           <div className="k">Payments</div>
           {payments.length === 0 ? (
             <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 8 }}>
@@ -478,18 +479,18 @@ export default function BillingCard({
                   key={i}
                   style={{
                     display: "flex", gap: 12, alignItems: "baseline", flexWrap: "wrap",
-                    padding: "9px 0", borderBottom: "1px solid var(--border)",
+                    padding: "8px 0", borderBottom: "1px solid var(--border)",
                   }}
                 >
-                  <span className="mono" style={{ fontWeight: 600, fontSize: 12.5 }}>{fmtLKR(p.amount)}</span>
-                  <span style={{ fontSize: 12.5, color: "var(--muted)" }}>
+                  <span className="mono" style={{ fontWeight: 500, fontSize: 13 }}>{fmtLKR(p.amount)}</span>
+                  <span style={{ fontSize: 13, color: "var(--muted)" }}>
                     {p.at.slice(0, 10)} · {p.method}
                     {p.invoiceSlug ? ` · ${p.invoiceSlug}` : ""}
                     {p.note ? ` · ${p.note}` : ""}
                   </span>
                   <button
                     className="btn ghost small"
-                    style={{ padding: "2px 10px", fontSize: 11, marginLeft: "auto" }}
+                    style={{ padding: "2px 12px", fontSize: 11, marginLeft: "auto" }}
                     disabled={!!busy}
                     onClick={() => removePayment(p, i)}
                   >
@@ -504,7 +505,7 @@ export default function BillingCard({
               listed separately rather than netted off, because netting it off
               is what used to show "settled" while an invoice was unpaid
               (LC-003). Overpayment is shown for the same reason. */}
-          <div style={{ marginTop: 10, fontSize: 13 }}>
+          <div style={{ marginTop: 12, fontSize: 13 }}>
             Outstanding: <b className="mono">{fmtLKR(money.outstanding)}</b>
             <span style={{ color: "var(--muted)" }}>
               {" "}

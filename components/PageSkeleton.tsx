@@ -23,7 +23,7 @@ export default function PageSkeleton({ current }: { current?: string }) {
       <span className="sr-only">Loading…</span>
       <div className="card">
         <div className="skel-bar" style={{ width: "55%", height: 18 }} />
-        <div className="skel-bar" style={{ width: "92%", height: 13, marginTop: 14 }} />
+        <div className="skel-bar" style={{ width: "92%", height: 13, marginTop: 16 }} />
         <div className="skel-bar" style={{ width: "80%", height: 13, marginTop: 8 }} />
         <div className="skel-bar" style={{ width: "68%", height: 13, marginTop: 8 }} />
       </div>

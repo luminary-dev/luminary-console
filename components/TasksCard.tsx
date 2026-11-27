@@ -101,11 +101,11 @@ export default function TasksCard({ slug, tasks }: { slug: string; tasks: Task[]
           transfer.
         </p>
       ) : (
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 12 }}>
           {list.map((t, i) => {
             const overdue = !t.done && t.due && t.due < today();
             return (
-            <div className={`task-row${t.done ? " done" : ""}`} key={`${t.at}-${i}`}>
+            <div className={`task-row${t.done ? " is-done" : ""}`} key={`${t.at}-${i}`}>
               <input
                 className="check-24"
                 type="checkbox"
@@ -117,7 +117,7 @@ export default function TasksCard({ slug, tasks }: { slug: string; tasks: Task[]
               <span className="task-text">
                 {t.text}
                 {(t.due || t.assignee) && (
-                  <span style={{ marginLeft: 8, fontSize: 11.5, color: overdue ? "var(--danger, #d33)" : "var(--muted)", fontWeight: overdue ? 700 : 400 }}>
+                  <span style={{ marginLeft: 8, fontSize: 12, color: overdue ? "var(--danger, #d33)" : "var(--muted)", fontWeight: overdue ? 600 : 400 }}>
                     {t.due ? `due ${t.due}${overdue ? " · overdue" : ""}` : ""}
                     {t.due && t.assignee ? " · " : ""}
                     {t.assignee ? displayName(t.assignee) : ""}

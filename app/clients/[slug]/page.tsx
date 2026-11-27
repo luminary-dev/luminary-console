@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { sentenceCase } from "@/lib/sentence-case";
 import { after } from "next/server";
 import { getClient } from "@/lib/store";
 import { DOC_LABELS, type DocType } from "@/lib/types";
@@ -127,7 +128,7 @@ export default async function ClientPage({
                 <>
                   <b className="mono">{fmtLKR(money.outstanding)}</b> still to pay
                   {od.count > 0 && (
-                    <span style={{ color: "var(--danger, #d33)", fontWeight: 700 }}> · {fmtLKR(od.total)} overdue</span>
+                    <span style={{ color: "var(--danger, #d33)", fontWeight: 600 }}> · {fmtLKR(od.total)} overdue</span>
                   )}
                 </>
               ) : (
@@ -138,7 +139,7 @@ export default async function ClientPage({
         })()}
         <StageSelect slug={slug} stage={currentStage(client)} />
         {client.acceptance && (
-          <span style={{ fontSize: 12.5, color: "var(--muted)" }}>
+          <span style={{ fontSize: 13, color: "var(--muted)" }}>
             Quotation accepted by <b style={{ color: "var(--text)" }}>{client.acceptance.name}</b>{" "}
             on {client.acceptance.at.slice(0, 10)}
           </span>
@@ -173,13 +174,13 @@ export default async function ClientPage({
         <p className="empty-note" style={{ marginTop: 4 }}>
           What the client opens. Copy a link, or email the published documents in one go.
         </p>
-        <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 6 }}>
+        <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
           <div>
-            <span className="k" style={{ marginRight: 10 }}>Questions form</span>
+            <span className="k" style={{ marginRight: 12 }}>Questions form</span>
             <CopyLink url={`${base}/questionnaire`} />
           </div>
           {ORDER.filter((t) => client.docs[t]?.status === "published").map((t) => (
-            <div key={t} style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
+            <div key={t} style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
               <span className="k" style={{ marginRight: -4 }}>{DOC_LABELS[t]}</span>
               <CopyLink url={`${base}/${t}`} />
             </div>
@@ -203,7 +204,7 @@ export default async function ClientPage({
                 },
               ]
             ).map((sub, i) => (
-              <div key={i} style={{ marginTop: 6 }}>
+              <div key={i} style={{ marginTop: 8 }}>
                 #{i + 1} · {sub.at} by <b>{sub.by}</b>
                 {" · "}
                 <a href={sub.pdfUrl} target="_blank" rel="noopener noreferrer">
@@ -246,12 +247,12 @@ export default async function ClientPage({
           </thead>
           <tbody>
             <tr>
-              <td style={{ fontWeight: 600 }}>Questions form</td>
+              <td style={{ fontWeight: 500 }}>Questions form</td>
               <td className="mono">LUM-QST-{client.docNoBase}</td>
               <td>
                 <span className={`pill${client.answersAt ? "" : " grey"}`}>
                   <i />
-                  {client.answersAt ? "answered" : "not answered yet"}
+                  {client.answersAt ? "Answered" : "Not answered yet"}
                 </span>
               </td>
               <td>
@@ -273,13 +274,13 @@ export default async function ClientPage({
               const billing = t === "invoice" || t === "receipt";
               return (
                 <tr key={t}>
-                  <td style={{ fontWeight: 600 }}>{DOC_LABELS[t]}</td>
+                  <td style={{ fontWeight: 500 }}>{DOC_LABELS[t]}</td>
                   <td className="mono">{meta?.no ?? "—"}</td>
                   <td>
                     {meta ? (
                       <span className={`pill${meta.status === "draft" ? " grey" : ""}`}>
                         <i />
-                        {meta.status}
+                        {sentenceCase(meta.status)}
                       </span>
                     ) : (
                       <span style={{ color: "var(--label)" }}>
@@ -287,7 +288,7 @@ export default async function ClientPage({
                       </span>
                     )}
                     {meta?.status === "published" && docViews[t] && (
-                      <div style={{ marginTop: 5, fontSize: 11, color: "var(--a-text)" }}>
+                      <div style={{ marginTop: 4, fontSize: 11, color: "var(--a-text)" }}>
                         opened <RelativeTime at={docViews[t]} initial={relTime(docViews[t], now)} />
                       </div>
                     )}
@@ -330,7 +331,7 @@ export default async function ClientPage({
           </tbody>
         </table></div>
         {client.status === "answers_in" && !client.docs.quotation && (
-          <div className="notice" style={{ marginTop: 14 }}>
+          <div className="notice" style={{ marginTop: 16 }}>
             Their answers are in and the documents are being written. If the drafts have not
             appeared after a few minutes, start it by hand: <RetryStage2 slug={slug} />
           </div>
@@ -396,10 +397,10 @@ export default async function ClientPage({
                 key={`${u.url}-${i}`}
                 style={{
                   display: "flex", gap: 12, alignItems: "baseline", flexWrap: "wrap",
-                  padding: "9px 0", borderTop: "1px solid var(--border)",
+                  padding: "8px 0", borderTop: "1px solid var(--border)",
                 }}
               >
-                <a href={u.url} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 600, fontSize: 13.5 }}>
+                <a href={u.url} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 500, fontSize: 14 }}>
                   {u.name}
                 </a>
                 <span className="mono" style={{ fontSize: 12, color: "var(--muted)" }}>{fmtSize(u.size)}</span>
@@ -425,7 +426,7 @@ export default async function ClientPage({
       <div className="card">
         <h3>The original brief</h3>
         <p className="empty-note" style={{ marginTop: 4 }}>What we were asked to build, as typed when the client was added.</p>
-        <p style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 8, whiteSpace: "pre-wrap" }}>
+        <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 8, whiteSpace: "pre-wrap" }}>
           {client.brief}
         </p>
       </div>

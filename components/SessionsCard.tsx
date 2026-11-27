@@ -106,7 +106,7 @@ export default function SessionsCard({ initial }: { initial: Session[] }) {
   return (
     <div className="card">
       {dialog}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <h3>Signed-in devices</h3>
         {sessions && sessions.length > 0 && (
           <button className="btn ghost small" onClick={revokeAll} disabled={busy}>
@@ -115,27 +115,27 @@ export default function SessionsCard({ initial }: { initial: Session[] }) {
         )}
       </div>
       {sessions === null ? (
-        <p style={{ color: "var(--muted)", marginTop: 10, fontSize: 13.5 }}>Loading…</p>
+        <p style={{ color: "var(--muted)", marginTop: 12, fontSize: 14 }}>Loading…</p>
       ) : sessions.length === 0 ? (
-        <p style={{ color: "var(--muted)", marginTop: 10, fontSize: 13.5 }}>
+        <p style={{ color: "var(--muted)", marginTop: 12, fontSize: 14 }}>
           No registered sessions yet: they appear here from the next sign-in.
         </p>
       ) : (
-        <div style={{ marginTop: 6 }}>
+        <div style={{ marginTop: 8 }}>
           {sessions.map((s) => (
             <div
               key={s.sid}
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 10,
+                gap: 12,
                 flexWrap: "wrap",
-                padding: "10px 0",
+                padding: "12px 0",
                 borderTop: "1px solid var(--border)",
               }}
             >
               <div style={{ minWidth: 0, flex: "1 1 200px" }}>
-                <div style={{ fontSize: 13.5, fontWeight: 600 }}>
+                <div style={{ fontSize: 14, fontWeight: 500 }}>
                   {device(s.ua)}
                   {s.current && (
                     <span className="pill" style={{ marginLeft: 8 }}>

@@ -11,14 +11,14 @@ export default function CopyLink({ url }: { url: string }) {
       </a>
       <button
         className="btn ghost small"
-        style={{ padding: "2px 10px", fontSize: 11 }}
+        style={{ padding: "2px 12px", fontSize: 11 }}
         onClick={async () => {
           await navigator.clipboard.writeText(url);
           setCopied(true);
           setTimeout(() => setCopied(false), 1500);
         }}
       >
-        {copied ? "Copied ✓" : "Copy"}
+        {copied ? "Copied" : "Copy"}
       </button>
     </span>
   );
