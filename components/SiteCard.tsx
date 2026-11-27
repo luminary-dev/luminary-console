@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation";
 import type { SiteEntry } from "@/lib/types";
 import { useConfirm } from "./ConfirmDialog";
 import { opsFetch } from "@/lib/ops-fetch";
+import HowItWorks from "./HowItWorks";
+import MoreActions from "./MoreActions";
 
 const ROOT = "luminary-dev.xyz";
 
@@ -73,13 +75,20 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
     <div className="card">
       {dialog}
       <div className="ask-head">
-        <h3>Finalized site</h3>
+        <h3>The finished website</h3>
         {site && <span className={`pill${site.status === "draft" ? " grey" : ""}`}><i />{site.status}</span>}
       </div>
-      <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 6, lineHeight: 1.6 }}>
-        Deploy the finished build from a GitHub repo in the org. Clients reach it at{" "}
-        <span className="mono">{clientPath}</span>, which shows an under-maintenance page until you publish.
+      <p className="empty-note" style={{ marginTop: 6 }}>
+        Connect the site once it is built. The client opens it at{" "}
+        <span className="mono">{clientPath}</span> and sees a holding page until you publish.
       </p>
+      <HowItWorks>
+        <p>
+          The site is put online from its repository on GitHub, into its own Vercel project. Give
+          the repository and the branch to use. If the site is already online somewhere else, set
+          its address by hand instead.
+        </p>
+      </HowItWorks>
 
       {!site ? (
         <div style={{ marginTop: 16 }}>
@@ -87,11 +96,11 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
             <input className="q-line" style={{ flex: "1 1 280px" }} aria-label="Repository" placeholder="github.com/luminary-dev/eco-mech-site" value={repo} onChange={(e) => setRepo(e.target.value)} />
             <input className="q-line" style={{ width: 110 }} aria-label="Branch" placeholder="branch" value={ref} onChange={(e) => setRef(e.target.value)} />
             <button className="btn small" disabled={!!busy || !repo.trim()} onClick={() => call({ action: "deploy", repo, ref }, "deploy")}>
-              {busy === "deploy" ? "Deploying…" : "Deploy"}
+              {busy === "deploy" ? "Putting it online…" : "Put it online"}
             </button>
           </div>
           <button className="btn ghost small" style={{ marginTop: 12 }} onClick={() => setShowManual((v) => !v)}>
-            {showManual ? "Cancel" : "Set URL manually"}
+            {showManual ? "Cancel" : "It is already online: give its address"}
           </button>
           {showManual && (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
@@ -122,25 +131,28 @@ export default function SiteCard({ slug, initial }: { slug: string; initial?: Si
             )}
           </div>
 
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
-            <button className="btn ghost small" disabled={!!busy} onClick={() => call({ action: "refresh" }, "refresh")}>
-              {busy === "refresh" ? "…" : "Refresh status"}
-            </button>
-            {site.status === "draft" ? (
+          <div className="row-actions" style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
+            {site.status === "draft" && (
               <button className="btn small" disabled={!!busy || site.state !== "READY"} onClick={() => call({ action: "publish" }, "publish")}>
                 {busy === "publish" ? "…" : "Publish"}
               </button>
-            ) : (
+            )}
+            <button className="btn ghost small" disabled={!!busy} onClick={() => call({ action: "refresh" }, "refresh")}>
+              {busy === "refresh" ? "…" : "Check again"}
+            </button>
+            <MoreActions>
+            {site.status !== "draft" && (
               <button className="btn ghost small" disabled={!!busy} onClick={() => call({ action: "unpublish" }, "unpublish")}>
                 {busy === "unpublish" ? "…" : "Unpublish"}
               </button>
             )}
             <button className="btn ghost small" disabled={!!busy} onClick={() => call({ action: "redeploy" }, "redeploy")}>
-              {busy === "redeploy" ? "…" : "Redeploy"}
+              {busy === "redeploy" ? "…" : "Put the latest version online"}
             </button>
-            <button className="btn ghost small" style={{ color: "var(--danger)", borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)", marginLeft: "auto" }} disabled={!!busy} onClick={remove}>
-              {busy === "delete" ? "…" : "Remove"}
+            <button className="btn ghost small"  disabled={!!busy} onClick={remove}>
+              {busy === "delete" ? "…" : "Disconnect the site"}
             </button>
+            </MoreActions>
           </div>
           {site.status === "draft" && site.state === "READY" && (
             <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 10 }}>

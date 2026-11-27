@@ -75,6 +75,16 @@ describe("LC-010 the proxy uses the session registry as an allowlist", () => {
     expect(res.status).toBe(401);
   });
 
+  it("keeps the menu's unread count behind the same gate as every other API route", async () => {
+    // The console frame asks for this on every screen. It is a number about the
+    // studio's clients, so no session means no number, and a live one gets through.
+    const sid = newSid();
+    liveSids.mockResolvedValue([sid]);
+    expect((await consoleRequest(await makeSessionToken(SECRET, newSid()), "/api/activity/unread")).status).toBe(401);
+    expect((await consoleRequest("", "/api/activity/unread")).status).toBe(401);
+    expect(allowed(await consoleRequest(await makeSessionToken(SECRET, sid), "/api/activity/unread"))).toBe(true);
+  });
+
   it("re-reads the registry for a session minted after the cached snapshot", async () => {
     // A stale snapshot must not bounce an operator who signed in seconds ago,
     // so a miss on a token ISSUED after the snapshot triggers one fresh read.

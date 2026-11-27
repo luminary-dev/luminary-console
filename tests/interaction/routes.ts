@@ -40,16 +40,16 @@ export const ROUTES: Route[] = [
   {
     path: "/",
     pattern: "app/page.tsx",
-    name: "Dashboard",
+    name: "Today",
     surface: "console",
     auth: "operator",
-    purpose: "Client pipeline, outstanding money, unseen activity, sessions.",
+    purpose: "What is waiting on the signed-in operator, three ways to start something, and what happened.",
     needs: "at least one client in the index",
   },
   {
     path: "/clients",
     pattern: "app/clients/page.tsx",
-    name: "Clients",
+    name: "All clients",
     surface: "console",
     auth: "operator",
     purpose: "Every client, filterable by stage, searchable, virtualised past 100 rows.",
@@ -58,7 +58,7 @@ export const ROUTES: Route[] = [
   {
     path: "/clients/new",
     pattern: "app/clients/new/page.tsx",
-    name: "New client",
+    name: "Add a client",
     surface: "console",
     auth: "operator",
     purpose: "Creates a client, drafts the estimate, provisions the subdomain.",
@@ -75,7 +75,7 @@ export const ROUTES: Route[] = [
   {
     path: "/activity",
     pattern: "app/activity/page.tsx",
-    name: "Activity",
+    name: "History",
     surface: "console",
     auth: "operator",
     purpose: "Cross-client activity feed with unread tracking.",
@@ -83,16 +83,24 @@ export const ROUTES: Route[] = [
   {
     path: "/publish",
     pattern: "app/publish/page.tsx",
-    name: "Publish studio",
+    name: "Blog posts",
     surface: "console",
     auth: "operator",
-    purpose: "Drafts and publishes blog articles and portfolio projects.",
+    purpose: "Writes a blog post and sends it for approval as a pull request.",
+  },
+  {
+    path: "/publish/project",
+    pattern: "app/publish/project/page.tsx",
+    name: "Portfolio projects",
+    surface: "console",
+    auth: "operator",
+    purpose: "Adds a finished project to the website's Work page, sent for approval as a pull request.",
   },
 
   {
     path: "/sales",
     pattern: "app/sales/page.tsx",
-    name: "Sales, send queue",
+    name: "Message shops",
     surface: "console",
     auth: "operator",
     purpose: "The next shop to message, with the message written and the team's shared progress.",
@@ -101,7 +109,7 @@ export const ROUTES: Route[] = [
   {
     path: "/sales/shops",
     pattern: "app/sales/shops/page.tsx",
-    name: "Sales, shops",
+    name: "Shop list",
     surface: "console",
     auth: "operator",
     purpose: "Every shop with its status, note and preview link, and the list import.",
@@ -110,7 +118,7 @@ export const ROUTES: Route[] = [
   {
     path: "/sales/scripts",
     pattern: "app/sales/scripts/page.tsx",
-    name: "Sales, scripts",
+    name: "Ready replies",
     surface: "console",
     auth: "operator",
     purpose: "Replies to what shops say back, with the offer's numbers filled in.",
@@ -118,7 +126,7 @@ export const ROUTES: Route[] = [
   {
     path: "/sales/kit",
     pattern: "app/sales/kit/page.tsx",
-    name: "Sales, social kit",
+    name: "Social posts",
     surface: "console",
     auth: "operator",
     purpose: "Every social post with its caption and pictures, and shared ticks for what is posted.",
@@ -128,10 +136,18 @@ export const ROUTES: Route[] = [
   {
     path: "/settings",
     pattern: "app/settings/page.tsx",
-    name: "Settings",
+    name: "Devices and export",
     surface: "console",
     auth: "operator",
     purpose: "Signed-in devices and the client CSV export. Occasional, deliberate actions.",
+  },
+  {
+    path: "/help",
+    pattern: "app/help/page.tsx",
+    name: "Help",
+    surface: "console",
+    auth: "operator",
+    purpose: "What every screen is for, a client's tabs, and what the studio's words mean. Read from the menu.",
   },
 
   // ——— console, engineering ———
@@ -155,7 +171,7 @@ export const ROUTES: Route[] = [
   {
     path: "/github/ci",
     pattern: "app/github/ci/page.tsx",
-    name: "CI",
+    name: "Builds",
     surface: "console",
     auth: "operator",
     purpose: "Workflow runs, flaky checks, duration trends.",
@@ -163,7 +179,7 @@ export const ROUTES: Route[] = [
   {
     path: "/github/deployments",
     pattern: "app/github/deployments/page.tsx",
-    name: "Deployments",
+    name: "Live versions",
     surface: "console",
     auth: "operator",
     purpose: "What is deployed where, grouped by environment.",
@@ -181,7 +197,7 @@ export const ROUTES: Route[] = [
   {
     path: "/github/security",
     pattern: "app/github/security/page.tsx",
-    name: "Security",
+    name: "Security alerts",
     surface: "console",
     auth: "operator",
     purpose: "Dependabot, code scanning and secret scanning alerts.",
@@ -190,7 +206,7 @@ export const ROUTES: Route[] = [
   {
     path: "/github/insights",
     pattern: "app/github/insights/page.tsx",
-    name: "Insights",
+    name: "Team stats",
     surface: "console",
     auth: "operator",
     purpose: "Team-level throughput, cycle time, review load, flakes.",
@@ -198,7 +214,7 @@ export const ROUTES: Route[] = [
   {
     path: "/github/activity",
     pattern: "app/github/activity/page.tsx",
-    name: "Engineering activity",
+    name: "Code history",
     surface: "console",
     auth: "operator",
     purpose: "Delivery stream, filterable by kind and repository.",

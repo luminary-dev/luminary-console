@@ -1,40 +1,27 @@
 "use client";
 
-// The console's "find anything" control: a Search button in the top bar of
-// every page, and ⌘K / Ctrl-K from anywhere.
+// The console's "find anything" dialog: Search in the menu, ⌘K / Ctrl-K or
+// "/" from anywhere.
 //
-// Before this the only way to reach a screen was to know which section it sat
-// under and click down to it, and the only search was for clients, on two
-// pages, behind a shortcut the interface never mentioned. This lists every
-// screen by name and by the words people actually look for ("invoice" finds
-// nothing called that, so Clients carries it as a keyword), and every client.
-//
-// The destinations are written out here rather than derived from the section
-// components, because a server component cannot hand a client component a
-// module full of them and the list is short. tests/quick-find.test.tsx fails
-// if a section gains a page that is missing here.
+// It lists every screen and every client. The screens are not written out
+// here: they are the menu itself (lib/menu.ts), so a screen that is added to
+// the menu is findable without anyone remembering to add it here too. Each one
+// matches on its name, the group it sits in, the sentence that says what it is
+// for, and its keywords, which include what the screen used to be called
+// ("sales", "engineering", "CI"), so old habits still find the new names.
 import CommandPalette, { type PaletteDestination, type PaletteItem } from "./CommandPalette";
+import { ALL_SCREENS } from "@/lib/menu";
 
-export const DESTINATIONS: PaletteDestination[] = [
-  { href: "/", label: "Home", group: "Console", keywords: "dashboard hub overview start", top: true },
-  { href: "/clients", label: "Clients", group: "Console", keywords: "customers projects list documents billing invoice quotation", top: true },
-  { href: "/clients/new", label: "New client", group: "Clients", keywords: "add create start estimate lead", top: true },
-  { href: "/sales", label: "Sales: send queue", group: "Sales", keywords: "outreach shops messages whatsapp instagram next follow up", top: true },
-  { href: "/sales/shops", label: "Sales: shops", group: "Sales", keywords: "leads prospects list status notes import" },
-  { href: "/sales/scripts", label: "Sales: reply scripts", group: "Sales", keywords: "templates answers price objections" },
-  { href: "/sales/kit", label: "Sales: social kit", group: "Sales", keywords: "posts instagram facebook captions pictures content" },
-  { href: "/github", label: "Pull requests", group: "Engineering", keywords: "github prs review merge code", top: true },
-  { href: "/github/repos", label: "Repositories", group: "Engineering", keywords: "github repos health" },
-  { href: "/github/ci", label: "CI", group: "Engineering", keywords: "github checks builds failing flaky tests" },
-  { href: "/github/deployments", label: "Deployments", group: "Engineering", keywords: "github deploy vercel production versions" },
-  { href: "/github/releases", label: "Releases", group: "Engineering", keywords: "github versions tags notes" },
-  { href: "/github/security", label: "Security", group: "Engineering", keywords: "github dependabot alerts vulnerabilities secrets" },
-  { href: "/github/insights", label: "Insights", group: "Engineering", keywords: "github team health metrics" },
-  { href: "/github/activity", label: "Engineering activity", group: "Engineering", keywords: "github events stream" },
-  { href: "/activity", label: "Activity", group: "Console", keywords: "log history audit updates notifications", top: true },
-  { href: "/publish", label: "Publish", group: "Console", keywords: "blog article portfolio project landing page write", top: true },
-  { href: "/settings", label: "Settings", group: "Account", keywords: "sessions devices sign out export csv data" },
-];
+/** Listed before anything is typed: the places most visits are headed. */
+const FIRST = new Set(["/", "/clients", "/clients/new", "/sales", "/github", "/activity"]);
+
+export const DESTINATIONS: PaletteDestination[] = ALL_SCREENS.map((s) => ({
+  href: s.href,
+  label: s.label,
+  ...(s.group ? { group: s.group } : {}),
+  keywords: `${s.keywords ?? ""} ${s.what}`,
+  ...(FIRST.has(s.href) ? { top: true } : {}),
+}));
 
 /** The client index, as the palette lists it. The route is the same one the
  *  clients page is built from, behind the same session gate. */
@@ -52,6 +39,6 @@ async function loadClients(): Promise<PaletteItem[]> {
   });
 }
 
-export default function QuickFind() {
-  return <CommandPalette items={[]} destinations={DESTINATIONS} loadItems={loadClients} trigger />;
+export default function QuickFind({ trigger = false }: { trigger?: boolean }) {
+  return <CommandPalette items={[]} destinations={DESTINATIONS} loadItems={loadClients} trigger={trigger} />;
 }

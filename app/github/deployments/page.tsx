@@ -10,15 +10,11 @@
 // missed, so it is called out above the fold, again on its environment, and
 // again on its own row.
 import { Suspense } from "react";
-import Link from "next/link";
-import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 import { githubConfigured } from "@/lib/github/config";
 import type { DeploymentEntity } from "@/lib/github/entities";
 import { listAllDeployments } from "@/lib/github/projection";
-import GithubNav, { GithubEmpty, GithubError } from "@/components/github/GithubNav";
+import { GithubEmpty, GithubError } from "@/components/github/GithubNav";
 import { StatusIcon, type StatusTone } from "@/components/github/MergeVerdict";
 import { shortAge } from "@/components/github/PrRow";
 import "@/components/github/github.css";
@@ -96,39 +92,21 @@ export function groupByEnvironment(deployments: DeploymentEntity[]): Environment
 
 export default function DeploymentsPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Deployments</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
-
-      <GithubNav current="/github/deployments" />
-
-      <div className="gh-head">
-        <div>
-          <h1 className="gh-h1">Deployments</h1>
-          <p className="gh-lede">
+    <ConsoleShell
+      current="/github/deployments"
+      className="gh-page"
+      how={
+        <p>
             What version is on each environment, who put it there and when. Grouped by
             environment, newest first, with anything that failed called out.
-          </p>
-        </div>
-      </div>
-
+        </p>
+      }
+    >
       <Suspense fallback={<DeploymentsSkeleton />}>
         <DeploymentsData />
       </Suspense>
 
-      <AppTabBar />
-    </main>
+    </ConsoleShell>
   );
 }
 

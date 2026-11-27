@@ -11,6 +11,7 @@
 // text. The digest is the correlation handle, and it is safe by construction.
 import { useEffect } from "react";
 import Link from "next/link";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 
 export default function ConsoleError({
   error,
@@ -24,23 +25,10 @@ export default function ConsoleError({
   }, [error]);
 
   return (
-    <main className="wrap" style={{ paddingBottom: 80 }}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Console</small>
-        </div>
-      </div>
-      {/* Skip-link target. The topbar lives inside <main> on every console
-          page, so the jump lands here, after the nav, and the next Tab
-          continues into the content. tabIndex makes it focusable, which is
-          what moves focus rather than only the scroll position. */}
-      <div id="main-content" tabIndex={-1} />
-
-
+    <ConsoleShell title="This page could not load" purpose={null}>
       <div className="card">
-        <h3>This page could not load</h3>
-        <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 6, lineHeight: 1.65 }}>
+        <h3>Nothing has been lost</h3>
+        <p className="empty-note" style={{ marginTop: 6 }}>
           Something the console needed to read did not come back. This is almost always the record
           store being briefly unreachable, and it usually clears on a retry. Nothing has been changed
           or lost: loading a page only reads.
@@ -50,7 +38,7 @@ export default function ConsoleError({
             Try again
           </button>
           <Link className="btn ghost" href="/">
-            Back to the dashboard
+            Back to Today
           </Link>
         </div>
         {error.digest && (
@@ -59,6 +47,6 @@ export default function ConsoleError({
           </p>
         )}
       </div>
-    </main>
+    </ConsoleShell>
   );
 }

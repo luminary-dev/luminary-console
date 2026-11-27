@@ -5,11 +5,7 @@
 // the pull request inbox about what is open. The read is wrapped in Suspense
 // so the shell and the navigation paint immediately and only the table waits.
 import { Suspense } from "react";
-import Link from "next/link";
-import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 import { githubConfigured } from "@/lib/github/config";
 import {
   listAllAlerts,
@@ -17,7 +13,7 @@ import {
   listAllWorkflowRuns,
   listRepos,
 } from "@/lib/github/projection";
-import GithubNav, { GithubEmpty, GithubError } from "@/components/github/GithubNav";
+import { GithubEmpty, GithubError } from "@/components/github/GithubNav";
 import RepoHealth, { RepoHealthSkeleton } from "@/components/github/RepoHealth";
 import { repoHealthRows } from "@/lib/github/repo-health";
 import "@/components/github/github.css";
@@ -28,40 +24,22 @@ export const dynamic = "force-dynamic";
 
 export default function ReposPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Repositories</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
-
-      <GithubNav current="/github/repos" />
-
-      <div className="gh-head">
-        <div>
-          <h1 className="gh-h1">Repositories</h1>
-          <p className="gh-lede">
+    <ConsoleShell
+      current="/github/repos"
+      className="gh-page"
+      how={
+        <p>
             One row per repository, with the numbers that say whether it needs attention: open
             pull requests, how often CI passes, open security alerts and how long since anyone
             pushed. Sortable on every one of those.
-          </p>
-        </div>
-      </div>
-
+        </p>
+      }
+    >
       <Suspense fallback={<ReposSkeleton />}>
         <ReposData />
       </Suspense>
 
-      <AppTabBar />
-    </main>
+    </ConsoleShell>
   );
 }
 

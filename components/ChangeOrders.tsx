@@ -44,10 +44,10 @@ export default function ChangeOrders({
 
   return (
     <div className="card">
-      <h3>Change orders</h3>
-      <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-        Changes the client requests after the quotation is accepted. Log them here as they're
-        approved: each one is billed as its own line on the <b>final invoice</b>.
+      <h3>Changes after the price was agreed</h3>
+      <p className="empty-note" style={{ marginTop: 4 }}>
+        When the client asks for something that was not in the quotation, write it down here. Each
+        one is added as its own line on the <b>70% invoice</b>. These are called change orders.
       </p>
 
       {changeOrders.length > 0 && (
@@ -110,13 +110,13 @@ export default function ChangeOrders({
         </div>
         <div className="q-field half">
           <span className="q-label">Amount (LKR)</span>
-          <input className="q-line" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Leave blank to price automatically" aria-label="Amount in LKR" />
+          <input className="q-line" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Leave empty for the usual price" aria-label="Amount in LKR" />
         </div>
       </div>
       {dialog}
       <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 6 }}>
-        Leave the amount blank to apply the aftercare default: the first {FREE_CHANGE_REQUESTS} change
-        requests are free, then {fmtLKR(CHANGE_REQUEST_FEE)} each. Enter an amount to override (e.g. a larger change quoted first).
+        Leave the amount empty and the usual rule applies: the first {FREE_CHANGE_REQUESTS} changes are
+        free, then {fmtLKR(CHANGE_REQUEST_FEE)} each. Type an amount for a bigger change you have already priced.
       </p>
       {error && <div className="form-error" role="alert">{error}</div>}
       <button
@@ -125,7 +125,7 @@ export default function ChangeOrders({
         disabled={busy || !desc.trim()}
         onClick={() => call({ action: "add", desc, amount })}
       >
-        {busy ? "Saving…" : "Add change order"}
+        {busy ? "Saving…" : "Add this change"}
       </button>
     </div>
   );

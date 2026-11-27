@@ -30,7 +30,8 @@ import type {
 import { buildInsights, type FlakeStat } from "@/lib/github/insights";
 import { atIndex } from "./helpers";
 import AlertList, { sortAlerts } from "@/components/github/AlertList";
-import GithubNav, { GITHUB_SECTIONS, GithubEmpty } from "@/components/github/GithubNav";
+import { GithubEmpty } from "@/components/github/GithubNav";
+import { MENU } from "@/lib/menu";
 import InsightPanel, {
   DurationTable,
   FlakeLeaderboard,
@@ -409,43 +410,42 @@ describe("every status has words beside its icon", () => {
   });
 });
 
-// === section navigation ===
+// === where the Code screens sit ===
 
-describe("section navigation", () => {
-  it("marks exactly one link as the current page", () => {
-    const { container } = render(<GithubNav current="/github/security" />);
-    const marked = [...container.querySelectorAll("[aria-current]")];
-    expect(marked).toHaveLength(1);
-    expect(atIndex(marked, 0).textContent).toBe("Security");
+describe("the Code screens in the menu", () => {
+  const code = MENU.find((g) => g.id === "code");
+  const pages: [string, string][] = [
+    ["app/github/page.tsx", "/github"],
+    ["app/github/repos/page.tsx", "/github/repos"],
+    ["app/github/ci/page.tsx", "/github/ci"],
+    ["app/github/deployments/page.tsx", "/github/deployments"],
+    ["app/github/releases/page.tsx", "/github/releases"],
+    ["app/github/security/page.tsx", "/github/security"],
+    ["app/github/insights/page.tsx", "/github/insights"],
+  ];
+
+  it("lists every one of them, the pull request inbox first", () => {
+    const listed = code?.items.map((i) => i.href) ?? [];
+    expect(listed[0]).toBe("/github");
+    expect([...listed].sort()).toEqual(pages.map(([, href]) => href).sort());
   });
 
-  it("links every section, including the pull request inbox", () => {
-    render(<GithubNav current="/github/repos" />);
-    for (const section of GITHUB_SECTIONS) {
-      expect(screen.getByRole("link", { name: section.label }).getAttribute("href")).toBe(
-        section.href,
-      );
-    }
-  });
-
-  it("appears on every screen it belongs to, marked with that screen's own href", () => {
-    // The nav is server rendered per page, so the marking is a source fact.
-    const pages: [string, string][] = [
-      ["app/github/repos/page.tsx", "/github/repos"],
-      ["app/github/ci/page.tsx", "/github/ci"],
-      ["app/github/deployments/page.tsx", "/github/deployments"],
-      ["app/github/releases/page.tsx", "/github/releases"],
-      ["app/github/security/page.tsx", "/github/security"],
-      ["app/github/insights/page.tsx", "/github/insights"],
-      ["app/github/activity/page.tsx", "/github/activity"],
-    ];
+  it("each page sits in the console's frame under its own menu entry", () => {
+    // The frame draws the one h1, the trail and the purpose from the menu, so
+    // a page that names its own entry cannot be titled differently from it.
     for (const [file, href] of pages) {
       const source = sourceOf(file);
-      expect(source).toContain(`<GithubNav current="${href}" />`);
-      // Exactly one h1 per page, which is the heading-order rule that is
-      // easiest to break by copying a section between screens.
-      expect(source.match(/className="gh-h1"/g) ?? []).toHaveLength(1);
+      expect(source).toContain(`current="${href}"`);
+      expect(source).toContain("<ConsoleShell");
+      expect(source).not.toMatch(/<h1[\s>]/);
     }
+  });
+
+  it("code history is the second half of History, not an eighth Code screen", () => {
+    const source = sourceOf("app/github/activity/page.tsx");
+    expect(source).toContain('current="/activity"');
+    expect(source).toContain('<HistorySwitch current="code" />');
+    expect(code?.items.some((i) => i.href === "/github/activity")).toBe(false);
   });
 });
 

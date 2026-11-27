@@ -4,14 +4,10 @@
    token. --subtle is deliberately absent: it is a border/dot token and fails
    the AA floor as text on both themes. */
 
-.gh-page { padding-bottom: 80px; }
+/* The page frame (components/shell/) sets the padding now. */
 
 /* === page heading === */
-.gh-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
-.gh-h1 { font-size: 20px; font-weight: 800; letter-spacing: -.03em; line-height: 1.25; }
-.gh-lede { color: var(--muted); font-size: 13px; line-height: 1.6; margin-top: 5px; max-width: 74ch; }
 .gh-card-title { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
-.gh-crumb { font-family: var(--font-mono), monospace; font-size: 11px; letter-spacing: .08em; color: var(--label); }
 
 /* === saved view chips === */
 .gh-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
@@ -158,8 +154,7 @@
 .gh-note code { font-family: var(--font-mono), monospace; font-size: 12.5px; color: var(--text); }
 
 @media (max-width: 720px) {
-  .gh-head { margin-top: 14px; }
-  .gh-scroll { margin-left: -18px; margin-right: -18px; padding: 0 18px; }
+    .gh-scroll { margin-left: -18px; margin-right: -18px; padding: 0 18px; }
 }
 
 /* ——— Hover, guarded ———

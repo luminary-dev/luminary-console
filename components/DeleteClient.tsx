@@ -46,10 +46,11 @@ export default function DeleteClient({ slug, company }: { slug: string; company:
 
   return (
     <div className="card" style={{ borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)" }}>
-      <h3 style={{ color: "var(--danger)" }}>Danger zone</h3>
-      <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 6 }}>
-        When a project is finished, delete the client to remove all documents, the questionnaire
-        answers, the subdomain and its DNS record.
+      <h3 style={{ color: "var(--danger)" }}>Delete this client</h3>
+      <p className="empty-note" style={{ marginTop: 6 }}>
+        This removes everything for good: every document, their answers to the questions form and
+        their web address. It cannot be undone. Use it only when a project is finished and you no
+        longer need the record.
       </p>
       {error && <div className="form-error" role="alert">{error}</div>}
       <button
@@ -58,7 +59,7 @@ export default function DeleteClient({ slug, company }: { slug: string; company:
         disabled={busy}
         onClick={run}
       >
-        {busy ? "Deleting…" : "Delete client & subdomain"}
+        {busy ? "Deleting…" : "Delete this client and their web address"}
       </button>
       {dialog}
     </div>

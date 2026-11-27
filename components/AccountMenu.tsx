@@ -1,6 +1,8 @@
 "use client";
 
-// The console's utility controls, folded into one disclosure.
+// The console's utility controls, folded into one disclosure. It is the last
+// row of the menu (components/shell/ShellChrome.tsx), where its panel opens
+// upward; the history below is why it is one control and not four.
 //
 // The topbar used to carry five separate action controls on the right —
 // theme, per-device alerts, Settings, Sign out and the primary "+ New client".
@@ -20,6 +22,7 @@ import Link from "next/link";
 import SignOut from "@/components/SignOut";
 import PushToggle from "@/components/PushToggle";
 import ThemeToggle from "@/components/ThemeToggle";
+import { SETTINGS } from "@/lib/menu";
 
 export default function AccountMenu({ showSettings = true }: { showSettings?: boolean }) {
   const [open, setOpen] = useState(false);
@@ -78,8 +81,8 @@ export default function AccountMenu({ showSettings = true }: { showSettings?: bo
               available, in which case the panel is theme + Settings + Sign out. */}
           <PushToggle />
           {showSettings && (
-            <Link className="acct-item" href="/settings" onClick={() => setOpen(false)}>
-              Settings
+            <Link className="acct-item" href={SETTINGS.href} onClick={() => setOpen(false)}>
+              {SETTINGS.label}
             </Link>
           )}
           <SignOut />

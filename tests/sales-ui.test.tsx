@@ -6,7 +6,6 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ImportShops from "@/components/sales/ImportShops";
 import KitBoard from "@/components/sales/KitBoard";
-import SalesNav, { SALES_SECTIONS } from "@/components/sales/SalesNav";
 import SalesQueue from "@/components/sales/SalesQueue";
 import ShopList from "@/components/sales/ShopList";
 import type { Kit } from "@/lib/kit";
@@ -37,15 +36,6 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
   refresh.mockClear();
-});
-
-describe("SalesNav", () => {
-  it("marks exactly the current page", () => {
-    render(<SalesNav current="/sales/shops" />);
-    const links = screen.getAllByRole("link");
-    expect(links).toHaveLength(SALES_SECTIONS.length);
-    expect(links.filter((l) => l.getAttribute("aria-current") === "page").map((l) => l.textContent)).toEqual(["Shops"]);
-  });
 });
 
 describe("SalesQueue", () => {

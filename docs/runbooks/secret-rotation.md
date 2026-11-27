@@ -78,7 +78,7 @@ valid key.
 ## VAPID keys
 
 Rotating these invalidates every push subscription. Every device must
-re-enable alerts from the console topbar afterwards. Say so in the team
+re-enable alerts from Account, at the foot of the console menu, afterwards. Say so in the team
 channel before doing it.
 
 ## Third-party tokens at rest

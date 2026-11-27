@@ -4,9 +4,9 @@
 // caller supplies them, to any screen of the console. The content search hits
 // /api/search.
 //
-// It is mounted once in the top bar (components/QuickFind.tsx), so it is on
-// every page with a visible button, instead of on two pages behind a shortcut
-// nobody could discover. The client list is either passed in (`items`) or
+// It is mounted once per page by the console's frame (components/QuickFind.tsx
+// inside components/shell/), so it is on every screen, with a Search button in
+// the menu, instead of on two pages behind a shortcut nobody could discover. The client list is either passed in (`items`) or
 // fetched the first time the palette opens (`loadItems`), so pages that do not
 // already hold the list do not pay for it up front.
 //
@@ -55,6 +55,15 @@ const HEADING: Record<Option["kind"], string> = {
   name: "Clients",
   content: "In documents and notes",
 };
+
+/** How anything on the page asks the Search dialog to open. The dialog is
+ *  mounted once per page (components/QuickFind.tsx) and the buttons that open
+ *  it live elsewhere (the side menu, the phone's bottom bar), so they ask with
+ *  an event instead of each holding a copy of the dialog. */
+export const OPEN_SEARCH_EVENT = "console:open-search";
+export function openSearch(): void {
+  window.dispatchEvent(new Event(OPEN_SEARCH_EVENT));
+}
 
 /** True when a keystroke is going into a field, so "/" must be left alone. */
 function isTyping(target: EventTarget | null): boolean {
@@ -128,6 +137,17 @@ export default function CommandPalette({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [captureTrigger]);
+
+  // A Search button somewhere on the page asked (see openSearch above). The
+  // button still has focus at this point, so it is what focus returns to.
+  useEffect(() => {
+    const onAsk = () => {
+      if (!openRef.current) captureTrigger();
+      setOpen(true);
+    };
+    window.addEventListener(OPEN_SEARCH_EVENT, onAsk);
+    return () => window.removeEventListener(OPEN_SEARCH_EVENT, onAsk);
   }, [captureTrigger]);
 
   useEffect(() => {

@@ -12,6 +12,8 @@ export default function MarkAllRead() {
     setBusy(true);
     try {
       await fetch("/api/activity/read", { method: "POST" });
+      // The menu's count is read by the frame, not by this page: tell it.
+      window.dispatchEvent(new Event("console:unread-changed"));
       router.refresh();
     } finally {
       setBusy(false);

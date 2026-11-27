@@ -8,14 +8,10 @@
 // already in someone else's hands while a critical advisory still needs an
 // exploit written for it.
 import { Suspense } from "react";
-import Link from "next/link";
-import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 import { githubConfigured } from "@/lib/github/config";
 import { listAllAlerts } from "@/lib/github/projection";
-import GithubNav, { GithubEmpty, GithubError } from "@/components/github/GithubNav";
+import { GithubEmpty, GithubError } from "@/components/github/GithubNav";
 import AlertList, { AlertListSkeleton, alertCounts } from "@/components/github/AlertList";
 import "@/components/github/github.css";
 import "@/components/github/github-views.css";
@@ -25,39 +21,21 @@ export const dynamic = "force-dynamic";
 
 export default function SecurityPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Security</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
-
-      <GithubNav current="/github/security" />
-
-      <div className="gh-head">
-        <div>
-          <h1 className="gh-h1">Security</h1>
-          <p className="gh-lede">
+    <ConsoleShell
+      current="/github/security"
+      className="gh-page"
+      how={
+        <p>
             Dependabot, code scanning and secret scanning alerts across every repository, ordered
             by what needs doing first. A leaked secret outranks everything else on this page.
-          </p>
-        </div>
-      </div>
-
+        </p>
+      }
+    >
       <Suspense fallback={<SecuritySkeleton />}>
         <SecurityData />
       </Suspense>
 
-      <AppTabBar />
-    </main>
+    </ConsoleShell>
   );
 }
 

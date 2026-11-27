@@ -6,17 +6,13 @@
 // every time is broken. Re-running is the right answer to neither, but for
 // opposite reasons, so this screen never lumps them together under "failing".
 import { Suspense } from "react";
-import Link from "next/link";
-import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 import { githubConfigured } from "@/lib/github/config";
 import { isFailingConclusion, type WorkflowRunEntity } from "@/lib/github/entities";
 import { durationTrends, flakeStats, formatDuration } from "@/lib/github/insights";
 import { listAllPullRequests, listAllWorkflowRuns } from "@/lib/github/projection";
 import { groupFailures } from "@/lib/github/views";
-import GithubNav, { GithubEmpty, GithubError } from "@/components/github/GithubNav";
+import { GithubEmpty, GithubError } from "@/components/github/GithubNav";
 import FailureGroups from "@/components/github/FailureGroups";
 import { DurationTable, FlakeLeaderboard } from "@/components/github/InsightPanel";
 import { StatusIcon, type StatusTone } from "@/components/github/MergeVerdict";
@@ -52,40 +48,22 @@ export function runState(run: WorkflowRunEntity): { label: string; tone: StatusT
 
 export default function CiPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>CI</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
-
-      <GithubNav current="/github/ci" />
-
-      <div className="gh-head">
-        <div>
-          <h1 className="gh-h1">CI</h1>
-          <p className="gh-lede">
+    <ConsoleShell
+      current="/github/ci"
+      className="gh-page"
+      how={
+        <p>
             Workflow run history, how long each workflow takes, which checks fail and whether they
             are flaky or genuinely broken. Read from the stored projection, so it is as fresh as
             the last sync.
-          </p>
-        </div>
-      </div>
-
+        </p>
+      }
+    >
       <Suspense fallback={<CiSkeleton />}>
         <CiData />
       </Suspense>
 
-      <AppTabBar />
-    </main>
+    </ConsoleShell>
   );
 }
 

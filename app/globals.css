@@ -119,83 +119,21 @@ summary:focus-visible,
    min-width: auto and will not shrink below its content without it. */
 .portal-link .no--actions { flex-shrink: 1; min-width: 0; }
 
-.topbar { display: flex; justify-content: space-between; align-items: center; padding: 26px 0 10px; margin-bottom: 6px; }
-
-/* ——— The console menu ———
-   The dashboard topbar used to be seven identical ghost pills in one row:
-   navigation, account controls and the primary action, all wearing the same
-   clothes. Finding "Publish" meant reading all seven labels. These three rules
-   split it into where you GO, what you CONTROL, and the one thing you DO.
-   Nothing here changes what is on the bar; it changes what each thing looks
-   like it is. */
-.topnav {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  /* Wrapping and min-width: 0 together are what stop this pushing the page
-     sideways. Four links come to 314px, which does not fit a 320px phone, and
-     a nowrap flex row in a flex parent will happily overflow rather than
-     shrink. */
-  flex-wrap: wrap;
-  min-width: 0;
-  margin-left: auto;
-  margin-right: 14px;
-  padding-right: 14px;
-  border-right: 1px solid var(--border);
-}
-.topnav-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 12px;
-  border-radius: 9px;
-  color: var(--muted);
-  font-size: 13.5px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.topnav-link[aria-current="page"] { color: var(--text); background: var(--off); }
-/* The unread count is a number, so it reads as one: mono, tabular, and it
-   does not change the link's width as it climbs from 9 to 10. */
-.topnav-count {
-  font-family: var(--font-mono), monospace;
-  font-variant-numeric: tabular-nums;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--a-text);
-  background: var(--a-dim);
-  border-radius: 100px;
-  padding: 1px 7px;
-}
-.topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-
-/* The "find anything" control (components/QuickFind.tsx). It is a quiet
-   outlined pill on purpose: it sits beside the one filled button on the bar
-   and must not compete with it, but it has to be findable, which the bare ⌘K
-   shortcut never was. The key hint is real <kbd> and is dropped on touch
-   screens, where there is no such key. */
+/* The menu and the page header are components/shell/shell.css. What is left
+   here from the old top bar is the look of the one button the Search dialog
+   can draw for itself (CommandPalette's `trigger`), and the account
+   disclosure, which the menu now carries as its last row. */
 .topbar-search {
   display: inline-flex; align-items: center; gap: 10px;
   border: 1px solid var(--border-hi); background: transparent; color: var(--muted);
   font-family: inherit; font-size: 13px; font-weight: 600;
   border-radius: 100px; padding: 7px 9px 7px 14px; cursor: pointer;
-  transition: color .15s ease, border-color .15s ease;
 }
 .topbar-search kbd {
   font-family: var(--font-mono), monospace; font-size: 10.5px; font-weight: 600;
   color: var(--label); border: 1px solid var(--border-hi); border-radius: 6px; padding: 2px 6px;
 }
-@media (hover: hover) { .topbar-search:hover { color: var(--text); border-color: var(--a-border); } }
-@media (pointer: coarse) {
-  .topbar-search { min-height: 44px; padding: 7px 16px; }
-  .topbar-search kbd { display: none; }
-}
 
-/* ——— Account menu ———
-   One disclosure holding the three rarely-touched controls (alerts, Settings,
-   Sign out), so the right of the bar is theme + primary action + this, instead
-   of five same-weight buttons that wrapped to a second row below ~950px.
-   Markup: components/AccountMenu.tsx. */
 .acct { position: relative; display: inline-flex; }
 .acct-trigger { display: inline-flex; align-items: center; gap: 6px; }
 .acct-caret { transition: transform .15s ease; }
@@ -292,10 +230,27 @@ summary:focus-visible,
 
 .hub {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 18px;
-  margin-top: 30px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 18px;
 }
+
+/* Today's list of what is waiting (app/page.tsx, lib/today.ts). One row per
+   thing: what part of the work it belongs to, what it is, why it is here, and
+   one button that takes you to it. */
+.today-list { list-style: none; margin: 6px 0 0; padding: 0; }
+.today-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap;
+  padding: 14px 0; border-top: 1px solid var(--border);
+}
+.today-row:first-child { border-top: none; }
+.today-what { display: flex; flex-direction: column; gap: 3px; flex: 1 1 320px; min-width: 0; }
+.today-what b { font-size: 14.5px; font-weight: 700; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.today-detail { font-size: 13px; line-height: 1.55; color: var(--muted); overflow-wrap: anywhere; }
+.today-row.is-urgent .k { color: var(--danger); }
+.today-row .btn { flex-shrink: 0; }
+.today-foot { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); }
+.today-foot b { color: var(--text); }
 .hub-tile {
   display: flex;
   flex-direction: column;
@@ -315,17 +270,6 @@ summary:focus-visible,
   font-size: 15.5px;
   font-weight: 700;
 }
-.hub-tile__n {
-  font-family: var(--font-mono), monospace;
-  font-variant-numeric: tabular-nums;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--label);
-  background: var(--off);
-  border-radius: 100px;
-  padding: 2px 8px;
-}
-.hub-tile__n.is-accent { color: var(--a-text); background: var(--a-dim); }
 .hub-tile__note { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
 
 .hub-feed { list-style: none; margin: 4px 0 0; padding: 0; }
@@ -345,9 +289,7 @@ summary:focus-visible,
 .card-head { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
 
 /* Five tiles: five across, then three and two, then pairs, then a column. */
-@media (max-width: 1100px) { .hub { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 900px) { .hub { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .hub { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .hub { grid-template-columns: 1fr; gap: 12px; } .hub-tile { min-height: 0; } }
 
 
 /* One line of text does not need a card. The outstanding figure used to sit
@@ -373,53 +315,6 @@ summary:focus-visible,
 }
 .summary-strip p { font-size: 13.5px; margin: 0; }
 @media (max-width: 720px) { .summary-strip { padding: 0 18px; } }
-
-@media (max-width: 720px) {
-  /* The nav group is .app-hide in the installed app, but a narrow browser
-     still gets it, and a vertical border between wrapped rows reads as a
-     stray line rather than a separator. margin-left: auto goes too: once the
-     bar wraps, pushing the group right just strands it. */
-  .topnav { border-right: none; padding-right: 0; margin-right: 0; margin-left: 0; }
-  /* Five sections no longer fit a phone on one line, and wrapping left one
-     link alone on a second row. They stay on one row and scroll sideways
-     instead, which costs one line of height instead of two. position:
-     relative makes the scroller the containing block for anything absolutely
-     placed inside it (tests/css-layout.test.ts). */
-  .topnav {
-    position: relative; flex-wrap: nowrap; overflow-x: auto; width: 100%;
-    /* Last in the bar, so the wordmark and the controls share the first row
-       and the sections get the whole second one. */
-    order: 3;
-    scrollbar-width: none; -webkit-overflow-scrolling: touch;
-  }
-  .topnav::-webkit-scrollbar { display: none; }
-}
-/* A phone, as opposed to a narrow window: the bar gets two rows and no more.
-   Row one is the wordmark, Search, "+" and Account; row two is the sections,
-   set a little tighter so all five fit a 390px screen without scrolling. */
-@media (max-width: 480px) {
-  .topnav { gap: 0; }
-  .topnav-link { padding: 7px 9px; font-size: 13px; }
-  /* The small line under the wordmark is the client's name on a client page,
-     and a long one used to claim the whole row and push the controls down.
-     It is cut short here instead: the full name is the heading just below. */
-  .topbar .brand { flex: 1 1 0; min-width: 0; }
-  .topbar .brand small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .topbar-actions { flex-wrap: nowrap; gap: 8px; }
-  /* .btn.topbar-new, not .topbar-new: the .btn rule comes later in this file
-     and would otherwise win on padding and display. */
-  .btn.topbar-new {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; height: 44px; min-height: 44px; padding: 0;
-    font-size: 21px; line-height: 1; flex-shrink: 0;
-  }
-  /* Hidden to the eye only (the same clip as .sr-only), so the link is still
-     called "+ New client" by a screen reader. */
-  .topbar-new-label {
-    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
-    overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
-  }
-}
 
 .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; flex-shrink: 0; }
 /* The wordmark is the text colour, not the link colour.
@@ -532,7 +427,6 @@ th[aria-sort="ascending"] .th-sort, th[aria-sort="descending"] .th-sort { color:
 .th-arrow { display: inline-block; min-width: .6em; }
 
 @media (max-width: 720px) {
-  .topbar { flex-wrap: wrap; gap: 12px; }
   .card { padding: 16px 16px; }
   .table-scroll { margin: 8px -16px 0; padding: 0 16px; }
   .sheet { margin: 20px auto 48px; }
@@ -831,25 +725,21 @@ body {
   padding-right: env(safe-area-inset-right, 0px);
 }
 
-.app-tabs { display: none; }
-
 @media (display-mode: standalone) and (max-width: 820px) {
   /* Clear the status bar / Dynamic Island. */
-  .topbar { padding-top: calc(18px + env(safe-area-inset-top, 0px)); }
   .sheet--auth { margin-top: calc(10vh + env(safe-area-inset-top, 0px)); }
 
-  /* Duplicate topbar nav and desktop-only actions — the tab bar owns
-     navigation in the app. */
+  /* Things the installed app has no use for (the bottom bar and the menu,
+     components/shell/, do the navigating in the browser and the app alike). */
   .app-hide { display: none !important; }
 
-  /* Room for the tab bar + home indicator (inline paddingBottom:80 on each
-     page's <main> would otherwise win, hence !important). */
+  /* Room for the home indicator on the pages that are not in the console's
+     frame (the frame pads its own, see shell.css). */
   main.wrap, main.sheet { padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important; }
 
   /* Roomier rhythm: one column of well-spaced cards, bigger tap targets. */
   .wrap > .card, .card { margin-top: 18px; padding: 22px 18px; border-radius: 16px; }
   .wrap > .card > h3, .card h3 { font-size: 16.5px; }
-  .topbar { padding-bottom: 10px; row-gap: 10px; }
   .btn { padding: 12px 24px; font-size: 14px; }
   .btn.small { padding: 8px 16px; font-size: 12.5px; }
   /* Wrapping lets the action cluster drop onto its own full-width line
@@ -858,29 +748,6 @@ body {
   table.list td { padding: 14px 10px; font-size: 14px; }
   .task-row, .log-row { padding-top: 12px; padding-bottom: 12px; }
   body { -webkit-tap-highlight-color: transparent; }
-
-  /* Bottom tab bar (markup: components/AppTabBar.tsx). */
-  .app-tabs {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
-    display: flex; align-items: stretch;
-    padding: 6px max(10px, env(safe-area-inset-left, 0px))
-             calc(8px + env(safe-area-inset-bottom, 0px))
-             max(10px, env(safe-area-inset-right, 0px));
-    background: color-mix(in srgb, var(--desk) 86%, transparent);
-    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
-    border-top: 1px solid var(--border);
-  }
-  .app-tab {
-    flex: 1; min-width: 0;
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
-    padding: 7px 0 3px; color: var(--muted); border-radius: 12px;
-  }
-  .app-tab svg { width: 22px; height: 22px; flex-shrink: 0; }
-  .app-tab span {
-    font-family: var(--font-mono), monospace; font-size: 9.5px; font-weight: 600;
-    letter-spacing: .08em; text-transform: uppercase;
-  }
-  .app-tab.on { color: var(--a-text); }
 }
 
 /* ——— Hover, guarded ———
@@ -904,7 +771,6 @@ body {
   .task-x:hover { color: var(--danger); }
   .lang-btn:hover { color: var(--text); }
   .th-sort:hover { color: var(--text); }
-  .app-tab:hover { color: var(--a-text); }
 }
 
 /* ——— Touch target sizing ———
@@ -972,7 +838,6 @@ body {
   }
 
   .theme-toggle,
-  .gh-nav-link,
   .gh-chip {
     min-height: 44px;
   }

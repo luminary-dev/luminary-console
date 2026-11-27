@@ -2,9 +2,10 @@
 
 // Per-document action row on the client detail page: publish/unpublish,
 // regenerate with instructions, generate billing docs, retry drafting.
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useConfirm } from "./ConfirmDialog";
+import MoreActions from "./MoreActions";
 import { opsFetch } from "@/lib/ops-fetch";
 
 export default function DocActions({
@@ -17,6 +18,7 @@ export default function DocActions({
   no,
   relatedDocs = [],
   email,
+  children,
 }: {
   slug: string;
   type: string;
@@ -28,8 +30,11 @@ export default function DocActions({
   /** Labels of the other project documents this edit can be applied to as
    *  well (empty for docs with no cascade family, e.g. billing). */
   relatedDocs?: string[];
-  /** Client email — enables the one-click "Publish & email" on a draft. */
+  /** Client email — enables the one-click "Publish and email" on a draft. */
   email?: string;
+  /** The row's other everyday action (Email), placed by this component: beside
+   *  More once the document is published, inside More while it is a draft. */
+  children?: ReactNode;
 }) {
   const router = useRouter();
   const { confirm, dialog } = useConfirm();
@@ -103,15 +108,12 @@ export default function DocActions({
 
   return (
     <div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {exists && status === "draft" && (
-          <button className="btn small" disabled={!!busy} onClick={() => act("publish")}>
-            {busy === "publish" ? "…" : "Publish"}
-          </button>
-        )}
+      {/* One main action, the rest behind More. A draft's main action is to
+          send it; a published document's is passed in by the page (Email). */}
+      <div className="row-actions">
         {exists && status === "draft" && email && (
           <button
-            className="btn ghost small"
+            className="btn small"
             disabled={!!busy}
             onClick={async () => {
               setBusy("pubemail");
@@ -132,17 +134,12 @@ export default function DocActions({
               router.refresh();
             }}
           >
-            {busy === "pubemail" ? "Working…" : "Publish & email"}
+            {busy === "pubemail" ? "Working…" : "Publish and email"}
           </button>
         )}
-        {exists && status === "published" && (
-          <button className="btn ghost small" disabled={!!busy} onClick={() => act("unpublish")}>
-            {busy === "unpublish" ? "…" : "Unpublish"}
-          </button>
-        )}
-        {exists && (
-          <button className="btn ghost small" disabled={!!busy} onClick={() => setShowRevise((s) => !s)}>
-            Revise
+        {exists && status === "draft" && !email && (
+          <button className="btn small" disabled={!!busy} onClick={() => act("publish")}>
+            {busy === "publish" ? "…" : "Publish"}
           </button>
         )}
         {!exists && billing && (
@@ -150,15 +147,27 @@ export default function DocActions({
             Generate
           </button>
         )}
+        {exists && status === "published" && children}
         {exists && (
-          <button
-            className="btn ghost small"
-            style={{ color: "var(--danger)", borderColor: "color-mix(in srgb, var(--danger) 35%, transparent)" }}
-            disabled={!!busy}
-            onClick={remove}
-          >
-            {busy === "delete" ? "…" : "Delete"}
-          </button>
+          <MoreActions>
+            {status === "draft" && email && (
+              <button className="btn ghost small" disabled={!!busy} onClick={() => act("publish")}>
+                {busy === "publish" ? "…" : "Publish without emailing"}
+              </button>
+            )}
+            {status === "draft" && children}
+            {status === "published" && (
+              <button className="btn ghost small" disabled={!!busy} onClick={() => act("unpublish")}>
+                {busy === "unpublish" ? "…" : "Unpublish"}
+              </button>
+            )}
+            <button className="btn ghost small" disabled={!!busy} onClick={() => setShowRevise((s) => !s)}>
+              Make changes
+            </button>
+            <button className="btn ghost small is-danger" disabled={!!busy} onClick={remove}>
+              {busy === "delete" ? "…" : "Delete"}
+            </button>
+          </MoreActions>
         )}
       </div>
       {showRevise && (
@@ -169,7 +178,7 @@ export default function DocActions({
             rows={2}
             placeholder={
               exists
-                ? "Revision instructions: e.g. 'drop the total to 40,000 and add a maintenance line'"
+                ? "Say what to change, e.g. 'drop the total to 40,000 and add a maintenance line'"
                 : "What to bill: e.g. '30% design-approval against the quotation' or 'receipt for 22,500 received today by bank transfer'"
             }
             value={instructions}
@@ -205,8 +214,8 @@ export default function DocActions({
                 : "Working… (up to a minute)"
               : exists
                 ? cascade
-                  ? "Regenerate + apply to related"
-                  : "Regenerate"
+                  ? "Rewrite it and the related documents"
+                  : "Rewrite it"
                 : "Generate"}
           </button>
         </div>

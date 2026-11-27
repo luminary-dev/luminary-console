@@ -8,15 +8,11 @@
 // it, no markdown is parsed, no URL is auto-linked, and the reader loses only
 // the formatting.
 import { Suspense } from "react";
-import Link from "next/link";
-import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 import { githubConfigured } from "@/lib/github/config";
 import type { ReleaseEntity } from "@/lib/github/entities";
 import { listAllReleases } from "@/lib/github/projection";
-import GithubNav, { GithubEmpty, GithubError } from "@/components/github/GithubNav";
+import { GithubEmpty, GithubError } from "@/components/github/GithubNav";
 import { StatusIcon, type StatusTone } from "@/components/github/MergeVerdict";
 import "@/components/github/github.css";
 import "@/components/github/github-views.css";
@@ -40,39 +36,21 @@ export function releaseState(release: ReleaseEntity): { label: string; tone: Sta
 
 export default function ReleasesPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Releases</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
-
-      <GithubNav current="/github/releases" />
-
-      <div className="gh-head">
-        <div>
-          <h1 className="gh-h1">Releases</h1>
-          <p className="gh-lede">
+    <ConsoleShell
+      current="/github/releases"
+      className="gh-page"
+      how={
+        <p>
             Every release across the organisation, newest first, with its tag, date, author and
             notes. Notes are shown as plain text, never as rendered markup.
-          </p>
-        </div>
-      </div>
-
+        </p>
+      }
+    >
       <Suspense fallback={<ReleasesSkeleton />}>
         <ReleasesData />
       </Suspense>
 
-      <AppTabBar />
-    </main>
+    </ConsoleShell>
   );
 }
 

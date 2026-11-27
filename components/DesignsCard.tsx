@@ -11,6 +11,8 @@ import { MAX_DESIGNS, designUrl } from "@/lib/designs";
 import type { DesignEntry } from "@/lib/types";
 import { opsFetch } from "@/lib/ops-fetch";
 import { shortWhenLabel } from "@/lib/time";
+import HowItWorks from "./HowItWorks";
+import MoreActions from "./MoreActions";
 
 export default function DesignsCard({
   slug,
@@ -109,17 +111,23 @@ export default function DesignsCard({
         style={{ display: "none" }}
       />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <h3>Design previews</h3>
+        <h3>Design ideas</h3>
         <button className="btn ghost small" onClick={() => openPicker()} disabled={busy || full}>
-          {busy ? "Working…" : "Add design"}
+          {busy ? "Working…" : "Add a design"}
         </button>
       </div>
-      <p style={{ color: "var(--muted)", marginTop: 6, fontSize: 13 }}>
-        Up to {MAX_DESIGNS} concept previews, each a single HTML file at{" "}
-        <span className="mono">{domain}/design/&lt;n&gt;</span>. Once published the client can view it live
-        and download a laptop-width PDF of it. Drafts show a holding page in public and can be previewed
-        here; publishing renders the PDF and makes both live.
+      <p className="empty-note" style={{ marginTop: 6 }}>
+        Up to {MAX_DESIGNS} designs for the client to choose from. Publish one and it appears on
+        their page, where they can look at it and pick the one they want.
       </p>
+      <HowItWorks>
+        <p>
+          Each design is a single HTML file, shown at{" "}
+          <span className="mono">{domain}/design/&lt;n&gt;</span>. Until it is published that address
+          shows a holding page, and only we can preview it here. Publishing also makes a
+          laptop-width PDF the client can download.
+        </p>
+      </HowItWorks>
       {error && (
         <p className="notice" style={{ marginTop: 10, color: "var(--danger)", fontSize: 13 }}>
           {error}
@@ -127,8 +135,8 @@ export default function DesignsCard({
       )}
 
       {designs.length === 0 ? (
-        <p style={{ color: "var(--muted)", marginTop: 12, fontSize: 13.5 }}>
-          No designs yet. Add one to publish it under this client&apos;s site.
+        <p className="empty-note" style={{ marginTop: 12 }}>
+          No designs yet. Add the first one, then publish it so the client can see it.
         </p>
       ) : (
         <div style={{ marginTop: 6 }}>
@@ -171,25 +179,28 @@ export default function DesignsCard({
                     · <span className="mono">{shortWhenLabel(d.updatedAt)}</span>
                   </div>
                 </div>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  <a className="btn ghost small" href={`/api/clients/${slug}/designs/${d.id}`} target="_blank" rel="noopener noreferrer">
-                    Preview
-                  </a>
-                  {d.status === "published" ? (
-                    <button className="btn ghost small" onClick={() => act(d.id, "unpublish")} disabled={busy}>
-                      Unpublish
-                    </button>
-                  ) : (
+                <div className="row-actions" style={{ flex: "0 1 auto", justifyContent: "flex-end" }}>
+                  {d.status !== "published" && (
                     <button className="btn small" onClick={() => act(d.id, "publish")} disabled={busy}>
                       Publish
                     </button>
                   )}
-                  <button className="btn ghost small" onClick={() => openPicker(d.id)} disabled={busy}>
-                    Replace
-                  </button>
-                  <button className="btn ghost small" onClick={() => remove(d)} disabled={busy}>
-                    Delete
-                  </button>
+                  <a className="btn ghost small" href={`/api/clients/${slug}/designs/${d.id}`} target="_blank" rel="noopener noreferrer">
+                    Preview
+                  </a>
+                  <MoreActions>
+                    {d.status === "published" && (
+                      <button className="btn ghost small" onClick={() => act(d.id, "unpublish")} disabled={busy}>
+                        Unpublish
+                      </button>
+                    )}
+                    <button className="btn ghost small" onClick={() => openPicker(d.id)} disabled={busy}>
+                      Replace the file
+                    </button>
+                    <button className="btn ghost small is-danger" onClick={() => remove(d)} disabled={busy}>
+                      Delete
+                    </button>
+                  </MoreActions>
                 </div>
               </div>
             );

@@ -6,15 +6,11 @@
 // screen says so out loud, so nobody has to go looking for the reason a
 // per-person number is missing.
 import { Suspense } from "react";
-import Link from "next/link";
-import AppTabBar from "@/components/AppTabBar";
-import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 import { githubConfigured } from "@/lib/github/config";
 import { buildInsights } from "@/lib/github/insights";
 import { listAllPullRequests, listAllWorkflowRuns } from "@/lib/github/projection";
-import GithubNav, { GithubEmpty, GithubError } from "@/components/github/GithubNav";
+import { GithubEmpty, GithubError } from "@/components/github/GithubNav";
 import InsightPanel from "@/components/github/InsightPanel";
 import "@/components/github/github.css";
 import "@/components/github/github-views.css";
@@ -24,40 +20,22 @@ export const dynamic = "force-dynamic";
 
 export default function InsightsPage() {
   return (
-    <main className="wrap gh-page" id={MAIN_ID} tabIndex={-1}>
-      <div className="topbar">
-        <div className="brand">
-          Luminary<span>.</span>
-          <small>Insights</small>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <ThemeToggle />
-          <SignOut />
-          <Link className="btn ghost small app-hide" href="/">
-            <span aria-hidden="true">← </span>Dashboard
-          </Link>
-        </div>
-      </div>
-
-      <GithubNav current="/github/insights" />
-
-      <div className="gh-head">
-        <div>
-          <h1 className="gh-h1">Insights</h1>
-          <p className="gh-lede">
+    <ConsoleShell
+      current="/github/insights"
+      className="gh-page"
+      how={
+        <p>
             Team health, framed for changing the process rather than ranking the people in it.
             Throughput, cycle time, review queue, pull request size, flaky checks and workflow
             durations. A metric with no sample says so instead of printing zero.
-          </p>
-        </div>
-      </div>
-
+        </p>
+      }
+    >
       <Suspense fallback={<InsightsSkeleton />}>
         <InsightsData />
       </Suspense>
 
-      <AppTabBar />
-    </main>
+    </ConsoleShell>
   );
 }
 

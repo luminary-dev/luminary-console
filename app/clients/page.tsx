@@ -4,40 +4,37 @@
 // needs attention, and being the client list. Those want different shapes. The
 // hub answers "what should I look at", this answers "where is that client".
 import Link from "next/link";
-import AppTabBar from "@/components/AppTabBar";
 import ClientTable from "@/components/ClientTable";
-import ConsoleTopbar from "@/components/ConsoleTopbar";
-import { MAIN_ID } from "@/components/SkipLink";
-import { loadClientOverview, loadUnreadActivity } from "@/lib/console-overview";
+import ConsoleShell from "@/components/shell/ConsoleShell";
+import { loadClientOverview } from "@/lib/console-overview";
 
 export const metadata = { title: "Clients" };
 export const dynamic = "force-dynamic";
 
 export default async function ClientsPage() {
-  const [{ rows }, { unread }] = await Promise.all([loadClientOverview(), loadUnreadActivity()]);
+  const { rows } = await loadClientOverview();
 
   return (
-    <div className="wrap" style={{ paddingBottom: 80 }}>
-      <ConsoleTopbar current="/clients" unread={unread} />
-      <main id={MAIN_ID}>
-      <h1 className="sr-only">Clients</h1>
+    <ConsoleShell
+      current="/clients"
+      action={
+        <Link className="btn" href="/clients/new">
+          Add a client
+        </Link>
+      }
+    >
 
       {rows.length === 0 ? (
         <div className="card">
-          <h3>Clients</h3>
-          <p style={{ color: "var(--muted)", marginTop: 10, fontSize: 14 }}>
-            No clients yet. Create the first one and the estimate, questionnaire and subdomain are
-            generated automatically.
+          <h3>No clients yet</h3>
+          <p className="empty-note">
+            Add the first one. Its estimate, its questions form and its own web address are made for
+            you, ready to send.
           </p>
-          <Link className="btn" href="/clients/new" style={{ marginTop: 16 }}>
-            + New client
-          </Link>
         </div>
       ) : (
         <ClientTable rows={rows} />
       )}
-      </main>
-      <AppTabBar />
-    </div>
+    </ConsoleShell>
   );
 }

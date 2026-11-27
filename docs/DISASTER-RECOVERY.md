@@ -46,7 +46,7 @@ This is the honest part.
 | Webhook delivery inbox | No, and it does not matter | Debugging history only |
 | Activity log | **No** | The audit trail is lost. It is capped at 500 entries anyway |
 | Session and revocation state | No, and it does not matter | Everyone signs in again |
-| Push subscriptions | No | Each device re-enables alerts from the topbar |
+| Push subscriptions | No | Each device re-enables alerts from Account, at the foot of the menu |
 | **Questionnaire answer files** | **No** | **Permanent loss of the client's own words** |
 | **Client uploads** (brand assets, signed contracts, photos) | **No** | **Permanent loss of files the client sent us** |
 

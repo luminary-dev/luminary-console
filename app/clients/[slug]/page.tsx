@@ -5,9 +5,10 @@ import { DOC_LABELS, type DocType } from "@/lib/types";
 import DocActions from "@/components/DocActions";
 import CopyLink from "@/components/CopyLink";
 import RetryStage2 from "@/components/RetryStage2";
-import AppTabBar from "@/components/AppTabBar";
-import ConsoleTopbar from "@/components/ConsoleTopbar";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
+import HowItWorks from "@/components/HowItWorks";
+import NextStepCard from "@/components/NextStepCard";
+import { nextStep } from "@/lib/next-step";
 import DeleteClient from "@/components/DeleteClient";
 import SendToClient from "@/components/SendToClient";
 import BillingCard from "@/components/BillingCard";
@@ -32,7 +33,7 @@ import { getDocViews } from "@/lib/receipts";
 import { relTime } from "@/lib/time";
 import ActivityList from "@/components/ActivityList";
 import RelativeTime from "@/components/RelativeTime";
-import ClientTabs, { clientTabFrom, type ClientTab } from "@/components/ClientTabs";
+import ClientTabs, { clientTabFrom, tabLabel, type ClientTab } from "@/components/ClientTabs";
 
 export const dynamic = "force-dynamic";
 
@@ -87,57 +88,62 @@ export default async function ClientPage({
   };
 
   return (
-    <div className="wrap" style={{ paddingBottom: 80 }}>
-      <ConsoleTopbar current="/clients" subtitle={client.company} />
-      <main id={MAIN_ID}>
-      <h1 className="sr-only">{client.company}</h1>
+    <ConsoleShell
+      current="/clients"
+      title={client.company}
+      purpose={`${client.projectLabel} · doc no. ${client.docNoBase} · created ${client.createdAt.slice(0, 10)}`}
+      trail={[
+        { label: "Clients", href: "/clients" },
+        tab === "overview" ? { label: client.company } : { label: client.company, href: `/clients/${slug}` },
+        { label: tabLabel(tab) },
+      ]}
+    >
+      {client.dnsStatus !== "automated" && (
+        <div className="form-error" role="alert">
+          This client&apos;s web address is not working yet, so the links you send them will not
+          open.
+          <HowItWorks label="How to fix it">
+            <p>
+              DNS is <b>{client.dnsStatus}</b>. The CNAME &quot;{client.slug}&quot; → cname.vercel-dns.com
+              has to exist in Cloudflare and the domain has to be attached to the Vercel project.
+              Set CLOUDFLARE_API_TOKEN and VERCEL_TOKEN to have this done automatically.
+            </p>
+          </HowItWorks>
+        </div>
+      )}
 
-
-      <div className="card">
-        <h3>{client.company}</h3>
-        <p style={{ color: "var(--muted)", fontSize: 13.5, marginTop: 4 }}>
-          {client.projectLabel} · doc no. {client.docNoBase} · created {client.createdAt.slice(0, 10)}
-        </p>
+      <NextStepCard slug={slug} step={nextStep(client, now)} currentTab={tab}>
         {(() => {
           const openTasks = (client.tasks ?? []).filter((t) => !t.done).length;
           const money = clientMoney(client);
           const od = overdueSummary(client);
           return (
-            <p style={{ fontSize: 13, marginTop: 6 }}>
+            <span>
               <span style={{ color: openTasks > 0 ? "var(--text)" : "var(--muted)", fontWeight: openTasks > 0 ? 600 : 400 }}>
                 {openTasks > 0 ? `${openTasks} task${openTasks > 1 ? "s" : ""} open` : "No open tasks"}
               </span>
               <span style={{ color: "var(--muted)" }}> · </span>
               {money.outstanding > 0 ? (
                 <>
-                  <b className="mono">{fmtLKR(money.outstanding)}</b> outstanding
+                  <b className="mono">{fmtLKR(money.outstanding)}</b> still to pay
                   {od.count > 0 && (
                     <span style={{ color: "var(--danger, #d33)", fontWeight: 700 }}> · {fmtLKR(od.total)} overdue</span>
                   )}
                 </>
               ) : (
-                <span style={{ color: "var(--muted)" }}>settled</span>
+                <span style={{ color: "var(--muted)" }}>nothing owed</span>
               )}
-            </p>
+            </span>
           );
         })()}
-        <div style={{ marginTop: 12, display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
-          <StageSelect slug={slug} stage={currentStage(client)} />
-          {client.acceptance && (
-            <span style={{ fontSize: 12.5, color: "var(--muted)" }}>
-              Quotation accepted by <b style={{ color: "var(--text)" }}>{client.acceptance.name}</b>{" "}
-              on {client.acceptance.at.slice(0, 10)}
-            </span>
-          )}
-        </div>
-        {client.dnsStatus !== "automated" && (
-          <div className="form-error" role="alert" style={{ marginTop: 14 }}>
-            DNS is <b>{client.dnsStatus}</b>: this client&apos;s links won&apos;t resolve until the CNAME
-            &quot;{client.slug}&quot; → cname.vercel-dns.com exists in Cloudflare and the domain is
-            attached to the Vercel project. Set CLOUDFLARE_API_TOKEN / VERCEL_TOKEN to automate this.
-          </div>
+        <StageSelect slug={slug} stage={currentStage(client)} />
+        {client.acceptance && (
+          <span style={{ fontSize: 12.5, color: "var(--muted)" }}>
+            Quotation accepted by <b style={{ color: "var(--text)" }}>{client.acceptance.name}</b>{" "}
+            on {client.acceptance.at.slice(0, 10)}
+          </span>
         )}
-      </div>
+      </NextStepCard>
 
       <ClientTabs slug={slug} current={tab} counts={tabCounts} />
 
@@ -149,10 +155,10 @@ export default async function ClientPage({
 
       {activity.length > 0 && (
         <div className="card">
-          <h3>Activity</h3>
-          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            This project&apos;s history: client actions and operator work. New since your last visit
-            by default; use <b>See more</b> for the rest.
+          <h3>This client&apos;s history</h3>
+          <p className="empty-note" style={{ marginTop: 4 }}>
+            What the client did and what we did, newest first. Only what is new since you last
+            looked shows at first: press <b>See more</b> for the rest.
           </p>
           <ActivityList entries={activity} now={now} seenAt={activitySeenAt} />
         </div>
@@ -169,7 +175,7 @@ export default async function ClientPage({
         </p>
         <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 6 }}>
           <div>
-            <span className="k" style={{ marginRight: 10 }}>Questionnaire</span>
+            <span className="k" style={{ marginRight: 10 }}>Questions form</span>
             <CopyLink url={`${base}/questionnaire`} />
           </div>
           {ORDER.filter((t) => client.docs[t]?.status === "published").map((t) => (
@@ -186,7 +192,7 @@ export default async function ClientPage({
         />
         {(client.submissions?.length ?? (client.answersAt ? 1 : 0)) > 0 && (
           <div className="notice">
-            <b>Questionnaire submissions</b>
+            <b>Their answers to the questions form</b>
             {(
               client.submissions ?? [
                 {
@@ -219,8 +225,8 @@ export default async function ClientPage({
               </div>
             ))}
             <div style={{ marginTop: 8, fontSize: 12, color: "var(--muted)" }}>
-              Documents are drafted from the first submission automatically; later submissions
-              never overwrite your documents: use Revise to fold them in.
+              The documents were written from the first set of answers. Later answers never
+              change a document by themselves: use Make changes on it to work them in.
             </div>
           </div>
         )}
@@ -228,7 +234,7 @@ export default async function ClientPage({
 
       <div className="card">
         <h3>Documents</h3>
-        <div className="table-scroll"><table className="list">
+        <div className="table-scroll"><table className="list list--wide">
           <thead>
             <tr>
               <th>Document</th>
@@ -240,12 +246,12 @@ export default async function ClientPage({
           </thead>
           <tbody>
             <tr>
-              <td style={{ fontWeight: 600 }}>Questionnaire</td>
+              <td style={{ fontWeight: 600 }}>Questions form</td>
               <td className="mono">LUM-QST-{client.docNoBase}</td>
               <td>
                 <span className={`pill${client.answersAt ? "" : " grey"}`}>
                   <i />
-                  {client.answersAt ? "answers in" : "live"}
+                  {client.answersAt ? "answered" : "not answered yet"}
                 </span>
               </td>
               <td>
@@ -277,7 +283,7 @@ export default async function ClientPage({
                       </span>
                     ) : (
                       <span style={{ color: "var(--label)" }}>
-                        {billing ? "not generated" : t === "estimate" ? "—" : "awaiting answers"}
+                        {billing ? "not made yet" : t === "estimate" ? "—" : "written once they answer"}
                       </span>
                     )}
                     {meta?.status === "published" && docViews[t] && (
@@ -296,7 +302,6 @@ export default async function ClientPage({
                     )}
                   </td>
                   <td style={{ minWidth: 220 }}>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
                       <DocActions
                         slug={slug}
                         type={t}
@@ -314,9 +319,9 @@ export default async function ClientPage({
                                 .map((x) => DOC_LABELS[x])
                             : []
                         }
-                      />
-                      {meta && <EmailDocButton slug={slug} docKey={t} label={DOC_LABELS[t]} {...emailProp} />}
-                    </div>
+                      >
+                        {meta && <EmailDocButton slug={slug} docKey={t} label={DOC_LABELS[t]} {...emailProp} />}
+                      </DocActions>
                     <DocHistory {...(meta?.history ? { history: meta.history } : {})} />
                   </td>
                 </tr>
@@ -326,8 +331,8 @@ export default async function ClientPage({
         </table></div>
         {client.status === "answers_in" && !client.docs.quotation && (
           <div className="notice" style={{ marginTop: 14 }}>
-            Answers are in, and drafting runs automatically in the background. If the drafts don&apos;t
-            appear after a few minutes, run it manually: <RetryStage2 slug={slug} />
+            Their answers are in and the documents are being written. If the drafts have not
+            appeared after a few minutes, start it by hand: <RetryStage2 slug={slug} />
           </div>
         )}
       </div>
@@ -381,9 +386,9 @@ export default async function ClientPage({
 
       {(client.uploads?.length ?? 0) > 0 && (
         <div className="card">
-          <h3>Client uploads</h3>
-          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-            Files the client sent from their portal. Stored in the private bucket: links open on the console.
+          <h3>Files the client sent</h3>
+          <p className="empty-note" style={{ marginTop: 4 }}>
+            Sent from their page. They are private: the links open only while you are signed in here.
           </p>
           <div style={{ marginTop: 8 }}>
             {[...client.uploads!].reverse().map((u, i) => (
@@ -418,7 +423,8 @@ export default async function ClientPage({
       {tab === "details" && (
         <>
       <div className="card">
-        <h3>Brief</h3>
+        <h3>The original brief</h3>
+        <p className="empty-note" style={{ marginTop: 4 }}>What we were asked to build, as typed when the client was added.</p>
         <p style={{ fontSize: 13.5, color: "var(--muted)", marginTop: 8, whiteSpace: "pre-wrap" }}>
           {client.brief}
         </p>
@@ -427,9 +433,6 @@ export default async function ClientPage({
       <DeleteClient slug={slug} company={client.company} />
         </>
       )}
-
-      </main>
-      <AppTabBar />
-    </div>
+    </ConsoleShell>
   );
 }

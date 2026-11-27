@@ -1,3 +1,4 @@
+import ConsoleFrame from "@/components/shell/ConsoleFrame";
 import SessionGuard from "@/components/SessionGuard";
 import SkipLink from "@/components/SkipLink";
 import type { Metadata, Viewport } from "next";
@@ -57,7 +58,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* First tab stop on every page, so a keyboard user is not walked
             through the topbar on every navigation. */}
         <SkipLink />
-        {children}
+        {/* The console's menu, around console screens only. On a client's
+            subdomain, and on the sign-in, client and preview pages, this
+            renders the page untouched: see ConsoleFrame. */}
+        <ConsoleFrame enabled={!isClientHost}>{children}</ConsoleFrame>
         <SessionGuard enabled={!isClientHost} />
       </body>
     </html>

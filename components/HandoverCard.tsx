@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useConfirm } from "./ConfirmDialog";
 import { opsFetch } from "@/lib/ops-fetch";
+import HowItWorks from "./HowItWorks";
 
 export default function HandoverCard({
   slug,
@@ -59,14 +60,19 @@ export default function HandoverCard({
   return (
     <div className="card">
       <h3>Handover pack</h3>
-      <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-        The document that closes the project out: what was built, every document issued with its
-        number and date, a credentials table for you to fill in at handover, the 30-day warranty
-        window{deliveredOn ? ` (running from ${deliveredOn.slice(0, 10)})` : ""}, the care-plan
-        pitch and a payment summary. Built from the record, with no drafting step, so rebuilding it
-        after a late payment or a new document costs nothing. It appears in <b>Billing</b> below,
-        where you publish, email or delete it like any other document.
+      <p className="empty-note" style={{ marginTop: 4 }}>
+        The document that closes the project: what was built, every document we issued, the logins
+        to hand over, the 30-day warranty{deliveredOn ? ` (running from ${deliveredOn.slice(0, 10)})` : ""}{" "}
+        and a summary of payments. Once made it appears under <b>Money</b>, where you publish and
+        email it like any other document.
       </p>
+      <HowItWorks>
+        <p>
+          It is built straight from this client&apos;s record, with nothing to draft, so making it
+          again after a late payment or a new document costs nothing. It also carries the care-plan
+          offer. The logins table is left for you to fill in at handover.
+        </p>
+      </HowItWorks>
 
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 12 }}>
         <span
@@ -75,15 +81,15 @@ export default function HandoverCard({
           title={
             eligible
               ? undefined
-              : "Available once the project is delivered: publish the final receipt, or set the stage to Delivered."
+              : "You can make this once the project is delivered: publish the receipt for the 70%, or set the stage to Delivered."
           }
         >
           <button className="btn small" disabled={!eligible || busy} onClick={run}>
             {busy
               ? "Working…"
               : existing
-                ? "Rebuild handover pack"
-                : "Generate handover pack"}
+                ? "Make it again"
+                : "Make the handover pack"}
           </button>
         </span>
         {existing ? (
@@ -101,8 +107,8 @@ export default function HandoverCard({
         ) : (
           !eligible && (
             <span style={{ fontSize: 12.5, color: "var(--muted)" }}>
-              Available once the project is delivered: publish the final receipt, or set the stage
-              to <b>Delivered</b>.
+              You can make this once the project is delivered: publish the receipt for the 70%, or
+              set the stage to <b>Delivered</b>.
             </span>
           )
         )}

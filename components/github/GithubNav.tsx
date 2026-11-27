@@ -1,52 +1,16 @@
-// The GitHub console's section navigation, plus the empty and error furniture
-// every section screen shares.
+// The empty and error furniture every Code screen shares.
 //
-// The nav lives here rather than in a layout because each of these screens is
-// its own route with its own data read: a layout would have to know which one
-// is current anyway, and passing the current href in makes the marking a
-// server-rendered fact rather than a hydration-time one.
+// (This file used to hold the section's own row of tabs as well. The side
+// menu lists those screens now, from lib/menu.ts, so the tabs are gone.)
 //
-// The empty and error blocks are here too because their WORDING is the shared
-// part. Each screen supplies the sentence that names its own first action; the
-// paragraph that distinguishes "GitHub is not configured" from "nothing has
-// been synced yet" is identical everywhere and must stay that way, since an
-// operator who learns it once should not have to re-read it per screen.
-import Link from "next/link";
+// The WORDING is the shared part. Each screen supplies the sentence that names
+// its own first action; the line that tells "GitHub is not connected" from
+// "nothing has been brought in yet" is identical everywhere and must stay that
+// way, since someone who learns it once should not have to re-read it per
+// screen. The plain sentence is on the card; the setup detail an engineer
+// needs is folded under it.
 import type { ReactNode } from "react";
-
-export type GithubSection = { href: string; label: string };
-
-export const GITHUB_SECTIONS: GithubSection[] = [
-  { href: "/github", label: "Pull requests" },
-  { href: "/github/repos", label: "Repositories" },
-  { href: "/github/ci", label: "CI" },
-  { href: "/github/deployments", label: "Deployments" },
-  { href: "/github/releases", label: "Releases" },
-  { href: "/github/security", label: "Security" },
-  { href: "/github/insights", label: "Insights" },
-  { href: "/github/activity", label: "Activity" },
-];
-
-/** `current` is the section's own href, so exactly one link is marked. */
-export default function GithubNav({ current }: { current: string }) {
-  return (
-    <nav className="gh-nav" aria-label="GitHub console sections">
-      <ul className="gh-nav-list">
-        {GITHUB_SECTIONS.map((section) => (
-          <li key={section.href}>
-            <Link
-              className="gh-nav-link"
-              href={section.href}
-              aria-current={section.href === current ? "page" : undefined}
-            >
-              {section.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-}
+import HowItWorks from "@/components/HowItWorks";
 
 /**
  * Nothing stored yet.
@@ -71,21 +35,28 @@ export function GithubEmpty({
         {title}
       </h2>
       <p className="gh-note">{children}</p>
-      {configured ? (
-        <p className="gh-note">
-          A GitHub credential is configured, so nothing is stopping a sync. The likely cause is
-          that no backfill has run and no webhook has arrived yet. Run the backfill, then reload.
-          If it stays empty after that, check that the App is installed on the organisation and
-          that its webhook deliveries are succeeding.
-        </p>
-      ) : (
-        <p className="gh-note">
-          No GitHub credential is configured, so nothing can sync and this screen cannot fill.
-          Set the GitHub App (<code>GITHUB_APP_ID</code> and <code>GITHUB_APP_PRIVATE_KEY</code>)
-          or, as a stopgap, <code>GH_TOKEN</code>, then run the backfill. See{" "}
-          <b>docs/GITHUB-APP.md</b> for the install steps.
-        </p>
-      )}
+      <p className="gh-note">
+        {configured
+          ? "Nothing has been brought in from GitHub yet. That usually sorts itself out after the first sync."
+          : "The console is not connected to GitHub yet, so there is nothing to show here."}
+      </p>
+      <HowItWorks label={configured ? "If it stays empty" : "How to connect it"}>
+        {configured ? (
+          <p>
+            A GitHub credential is configured, so nothing is stopping a sync. The likely cause is
+            that no backfill has run and no webhook has arrived yet. Run the backfill, then reload.
+            If it stays empty after that, check that the App is installed on the organisation and
+            that its webhook deliveries are succeeding.
+          </p>
+        ) : (
+          <p>
+            No GitHub credential is configured, so nothing can sync and this screen cannot fill.
+            Set the GitHub App (<code>GITHUB_APP_ID</code> and <code>GITHUB_APP_PRIVATE_KEY</code>)
+            or, as a stopgap, <code>GH_TOKEN</code>, then run the backfill. See{" "}
+            <b>docs/GITHUB-APP.md</b> for the install steps.
+          </p>
+        )}
+      </HowItWorks>
     </section>
   );
 }
@@ -113,10 +84,15 @@ export function GithubError({
         {title}
       </h2>
       <p className="gh-note">
-        The object store did not answer, so this screen is showing nothing rather than passing off
-        stale data as current. Reload to retry. If it keeps failing, the object store is the place
-        to look: the console reads every GitHub entity from it.
+        This could not be read just now, so nothing is shown instead of something out of date.
+        Reload the page to try again.
       </p>
+      <HowItWorks label="If it keeps failing">
+        <p>
+          The object store did not answer. The console reads everything about GitHub from it, so
+          that is the place to look.
+        </p>
+      </HowItWorks>
       {children ? <p className="gh-note">{children}</p> : null}
       <p className="form-error" role="alert">{detail}</p>
     </section>

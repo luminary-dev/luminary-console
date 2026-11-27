@@ -8,27 +8,6 @@
    contrast floor on both themes. Small label text uses --label. */
 
 /* === section sub-navigation === */
-.gh-nav { margin-top: 14px; }
-.gh-nav-list {
-  list-style: none; margin: 0; padding: 0;
-  display: flex; gap: 4px; flex-wrap: wrap;
-  border-bottom: 1px solid var(--border);
-}
-.gh-nav-link {
-  display: inline-block;
-  font-family: var(--font-mono), monospace; font-size: 11px; font-weight: 600;
-  letter-spacing: .08em; text-transform: uppercase;
-  color: var(--label); padding: 8px 12px;
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
-  transition: color .15s ease, border-color .15s ease;
-}
-/* The current section is marked by weight, colour AND an underline rule, so
-   it does not depend on hue alone. aria-current carries it to a screen
-   reader. */
-.gh-nav-link[aria-current="page"] {
-  color: var(--a-text); border-bottom-color: var(--accent); font-weight: 700;
-}
-
 /* === metric tiles === */
 .gh-metrics {
   list-style: none; margin: 14px 0 0; padding: 0;
@@ -134,8 +113,6 @@
 
 @media (max-width: 720px) {
   .gh-stream-item { grid-template-columns: 1fr; gap: 3px; }
-  .gh-nav-list { gap: 0; }
-  .gh-nav-link { padding: 8px 10px; }
 }
 
 /* ——— Hover, guarded ———
@@ -147,6 +124,3 @@
    Rules combining hover with a persistent state (a sorted column, the active
    tab) are split: the persistent half stays outside this block because it must
    still apply on touch. */
-@media (hover: hover) and (pointer: fine) {
-  .gh-nav-link:hover { color: var(--text); }
-}

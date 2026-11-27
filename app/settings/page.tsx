@@ -5,10 +5,8 @@
 // competing every day with the work you actually came to do. Here they cost
 // nothing until you go looking.
 import { cookies } from "next/headers";
-import AppTabBar from "@/components/AppTabBar";
 import SessionsCard from "@/components/SessionsCard";
-import ConsoleTopbar from "@/components/ConsoleTopbar";
-import { MAIN_ID } from "@/components/SkipLink";
+import ConsoleShell from "@/components/shell/ConsoleShell";
 import { getIndex } from "@/lib/store";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
 import { listSessions } from "@/lib/sessions";
@@ -28,29 +26,23 @@ export default async function SettingsPage() {
   const sessions = (await listSessions()).map((s) => ({ ...s, current: s.sid === session?.sid }));
 
   return (
-    <div className="wrap wrap--narrow" style={{ paddingBottom: 80 }}>
-      <ConsoleTopbar subtitle="Settings" showNewClient={false} />
-      <main id={MAIN_ID}>
-      <h1 className="sr-only">Settings</h1>
+    <ConsoleShell current="/settings" narrow>
 
       <SessionsCard initial={sessions} />
 
       <section className="card" aria-labelledby="settings-data">
-        <h3 id="settings-data">Data</h3>
+        <h3 id="settings-data">A spreadsheet of every client</h3>
         <p style={{ color: "var(--muted)", marginTop: 8, fontSize: 13.5 }}>
           {index.length > 0
-            ? `Every client record as a single CSV: ${index.length} client${index.length === 1 ? "" : "s"}, with document numbers, stage and outstanding balance.`
-            : "There are no clients to export yet."}
+            ? `One file with all ${index.length} client${index.length === 1 ? "" : "s"}: document numbers, stage and what each still owes. It opens in Excel or Google Sheets.`
+            : "There are no clients to put in it yet."}
         </p>
         {index.length > 0 && (
           <a className="btn ghost small" href="/api/clients/export" style={{ marginTop: 14 }}>
-            Export clients as CSV
+            Download the spreadsheet
           </a>
         )}
       </section>
-
-      </main>
-      <AppTabBar />
-    </div>
+    </ConsoleShell>
   );
 }
