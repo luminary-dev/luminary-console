@@ -34,6 +34,42 @@ export const DAY_RATE = 20000;
 export const CHANGE_REQUEST_FEE = 6000;
 export const FREE_CHANGE_REQUESTS = 5;
 
+/** Design, brand and video work: starting prices (LKR), the same names and
+ *  figures as the website's Pricing section. Larger jobs are quoted above these. */
+export const DESIGN_RATES = {
+  logo: { title: "Logo & Brand Mark", from: 6500, unit: "" },
+  brandKit: { title: "Brand Identity Kit", from: 20000, unit: "" },
+  video: { title: "Video & Motion Graphics", from: 4500, unit: "per video" },
+} as const;
+
+/** Single design items: starting prices (LKR). */
+export const ITEM_RATES = {
+  flyer: { title: "Flyer / leaflet", from: 1500 },
+  socialPost: { title: "Social media post", from: 1000 },
+  videoEdit: { title: "Video edit / reel", from: 4000 },
+} as const;
+
+/** Monthly care and hosting for studio clients has no standard price: it is
+ *  sized per client and quoted with the project. */
+export const CARE_PLAN =
+  "A monthly care and hosting plan is available after launch, priced per client.";
+
+/** The studio's eight services, with the same names as the website
+ *  (components/Services.tsx and lib/studio.ts in luminary-landing-page). */
+export const SERVICES = [
+  "Web Design & UX Strategy",
+  "Frontend Development",
+  "Backend & API Architecture",
+  "Performance Optimization",
+  "Cloud & DevOps",
+  "Graphic & Logo Design",
+  "Video & Motion Graphics",
+  "Technical Consulting",
+] as const;
+
+/** The five engagement phases, in order, as the website names them. */
+export const PHASES = ["Discovery", "Design", "Development", "Launch", "Aftercare"] as const;
+
 /** Payment split: 30% on design approval (development begins), 70% on
  *  delivery. There is no upfront signing payment — the design work is done
  *  first, and the 30% falls due once the client approves the design. */
@@ -125,7 +161,7 @@ export function quotationPaymentTerms(total: number): string[] {
     `70% on delivery: ${fmtLKR(s[1].amount)}. Due on delivery, payable before final handover.`,
     "Included: 3 prototype concepts, selection plus up to 2 revision rounds, and refinements to the approved design during development.",
     "New pages, features or changes requested after delivery are quoted first as a written change order and invoiced once that change is completed.",
-    "Aftercare: the first 5 change requests are free, then LKR 6,000 per change request; additional requirements are quoted per item or LKR 20,000 per working day.",
+    `Aftercare: the first ${FREE_CHANGE_REQUESTS} change requests are free, then ${fmtLKR(CHANGE_REQUEST_FEE)} per change request; additional requirements are quoted per item or ${fmtLKR(DAY_RATE)} per working day.`,
     "A 30-day post-launch warranty covers defects at no charge. Intellectual property transfers to you on full payment. Once signed the price is fixed unless you add pages or requirements.",
   ];
 }
@@ -136,8 +172,9 @@ export const POLICY: string[] = [
   "Payment is staged 30/70: 30% on design approval (development begins; this also covers the discovery and 3 prototype concepts delivered in the design stage), 70% on delivery before final handover.",
   "Design stage delivers 3 prototype concepts; you pick 1, then we run up to 2 revision rounds on it.",
   "Development includes refinements to the approved design; new pages, features or changes requested after delivery are billable, quoted first as a written change order, and invoiced once the change is completed.",
-  "Aftercare: the first 5 change requests are free, then LKR 6,000 per change request. A change request is one discrete self-contained change; larger work is several change requests and is quoted first.",
-  "Additional requirements are quoted per item, or LKR 20,000 per working day.",
+  `Aftercare: the first ${FREE_CHANGE_REQUESTS} change requests are free, then ${fmtLKR(CHANGE_REQUEST_FEE)} per change request. A change request is one discrete self-contained change; larger work is several change requests and is quoted first.`,
+  `Additional requirements are quoted per item, or ${fmtLKR(DAY_RATE)} per working day.`,
+  CARE_PLAN,
   "A 30-day post-launch warranty covers defects at no charge; new features are excluded.",
   "Intellectual property transfers to you on full payment. Once the SOW is signed the price is fixed unless you request additional pages or requirements.",
 ];
@@ -149,7 +186,10 @@ export const PRICING_REFERENCE = `FIXED PRICING MODEL (use these exact figures, 
 - Standard page: ${fmtLKR(PAGE_RATES.standard)}.
 - Functional page (form / listing / dynamic / integration): ${fmtLKR(PAGE_RATES.functional)}.
 - The 3 prototypes are a one-time design-direction exploration delivered with the primary page; add-on pages reuse that direction and are cheaper.
-- Pages added later use a multiplier on the page base rate by phase: Design x${PHASE_MULTIPLIERS.design}, Development x${PHASE_MULTIPLIERS.development}, Late development / pre-launch x${PHASE_MULTIPLIERS.prelaunch}.
+- Pages added later use a multiplier on the page base rate by phase: Design x${PHASE_MULTIPLIERS.design}, Development x${PHASE_MULTIPLIERS.development}, Pre-launch x${PHASE_MULTIPLIERS.prelaunch}.
 - Additional requirements: quoted per item, or ${fmtLKR(DAY_RATE)} per working day.
 - Aftercare: first ${FREE_CHANGE_REQUESTS} change requests free, then ${fmtLKR(CHANGE_REQUEST_FEE)} per change request.
-- Payment split: 30% on design approval (development begins), 70% on delivery before final handover. No upfront signing payment.`;
+- Payment split: 30% on design approval (development begins), 70% on delivery before final handover. No upfront signing payment.
+- Design, brand and video (starting prices, quoted above these for larger jobs): ${Object.values(DESIGN_RATES).map((r) => `${r.title} from ${fmtLKR(r.from)}${r.unit ? ` ${r.unit}` : ""}`).join("; ")}.
+- Single items (starting prices): ${Object.values(ITEM_RATES).map((r) => `${r.title} from ${fmtLKR(r.from)}`).join("; ")}.
+- ${CARE_PLAN} Do not state a monthly figure.`;

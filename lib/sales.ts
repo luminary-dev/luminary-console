@@ -14,12 +14,22 @@ import { z } from "zod";
 
 /** Shopfront's public offer. Mirrors Products/shopfront/shopfront.config.json;
  *  change both together. */
+const PRICE = 17_500;
 export const OFFER = {
-  price: 17_500,
-  half: 8_750,
+  price: PRICE,
+  /** Paid half to start and half when the shop is live. */
+  half: Math.round(PRICE / 2),
   regularPrice: 25_000,
   days: 3,
-  deadline: "31 December",
+  deadline: "31 December 2026",
+  items: 30,
+  /** After the first free month: updates by the month, or per update. */
+  care: 1_500,
+  perUpdate: 750,
+  /** Hosting from the second year (the first year is included). */
+  hostingYearly: 3_500,
+  /** About what a .lk address costs a year, paid to the registry in the shop's name. */
+  lkAddress: 6_000,
   /** A finished shop shown as proof in first messages. */
   sample: "https://dev.luvana.lk",
   offerUrl: "https://shopfront.luminary-dev.xyz/",
@@ -445,7 +455,7 @@ export const SCRIPTS: Script[] = [
     id: "price",
     title: "They ask: how much?",
     why: "Say the number first, then what it covers.",
-    text: "It is {price}, paid once: {half} to start and {half} when your shop is live.\n\nThat covers the website with up to 30 items, setup on your own address, hosting for the first year, and a month of free updates. The only other cost is the address itself: a .lk is about LKR 6,000 a year, registered in your name.\n\nNo monthly fee. This launch price is for shops ordered before {deadline}; after that it is {regular}.",
+    text: "It is {price}, paid once: {half} to start and {half} when your shop is live.\n\nThat covers the website with up to {items} items, setup on your own address, hosting for the first year, and a month of free updates. The address itself is separate: a .lk is about {lk} a year, registered in your name.\n\nThere is no required monthly fee. After the first month, updates are {care} a month or {perUpdate} each, only if you want them, and hosting is {hosting} a year from the second year. This launch price is for shops ordered before {deadline}; after that it is {regular}.",
   },
   {
     id: "think",
@@ -482,4 +492,9 @@ export const scriptText = (script: Script): string =>
     days: String(OFFER.days),
     deadline: OFFER.deadline,
     offer: OFFER.offerUrl,
+    items: String(OFFER.items),
+    lk: lkr(OFFER.lkAddress),
+    care: lkr(OFFER.care),
+    perUpdate: lkr(OFFER.perUpdate),
+    hosting: lkr(OFFER.hostingYearly),
   });

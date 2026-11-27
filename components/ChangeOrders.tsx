@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ChangeOrder } from "@/lib/types";
+import { CHANGE_REQUEST_FEE, FREE_CHANGE_REQUESTS, fmtLKR } from "@/lib/pricing";
 import { opsFetch } from "@/lib/ops-fetch";
 import { useConfirm } from "./ConfirmDialog";
 
@@ -114,8 +115,8 @@ export default function ChangeOrders({
       </div>
       {dialog}
       <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 6 }}>
-        Leave the amount blank to apply the aftercare default: the first 5 change requests are free,
-        then LKR 6,000 each. Enter an amount to override (e.g. a larger change quoted first).
+        Leave the amount blank to apply the aftercare default: the first {FREE_CHANGE_REQUESTS} change
+        requests are free, then {fmtLKR(CHANGE_REQUEST_FEE)} each. Enter an amount to override (e.g. a larger change quoted first).
       </p>
       {error && <div className="form-error" role="alert">{error}</div>}
       <button

@@ -7,7 +7,7 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const MODEL = "claude-opus-5";
 
-const BLOG_SYSTEM = `You draft long-form posts for the Luminary engineering blog (luminary-dev.xyz/blog). Luminary is a full-service digital studio in Colombo, Sri Lanka: web design & development (Next.js/React), brand & motion, cloud & DevOps.
+const BLOG_SYSTEM = `You draft long-form posts for the Luminary engineering blog (luminary-dev.xyz/blog). Luminary is a digital studio in Colombo, Sri Lanka: web design & development (Next.js/React), brand & motion, cloud & DevOps.
 
 Voice: a senior practitioner writing to peers. Practical, specific, first-person plural ("we"), opinionated but honest about trade-offs. British-adjacent spelling. No hype, no filler, no listicle fluff. Concrete numbers, commands and code where they earn their place. GitHub-flavored markdown: ## section headings, tables and fenced code blocks where useful. Do NOT include an H1 (the page renders the title) and do NOT include frontmatter. Never mention AI or that this was drafted.`;
 

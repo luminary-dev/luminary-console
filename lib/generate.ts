@@ -11,21 +11,24 @@ import type {
   QuotationData,
 } from "./templates/docs";
 import { parseAmount } from "./money";
-import { PRICING_REFERENCE, fmtLKR, paymentSchedule } from "./pricing";
+import { CARE_PLAN, CHANGE_REQUEST_FEE, DAY_RATE, FREE_CHANGE_REQUESTS, PAGE_RATES, PHASES, PRICING_REFERENCE, SERVICES, fmtLKR, paymentSchedule } from "./pricing";
+
+// Plain figure for line amounts, e.g. "65,000".
+const n = (x: number) => x.toLocaleString("en-US");
 
 const MODEL = "claude-opus-5";
 
-const SYSTEM = `You are the document-drafting engine for Luminary Studio, a full-service digital studio in Colombo, Sri Lanka (luminary-dev.xyz · support@luminary-dev.xyz · +94 70 72 94 885).
+const SYSTEM = `You are the document-drafting engine for Luminary Studio, a digital studio in Colombo, Sri Lanka (luminary-dev.xyz · support@luminary-dev.xyz · +94 70 72 94 885).
 
-Services: web design & development (Next.js/React), brand & graphic design, video & motion graphics, cloud & DevOps engineering, SEO & performance. Process: discovery → design → build → launch → ongoing care. Small senior team, weekly delivery with live staging links, transparent itemised pricing, no hidden fees.
+Services: ${SERVICES.join(", ")}. Process: ${PHASES.join(", then ")}. Progress is shared through live staging links; pricing is transparent and itemised, with no hidden fees.
 
 Currency & market: quote in Sri Lankan Rupees (LKR). Luminary prices web work on a fixed per-page build model, not open-ended ranges.
 
 ${PRICING_REFERENCE}
 
-Format money as "LKR 65,000" for totals and "65,000" for line amounts. Never invent certifications, client names, or capabilities Luminary doesn't have.
+Format money as "${fmtLKR(PAGE_RATES.primary)}" for totals and "${n(PAGE_RATES.primary)}" for line amounts. Never invent certifications, client names, or capabilities Luminary doesn't have.
 
-Commercial policy (apply consistently in every document): the process runs Discovery, then Design (3 prototype concepts, the client picks 1, then up to 2 revision rounds on it), then Development (refinements to the approved design are included; new pages, features or direction changes are billable and quoted first as a written change order), then Launch (deploy and handover), then Aftercare. Payment is staged 30/70: 30% on design approval (development begins; this payment also covers the discovery and 3 prototype concepts already delivered in the design stage), 70% on delivery before final handover. There is no upfront signing payment. Once an SOW is signed the price is fixed unless the client requests additional pages or requirements; any such change requested after delivery is quoted first as a written change order and invoiced once that change is completed. Aftercare: the first 5 change requests are free, then LKR 6,000 per change request; a change request is one discrete self-contained change, larger work is several change requests and is quoted first. A 30-day post-launch warranty covers defects at no charge (new features excluded). Intellectual property transfers to the client on full payment. Use hyphens, commas, colons and periods in all copy; do not use em-dashes or en-dashes.
+Commercial policy (apply consistently in every document): the process runs Discovery, then Design (3 prototype concepts, the client picks 1, then up to 2 revision rounds on it), then Development (refinements to the approved design are included; new pages, features or direction changes are billable and quoted first as a written change order), then Launch (deploy and handover), then Aftercare. Payment is staged 30/70: 30% on design approval (development begins; this payment also covers the discovery and 3 prototype concepts already delivered in the design stage), 70% on delivery before final handover. There is no upfront signing payment. Once an SOW is signed the price is fixed unless the client requests additional pages or requirements; any such change requested after delivery is quoted first as a written change order and invoiced once that change is completed. Aftercare: the first ${FREE_CHANGE_REQUESTS} change requests are free, then ${fmtLKR(CHANGE_REQUEST_FEE)} per change request; a change request is one discrete self-contained change, larger work is several change requests and is quoted first. A 30-day post-launch warranty covers defects at no charge (new features excluded). Intellectual property transfers to the client on full payment. ${CARE_PLAN} Never state a monthly care figure. Use hyphens, commas, colons and periods in all copy; do not use em-dashes or en-dashes.
 
 Tone: confident, warm, plain-spoken, precise — a senior studio writing to a client, never salesy or padded. Keep line-item descriptions to one line. British-adjacent Sri Lankan business English ("colour", "itemised").
 
@@ -95,7 +98,7 @@ const ESTIMATE_SCHEMA = S.obj(
         range: {
           type: "string",
           description:
-            "Fixed per-page build price for that page tier, e.g. '65,000' (primary / landing / long-scroll), '22,000' (standard page) or '42,000' (functional page: form / listing / dynamic / integration). Not a range.",
+            `Fixed per-page build price for that page tier, e.g. '${n(PAGE_RATES.primary)}' (primary / landing / long-scroll), '${n(PAGE_RATES.standard)}' (standard page) or '${n(PAGE_RATES.functional)}' (functional page: form / listing / dynamic / integration). Not a range.`,
         },
       })),
       note: {
@@ -117,18 +120,18 @@ const QUOTATION_SCHEMA = S.obj(
     items: S.arr(S.obj(["title", "desc", "amount", "pageType", "qty", "unitRate"], {
       title: S.str,
       desc: S.str,
-      amount: { type: "string", description: "Formatted line amount, e.g. '65,000'. For a page line, this is unitRate x qty." },
+      amount: { type: "string", description: `Formatted line amount, e.g. '${n(PAGE_RATES.primary)}'. For a page line, this is unitRate x qty.` },
       pageType: S.nullable({
         type: "string",
         enum: ["primary", "standard", "functional"],
         description:
-          "If this line is a page build, its tier: 'primary' (landing / long-scroll, LKR 65,000, includes the 3 prototypes), 'standard' (LKR 22,000) or 'functional' (form / listing / dynamic / integration, LKR 42,000). null for non-page lines (day-rate work, etc.). The system re-prices page lines from these tiers, so use the exact fixed rate.",
+          `If this line is a page build, its tier: 'primary' (landing / long-scroll, ${fmtLKR(PAGE_RATES.primary)}, includes the 3 prototypes), 'standard' (${fmtLKR(PAGE_RATES.standard)}) or 'functional' (form / listing / dynamic / integration, ${fmtLKR(PAGE_RATES.functional)}). null for non-page lines (day-rate work, etc.). The system re-prices page lines from these tiers, so use the exact fixed rate.`,
       }),
       qty: S.nullable({ type: "number", description: "Number of pages of this tier on this line (default 1). null for non-page lines." }),
-      unitRate: S.nullable({ type: "number", description: "The per-page base rate in LKR for this tier (65000 / 22000 / 42000). null for non-page lines." }),
+      unitRate: S.nullable({ type: "number", description: `The per-page base rate in LKR for this tier (${PAGE_RATES.primary} / ${PAGE_RATES.standard} / ${PAGE_RATES.functional}). null for non-page lines.` }),
     })),
     total: { type: "string", description: "Sum of all line amounts, e.g. 'LKR 195,000'. Must equal the fixed per-page prices added up." },
-    paymentTerms: { type: "array", items: S.str, description: "4-7 short terms covering the FULL money lifecycle under the 30/70 model: 30% on design approval (development begins; also covers the discovery and 3 prototypes delivered in the design stage); 70% on delivery before final handover; no upfront signing payment; the 3 prototypes + pick 1 + up to 2 revision rounds and refinements during development are included; new pages/features/changes requested after delivery are quoted as written change orders and invoiced once each change is completed; aftercare first 5 change requests free then LKR 6,000 each; 30-day post-launch defect warranty; IP transfers on full payment; price fixed once signed. The system may overwrite these with exact 30/70 amounts." },
+    paymentTerms: { type: "array", items: S.str, description: `4-7 short terms covering the FULL money lifecycle under the 30/70 model: 30% on design approval (development begins; also covers the discovery and 3 prototypes delivered in the design stage); 70% on delivery before final handover; no upfront signing payment; the 3 prototypes + pick 1 + up to 2 revision rounds and refinements during development are included; new pages/features/changes requested after delivery are quoted as written change orders and invoiced once each change is completed; aftercare first 5 change requests free then ${fmtLKR(CHANGE_REQUEST_FEE)} each; 30-day post-launch defect warranty; IP transfers on full payment; price fixed once signed. The system may overwrite these with exact 30/70 amounts.` },
     notes: { type: "string", description: "One short paragraph: exclusions/assumptions." },
   },
 );
@@ -160,7 +163,7 @@ const CONTRACT_SCHEMA = S.obj(["agreementDate", "sow", "clauses"], {
   }),
   clauses: {
     type: "array",
-    description: "9-11 clauses, plain-language but real: Scope of Services (fixed per-page build); Fees & Payment (fixed price; no upfront signing payment; 30% on design approval, which begins development and covers the discovery and 3 prototypes delivered in the design stage; 70% on delivery before final handover; late-payment handling); Design & Revisions (3 prototype concepts, client picks 1, up to 2 revision rounds; refinements to the approved design during development are included); Change Requests & Additional Scope (new pages, features or changes requested after delivery are billable, quoted first as a written change order, invoiced once the change is completed, and may move the timeline; price fixed once signed unless the client adds pages or requirements); Timeline & Client Responsibilities; Intellectual Property (transfers on full payment); Confidentiality; Support, Aftercare & Warranty (30-day post-launch defect window; first 5 change requests free then LKR 6,000 each; additional requirements per item or LKR 20,000 per working day; ongoing care as separate plan); Warranties & Liability; Termination; Governing Law (Sri Lanka). Use hyphens, commas, colons and periods only, never em-dashes or en-dashes.",
+    description: `9-11 clauses, plain-language but real: Scope of Services (fixed per-page build); Fees & Payment (fixed price; no upfront signing payment; 30% on design approval, which begins development and covers the discovery and 3 prototypes delivered in the design stage; 70% on delivery before final handover; late-payment handling); Design & Revisions (3 prototype concepts, client picks 1, up to 2 revision rounds; refinements to the approved design during development are included); Change Requests & Additional Scope (new pages, features or changes requested after delivery are billable, quoted first as a written change order, invoiced once the change is completed, and may move the timeline; price fixed once signed unless the client adds pages or requirements); Timeline & Client Responsibilities; Intellectual Property (transfers on full payment); Confidentiality; Support, Aftercare & Warranty (30-day post-launch defect window; first 5 change requests free then ${fmtLKR(CHANGE_REQUEST_FEE)} each; additional requirements per item or ${fmtLKR(DAY_RATE)} per working day; ongoing care as separate plan); Warranties & Liability; Termination; Governing Law (Sri Lanka). Use hyphens, commas, colons and periods only, never em-dashes or en-dashes.`,
     items: S.obj(["title", "body"], { title: S.str, body: { type: "string", description: "2-5 sentences; newlines allowed" } }),
   },
 });
@@ -177,13 +180,13 @@ const PROPOSAL_SCHEMA = S.obj(
       title: {
         type: "string",
         description:
-          "Aligned to Luminary's five phases in order: Discovery, Design (3 prototype concepts, pick 1, up to 2 revision rounds), Development (build the approved design; refinements included), Launch (deploy and handover), Aftercare (first 5 change requests free, then LKR 6,000 each).",
+          `Aligned to Luminary's five phases in order: Discovery, Design (3 prototype concepts, pick 1, up to 2 revision rounds), Development (build the approved design; refinements included), Launch (deploy and handover), Aftercare (first 5 change requests free, then ${fmtLKR(CHANGE_REQUEST_FEE)} each).`,
       },
       timeframe: { type: "string", description: "e.g. 'Week 1'" },
       desc: S.str,
     })),
     deliverables: S.arr(S.str),
-    investment: { type: "string", description: "e.g. 'LKR 65,000 fixed'" },
+    investment: { type: "string", description: `e.g. '${fmtLKR(PAGE_RATES.primary)} fixed'` },
     whyUs: { type: "string", description: "One short paragraph, no invented claims." },
     nextSteps: { type: "string", description: "One short paragraph: sign contract, approve the design, settle the 30% design-approval invoice, kickoff development." },
   },
@@ -244,7 +247,7 @@ ${clientContext(client)}
 ${PRICING_REFERENCE}
 
 Draft, for this new client:
-1. estimate — a budgetary estimate built from the fixed per-page prices above, applied to the pages/scope implied by the brief. Use the exact fixed rates (do not invent ranges): a primary page is LKR 65,000 and includes the 3 prototype concepts; standard pages LKR 22,000; functional pages LKR 42,000. Fold sub-tasks like forms, SEO and deployment into line descriptions. Include a cost-scaling table showing the per-page tiers whenever the deliverable scales by page count, otherwise null. If the operator's brief states different figures, treat those as authoritative.
+1. estimate — a budgetary estimate built from the fixed per-page prices above, applied to the pages/scope implied by the brief. Use the exact fixed rates (do not invent ranges): a primary page is ${fmtLKR(PAGE_RATES.primary)} and includes the 3 prototype concepts; standard pages ${fmtLKR(PAGE_RATES.standard)}; functional pages ${fmtLKR(PAGE_RATES.functional)}. Fold sub-tasks like forms, SEO and deployment into line descriptions. Include a cost-scaling table showing the per-page tiers whenever the deliverable scales by page count, otherwise null. If the operator's brief states different figures, treat those as authoritative.
 2. projectLabel — a short project label.
 3. extraQuestions — up to 4 discovery questions specific to this client's industry/situation that our standard questionnaire (business, goals, customers, brand assets, design, content, practical, timeline) wouldn't already cover. Only genuinely useful ones; empty array is fine.`;
   return generate<Stage1Result>(prompt, STAGE1_SCHEMA);
