@@ -17,7 +17,7 @@ export const EN_UI: UIStrings = {
   langNote:
     "A few questions written specially for your project appear in English only — answer them in whichever language you prefer.",
 
-  tagline: "Full-Service Digital Studio",
+  tagline: "Digital Studio · Sri Lanka",
   docTitle: "Questionnaire",
   pill: "Project discovery",
   preparedFor: "Prepared for",
