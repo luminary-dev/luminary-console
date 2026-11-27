@@ -191,6 +191,48 @@ describe("Search", () => {
     expect(push).toHaveBeenCalledWith("/clients/replies-first");
   });
 
+  it("goes straight to a client's tab from the client's name and a word for the tab", async () => {
+    stubFetch();
+    const user = userEvent.setup();
+    render(<QuickFind trigger />);
+    const dialog = await open(user);
+    await within(dialog).findByText("Tide Tees");
+
+    await user.type(within(dialog).getByRole("combobox"), "tide invoice");
+    expect(labels(dialog)[0]).toBe("Tide Tees › Money");
+
+    await user.keyboard("{Enter}");
+    expect(push).toHaveBeenCalledWith("/clients/tide-tees?tab=billing");
+  });
+
+  it("offers the tab for each client when only the thing is typed", async () => {
+    stubFetch();
+    const user = userEvent.setup();
+    render(<QuickFind trigger />);
+    const dialog = await open(user);
+    await within(dialog).findByText("Tide Tees");
+
+    await user.type(within(dialog).getByRole("combobox"), "designs");
+    expect(labels(dialog).slice(0, 2)).toEqual(["Tide Tees › Design & website", "Replies First › Design & website"]);
+  });
+
+  it("opens a match inside a document on the tab it is on", async () => {
+    vi.stubGlobal("fetch", vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.startsWith("/api/clients")) return json(CLIENTS);
+      return json({ results: [{ slug: "tide-tees", company: "Tide Tees", where: "invoice", snippet: "invoice LUM-INV-0061-1", tab: "billing" }] });
+    }));
+    const user = userEvent.setup();
+    render(<QuickFind trigger />);
+    const dialog = await open(user);
+    await within(dialog).findByText("Tide Tees");
+
+    await user.type(within(dialog).getByRole("combobox"), "LUM-INV-0061-1");
+    await within(dialog).findByText("invoice LUM-INV-0061-1");
+    await user.keyboard("{Enter}");
+    expect(push).toHaveBeenCalledWith("/clients/tide-tees?tab=billing");
+  });
+
   it("still lists the screens when the client list cannot be read", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => json({ error: "no" }, 500)));
     const user = userEvent.setup();

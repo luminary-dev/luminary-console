@@ -137,7 +137,7 @@ describe("CommandPalette content search", () => {
     await act(async () => { vi.advanceTimersByTime(250); });
 
     const options = screen.getAllByRole("option");
-    expect(options.map((o) => o.textContent)).toEqual(["Top CoLUM-0009", "Deep Coquotationfound"]);
+    expect(options.map((o) => o.textContent)).toEqual(["Top CoLUM-0009", "Deep CoQuotationfound"]);
     expect(input.getAttribute("aria-activedescendant")).toBe(atIndex(options, 0).id);
 
     // The content hits below the name matches used to be unreachable.

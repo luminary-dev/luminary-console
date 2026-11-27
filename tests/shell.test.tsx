@@ -11,7 +11,7 @@ import FirstVisit from "@/components/FirstVisit";
 import HelpContent, { WORDS } from "@/components/HelpContent";
 import HowItWorks from "@/components/HowItWorks";
 import MoreActions from "@/components/MoreActions";
-import NextStepCard from "@/components/NextStepCard";
+import NextStepCard, { NextStepBar } from "@/components/NextStepCard";
 import PageSkeleton from "@/components/PageSkeleton";
 import { CLIENT_TABS } from "@/components/ClientTabs";
 import ConsoleFrame from "@/components/shell/ConsoleFrame";
@@ -403,6 +403,20 @@ describe("the top of a client's page", () => {
 
   it("does not offer a button to the tab you are already on", () => {
     render(<NextStepCard slug="tide-tees" step={step} currentTab="design" />);
+    expect(screen.queryByRole("link", { name: /^Open / })).toBeNull();
+  });
+
+  it("is one line on the other tabs: which step, whose turn, what next", () => {
+    render(<NextStepBar slug="tide-tees" step={step} currentTab="billing" />);
+    const bar = screen.getByRole("region", { name: "Where this project is" });
+    expect(within(bar).getByRole("link", { name: "Step 3 of 7: Accepted" }).getAttribute("href")).toBe("/clients/tide-tees");
+    expect(bar.textContent).toContain("Waiting on the client: " + step.title);
+    expect(within(bar).getByRole("link", { name: "Open Design & website" }).getAttribute("href")).toBe("/clients/tide-tees?tab=design");
+    expect(within(bar).queryByRole("list")).toBeNull();
+  });
+
+  it("leaves the button out of the line on the tab where the step is done", () => {
+    render(<NextStepBar slug="tide-tees" step={step} currentTab="design" />);
     expect(screen.queryByRole("link", { name: /^Open / })).toBeNull();
   });
 });

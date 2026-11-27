@@ -8,7 +8,7 @@ import CopyLink from "@/components/CopyLink";
 import RetryStage2 from "@/components/RetryStage2";
 import ConsoleShell from "@/components/shell/ConsoleShell";
 import HowItWorks from "@/components/HowItWorks";
-import NextStepCard from "@/components/NextStepCard";
+import NextStepCard, { NextStepBar } from "@/components/NextStepCard";
 import { nextStep } from "@/lib/next-step";
 import DeleteClient from "@/components/DeleteClient";
 import SendToClient from "@/components/SendToClient";
@@ -83,6 +83,7 @@ export default async function ClientPage({
   const emailProp = client.email !== undefined ? { email: client.email } : {};
   // What is waiting behind each tab, shown on the tab itself so nothing has to
   // be opened to find out.
+  const step = nextStep(client, now);
   const tabCounts: Partial<Record<ClientTab, number>> = {
     overview: (client.tasks ?? []).filter((t) => !t.done).length,
     messages: (client.comments ?? []).length,
@@ -113,7 +114,17 @@ export default async function ClientPage({
         </div>
       )}
 
-      <NextStepCard slug={slug} step={nextStep(client, now)} currentTab={tab}>
+
+      {/* The tabs sit straight under the client's name, so they are in the same
+          place on every tab. Summary opens with where the project stands;
+          every other tab gets that as one line. */}
+      <ClientTabs slug={slug} current={tab} counts={tabCounts} />
+
+      {tab !== "overview" && <NextStepBar slug={slug} step={step} currentTab={tab} />}
+
+      {tab === "overview" && (
+        <>
+      <NextStepCard slug={slug} step={step} currentTab={tab}>
         {(() => {
           const openTasks = (client.tasks ?? []).filter((t) => !t.done).length;
           const money = clientMoney(client);
@@ -145,11 +156,6 @@ export default async function ClientPage({
           </span>
         )}
       </NextStepCard>
-
-      <ClientTabs slug={slug} current={tab} counts={tabCounts} />
-
-      {tab === "overview" && (
-        <>
       <TasksCard slug={slug} tasks={client.tasks ?? []} />
 
       <NotesCard slug={slug} {...(client.notes !== undefined ? { notes: client.notes } : {})} />

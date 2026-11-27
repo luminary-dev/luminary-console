@@ -22,21 +22,41 @@ function snippet(haystack: string, needle: string): string {
   return (start > 0 ? "…" : "") + haystack.slice(start, end).replace(/\s+/g, " ").trim() + (end < haystack.length ? "…" : "");
 }
 
-/** Return {where, snippet} for the first field of this client that matches. */
-function firstMatch(c: ClientRecord, q: string): { where: string; snippet: string } | null {
-  const fields: { where: string; text: string }[] = [
-    { where: "brief", text: c.brief ?? "" },
-    { where: "notes", text: c.notes ?? "" },
-    ...(c.comments ?? []).map((m) => ({ where: `comment by ${m.by}`, text: m.text })),
+/** The words inside a document's data, without the JSON around them, so the
+ *  line under a match reads "invoice LUM-INV-0051-1 · LKR 55,500" and not
+ *  {"total":"LKR 55,500",...}. */
+function flat(data: unknown): string {
+  if (data == null) return "";
+  if (typeof data === "string" || typeof data === "number") return String(data);
+  if (Array.isArray(data)) return data.map(flat).filter(Boolean).join(" · ");
+  if (typeof data === "object") return Object.values(data as Record<string, unknown>).map(flat).filter(Boolean).join(" · ");
+  return "";
+}
+
+/** Return {where, snippet, tab} for the first field of this client that
+ *  matches. `tab` is the client tab the field is shown on, so Search opens the
+ *  client there instead of on the summary. Each field carries the word for
+ *  what it is ("invoice", "payment", "quotation"), so searching for the kind
+ *  of thing finds the clients that have one. */
+function firstMatch(c: ClientRecord, q: string): { where: string; snippet: string; tab: string } | null {
+  const fields: { where: string; tab: string; text: string }[] = [
+    ...(c.billing ?? []).map((b) => ({ where: `${b.kind}`, tab: "billing", text: `${b.kind} ${b.no} · ${flat(b.data)}` })),
+    ...(c.payments ?? []).map((p) => ({ where: "payment", tab: "billing", text: `payment ${p.amount} ${p.method ?? ""} ${p.note ?? ""}` })),
+    ...(c.changeOrders ?? []).map((o) => ({ where: "change", tab: "billing", text: `change ${o.desc}` })),
     ...((Object.keys(c.docs) as DocType[]).map((t) => ({
       where: DOC_LABELS[t],
-      text: `${c.docs[t]?.no ?? ""} ${JSON.stringify(c.docs[t]?.data ?? "")}`,
+      tab: t === "invoice" || t === "receipt" ? "billing" : "documents",
+      text: `${DOC_LABELS[t]} ${c.docs[t]?.no ?? ""} · ${flat(c.docs[t]?.data)}`,
     }))),
-    ...(c.designs ?? []).map((d) => ({ where: "design", text: d.title })),
-    ...(c.billing ?? []).map((b) => ({ where: `${b.kind}`, text: `${b.no} ${JSON.stringify(b.data ?? "")}` })),
+    ...(c.designs ?? []).map((d) => ({ where: "design", tab: "design", text: `design ${d.title}` })),
+    ...(c.tasks ?? []).map((t) => ({ where: "task", tab: "overview", text: `task ${t.text}` })),
+    { where: "notes", tab: "overview", text: c.notes ?? "" },
+    ...(c.comments ?? []).map((m) => ({ where: `comment by ${m.by}`, tab: "messages", text: m.text })),
+    ...(c.uploads ?? []).map((u) => ({ where: "file", tab: "messages", text: `file ${u.name} ${u.note ?? ""}` })),
+    { where: "brief", tab: "details", text: c.brief ?? "" },
   ];
   for (const f of fields) {
-    if (f.text.toLowerCase().includes(q)) return { where: f.where, snippet: snippet(f.text, q) };
+    if (f.text.toLowerCase().includes(q)) return { where: f.where, snippet: snippet(f.text, q), tab: f.tab };
   }
   return null;
 }
@@ -46,7 +66,7 @@ export async function GET(req: Request) {
   if (q.length < 2) return NextResponse.json({ results: [] });
 
   const index = await getIndex();
-  const results: { slug: string; company: string; where: string; snippet: string }[] = [];
+  const results: { slug: string; company: string; where: string; snippet: string; tab: string }[] = [];
   // One bounded batch at a time, in index order, stopping the moment the page
   // of results is full: a common term still costs a handful of reads, and a
   // rare one no longer serialises a round trip per client.
@@ -60,7 +80,7 @@ export async function GET(req: Request) {
       // the CONTENT match so the palette can show "why" this client came up.
       const m = firstMatch(c, q);
       const e = batch[n];
-      if (m && e) results.push({ slug: e.slug, company: e.company, where: m.where, snippet: m.snippet });
+      if (m && e) results.push({ slug: e.slug, company: e.company, ...m });
     }
   }
   return NextResponse.json({ results });
