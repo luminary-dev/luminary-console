@@ -3,6 +3,7 @@
 // renders through. "web" mode adds a floating PRINT/PDF toolbar; "pdf" mode
 // is what Chromium prints.
 import type { ClientRecord } from "../types";
+import { POLICY } from "../pricing";
 
 export const esc = (s: string) =>
   s
@@ -136,14 +137,9 @@ html[data-reveal] *{transition:none!important;}
 
 // Studio-standard commercial terms — rendered by the TEMPLATES (not the AI),
 // so no generated document can ever omit them.
-export const POLICY_ITEMS = [
-  "Payment is staged 30/70: 30% on design approval (development begins; this also covers the discovery and 3 prototype concepts delivered in the design stage), 70% on delivery before final handover.",
-  "Design delivers 3 prototype concepts; you pick 1, then we run up to 2 revision rounds on it. Refinements to the approved design during development are included.",
-  "New pages, features or changes requested after delivery are billable, quoted first as a written change order, and invoiced once the change is completed; approved change orders may adjust the timeline.",
-  "Aftercare: the first 5 change requests are free, then LKR 6,000 per change request. Additional requirements are quoted per item, or LKR 20,000 per working day.",
-  "A 30-day post-launch warranty covers defects at no charge (new features excluded); ongoing hosting and care is available as a monthly plan.",
-  "Intellectual property transfers to you on full payment. Once the SOW is signed the price is fixed unless you request additional pages or requirements.",
-];
+// The policy text lives in lib/pricing.ts (POLICY), so documents, prompts and
+// the portal state the same terms.
+export const POLICY_ITEMS = POLICY;
 
 export function policyBox(title = "How payment & changes work"): string {
   return `<div class="box">
@@ -226,7 +222,7 @@ ${toolbar}
   <div class="head">
     <div>
       <div class="brand">Luminary<span>.</span></div>
-      <div class="brand-sub">Full-Service Digital Studio</div>
+      <div class="brand-sub">Digital Studio · Sri Lanka</div>
     </div>
     <div>
       <div class="doc-title">${esc(opts.docTitle)}</div>

@@ -19,6 +19,7 @@ import DocHistory from "./DocHistory";
 import RelativeTime from "./RelativeTime";
 import { useConfirm } from "./ConfirmDialog";
 import { opsFetch } from "@/lib/ops-fetch";
+import { DAY_RATE, fmtLKR as fmtPrice } from "@/lib/pricing";
 
 export default function BillingCard({
   slug,
@@ -259,7 +260,7 @@ export default function BillingCard({
             rows={2}
             placeholder={
               otherFor === "invoice"
-                ? "What extra work is being billed, and for how much? e.g. “New careers page requested after launch, LKR 25,000”"
+                ? `What extra work is being billed, and for how much? e.g. “Booking integration requested after launch, 2 working days, ${fmtPrice(2 * DAY_RATE)}”`
                 : "Which payment was received? e.g. “Payment received in full for additional invoice LUM-INV-0044-03”"
             }
             value={otherText}

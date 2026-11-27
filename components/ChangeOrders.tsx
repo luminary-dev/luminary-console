@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ChangeOrder } from "@/lib/types";
+import { CHANGE_REQUEST_FEE, FREE_CHANGE_REQUESTS, fmtLKR } from "@/lib/pricing";
 import { opsFetch } from "@/lib/ops-fetch";
 import { useConfirm } from "./ConfirmDialog";
 
@@ -114,8 +115,8 @@ export default function ChangeOrders({
       </div>
       {dialog}
       <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 6 }}>
-        Leave the amount empty and the usual rule applies: the first 5 changes are free, then LKR
-        6,000 each. Type an amount for a bigger change you have already priced.
+        Leave the amount empty and the usual rule applies: the first {FREE_CHANGE_REQUESTS} changes are
+        free, then {fmtLKR(CHANGE_REQUEST_FEE)} each. Type an amount for a bigger change you have already priced.
       </p>
       {error && <div className="form-error" role="alert">{error}</div>}
       <button

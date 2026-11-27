@@ -380,7 +380,7 @@ export const SI_UI: UIStrings = {
   langNote:
     "ඔබේ ව්‍යාපෘතියට ආවේණික අමතර ප්‍රශ්න කිහිපයක් ඉංග්‍රීසියෙන් පවතී — ඒවාට සිංහලෙන් පිළිතුරු දුන්නත් කිසිම ගැටලුවක් නැහැ.",
 
-  tagline: "Full-Service Digital Studio",
+  tagline: "Digital Studio · Sri Lanka",
   docTitle: "ප්‍රශ්නාවලිය",
   pill: "ව්‍යාපෘති තොරතුරු රැස්කිරීම",
   preparedFor: "සකස් කර ඇත්තේ",
