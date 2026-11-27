@@ -1,6 +1,6 @@
 {
   "name": "luminary-console",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": true,
   "description": "Luminary studio console — AI-drafted client documents (estimate, questionnaire, quotation, proposal, contract, invoice, receipt) on per-client subdomains, end to end",
   "engines": {
