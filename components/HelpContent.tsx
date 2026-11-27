@@ -59,8 +59,10 @@ export default function HelpContent() {
           <div>
             <dt>Search</dt>
             <dd>
-              Finds any screen or client by name. Press Search in the menu, or the / key. Typing
-              what you are after works too: &quot;invoice&quot; or &quot;posts&quot;.
+              Finds any screen, client or document. It is the box at the top of the menu, or press
+              the / key. Type what you are after, like &quot;invoice&quot;, and it offers each
+              client&apos;s Money tab. Type a client&apos;s name as well as the word to go straight
+              to that client&apos;s tab. A document number opens the tab it is on.
             </dd>
           </div>
           <div>

@@ -18,12 +18,12 @@ import LinkPending from "./LinkPending";
 // are the plain words: "Money", not "Billing"; "Settings", not "Details".
 // `what` is the one sentence Help prints for the tab.
 export const CLIENT_TABS = [
-  { id: "overview", label: "Summary", what: "Where the project stands and what to do next, your tasks, your private notes and this client's history." },
-  { id: "documents", label: "Documents", what: "The links the client opens, their answers to the questions form, and every document: estimate, quotation, proposal and contract." },
-  { id: "design", label: "Design & website", what: "The design ideas the client picks from, the finished website, and the handover pack that closes the project." },
-  { id: "billing", label: "Money", what: "Invoices, receipts, payments received, what is still owed, and changes the client asked for after agreeing the price." },
-  { id: "messages", label: "Client messages", what: "Questions the client asked, files they sent, emails we sent them, and the assistant that can draft a reply." },
-  { id: "details", label: "Settings", what: "The original brief, and the button that deletes the client." },
+  { id: "overview", label: "Summary", keywords: "summary steps stage next tasks todo notes overview", what: "Where the project stands and what to do next, your tasks, your private notes and this client's history." },
+  { id: "documents", label: "Documents", keywords: "documents docs estimate quotation quote proposal contract sow questions form questionnaire answers links", what: "The links the client opens, their answers to the questions form, and every document: estimate, quotation, proposal and contract." },
+  { id: "design", label: "Design & website", keywords: "design designs mockup website site live domain publish handover", what: "The design ideas the client picks from, the finished website, and the handover pack that closes the project." },
+  { id: "billing", label: "Money", keywords: "money invoice invoices receipt receipts payment payments paid pay owed overdue balance billing change orders extras", what: "Invoices, receipts, payments received, what is still owed, and changes the client asked for after agreeing the price." },
+  { id: "messages", label: "Client messages", keywords: "messages comments questions files uploads emails email assistant reply", what: "Questions the client asked, files they sent, emails we sent them, and the assistant that can draft a reply." },
+  { id: "details", label: "Settings", keywords: "settings brief delete remove", what: "The original brief, and the button that deletes the client." },
 ] as const;
 
 export type ClientTab = (typeof CLIENT_TABS)[number]["id"];
@@ -63,7 +63,7 @@ export default function ClientTabs({
                 // The overview is the bare URL, so there is one address for it.
                 href={t.id === "overview" ? `/clients/${slug}` : `/clients/${slug}?tab=${t.id}`}
                 aria-current={t.id === current ? "page" : undefined}
-                // Tabs swap the cards below; the summary above stays put, so
+                // Tabs swap the cards below; the tabs themselves stay put, so
                 // jumping back to the top on every tab would lose your place.
                 scroll={false}
               >

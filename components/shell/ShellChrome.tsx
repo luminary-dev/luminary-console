@@ -126,6 +126,17 @@ export default function ShellChrome({
           </button>
         </div>
 
+        {/* Search is the first thing in the menu, drawn like a search box,
+            because "where is it" is usually answered fastest by typing. */}
+        <button type="button" className="side-search" aria-haspopup="dialog" aria-keyshortcuts="Meta+K Control+K /" onClick={search}>
+          <svg viewBox="0 0 24 24" {...stroke} aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
+          <span>Search</span>
+          <kbd aria-hidden="true">⌘K</kbd>
+        </button>
+
         <NavList
           {...(current !== undefined ? { current } : {})}
           historyCount={
@@ -140,10 +151,6 @@ export default function ShellChrome({
         />
 
         <div className="side-foot">
-          <button type="button" className="side-link side-search" aria-haspopup="dialog" aria-keyshortcuts="Meta+K Control+K /" onClick={search}>
-            <span>Search</span>
-            <kbd aria-hidden="true">⌘K</kbd>
-          </button>
           <Link
             className="side-link"
             href={HELP.href}

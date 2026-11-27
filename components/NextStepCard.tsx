@@ -1,10 +1,15 @@
-// The top of a client's page: where the project is, and what happens next.
+// Where a client's project is, and what happens next. Two sizes:
 //
-// It is on every tab, so whichever part of the record you are in, the answer
-// to "what now" is one glance up. The rules are lib/next-step.ts; this only
-// draws them: the path a project travels with the current stage marked, whose
-// turn it is, the next step in a sentence, and a button to the tab where that
-// step is done (left out when you are already on it).
+// - NextStepCard, the whole picture, opens the Summary tab: the path a project
+//   travels with the current stage marked, whose turn it is, the next step with
+//   why, the money and tasks, the stage control and how the stages move.
+// - NextStepBar is one line on every other tab: which step of how many, whose
+//   turn it is and the next step, with a button to where it is done.
+//
+// It used to be the whole card on every tab, which pushed each tab's own
+// content (and the tabs themselves) a screen down on a phone. The rules are
+// lib/next-step.ts; this only draws them. Neither offers a button to the tab
+// you are already on.
 import Link from "next/link";
 import type { ReactNode } from "react";
 import HowItWorks from "@/components/HowItWorks";
@@ -66,6 +71,27 @@ export default function NextStepCard({
           days, then Closed. Change the stage by hand only to correct it.
         </p>
       </HowItWorks>
+    </section>
+  );
+}
+
+/** The one-line version for every tab except Summary. */
+export function NextStepBar({ slug, step, currentTab }: { slug: string; step: NextStep; currentTab: string }) {
+  const at = STAGES.indexOf(step.stage);
+  const tab = step.tab ? CLIENT_TABS.find((t) => t.id === step.tab) : undefined;
+  return (
+    <section className="next-bar" aria-label="Where this project is">
+      <Link className="next-bar__stage" href={`/clients/${slug}`} scroll={false} title="See every step on Summary">
+        Step {at + 1} of {STAGES.length}: {STAGE_LABELS[step.stage]}
+      </Link>
+      <p className="next-bar__text">
+        <span className={`next-who is-${step.waitingOn}`}>{WAITING_LABEL[step.waitingOn]}:</span> {step.title}
+      </p>
+      {tab && tab.id !== currentTab && (
+        <Link className="btn ghost small" href={`/clients/${slug}?tab=${tab.id}`} scroll={false}>
+          Open {tab.label}
+        </Link>
+      )}
     </section>
   );
 }

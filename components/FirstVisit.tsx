@@ -49,7 +49,7 @@ export default function FirstVisit() {
         ))}
       </dl>
       <p className="empty-note">
-        This page, Today, lists what is waiting on you. Search finds any screen or client by name.
+        This page, Today, lists what is waiting on you. Search, at the top of the menu, finds any screen, client or document.
       </p>
       <div className="welcome-actions">
         <Link className="btn small" href={HELP.href} onClick={dismiss}>

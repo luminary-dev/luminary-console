@@ -23,6 +23,8 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useOverlayBehaviour } from "./useOverlayBehaviour";
+import { CLIENT_TABS } from "./ClientTabs";
+import { sentenceCase } from "@/lib/sentence-case";
 
 export type PaletteItem = { slug: string; company: string; docNoBase: string };
 
@@ -38,7 +40,9 @@ export type PaletteDestination = {
   top?: boolean;
 };
 
-type ContentHit = { slug: string; company: string; where: string; snippet: string };
+/** `tab` is the client tab the match lives on, so picking it opens that tab
+ *  rather than the client's first one. */
+type ContentHit = { slug: string; company: string; where: string; snippet: string; tab?: string };
 
 /** Content results carry the query they were issued for, so a response that
  *  resolves after the query moved on can never be rendered (LC-022). The
@@ -48,13 +52,28 @@ type ContentState = { q: string; hits: ContentHit[] };
 type Option =
   | { kind: "page"; href: string; label: string; group: string }
   | { kind: "name"; slug: string; company: string; docNoBase: string }
-  | { kind: "content"; slug: string; company: string; where: string; snippet: string };
+  | { kind: "tab"; slug: string; company: string; tab: string; tabLabel: string }
+  | { kind: "content"; slug: string; company: string; where: string; snippet: string; tab?: string };
 
 const HEADING: Record<Option["kind"], string> = {
+  tab: "Straight to",
   page: "Go to",
   name: "Clients",
   content: "In documents and notes",
 };
+
+/** The words of a query. Every word has to match for a screen to match, so
+ *  "message shops" finds Message shops and not every screen with "shops". */
+function wordsOf(q: string): string[] {
+  return q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+}
+
+/** A client's own address for one tab. The summary is the bare address. */
+function clientHref(slug: string, tab?: string): string {
+  return !tab || tab === "overview" ? `/clients/${slug}` : `/clients/${slug}?tab=${tab}`;
+}
+
+const TAB_TEXT = CLIENT_TABS.map((t) => ({ id: t.id, label: t.label, text: `${t.label} ${t.keywords}`.toLowerCase() }));
 
 /** How anything on the page asks the Search dialog to open. The dialog is
  *  mounted once per page (components/QuickFind.tsx) and the buttons that open
@@ -170,17 +189,47 @@ export default function CommandPalette({
   }, [open, loadItems]);
 
   const pages = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    if (!needle) return destinations.filter((d) => d.top);
+    const words = wordsOf(q);
+    if (words.length === 0) return destinations.filter((d) => d.top);
     return destinations
-      .filter((d) => `${d.label} ${d.group ?? ""} ${d.keywords ?? ""}`.toLowerCase().includes(needle))
+      .filter((d) => {
+        const text = `${d.label} ${d.group ?? ""} ${d.keywords ?? ""}`.toLowerCase();
+        return words.every((w) => text.includes(w));
+      })
       .slice(0, 8);
   }, [destinations, q]);
 
+  // One client's tab, straight away. "harbour money" is a client word and a
+  // tab word: it offers that client's Money tab. A tab word alone ("invoice",
+  // "designs") offers that tab for the first few clients, so the answer to
+  // "where are invoices" is a click, not a lesson in where the tabs are.
+  const tabs = useMemo(() => {
+    const words = wordsOf(q);
+    if (words.length === 0 || items.length === 0) return [];
+    const out: { slug: string; company: string; tab: string; tabLabel: string }[] = [];
+    for (const c of items) {
+      const name = `${c.company} ${c.docNoBase}`.toLowerCase();
+      const own = words.filter((w) => name.includes(w));
+      const rest = words.filter((w) => !name.includes(w));
+      if (rest.length === 0) continue;
+      if (own.length === 0 && (words.join("").length < 3 || out.length >= 5)) continue;
+      for (const t of TAB_TEXT) {
+        if (rest.every((w) => t.text.includes(w))) out.push({ slug: c.slug, company: c.company, tab: t.id, tabLabel: t.label });
+      }
+    }
+    // A client named in the query comes before the general offer.
+    const named = (o: { company: string }) => wordsOf(q).some((w) => o.company.toLowerCase().includes(w));
+    return out.sort((a, b) => Number(named(b)) - Number(named(a))).slice(0, 6);
+  }, [items, q]);
+
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
+    const words = wordsOf(needle);
     const list = needle
-      ? items.filter((i) => i.company.toLowerCase().includes(needle) || i.docNoBase.toLowerCase().includes(needle))
+      ? items.filter((i) => {
+          const name = `${i.company} ${i.docNoBase}`.toLowerCase();
+          return words.every((w) => name.includes(w));
+        })
       : items;
     return list.slice(0, 8);
   }, [items, q]);
@@ -209,8 +258,11 @@ export default function CommandPalette({
   const contentHits = useMemo(() => {
     if (!content || content.q !== q.trim()) return [];
     const nameHits = new Set(results.map((r) => r.slug));
-    return content.hits.filter((h) => !nameHits.has(h.slug)).slice(0, 6);
-  }, [content, q, results]);
+    const tabHits = new Set(tabs.map((t) => `${t.slug}:${t.tab}`));
+    return content.hits
+      .filter((h) => !nameHits.has(h.slug) && !tabHits.has(`${h.slug}:${h.tab ?? "overview"}`))
+      .slice(0, 6);
+  }, [content, q, results, tabs]);
 
   // One flat option list so ArrowDown walks from one group straight into the
   // next. Before anything is typed the screens lead, because "where is X" is
@@ -219,9 +271,12 @@ export default function CommandPalette({
   const options = useMemo<Option[]>(() => {
     const pageOptions = pages.map((d): Option => ({ kind: "page", href: d.href, label: d.label, group: d.group ?? "" }));
     const nameOptions = results.map((r): Option => ({ kind: "name", slug: r.slug, company: r.company, docNoBase: r.docNoBase }));
-    const contentOptions = contentHits.map((h): Option => ({ kind: "content", slug: h.slug, company: h.company, where: h.where, snippet: h.snippet }));
-    return q.trim() ? [...nameOptions, ...pageOptions, ...contentOptions] : [...pageOptions, ...nameOptions, ...contentOptions];
-  }, [pages, results, contentHits, q]);
+    const tabOptions = tabs.map((t): Option => ({ kind: "tab", ...t }));
+    const contentOptions = contentHits.map((h): Option => ({ kind: "content", slug: h.slug, company: h.company, where: h.where, snippet: h.snippet, ...(h.tab ? { tab: h.tab } : {}) }));
+    return q.trim()
+      ? [...tabOptions, ...nameOptions, ...pageOptions, ...contentOptions]
+      : [...pageOptions, ...nameOptions, ...contentOptions];
+  }, [pages, results, tabs, contentHits, q]);
 
   // The list can shrink under the cursor while a search resolves.
   const activeIndex = options.length === 0 ? -1 : Math.min(active, options.length - 1);
@@ -254,7 +309,9 @@ export default function CommandPalette({
 
   const pick = (o: Option) => {
     setOpen(false);
-    router.push(o.kind === "page" ? o.href : `/clients/${o.slug}`);
+    router.push(
+      o.kind === "page" ? o.href : o.kind === "name" ? clientHref(o.slug) : clientHref(o.slug, o.tab),
+    );
   };
 
   const onInputKey = (e: ReactKeyboardEvent<HTMLInputElement>) => {
@@ -320,7 +377,7 @@ export default function CommandPalette({
           aria-activedescendant={activeIndex >= 0 ? optionId(activeIndex) : undefined}
           autoComplete="off"
           value={q}
-          placeholder={labelled ? "Jump to a screen or a client…" : "Jump to a client…"}
+          placeholder={labelled ? "Screens, clients, invoices, notes" : "Jump to a client…"}
           onChange={(e) => { setQ(e.target.value); setActive(0); }}
           onKeyDown={onInputKey}
           style={{ width: "100%", border: "none", borderBottom: "1px solid var(--border)", padding: "16px 20px", fontSize: 15, background: "transparent", color: "var(--text)", outline: "none" }}
@@ -338,7 +395,7 @@ export default function CommandPalette({
                 // listbox's child. tabIndex -1 keeps every option out of the
                 // tab order: selection is driven by aria-activedescendant
                 // from the input, which never loses focus.
-                <li key={o.kind === "page" ? `page-${o.href}` : `${o.kind}-${o.slug}`} role="presentation">
+                <li key={o.kind === "page" ? `page-${o.href}` : o.kind === "tab" ? `tab-${o.slug}-${o.tab}` : `${o.kind}-${o.slug}`} role="presentation">
                   {startsGroup(i) && (
                     <div style={{ padding: "8px 20px 4px", fontSize: 11, color: "var(--label)", borderTop: i ? "1px solid var(--border)" : "none" }}>
                       {HEADING[o.kind]}
@@ -364,6 +421,10 @@ export default function CommandPalette({
                         <span style={{ fontWeight: 500 }}>{o.label}</span>
                         <span style={{ fontSize: 11, color: "var(--muted)" }}>{o.group}</span>
                       </span>
+                    ) : o.kind === "tab" ? (
+                      <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                        <span style={{ fontWeight: 500 }}>{o.company} <span style={{ color: "var(--muted)" }}>›</span> {o.tabLabel}</span>
+                      </span>
                     ) : o.kind === "name" ? (
                       <span style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
                         <span style={{ fontWeight: 500 }}>{o.company}</span>
@@ -373,7 +434,7 @@ export default function CommandPalette({
                       <>
                         <span style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                           <span style={{ fontWeight: 500 }}>{o.company}</span>
-                          <span style={{ fontSize: 11, color: "var(--muted)" }}>{o.where}</span>
+                          <span style={{ fontSize: 11, color: "var(--muted)" }}>{sentenceCase(o.where)}</span>
                         </span>
                         <span style={{ display: "block", fontSize: 12, color: "var(--muted)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{o.snippet}</span>
                       </>
