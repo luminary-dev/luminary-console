@@ -30,6 +30,10 @@ export const OFFER = {
   hostingYearly: 3_500,
   /** About what a .lk address costs a year, paid to the registry in the shop's name. */
   lkAddress: 6_000,
+  /** Order by this date and the shop is live before the Christmas orders. */
+  christmasBy: "15 December",
+  /** Paid to whoever introduces a shop, once that shop is live and paid in full. */
+  referral: 2_500,
   /** A finished shop shown as proof in first messages. */
   sample: "https://dev.luvana.lk",
   offerUrl: "https://shopfront.luminary-dev.xyz/",
@@ -476,6 +480,18 @@ export const SCRIPTS: Script[] = [
     text: "Great! Here is how it goes:\n\n1. Advance of {half} to: [bank, account name, account number, branch]. Please send the slip here.\n2. Send me your item photos, names and prices, your logo, and the WhatsApp number orders should go to.\n3. Tell me the address you would like (for example yourshop.lk) and I will check it is free.\n\nYour shop will be live within {days} days of getting your photos. The balance of {half} is due once you have checked everything and it is live.",
   },
   {
+    id: "christmas",
+    title: "December follow-up: live before Christmas",
+    why: "A real date gives a reason to decide now. Send it to shops that said maybe or went quiet.",
+    text: "Hi! A quick one before the Christmas rush: if you would like your shop live in time for the Christmas orders, order by {christmas}. It is live within {days} days of getting your photos.\n\nThe launch price of {price} also ends on {deadline}; after that it is {regular}. Your preview is still free either way.",
+  },
+  {
+    id: "referral",
+    title: "Ask anyone for an introduction (with the reward)",
+    why: "Ask every shop you talk to, even the ones who say no. Sellers know other sellers.",
+    text: "Thanks for your time! One more thing: if you know another seller who would like a website like this, introduce us and ask them to mention your name. When their shop goes live and is paid, we send you {referral}. There is no limit on how many.",
+  },
+  {
     id: "warm",
     title: "To people you already know",
     why: "You are asking for introductions, not for a sale.",
@@ -497,4 +513,6 @@ export const scriptText = (script: Script): string =>
     care: lkr(OFFER.care),
     perUpdate: lkr(OFFER.perUpdate),
     hosting: lkr(OFFER.hostingYearly),
+    christmas: OFFER.christmasBy,
+    referral: lkr(OFFER.referral),
   });

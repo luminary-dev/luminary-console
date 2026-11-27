@@ -326,5 +326,9 @@ describe("scripts", () => {
     for (const s of SCRIPTS) expect(scriptText(s)).not.toMatch(/\{\w+\}/);
     const price = SCRIPTS.find((s) => s.id === "price");
     expect(price && scriptText(price)).toContain("It is LKR 17,500, paid once: LKR 8,750 to start");
+    const christmas = SCRIPTS.find((s) => s.id === "christmas");
+    expect(christmas && scriptText(christmas)).toContain("order by 15 December");
+    const referral = SCRIPTS.find((s) => s.id === "referral");
+    expect(referral && scriptText(referral)).toContain("we send you LKR 2,500");
   });
 });
