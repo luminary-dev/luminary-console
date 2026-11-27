@@ -101,10 +101,48 @@
 .kit-posted .check-row { font-size: 13px; }
 .kit-posted small { color: var(--muted); }
 
+/* Next up (full cards), then every post by week as compact rows that open */
+.kit-sub { font-size: 13px; font-weight: 600; color: var(--label); margin: 16px 0 0; }
+.kit-weeks { display: grid; gap: 8px; margin-top: 16px; }
+.kit-week { border: 1px solid var(--border); border-radius: 12px; background: var(--bg); }
+.kit-week > summary {
+  display: flex; align-items: baseline; gap: 12px; padding: 12px 16px; cursor: pointer; list-style: none;
+}
+.kit-week > summary::-webkit-details-marker { display: none; }
+.kit-week > summary::after {
+  content: ""; margin-left: auto; align-self: center; width: 8px; height: 8px;
+  border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: rotate(45deg);
+}
+.kit-week[open] > summary::after { transform: rotate(-135deg); }
+.kit-week-name { font-size: 14px; font-weight: 600; }
+.kit-rows { list-style: none; margin: 0; padding: 0 8px 8px; display: grid; gap: 4px; }
+.kit-row-head {
+  width: 100%; display: grid; grid-template-columns: 48px auto minmax(0, 1fr) auto auto; align-items: center; gap: 12px;
+  padding: 8px; border: 0; border-radius: 10px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.kit-row-head:hover, .kit-row.is-open .kit-row-head { background: var(--off); }
+.kit-row-head img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+.kit-row-title { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kit-row-marks { display: flex; gap: 4px; }
+.kit-mark {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px;
+}
+.kit-mark.is-on { color: var(--a-text); border-color: var(--a-border); background: var(--a-dim); }
+.kit-row.is-open .kit-post { margin: 4px 0 8px; }
+
 @media (max-width: 900px) {
   .sales-tally { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
   .sales-fields { grid-template-columns: 1fr; }
   .kit-post { grid-template-columns: 1fr; }
+  /* phones: picture, then the title over its day and ticks */
+  .kit-row-head { grid-template-columns: 48px minmax(0, 1fr) auto; grid-template-areas: "pic title no" "pic meta meta"; row-gap: 4px; }
+  .kit-row-head img { grid-area: pic; }
+  .kit-row-head .kit-no { grid-area: no; }
+  .kit-row-title { grid-area: title; }
+  .kit-row-head .kit-day { grid-area: meta; }
+  .kit-row-marks { grid-area: meta; justify-self: end; }
+  .kit-week > summary { flex-wrap: wrap; }
 }

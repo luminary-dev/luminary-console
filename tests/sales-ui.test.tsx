@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // The sales section in the browser: the queue card, a tap that a teammate got
 // to first, the shop list's filters, the import control and the kit's ticks.
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ImportShops from "@/components/sales/ImportShops";
@@ -209,6 +209,9 @@ describe("KitBoard", () => {
     const img = screen.getByAltText("Two designers waving.") as HTMLImageElement;
     expect(img.getAttribute("src")).toBe("/api/sales/kit/file?path=buildup%2Fb1-hello.jpg");
     expect(screen.getByRole("link", { name: "Download picture" }).getAttribute("href")).toBe("/api/sales/kit/file?path=buildup%2Fb1-hello.jpg&dl=1");
+    // post 4 is a later day: a compact row in its week, opened to reach its pictures
+    expect(screen.queryByRole("link", { name: "Picture 2" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /How it works/ }));
     expect(screen.getByRole("link", { name: "Picture 2" }).getAttribute("download")).toBe("04-2.jpg");
     expect(screen.getByText("0 of 2 on Instagram · 0 on Facebook")).toBeTruthy();
     expect(screen.getByRole("link", { name: "B1, Hello" }).getAttribute("href")).toBe("#post-b1");
@@ -227,7 +230,29 @@ describe("KitBoard", () => {
     await waitFor(() => expect(screen.getByText("1 of 2 on Instagram · 1 on Facebook")).toBeTruthy());
     expect(screen.queryByAltText("Two designers waving.")).toBeNull();
     await user.click(screen.getByRole("button", { name: "All 2" }));
+    await user.click(screen.getByRole("button", { name: /Hello/ }));
     expect(screen.getByAltText("Two designers waving.")).toBeTruthy();
+  });
+
+  it("shows the next day in full and every post by week, with a posted filter", async () => {
+    const user = userEvent.setup();
+    const kit: Kit = {
+      ...KIT,
+      posts: [
+        ...KIT.posts,
+        { id: "20", label: "20", title: "Second week post", day: 9, files: ["posts/20.jpg"], caption: "Later.", alt: "A later post." },
+      ],
+    };
+    render(<KitBoard kit={kit} initialPosted={{ b1: { instagram: { at: "2026-11-23T06:00:00Z", by: ME }, facebook: { at: "2026-11-23T06:00:00Z", by: ME } } }} kitUrl="https://kit.example.test/" />);
+    // b1 is up on both, so the next day is day 5
+    expect(screen.getByRole("heading", { name: "Next up, day 5" })).toBeTruthy();
+    const weeks = Array.from(document.querySelectorAll("details.kit-week"));
+    expect(weeks.map((w) => w.querySelector("summary .kit-week-name")?.textContent)).toEqual(["Week 1", "Week 2"]);
+    expect((weeks[0] as HTMLDetailsElement).open).toBe(true);
+    expect((weeks[1] as HTMLDetailsElement).open).toBe(false);
+    await user.click(screen.getByRole("button", { name: "Posted 1" }));
+    expect(screen.getByRole("button", { name: /Hello/ })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Second week post/ })).toBeNull();
   });
 
   it("puts the tick back and says why when it does not save", async () => {
